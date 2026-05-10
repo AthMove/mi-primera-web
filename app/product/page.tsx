@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import BuyButton from "./BuyButton";
+import BuyButton from "./[slug]/BuyButton";
 
 export default async function ProductPage({
   params,
