@@ -1,6 +1,9 @@
 import { supabase } from "@/lib/supabase";
 import BuyButton from "./BuyButton";
 
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
+
 export default async function ProductPage({
   params,
 }: {
