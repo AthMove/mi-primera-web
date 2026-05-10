@@ -1,196 +1,134 @@
-"use client";
-
-import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import BuyButton from "./BuyButton";
 
-export default function AuthPage() {
-  const [mode, setMode] = useState<"login" | "register">("register");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+export default async function ProductPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  const { data: product } = await supabase
+    .from("products")
+    .select("*")
+    .eq("id", slug)
+    .single();
 
-    if (!email || !password) {
-      alert("Introduce email y contraseña");
-      return;
-    }
-
-    if (password.length < 6) {
-      alert("La contraseña debe tener mínimo 6 caracteres");
-      return;
-    }
-
-    try {
-      if (mode === "register") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-        });
-
-        if (error) {
-          alert(error.message);
-          return;
-        }
-
-        alert("Cuenta creada. Revisa tu email.");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (error) {
-          alert(error.message);
-          return;
-        }
-
-        alert("Login correcto");
-      }
-    } catch (err) {
-      alert("Error conectando con Supabase");
-      console.error(err);
-    }
+  if (!product) {
+    return <div>Producto no encontrado</div>;
   }
 
   return (
-    <main
+    <div
       style={{
         minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
         background: "#f5f5f5",
-        padding: "20px",
+        padding: "60px",
+        fontFamily: "Arial",
       }}
     >
       <div
         style={{
-          width: "100%",
-          maxWidth: "420px",
-          background: "#ffffff",
-          borderRadius: "24px",
-          padding: "40px",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
+          maxWidth: "1400px",
+          margin: "0 auto",
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "60px",
+          alignItems: "start",
         }}
       >
         <div
           style={{
-            display: "flex",
-            gap: "10px",
-            marginBottom: "30px",
+            background: "white",
+            borderRadius: "40px",
+            padding: "40px",
           }}
         >
-          <button
-            onClick={() => setMode("login")}
+          <img
+            src={product.image}
+            alt={product.title}
             style={{
-              flex: 1,
-              padding: "12px",
-              borderRadius: "999px",
-              border: "none",
-              cursor: "pointer",
-              background:
-                mode === "login" ? "#111111" : "#eeeeee",
-              color:
-                mode === "login" ? "#ffffff" : "#111111",
-              fontWeight: 700,
+              width: "100%",
+              borderRadius: "20px",
+              objectFit: "cover",
             }}
-          >
-            SIGN IN
-          </button>
-
-          <button
-            onClick={() => setMode("register")}
-            style={{
-              flex: 1,
-              padding: "12px",
-              borderRadius: "999px",
-              border: "none",
-              cursor: "pointer",
-              background:
-                mode === "register" ? "#111111" : "#eeeeee",
-              color:
-                mode === "register" ? "#ffffff" : "#111111",
-              fontWeight: 700,
-            }}
-          >
-            REGISTER
-          </button>
+          />
         </div>
 
-        <h1
-          style={{
-            fontSize: "42px",
-            marginBottom: "10px",
-            fontWeight: 700,
-          }}
-        >
-          {mode === "register" ? "Register" : "Sign In"}
-        </h1>
-
-        <p
-          style={{
-            color: "#666666",
-            marginBottom: "30px",
-          }}
-        >
-          Welcome to ATHMOV
-        </p>
-
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "16px",
-          }}
-        >
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+        <div>
+          <p
             style={{
-              padding: "14px",
-              borderRadius: "14px",
-              border: "1px solid #dddddd",
-              fontSize: "16px",
-            }}
-          />
-
-          <input
-            type="password"
-            placeholder="Password mínimo 6 caracteres"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={{
-              padding: "14px",
-              borderRadius: "14px",
-              border: "1px solid #dddddd",
-              fontSize: "16px",
-            }}
-          />
-
-          <button
-            type="submit"
-            style={{
-              marginTop: "10px",
-              background: "#111111",
-              color: "#ffffff",
-              border: "none",
-              borderRadius: "999px",
-              padding: "15px",
-              fontSize: "16px",
-              fontWeight: 700,
-              cursor: "pointer",
+              letterSpacing: "4px",
+              color: "#777",
+              fontSize: "12px",
             }}
           >
-            {mode === "register"
-              ? "Create account"
-              : "Sign In"}
-          </button>
-        </form>
+            {product.brand}
+          </p>
+
+          <h1
+            style={{
+              fontSize: "72px",
+              margin: "20px 0",
+              fontWeight: "900",
+            }}
+          >
+            {product.title}
+          </h1>
+
+          <p
+            style={{
+              fontSize: "56px",
+              fontWeight: "700",
+              marginBottom: "40px",
+            }}
+          >
+            {product.price} €
+          </p>
+
+          <p
+            style={{
+              fontSize: "28px",
+              marginBottom: "40px",
+            }}
+          >
+            {product.description}
+          </p>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "20px",
+              marginBottom: "40px",
+            }}
+          >
+            <div
+              style={{
+                background: "white",
+                padding: "30px",
+                borderRadius: "24px",
+              }}
+            >
+              <p style={{ color: "#888", fontSize: "12px" }}>SPORT</p>
+              <h3>{product.sport}</h3>
+            </div>
+
+            <div
+              style={{
+                background: "white",
+                padding: "30px",
+                borderRadius: "24px",
+              }}
+            >
+              <p style={{ color: "#888", fontSize: "12px" }}>CONDITION</p>
+              <h3>{product.condition}</h3>
+            </div>
+          </div>
+
+          <BuyButton product={product} />
+        </div>
       </div>
-    </main>
+    </div>
   );
 }
