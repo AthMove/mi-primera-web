@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import BuyButton from "./[slug]/BuyButton";
-export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function ProductPage({
   params,
