@@ -129,12 +129,48 @@ export default function ProductPage() {
             </Link>
           )}
 
-          <a
-            href={`/api/checkout?productId=${product.id}`}
-            style={buttonStyle}
-          >
-            Comprar ahora
-          </a>
+          <div style={buttonsWrapperStyle}>
+  <button
+    onClick={() => {
+      const existingCart = localStorage.getItem("athmov_cart");
+
+      const cart = existingCart
+        ? JSON.parse(existingCart)
+        : [];
+
+      const alreadyExists = cart.find(
+        (item: any) => item.id === product.id
+      );
+
+      if (!alreadyExists) {
+        cart.push({
+          id: product.id,
+          title: product.title,
+          brand: product.brand,
+          price: product.price,
+          image: product.image,
+        });
+
+        localStorage.setItem(
+          "athmov_cart",
+          JSON.stringify(cart)
+        );
+      }
+
+      alert("Producto añadido al carrito");
+    }}
+    style={secondaryButtonStyle}
+  >
+    Añadir al carrito
+  </button>
+
+  <a
+    href={`/api/checkout?productId=${product.id}`}
+    style={buttonStyle}
+  >
+    Comprar ahora
+  </a>
+</div>
         </section>
       </div>
     </main>
@@ -290,6 +326,23 @@ const buttonStyle = {
   textDecoration: "none",
   background: "#111",
   color: "#fff",
+  borderRadius: "999px",
+  padding: "18px",
+  fontSize: "15px",
+  fontWeight: 700,
+  cursor: "pointer",
+};
+const buttonsWrapperStyle = {
+  display: "flex",
+  flexDirection: "column" as const,
+  gap: "12px",
+};
+
+const secondaryButtonStyle = {
+  width: "100%",
+  background: "#fff",
+  color: "#111",
+  border: "1px solid #ddd",
   borderRadius: "999px",
   padding: "18px",
   fontSize: "15px",

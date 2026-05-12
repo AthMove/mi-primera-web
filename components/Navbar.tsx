@@ -1,8 +1,32 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function Navbar() {
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    const updateCartCount = () => {
+      const cart = localStorage.getItem("athmov_cart");
+
+      if (cart) {
+        const parsedCart = JSON.parse(cart);
+        setCartCount(parsedCart.length);
+      } else {
+        setCartCount(0);
+      }
+    };
+
+    updateCartCount();
+
+    window.addEventListener("storage", updateCartCount);
+
+    return () => {
+      window.removeEventListener("storage", updateCartCount);
+    };
+  }, []);
+
   return (
     <nav
       style={{
@@ -59,6 +83,17 @@ export default function Navbar() {
           }}
         >
           Vender
+        </Link>
+
+        <Link
+          href="/cart"
+          style={{
+            textDecoration: "none",
+            color: "#111",
+            fontWeight: 700,
+          }}
+        >
+          Carrito ({cartCount})
         </Link>
 
         <button
