@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import FavoriteButton from "@/app/components/FavoriteButton";
 
 type Product = {
   id: string;
@@ -113,6 +114,7 @@ export default function ProductPage() {
           <p style={brandStyle}>{product.brand}</p>
           <h1 style={titleStyle}>{product.title}</h1>
           <p style={priceStyle}>€{product.price}</p>
+          <FavoriteButton productId={product.id} />
           <span style={conditionStyle}>{product.condition}</span>
           <p style={descriptionStyle}>{product.description}</p>
 
