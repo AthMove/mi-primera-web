@@ -4,176 +4,207 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 export default function SellPage() {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
-  const [category, setCategory] = useState("");
-  const [brand, setBrand] = useState("");
-  const [condition, setCondition] = useState("Como nuevo");
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(e: any) {
+  const [title, setTitle] = useState("");
+  const [brand, setBrand] = useState("");
+  const [price, setPrice] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("PADEL");
+  const [condition, setCondition] = useState("Usada");
+
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
+
+  const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []).slice(0, 5);
+
+    setImageFiles(files);
+    setPreviews(files.map((file) => URL.createObjectURL(file)));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!imageFile) {
-      alert("Selecciona una imagen");
-      return;
-    }
+    try {
+      setLoading(true);
 
-    const fileName = `${Date.now()}-${imageFile.name}`;
+      const imageUrls: string[] = [];
 
-    const { error: uploadError } = await supabase.storage
-      .from("product-images")
-      .upload(fileName, imageFile);
+      for (const file of imageFiles) {
+        const fileExt = file.type.split("/")[1] || "jpg";
+        const fileName = `${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
 
-    if (uploadError) {
-      alert("Error subiendo imagen");
-      return;
-    }
+        const { error: uploadError } = await supabase.storage
+          .from("products")
+          .upload(fileName, file, {
+            cacheControl: "3600",
+            upsert: false,
+            contentType: file.type,
+          });
 
-    const { data: imageData } = supabase.storage
-      .from("product-images")
-      .getPublicUrl(fileName);
+        if (uploadError) {
+          alert(`Error subiendo imagen: ${uploadError.message}`);
+          return;
+        }
 
-    const imageUrl = imageData.publicUrl;
+        const { data } = supabase.storage
+          .from("products")
+          .getPublicUrl(fileName);
 
-    const { error } = await supabase.from("products").insert([
-      {
-        title,
-        description,
-        price,
-        image: imageUrl,
-        category,
-        brand,
-        condition,
-      },
-    ]);
+        imageUrls.push(data.publicUrl);
+      }
 
-    if (error) {
-      alert(error.message);
-    } else {
-      alert("Producto publicado 🚀");
+      const { error } = await supabase.from("products").insert([
+        {
+          title,
+          brand,
+          price: Number(price),
+          description,
+          category,
+          condition,
+          image: imageUrls[0] || "",
+          images: imageUrls,
+        },
+      ]);
+
+      if (error) {
+        alert(`Error guardando producto: ${error.message}`);
+        return;
+      }
+
+      alert("Producto publicado correctamente");
 
       setTitle("");
-      setDescription("");
-      setPrice("");
-      setCategory("");
       setBrand("");
-      setCondition("Como nuevo");
-      setImageFile(null);
+      setPrice("");
+      setDescription("");
+      setCategory("PADEL");
+      setCondition("Usada");
+      setImageFiles([]);
+      setPreviews([]);
+    } catch (error: any) {
+      alert(error.message || "Error");
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        background: "#fff",
-        padding: "40px",
-        fontFamily: "Arial",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: "700px",
-          margin: "0 auto",
-        }}
-      >
-        <h1
-          style={{
-            fontSize: "52px",
-            fontWeight: 800,
-            marginBottom: "40px",
-          }}
-        >
-          Subir producto
-        </h1>
+    <main style={pageStyle}>
+      <div style={cardStyle}>
+        <h1 style={titleStyle}>Vender producto</h1>
 
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "20px",
-          }}
-        >
-          <input
-            placeholder="Título"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-            style={inputStyle}
-          />
+        <p style={subtitleStyle}>
+          Publica tu equipamiento premium en ATHMOV.
+        </p>
 
-          <textarea
-            placeholder="Descripción"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-            style={{
-              ...inputStyle,
-              minHeight: "140px",
-            }}
-          />
+        <form onSubmit={handleSubmit} style={formStyle}>
+          <div>
+            <label>Marca</label>
+            <input
+              value={brand}
+              onChange={(e) => setBrand(e.target.value)}
+              placeholder="Ej: Bullpadel"
+              required
+              style={inputStyle}
+            />
+          </div>
 
-          <input
-            type="number"
-            placeholder="Precio"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            required
-            style={inputStyle}
-          />
+          <div>
+            <label>Modelo</label>
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Ej: Vertex 03 2024"
+              required
+              style={inputStyle}
+            />
+          </div>
 
-          <input
-            placeholder="Deporte"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            required
-            style={inputStyle}
-          />
+          <div>
+            <label>Precio</label>
+            <input
+              type="number"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              placeholder="Ej: 185"
+              required
+              style={inputStyle}
+            />
+          </div>
 
-          <input
-            placeholder="Marca"
-            value={brand}
-            onChange={(e) => setBrand(e.target.value)}
-            required
-            style={inputStyle}
-          />
+          <div>
+            <label>Categoría</label>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              style={inputStyle}
+            >
+              <option>PADEL</option>
+              <option>TENNIS</option>
+              <option>GOLF</option>
+              <option>RUNNING</option>
+              <option>ROPA</option>
+            </select>
+          </div>
 
-          <select
-            value={condition}
-            onChange={(e) => setCondition(e.target.value)}
-            style={inputStyle}
-          >
-            <option>Como nuevo</option>
-            <option>Excelente estado</option>
-            <option>Buen estado</option>
-            <option>Usado</option>
-          </select>
+          <div>
+            <label>Estado</label>
+            <select
+              value={condition}
+              onChange={(e) => setCondition(e.target.value)}
+              style={inputStyle}
+            >
+              <option>Usada</option>
+              <option>Como nueva</option>
+              <option>Nueva</option>
+            </select>
+          </div>
 
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e: any) => setImageFile(e.target.files[0])}
-            required
-          />
+          <div>
+            <label>Descripción</label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Describe el estado del producto..."
+              required
+              style={textareaStyle}
+            />
+          </div>
 
-          <button
-            type="submit"
-            style={{
-              background: "#000",
-              color: "#fff",
-              border: "none",
-              padding: "22px",
-              borderRadius: "999px",
-              fontSize: "18px",
-              fontWeight: 700,
-              cursor: "pointer",
-              marginTop: "20px",
-            }}
-          >
-            Publicar producto
+          <div>
+            <label>Fotos del producto</label>
+
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleImagesChange}
+              style={fileInputStyle}
+            />
+
+            <p style={helpTextStyle}>
+              Puedes subir hasta 5 fotos. La primera será la imagen principal.
+            </p>
+
+            {previews.length > 0 && (
+              <div style={previewGridStyle}>
+                {previews.map((preview, index) => (
+                  <div key={index} style={previewBoxStyle}>
+                    <img
+                      src={preview}
+                      alt={`Preview ${index + 1}`}
+                      style={previewImageStyle}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <button type="submit" disabled={loading} style={buttonStyle}>
+            {loading ? "PUBLICANDO..." : "Publicar producto"}
           </button>
         </form>
       </div>
@@ -181,10 +212,98 @@ export default function SellPage() {
   );
 }
 
+const fontFamily =
+  "'Manrope', 'Satoshi', 'Avenir Next', system-ui, sans-serif";
+
+const pageStyle = {
+  minHeight: "100vh",
+  background: "#f6f6f3",
+  padding: "60px 20px",
+  fontFamily,
+};
+
+const cardStyle = {
+  maxWidth: "620px",
+  margin: "0 auto",
+  background: "#fff",
+  padding: "36px",
+  borderRadius: "30px",
+  boxShadow: "0 8px 28px rgba(0,0,0,0.045)",
+};
+
+const titleStyle = {
+  fontSize: "40px",
+  marginBottom: "10px",
+  fontWeight: 650,
+  letterSpacing: "-1.4px",
+};
+
+const subtitleStyle = {
+  color: "#666",
+  marginBottom: "34px",
+  fontSize: "15px",
+};
+
+const formStyle = {
+  display: "flex",
+  flexDirection: "column" as const,
+  gap: "18px",
+};
+
 const inputStyle = {
   width: "100%",
-  padding: "20px",
-  borderRadius: "18px",
+  padding: "16px",
+  borderRadius: "14px",
   border: "1px solid #ddd",
-  fontSize: "16px",
+  marginTop: "8px",
+  fontSize: "15px",
+  boxSizing: "border-box" as const,
+};
+
+const textareaStyle = {
+  ...inputStyle,
+  minHeight: "120px",
+  resize: "none" as const,
+};
+
+const fileInputStyle = {
+  marginTop: "10px",
+};
+
+const helpTextStyle = {
+  color: "#777",
+  fontSize: "13px",
+  marginTop: "8px",
+};
+
+const previewGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(5, 1fr)",
+  gap: "10px",
+  marginTop: "14px",
+};
+
+const previewBoxStyle = {
+  height: "90px",
+  borderRadius: "14px",
+  overflow: "hidden",
+  background: "#f4f4f1",
+};
+
+const previewImageStyle = {
+  width: "100%",
+  height: "100%",
+  objectFit: "cover" as const,
+};
+
+const buttonStyle = {
+  background: "#111",
+  color: "#fff",
+  border: "none",
+  borderRadius: "999px",
+  padding: "16px",
+  fontWeight: 700,
+  fontSize: "14px",
+  cursor: "pointer",
+  marginTop: "14px",
 };

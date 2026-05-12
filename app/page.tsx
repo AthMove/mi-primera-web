@@ -2,9 +2,11 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [lang, setLang] = useState<"EN" | "ES">("EN");
+  const router = useRouter();
 
   const t = {
     EN: {
@@ -29,8 +31,9 @@ export default function Home() {
       explore: "Explore Categories",
       featured: "Featured Products",
       curated: "Curated premium gear.",
-      rights: "© 2025 ATHMOV. All rights reserved.",
+      rights: "©️ 2025 ATHMOV. All rights reserved.",
     },
+
     ES: {
       shop: "COMPRAR",
       sell: "VENDER",
@@ -40,27 +43,30 @@ export default function Home() {
       heroTitle1: "Segunda mano.",
       heroTitle2: "Primera clase.",
       heroText:
-        "Compra y vende equipamiento deportivo premium autenticado de las mejores marcas del mundo.",
+        "Compra y vende equipamiento deportivo premium autenticado de las mejores marcas.",
       shopGear: "Comprar",
       sellGear: "Vender equipo",
-      trustText: "Únete a miles de deportistas que confían en ATHMOV.",
+      trustText:
+        "Únete a miles de deportistas que confían en ATHMOV.",
       authenticated: "AUTENTICADO",
-      authenticatedText: "Cada artículo es verificado por nuestros expertos.",
+      authenticatedText:
+        "Cada artículo es verificado por nuestros expertos.",
       quality: "CALIDAD PREMIUM",
-      qualityText: "Mejores marcas. Excelente estado garantizado.",
+      qualityText:
+        "Mejores marcas. Excelente estado garantizado.",
       sustainable: "SOSTENIBLE",
-      sustainableText: "Alarga la vida del material. Reduce residuos.",
+      sustainableText:
+        "Alarga la vida del material. Reduce residuos.",
       explore: "Explorar categorías",
       featured: "Productos destacados",
       curated: "Equipamiento premium seleccionado.",
-      rights: "© 2025 ATHMOV. Todos los derechos reservados.",
+      rights: "©️ 2025 ATHMOV. Todos los derechos reservados.",
     },
   };
 
   const productos = [
     {
       id: 1,
-      slug: "vertex-03-2024",
       marca: "BULLPADEL",
       modelo: "Vertex 03 2024",
       precio: "185 €",
@@ -69,7 +75,6 @@ export default function Home() {
     },
     {
       id: 2,
-      slug: "driver-stealth-2",
       marca: "TAYLORMADE",
       modelo: "Driver Stealth 2",
       precio: "320 €",
@@ -78,7 +83,6 @@ export default function Home() {
     },
     {
       id: 3,
-      slug: "pro-staff-97",
       marca: "WILSON",
       modelo: "Pro Staff 97",
       precio: "210 €",
@@ -87,7 +91,13 @@ export default function Home() {
     },
   ];
 
-  const categorias = ["PADEL", "GOLF", "TENNIS", "CYCLING", "RUNNING"];
+  const categorias = [
+    "PADEL",
+    "GOLF",
+    "TENNIS",
+    "CYCLING",
+    "RUNNING",
+  ];
 
   return (
     <main
@@ -96,9 +106,15 @@ export default function Home() {
         backgroundColor: "#ffffff",
         fontFamily: "Inter, Arial, sans-serif",
         color: "#111111",
+        width: "100%",
+        overflowX: "hidden",
       }}
     >
       <style>{`
+        *{
+          box-sizing:border-box;
+        }
+
         .product-card {
           border-radius: 28px;
           overflow: hidden;
@@ -106,6 +122,7 @@ export default function Home() {
           cursor: pointer;
           transition: transform 0.25s ease, box-shadow 0.25s ease;
           background: #ffffff;
+          width: 100%;
         }
 
         .product-card:hover {
@@ -121,13 +138,60 @@ export default function Home() {
           transform: scale(1.05);
         }
 
-        a {
-          text-decoration: none;
-          color: inherit;
+        @media (max-width: 1100px) {
+          .hero-section {
+            grid-template-columns: 1fr !important;
+            gap: 40px !important;
+          }
+
+          .products-grid {
+            grid-template-columns: 1fr !important;
+          }
+
+          .hero-title {
+            font-size: 58px !important;
+          }
+
+          .header-inner {
+            flex-wrap: wrap;
+            justify-content: center !important;
+          }
+
+          .hero-image {
+            height: 420px !important;
+          }
+        }
+
+        @media (max-width: 700px) {
+          .hero-title {
+            font-size: 42px !important;
+          }
+
+          .hero-text {
+            font-size: 18px !important;
+          }
+
+          .section-padding {
+            padding-left: 20px !important;
+            padding-right: 20px !important;
+          }
+
+          .navbar-menu {
+            gap: 14px !important;
+            font-size: 10px !important;
+          }
+
+          .logo-box {
+            width: 220px !important;
+            height: 70px !important;
+          }
+
+          .hero-image {
+            height: 300px !important;
+          }
         }
       `}</style>
 
-      {/* HEADER */}
       <header
         style={{
           width: "100%",
@@ -140,64 +204,96 @@ export default function Home() {
         }}
       >
         <div
+          className="header-inner section-padding"
           style={{
             maxWidth: "1440px",
             margin: "0 auto",
-            height: "120px",
+            padding: "22px 48px",
             display: "flex",
-            alignItems: "center",
             justifyContent: "space-between",
-            padding: "0 60px",
+            alignItems: "center",
             gap: "35px",
           }}
         >
-          <a href="/">
-            <div
-              style={{
-                position: "relative",
-                width: "340px",
-                height: "105px",
-              }}
-            >
-              <Image
-                src="/logo.png"
-                alt="ATHMOV"
-                fill
-                sizes="340px"
-                style={{ objectFit: "contain" }}
-                priority
-              />
-            </div>
-          </a>
+          <div
+            className="logo-box"
+            onClick={() => router.push("/")}
+            style={{
+              position: "relative",
+              width: "260px",
+              height: "80px",
+              cursor: "pointer",
+              flexShrink: 0,
+            }}
+          >
+            <Image
+              src="/logo.png"
+              alt="ATHMOV"
+              fill
+              sizes="260px"
+              style={{ objectFit: "contain" }}
+              priority
+            />
+          </div>
 
           <nav>
             <ul
+              className="navbar-menu"
               style={{
                 display: "flex",
-                gap: "28px",
+                flexWrap: "wrap",
+                gap: "20px",
                 listStyle: "none",
                 margin: 0,
                 padding: 0,
-                fontSize: "12px",
-                letterSpacing: "2.5px",
+                fontSize: "11px",
+                letterSpacing: "2px",
                 textTransform: "uppercase",
                 fontWeight: 800,
                 alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              <li>{t[lang].shop}</li>
-              <li>{t[lang].sell}</li>
+              <li
+                onClick={() => router.push("/products")}
+                style={{ cursor: "pointer" }}
+              >
+                {t[lang].shop}
+              </li>
+
+              <li
+                onClick={() => router.push("/sell")}
+                style={{ cursor: "pointer" }}
+              >
+                {t[lang].sell}
+              </li>
 
               {categorias.map((cat) => (
-                <li key={cat}>{cat}</li>
+                <li
+                  key={cat}
+                  onClick={() => router.push("/products")}
+                  style={{ cursor: "pointer" }}
+                >
+                  {cat}
+                </li>
               ))}
             </ul>
           </nav>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              flexWrap: "wrap",
+              justifyContent: "center",
+            }}
+          >
             <select
               value={lang}
-              onChange={(e) => setLang(e.target.value as "EN" | "ES")}
+              onChange={(e) =>
+                setLang(e.target.value as "EN" | "ES")
+              }
               style={{
                 border: "1px solid rgba(0,0,0,0.12)",
                 borderRadius: "999px",
@@ -213,6 +309,7 @@ export default function Home() {
             </select>
 
             <button
+              onClick={() => router.push("/auth")}
               style={{
                 background: "transparent",
                 border: "none",
@@ -226,6 +323,7 @@ export default function Home() {
             </button>
 
             <button
+              onClick={() => router.push("/auth")}
               style={{
                 backgroundColor: "#111111",
                 color: "#ffffff",
@@ -244,252 +342,294 @@ export default function Home() {
         </div>
       </header>
 
-      {/* HERO */}
-      <section style={{ padding: "100px 60px 70px" }}>
+      <section
+        className="hero-section section-padding"
+        style={{
+          maxWidth: "1440px",
+          margin: "0 auto",
+          padding: "70px 48px 40px",
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          alignItems: "center",
+          gap: "60px",
+        }}
+      >
+        <div>
+          <p
+            style={{
+              fontSize: "12px",
+              letterSpacing: "4px",
+              textTransform: "uppercase",
+              marginBottom: "24px",
+              opacity: 0.55,
+            }}
+          >
+            {t[lang].heroTag}
+          </p>
+
+          <h1
+            className="hero-title"
+            style={{
+              fontSize: "72px",
+              lineHeight: 1,
+              fontWeight: 900,
+              margin: 0,
+              letterSpacing: "-3px",
+            }}
+          >
+            {t[lang].heroTitle1}
+            <br />
+            {t[lang].heroTitle2}
+          </h1>
+
+          <p
+            className="hero-text"
+            style={{
+              marginTop: "30px",
+              fontSize: "20px",
+              lineHeight: 1.7,
+              color: "#4b4b4b",
+              maxWidth: "620px",
+            }}
+          >
+            {t[lang].heroText}
+          </p>
+
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "16px",
+              marginTop: "36px",
+            }}
+          >
+            <button
+              onClick={() => router.push("/products")}
+              style={{
+                backgroundColor: "#111111",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: "999px",
+                padding: "16px 28px",
+                fontSize: "14px",
+                fontWeight: 800,
+                cursor: "pointer",
+              }}
+            >
+              {t[lang].shopGear}
+            </button>
+
+            <button
+              onClick={() => router.push("/sell")}
+              style={{
+                backgroundColor: "transparent",
+                color: "#111111",
+                border: "1px solid rgba(0,0,0,0.16)",
+                borderRadius: "999px",
+                padding: "16px 28px",
+                fontSize: "14px",
+                fontWeight: 800,
+                cursor: "pointer",
+              }}
+            >
+              {t[lang].sellGear}
+            </button>
+          </div>
+        </div>
+
+        <div
+          className="hero-image"
+          style={{
+            width: "100%",
+            height: "520px",
+            borderRadius: "40px",
+            background:
+              "linear-gradient(135deg,#f7f7f5,#efefea)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            className="product-logo"
+            style={{
+              position: "relative",
+              width: "70%",
+              height: "180px",
+            }}
+          >
+            <Image
+              src="/logo.png"
+              alt="ATHMOV"
+              fill
+              sizes="600px"
+              style={{ objectFit: "contain" }}
+              priority
+            />
+          </div>
+        </div>
+      </section>
+
+      <section
+        className="section-padding"
+        style={{
+          maxWidth: "1440px",
+          margin: "0 auto",
+          padding: "40px 48px 120px",
+        }}
+      >
         <div
           style={{
-            maxWidth: "1440px",
-            margin: "0 auto",
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "90px",
-            alignItems: "center",
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            alignItems: "end",
+            gap: "20px",
+            marginBottom: "40px",
           }}
         >
           <div>
             <p
               style={{
-                color: "#7b8b42",
                 fontSize: "12px",
-                fontWeight: 800,
-                letterSpacing: "3px",
+                letterSpacing: "4px",
                 textTransform: "uppercase",
-                marginBottom: "26px",
+                opacity: 0.55,
               }}
             >
-              {t[lang].heroTag}
+              {t[lang].featured}
             </p>
 
-            <h1
+            <h2
               style={{
-                fontSize: "86px",
-                lineHeight: 0.95,
-                letterSpacing: "-5px",
-                margin: "0 0 30px",
-                fontWeight: 900,
+                fontSize: "46px",
+                marginTop: "12px",
+                marginBottom: 0,
+                letterSpacing: "-2px",
               }}
             >
-              {t[lang].heroTitle1}
-              <br />
-              {t[lang].heroTitle2}
-            </h1>
-
-            <p
-              style={{
-                fontSize: "20px",
-                lineHeight: 1.7,
-                color: "#5f5f5f",
-                maxWidth: "560px",
-                marginBottom: "40px",
-              }}
-            >
-              {t[lang].heroText}
-            </p>
-
-            <div style={{ display: "flex", gap: "18px", marginBottom: "35px" }}>
-              <button
-                style={{
-                  backgroundColor: "#111111",
-                  color: "#ffffff",
-                  border: "none",
-                  padding: "18px 34px",
-                  borderRadius: "999px",
-                  fontSize: "13px",
-                  fontWeight: 800,
-                  cursor: "pointer",
-                }}
-              >
-                {t[lang].shopGear}
-              </button>
-
-              <button
-                style={{
-                  backgroundColor: "#ffffff",
-                  color: "#111111",
-                  border: "1px solid #d9d9d9",
-                  padding: "18px 34px",
-                  borderRadius: "999px",
-                  fontSize: "13px",
-                  fontWeight: 800,
-                  cursor: "pointer",
-                }}
-              >
-                {t[lang].sellGear}
-              </button>
-            </div>
-
-            <p style={{ color: "#5f5f5f", fontSize: "15px" }}>
-              {t[lang].trustText}
-            </p>
+              {t[lang].explore}
+            </h2>
           </div>
 
-          <div
-            style={{
-              height: "620px",
-              borderRadius: "34px",
-              background: "linear-gradient(135deg,#f7f7f5,#ecece7)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "80px",
-              boxShadow: "0 30px 80px rgba(0,0,0,0.05)",
-            }}
-          >
-            <div style={{ position: "relative", width: "100%", height: "260px" }}>
-              <Image
-                src="/logo.png"
-                alt="ATHMOV"
-                fill
-                sizes="700px"
-                style={{ objectFit: "contain" }}
-                priority
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* PRODUCTS */}
-      <section style={{ padding: "0 60px 120px" }}>
-        <div style={{ maxWidth: "1440px", margin: "0 auto" }}>
           <p
             style={{
-              color: "#7b8b42",
-              fontSize: "12px",
-              fontWeight: 800,
-              letterSpacing: "3px",
-              textTransform: "uppercase",
-            }}
-          >
-            {t[lang].featured}
-          </p>
-
-          <h2
-            style={{
-              fontSize: "54px",
-              letterSpacing: "-3px",
-              marginBottom: "60px",
-              fontWeight: 900,
+              color: "#666",
+              fontSize: "18px",
             }}
           >
             {t[lang].curated}
-          </h2>
+          </p>
+        </div>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))",
-              gap: "34px",
-            }}
-          >
-            {productos.map((prod) => (
-              <a
-                key={prod.id}
-                href={`/product/${prod.slug}`}
-                style={{
-                  display: "block",
-                }}
-              >
-                <div className="product-card">
+        <div
+          className="products-grid"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3,1fr)",
+            gap: "26px",
+          }}
+        >
+          {productos.map((producto) => (
+            <div
+              key={producto.id}
+              onClick={() => router.push("/products")}
+            >
+              <div className="product-card">
+                <div
+                  style={{
+                    height: "280px",
+                    background:
+                      "linear-gradient(135deg,#f5f5f3,#ecece7)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
                   <div
+                    className="product-logo"
                     style={{
                       position: "relative",
-                      height: "360px",
-                      background: "linear-gradient(135deg,#f7f7f5,#efefea)",
+                      width: "180px",
+                      height: "80px",
                     }}
                   >
                     <Image
-                      className="product-logo"
                       src="/logo.png"
-                      alt={prod.modelo}
+                      alt={producto.modelo}
                       fill
-                      sizes="500px"
-                      style={{
-                        objectFit: "contain",
-                        padding: "70px",
-                      }}
+                      sizes="180px"
+                      style={{ objectFit: "contain" }}
                     />
+                  </div>
+                </div>
+
+                <div style={{ padding: "26px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      marginBottom: "14px",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: "12px",
+                        letterSpacing: "2px",
+                        opacity: 0.6,
+                      }}
+                    >
+                      {producto.marca}
+                    </span>
 
                     <span
                       style={{
-                        position: "absolute",
-                        top: "18px",
-                        left: "18px",
-                        backgroundColor: "#ffffff",
-                        color: prod.colorEstado,
-                        padding: "8px 14px",
-                        borderRadius: "999px",
-                        fontSize: "10px",
-                        fontWeight: 800,
-                        border: `1px solid ${prod.colorEstado}`,
+                        fontSize: "12px",
+                        color: producto.colorEstado,
+                        fontWeight: 700,
                       }}
                     >
-                      ● {prod.estado}
+                      {producto.estado}
                     </span>
                   </div>
 
-                  <div style={{ padding: "26px" }}>
-                    <p
-                      style={{
-                        color: "#7b8b42",
-                        fontSize: "11px",
-                        fontWeight: 800,
-                      }}
-                    >
-                      {prod.marca}
-                    </p>
+                  <h3
+                    style={{
+                      fontSize: "24px",
+                      margin: 0,
+                      letterSpacing: "-1px",
+                    }}
+                  >
+                    {producto.modelo}
+                  </h3>
 
-                    <h3 style={{ fontSize: "30px", margin: "0 0 16px" }}>
-                      {prod.modelo}
-                    </h3>
-
-                    <p style={{ fontSize: "36px", fontWeight: 900, margin: 0 }}>
-                      {prod.precio}
-                    </p>
-                  </div>
+                  <p
+                    style={{
+                      marginTop: "18px",
+                      fontSize: "24px",
+                      fontWeight: 800,
+                    }}
+                  >
+                    {producto.precio}
+                  </p>
                 </div>
-              </a>
-            ))}
-          </div>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* FOOTER */}
       <footer
         style={{
           borderTop: "1px solid rgba(0,0,0,0.06)",
-          padding: "70px 60px 40px",
+          padding: "40px",
+          textAlign: "center",
+          color: "#777",
+          fontSize: "14px",
         }}
       >
-        <div style={{ maxWidth: "1440px", margin: "0 auto" }}>
-          <div style={{ position: "relative", width: "240px", height: "70px" }}>
-            <Image
-              src="/logo.png"
-              alt="ATHMOV"
-              fill
-              sizes="240px"
-              style={{ objectFit: "contain" }}
-            />
-          </div>
-
-          <p style={{ color: "#7b8b42", fontWeight: 700 }}>
-            Second hand. First class.
-          </p>
-
-          <p style={{ color: "#666666", fontSize: "13px", marginTop: "40px" }}>
-            {t[lang].rights}
-          </p>
-        </div>
+        {t[lang].rights}
       </footer>
     </main>
   );
