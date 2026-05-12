@@ -56,7 +56,9 @@ export default function FavoritesPage() {
       return;
     }
 
-    const productIds = favoriteRows.map((favorite) => favorite.product_id);
+    const productIds = favoriteRows.map(
+      (favorite) => favorite.product_id
+    );
 
     const { data: products, error: productsError } = await supabase
       .from("products")
@@ -100,12 +102,18 @@ export default function FavoritesPage() {
     }
 
     setFavorites((current) =>
-      current.filter((favorite) => favorite.favoriteId !== favoriteId)
+      current.filter(
+        (favorite) => favorite.favoriteId !== favoriteId
+      )
     );
   };
 
   if (loading) {
-    return <main style={loadingStyle}>Cargando favoritos...</main>;
+    return (
+      <main style={loadingStyle}>
+        Cargando favoritos...
+      </main>
+    );
   }
 
   return (
@@ -113,8 +121,14 @@ export default function FavoritesPage() {
       <section style={headerStyle}>
         <div>
           <p style={eyebrowStyle}>Mi cuenta</p>
-          <h1 style={titleStyle}>Favoritos</h1>
-          <p style={subtitleStyle}>Productos que has guardado.</p>
+
+          <h1 style={titleStyle}>
+            Favoritos
+          </h1>
+
+          <p style={subtitleStyle}>
+            Productos que has guardado.
+          </p>
         </div>
 
         <Link href="/account" style={backButtonStyle}>
@@ -124,9 +138,13 @@ export default function FavoritesPage() {
 
       {favorites.length === 0 ? (
         <section style={emptyStyle}>
-          <h2 style={emptyTitleStyle}>No tienes favoritos todavía</h2>
+          <h2 style={emptyTitleStyle}>
+            No tienes favoritos todavía
+          </h2>
+
           <p style={emptyTextStyle}>
-            Guarda productos desde el corazón para verlos aquí.
+            Guarda productos desde el corazón
+            para verlos aquí.
           </p>
 
           <Link href="/products" style={shopButtonStyle}>
@@ -136,8 +154,11 @@ export default function FavoritesPage() {
       ) : (
         <section style={gridStyle}>
           {favorites.map((favorite) => (
-            <article key={favorite.favoriteId} style={cardStyle}>
-              <Link
+            <article
+              key={favorite.favoriteId}
+              style={cardStyle}
+            >
+              <a
                 href={`/products/${favorite.product.id}`}
                 style={imageLinkStyle}
               >
@@ -151,21 +172,31 @@ export default function FavoritesPage() {
                     style={imageStyle}
                   />
                 </div>
-              </Link>
+              </a>
 
               <div style={contentStyle}>
-                <p style={brandStyle}>{favorite.product.brand}</p>
-                <h2 style={productTitleStyle}>{favorite.product.title}</h2>
+                <p style={brandStyle}>
+                  {favorite.product.brand}
+                </p>
+
+                <h2 style={productTitleStyle}>
+                  {favorite.product.title}
+                </h2>
 
                 <div style={rowStyle}>
-                  <p style={priceStyle}>€{favorite.product.price}</p>
+                  <p style={priceStyle}>
+                    €{favorite.product.price}
+                  </p>
+
                   <span style={conditionStyle}>
                     {favorite.product.condition}
                   </span>
                 </div>
 
                 <button
-                  onClick={() => removeFavorite(favorite.favoriteId)}
+                  onClick={() =>
+                    removeFavorite(favorite.favoriteId)
+                  }
                   style={removeButtonStyle}
                 >
                   Quitar favorito
@@ -270,7 +301,8 @@ const gridStyle = {
   maxWidth: "1180px",
   margin: "0 auto",
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+  gridTemplateColumns:
+    "repeat(auto-fit, minmax(260px, 1fr))",
   gap: "24px",
 };
 
