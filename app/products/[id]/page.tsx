@@ -119,15 +119,53 @@ export default function ProductPage() {
           <p style={descriptionStyle}>{product.description}</p>
 
           {product.seller_id && (
-            <Link
-              href={`/seller/${product.seller_id}`}
-              style={sellerBoxStyle}
-            >
-              <span style={sellerLabelStyle}>Vendedor</span>
-              <strong style={sellerNameStyle}>Ver perfil del vendedor</strong>
-              <span style={sellerArrowStyle}>→</span>
-            </Link>
-          )}
+  <>
+    <Link
+      href={`/seller/${product.seller_id}`}
+      style={sellerBoxStyle}
+    >
+      <span style={sellerLabelStyle}>Vendedor</span>
+      <strong style={sellerNameStyle}>Ver perfil del vendedor</strong>
+      <span style={sellerArrowStyle}>→</span>
+    </Link>
+
+    <button
+      onClick={async () => {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) {
+          alert("Inicia sesión para contactar con el vendedor");
+          return;
+        }
+
+        if (user.id === product.seller_id) {
+          alert("No puedes enviarte un mensaje a ti mismo");
+          return;
+        }
+
+        const { error } = await supabase.from("messages").insert({
+          sender_id: user.id,
+          receiver_id: product.seller_id,
+          product_id: product.id,
+          content: `Hola, me interesa tu producto: ${product.brand} ${product.title}`,
+        });
+
+        if (error) {
+          alert(error.message);
+          return;
+        }
+
+        alert("Mensaje enviado al vendedor");
+        window.location.href = "/messages";
+      }}
+      style={contactButtonStyle}
+    >
+      Contactar vendedor
+    </button>
+  </>
+)}
 
           <div style={buttonsWrapperStyle}>
   <button
@@ -348,4 +386,16 @@ const secondaryButtonStyle = {
   fontSize: "15px",
   fontWeight: 700,
   cursor: "pointer",
+};
+const contactButtonStyle = {
+  width: "100%",
+  background: "#fff",
+  color: "#111",
+  border: "1px solid #ddd",
+  borderRadius: "999px",
+  padding: "16px",
+  fontSize: "14px",
+  fontWeight: 700,
+  cursor: "pointer",
+  marginBottom: "24px",
 };
