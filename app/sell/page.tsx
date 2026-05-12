@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 export default function SellPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const [title, setTitle] = useState("");
@@ -26,6 +28,21 @@ export default function SellPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      alert("Debes iniciar sesión para vender");
+      router.push("/auth?mode=login");
+      return;
+    }
+
+    if (imageFiles.length < 3) {
+      alert("Sube al menos 3 fotos reales del producto.");
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -33,7 +50,7 @@ export default function SellPage() {
 
       for (const file of imageFiles) {
         const fileExt = file.type.split("/")[1] || "jpg";
-        const fileName = `${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
+        const fileName = `${crypto.randomUUID()}.${fileExt}`;
 
         const { error: uploadError } = await supabase.storage
           .from("products")
@@ -63,8 +80,9 @@ export default function SellPage() {
           description,
           category,
           condition,
-          image: imageUrls[0] || "",
+          image: imageUrls[0],
           images: imageUrls,
+          seller_id: user.id,
         },
       ]);
 
@@ -74,15 +92,7 @@ export default function SellPage() {
       }
 
       alert("Producto publicado correctamente");
-
-      setTitle("");
-      setBrand("");
-      setPrice("");
-      setDescription("");
-      setCategory("PADEL");
-      setCondition("Usada");
-      setImageFiles([]);
-      setPreviews([]);
+      router.push("/products");
     } catch (error: any) {
       alert(error.message || "Error");
     } finally {
@@ -96,7 +106,7 @@ export default function SellPage() {
         <h1 style={titleStyle}>Vender producto</h1>
 
         <p style={subtitleStyle}>
-          Publica tu equipamiento premium en ATHMOV.
+          Sube entre 3 y 5 fotos reales. La primera será la portada del producto.
         </p>
 
         <form onSubmit={handleSubmit} style={formStyle}>
@@ -167,25 +177,28 @@ export default function SellPage() {
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe el estado del producto..."
+              placeholder="Describe el estado real del producto..."
               required
               style={textareaStyle}
             />
           </div>
 
           <div>
-            <label>Fotos del producto</label>
+            <label>Fotos reales del producto</label>
 
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleImagesChange}
-              style={fileInputStyle}
-            />
+            <label style={uploadButtonStyle}>
+              Subir fotos
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImagesChange}
+                style={{ display: "none" }}
+              />
+            </label>
 
             <p style={helpTextStyle}>
-              Puedes subir hasta 5 fotos. La primera será la imagen principal.
+              Mínimo 3 fotos, máximo 5. La primera será la imagen principal.
             </p>
 
             {previews.length > 0 && (
@@ -197,6 +210,10 @@ export default function SellPage() {
                       alt={`Preview ${index + 1}`}
                       style={previewImageStyle}
                     />
+
+                    {index === 0 && (
+                      <span style={mainBadgeStyle}>Portada</span>
+                    )}
                   </div>
                 ))}
               </div>
@@ -242,6 +259,7 @@ const subtitleStyle = {
   color: "#666",
   marginBottom: "34px",
   fontSize: "15px",
+  lineHeight: 1.6,
 };
 
 const formStyle = {
@@ -266,8 +284,19 @@ const textareaStyle = {
   resize: "none" as const,
 };
 
-const fileInputStyle = {
+const uploadButtonStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: "#111",
+  color: "#fff",
+  padding: "14px 22px",
+  borderRadius: "999px",
+  fontSize: "14px",
+  fontWeight: 600,
+  cursor: "pointer",
   marginTop: "10px",
+  width: "fit-content",
 };
 
 const helpTextStyle = {
@@ -284,6 +313,7 @@ const previewGridStyle = {
 };
 
 const previewBoxStyle = {
+  position: "relative" as const,
   height: "90px",
   borderRadius: "14px",
   overflow: "hidden",
@@ -294,6 +324,17 @@ const previewImageStyle = {
   width: "100%",
   height: "100%",
   objectFit: "cover" as const,
+};
+
+const mainBadgeStyle = {
+  position: "absolute" as const,
+  left: "6px",
+  bottom: "6px",
+  background: "#111",
+  color: "#fff",
+  fontSize: "10px",
+  padding: "4px 7px",
+  borderRadius: "999px",
 };
 
 const buttonStyle = {

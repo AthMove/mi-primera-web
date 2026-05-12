@@ -11,6 +11,7 @@ type Product = {
   price: number;
   description: string;
   image: string;
+  images?: string[];
   condition: string;
 };
 
@@ -19,6 +20,7 @@ export default function ProductPage() {
   const id = params.id as string;
 
   const [product, setProduct] = useState<Product | null>(null);
+  const [selectedImage, setSelectedImage] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -40,6 +42,13 @@ export default function ProductPage() {
 
     if (data) {
       setProduct(data);
+
+      const firstImage =
+        data.images?.[0] ||
+        data.image ||
+        "https://placehold.co/900x900?text=ATHMOV";
+
+      setSelectedImage(firstImage);
     }
 
     setLoading(false);
@@ -53,15 +62,49 @@ export default function ProductPage() {
     return <main style={loadingStyle}>Producto no encontrado</main>;
   }
 
+  const productImages =
+    product.images && product.images.length > 0
+      ? product.images
+      : [product.image];
+
   return (
     <main style={pageStyle}>
       <div style={containerStyle}>
-        <section style={imageSectionStyle}>
-          <img
-            src={product.image || "https://placehold.co/900x900?text=ATHMOV"}
-            alt={product.title}
-            style={imageStyle}
-          />
+        <section>
+          <div style={imageSectionStyle}>
+            <img
+              src={
+                selectedImage ||
+                product.image ||
+                "https://placehold.co/900x900?text=ATHMOV"
+              }
+              alt={product.title}
+              style={imageStyle}
+            />
+          </div>
+
+          <div style={thumbsStyle}>
+            {productImages.map((img, index) => (
+              <button
+                key={index}
+                type="button"
+                onClick={() => setSelectedImage(img)}
+                style={{
+                  ...thumbButtonStyle,
+                  border:
+                    selectedImage === img
+                      ? "2px solid #111"
+                      : "1px solid #ddd",
+                }}
+              >
+                <img
+                  src={img}
+                  alt={`${product.title} ${index + 1}`}
+                  style={thumbImageStyle}
+                />
+              </button>
+            ))}
+          </div>
         </section>
 
         <section style={infoStyle}>
@@ -72,11 +115,11 @@ export default function ProductPage() {
           <p style={descriptionStyle}>{product.description}</p>
 
           <a
-  href={`/api/checkout?productId=${product.id}`}
-  style={buttonStyle}
->
-  Comprar ahora
-</a>
+            href={`/api/checkout?productId=${product.id}`}
+            style={buttonStyle}
+          >
+            Comprar ahora
+          </a>
         </section>
       </div>
     </main>
@@ -101,11 +144,11 @@ const pageStyle = {
 };
 
 const containerStyle = {
-  maxWidth: "980px",
+  maxWidth: "1080px",
   margin: "0 auto",
   display: "grid",
-  gridTemplateColumns: "430px 1fr",
-  gap: "50px",
+  gridTemplateColumns: "480px 1fr",
+  gap: "54px",
   alignItems: "center",
 };
 
@@ -123,6 +166,29 @@ const imageStyle = {
   width: "90%",
   height: "90%",
   objectFit: "contain" as const,
+  display: "block",
+};
+
+const thumbsStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(5, 1fr)",
+  gap: "10px",
+  marginTop: "14px",
+};
+
+const thumbButtonStyle = {
+  height: "78px",
+  borderRadius: "14px",
+  overflow: "hidden",
+  background: "#efefea",
+  padding: 0,
+  cursor: "pointer",
+};
+
+const thumbImageStyle = {
+  width: "100%",
+  height: "100%",
+  objectFit: "cover" as const,
   display: "block",
 };
 
