@@ -86,16 +86,26 @@ export default function AccountPage() {
       <section style={headerStyle}>
         <div>
           <p style={eyebrowStyle}>Mi cuenta</p>
-          <h1 style={titleStyle}>Mis productos</h1>
+
+          <h1 style={titleStyle}>
+            Mis productos
+          </h1>
+
           <p style={emailStyle}>{email}</p>
         </div>
 
         <div style={actionsStyle}>
-          <Link href="/sell" style={sellButtonStyle}>
+          <Link
+            href="/sell"
+            style={sellButtonStyle}
+          >
             Vender producto
           </Link>
 
-          <button onClick={handleLogout} style={logoutButtonStyle}>
+          <button
+            onClick={handleLogout}
+            style={logoutButtonStyle}
+          >
             Cerrar sesión
           </button>
         </div>
@@ -103,20 +113,28 @@ export default function AccountPage() {
 
       {products.length === 0 ? (
         <section style={emptyStyle}>
-          <h2 style={emptyTitleStyle}>Aún no has publicado productos</h2>
+          <h2 style={emptyTitleStyle}>
+            Aún no has publicado productos
+          </h2>
 
           <p style={emptyTextStyle}>
             Publica tu primer producto para verlo aquí.
           </p>
 
-          <Link href="/sell" style={sellButtonStyle}>
+          <Link
+            href="/sell"
+            style={sellButtonStyle}
+          >
             Publicar producto
           </Link>
         </section>
       ) : (
         <section style={gridStyle}>
           {products.map((product) => (
-            <article key={product.id} style={cardStyle}>
+            <article
+              key={product.id}
+              style={cardStyle}
+            >
               <Link
                 href={`/products/${product.id}`}
                 style={imageLinkStyle}
@@ -134,7 +152,9 @@ export default function AccountPage() {
               </Link>
 
               <div style={contentStyle}>
-                <p style={brandStyle}>{product.brand}</p>
+                <p style={brandStyle}>
+                  {product.brand}
+                </p>
 
                 <h2 style={productTitleStyle}>
                   {product.title}
@@ -159,7 +179,9 @@ export default function AccountPage() {
                   </Link>
 
                   <button
-                    onClick={() => handleDelete(product.id)}
+                    onClick={() =>
+                      handleDelete(product.id)
+                    }
                     style={deleteButtonStyle}
                   >
                     Eliminar
@@ -273,7 +295,8 @@ const gridStyle = {
   maxWidth: "1180px",
   margin: "0 auto",
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+  gridTemplateColumns:
+    "repeat(auto-fit, minmax(260px, 1fr))",
   gap: "24px",
 };
 
@@ -341,7 +364,7 @@ const conditionStyle = {
 
 const buttonsRowStyle = {
   display: "flex",
-  gap: "10px",
+  gap: "12px",
 };
 
 const editButtonStyle = {

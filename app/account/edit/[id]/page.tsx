@@ -8,24 +8,22 @@ export default function EditProductPage() {
   const params = useParams();
   const router = useRouter();
 
-  const id = params.id as string;
+  const productId = params.id as string;
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const [title, setTitle] = useState("");
   const [brand, setBrand] = useState("");
+  const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
-  const [description, setDescription] = useState("");
   const [condition, setCondition] = useState("Usada");
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
-    if (id) {
-      fetchProduct();
-    }
-  }, [id]);
+    loadProduct();
+  }, []);
 
-  const fetchProduct = async () => {
+  const loadProduct = async () => {
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -38,130 +36,140 @@ export default function EditProductPage() {
     const { data, error } = await supabase
       .from("products")
       .select("*")
-      .eq("id", id)
-      .eq("seller_id", user.id)
+      .eq("id", productId)
       .single();
 
     if (error || !data) {
+      alert("Producto no encontrado");
       router.push("/account");
       return;
     }
 
-    setTitle(data.title || "");
+    if (data.seller_id !== user.id) {
+      router.push("/account");
+      return;
+    }
+
     setBrand(data.brand || "");
+    setTitle(data.title || "");
     setPrice(data.price?.toString() || "");
-    setDescription(data.description || "");
     setCondition(data.condition || "Usada");
+    setDescription(data.description || "");
 
     setLoading(false);
   };
 
-  const handleUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    try {
-      setSaving(true);
-
-      const { error } = await supabase
-        .from("products")
-        .update({
-          title,
-          brand,
-          price: Number(price),
-          description,
-          condition,
-        })
-        .eq("id", id);
-
-      if (error) {
-        alert(error.message);
-        return;
-      }
-
-      alert("Producto actualizado correctamente");
-
-      router.push("/account");
-    } catch (error: any) {
-      alert(error.message || "Error");
-    } finally {
-      setSaving(false);
+  const handleUpdate = async () => {
+    if (!brand || !title || !price) {
+      alert("Completa todos los campos");
+      return;
     }
+
+    setSaving(true);
+
+    const { error } = await supabase
+      .from("products")
+      .update({
+        brand,
+        title,
+        price: Number(price),
+        condition,
+        description,
+      })
+      .eq("id", productId);
+
+    setSaving(false);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    alert("Producto actualizado correctamente");
+
+    router.push("/account");
   };
 
   if (loading) {
-    return <main style={loadingStyle}>Cargando producto...</main>;
+    return (
+      <main style={loadingStyle}>
+        Cargando producto...
+      </main>
+    );
   }
 
   return (
     <main style={pageStyle}>
-      <div style={cardStyle}>
-        <h1 style={titleStyle}>Editar producto</h1>
+      <section style={cardStyle}>
+        <h1 style={titleStyle}>
+          Editar producto
+        </h1>
 
-        <form onSubmit={handleUpdate} style={formStyle}>
-          <div>
-            <label>Marca</label>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Marca</label>
 
-            <input
-              value={brand}
-              onChange={(e) => setBrand(e.target.value)}
-              style={inputStyle}
-              required
-            />
-          </div>
+          <input
+            value={brand}
+            onChange={(e) => setBrand(e.target.value)}
+            style={inputStyle}
+          />
+        </div>
 
-          <div>
-            <label>Modelo</label>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Modelo</label>
 
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              style={inputStyle}
-              required
-            />
-          </div>
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            style={inputStyle}
+          />
+        </div>
 
-          <div>
-            <label>Precio</label>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Precio</label>
 
-            <input
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              style={inputStyle}
-              required
-            />
-          </div>
+          <input
+            type="number"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            style={inputStyle}
+          />
+        </div>
 
-          <div>
-            <label>Estado</label>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Estado</label>
 
-            <select
-              value={condition}
-              onChange={(e) => setCondition(e.target.value)}
-              style={inputStyle}
-            >
-              <option>Usada</option>
-              <option>Como nueva</option>
-              <option>Nueva</option>
-            </select>
-          </div>
+          <select
+            value={condition}
+            onChange={(e) => setCondition(e.target.value)}
+            style={inputStyle}
+          >
+            <option>Nueva</option>
+            <option>Como nueva</option>
+            <option>Usada</option>
+          </select>
+        </div>
 
-          <div>
-            <label>Descripción</label>
+        <div style={fieldStyle}>
+          <label style={labelStyle}>Descripción</label>
 
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              style={textareaStyle}
-              required
-            />
-          </div>
+          <textarea
+            value={description}
+            onChange={(e) =>
+              setDescription(e.target.value)
+            }
+            style={textareaStyle}
+          />
+        </div>
 
-          <button type="submit" style={buttonStyle} disabled={saving}>
-            {saving ? "GUARDANDO..." : "Guardar cambios"}
-          </button>
-        </form>
-      </div>
+        <button
+          onClick={handleUpdate}
+          disabled={saving}
+          style={buttonStyle}
+        >
+          {saving ? "Guardando..." : "Guardar cambios"}
+        </button>
+      </section>
     </main>
   );
 }
@@ -181,39 +189,44 @@ const loadingStyle = {
 const pageStyle = {
   minHeight: "100vh",
   background: "#f6f6f3",
-  padding: "60px 20px",
+  padding: "40px 20px",
+  display: "flex",
+  justifyContent: "center",
   fontFamily,
 };
 
 const cardStyle = {
-  maxWidth: "620px",
-  margin: "0 auto",
+  width: "100%",
+  maxWidth: "720px",
   background: "#fff",
-  padding: "36px",
-  borderRadius: "30px",
-  boxShadow: "0 8px 28px rgba(0,0,0,0.045)",
+  borderRadius: "32px",
+  padding: "40px",
 };
 
 const titleStyle = {
   fontSize: "42px",
   marginBottom: "30px",
-  fontWeight: 700,
-  letterSpacing: "-1.5px",
+  letterSpacing: "-1px",
 };
 
-const formStyle = {
-  display: "flex",
-  flexDirection: "column" as const,
-  gap: "18px",
+const fieldStyle = {
+  marginBottom: "24px",
+};
+
+const labelStyle = {
+  display: "block",
+  marginBottom: "10px",
+  fontWeight: 600,
+  fontSize: "14px",
 };
 
 const inputStyle = {
   width: "100%",
-  padding: "16px",
-  borderRadius: "14px",
+  padding: "18px",
+  borderRadius: "18px",
   border: "1px solid #ddd",
-  marginTop: "8px",
-  fontSize: "15px",
+  fontSize: "16px",
+  outline: "none",
   boxSizing: "border-box" as const,
 };
 
