@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -13,6 +14,7 @@ type Product = {
   image: string;
   images?: string[];
   condition: string;
+  seller_id?: string;
 };
 
 export default function ProductPage() {
@@ -113,6 +115,17 @@ export default function ProductPage() {
           <p style={priceStyle}>€{product.price}</p>
           <span style={conditionStyle}>{product.condition}</span>
           <p style={descriptionStyle}>{product.description}</p>
+
+          {product.seller_id && (
+            <Link
+              href={`/seller/${product.seller_id}`}
+              style={sellerBoxStyle}
+            >
+              <span style={sellerLabelStyle}>Vendedor</span>
+              <strong style={sellerNameStyle}>Ver perfil del vendedor</strong>
+              <span style={sellerArrowStyle}>→</span>
+            </Link>
+          )}
 
           <a
             href={`/api/checkout?productId=${product.id}`}
@@ -235,7 +248,37 @@ const descriptionStyle = {
   fontSize: "15px",
   lineHeight: 1.7,
   color: "#444",
-  marginBottom: "34px",
+  marginBottom: "24px",
+};
+
+const sellerBoxStyle = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: "14px",
+  textDecoration: "none",
+  color: "#111",
+  background: "#fff",
+  border: "1px solid #e5e5df",
+  borderRadius: "22px",
+  padding: "16px 18px",
+  marginBottom: "24px",
+};
+
+const sellerLabelStyle = {
+  fontSize: "11px",
+  textTransform: "uppercase" as const,
+  letterSpacing: "1.5px",
+  color: "#777",
+};
+
+const sellerNameStyle = {
+  flex: 1,
+  fontSize: "14px",
+};
+
+const sellerArrowStyle = {
+  fontSize: "18px",
 };
 
 const buttonStyle = {
