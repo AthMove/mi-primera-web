@@ -1,87 +1,102 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect } from "react";
 
 export default function SuccessPage() {
-  return (
-    <main
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "#f7f7f5",
-        padding: "40px",
-        fontFamily: "Inter, sans-serif",
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "620px",
-          background: "#ffffff",
-          borderRadius: "32px",
-          padding: "60px",
-          textAlign: "center",
-          boxShadow: "0 20px 60px rgba(0,0,0,0.08)",
-        }}
-      >
-        <div
-          style={{
-            width: "90px",
-            height: "90px",
-            borderRadius: "999px",
-            background: "#8d9134",
-            margin: "0 auto 30px",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            color: "#ffffff",
-            fontSize: "42px",
-            fontWeight: 900,
-          }}
-        >
-          ✓
-        </div>
+  useEffect(() => {
+    localStorage.removeItem("athmov_cart");
+  }, []);
 
-        <h1
-          style={{
-            fontSize: "48px",
-            marginBottom: "20px",
-            color: "#111111",
-          }}
-        >
-          Pago completado
+  return (
+    <main style={pageStyle}>
+      <section style={cardStyle}>
+        <p style={eyebrowStyle}>Pago completado</p>
+
+        <h1 style={titleStyle}>
+          ¡Compra realizada correctamente!
         </h1>
 
-        <p
-          style={{
-            fontSize: "18px",
-            lineHeight: 1.7,
-            color: "#666666",
-            marginBottom: "40px",
-          }}
-        >
-          Tu compra se ha realizado correctamente.
-          <br />
-          Gracias por confiar en ATHMOV.
+        <p style={textStyle}>
+          Tu pedido ha sido procesado y el vendedor será notificado.
         </p>
 
-        <Link href="/">
-          <button
-            style={{
-              background: "#111111",
-              color: "#ffffff",
-              border: "none",
-              borderRadius: "999px",
-              padding: "16px 34px",
-              fontSize: "14px",
-              fontWeight: 800,
-              cursor: "pointer",
-            }}
-          >
-            Volver al inicio
-          </button>
-        </Link>
-      </div>
+        <div style={buttonsStyle}>
+          <Link href="/products" style={primaryButtonStyle}>
+            Seguir comprando
+          </Link>
+
+          <Link href="/messages" style={secondaryButtonStyle}>
+            Ver mensajes
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }
+
+const pageStyle = {
+  minHeight: "100vh",
+  background: "#f6f6f3",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: "24px",
+};
+
+const cardStyle = {
+  width: "100%",
+  maxWidth: "620px",
+  background: "#fff",
+  borderRadius: "36px",
+  padding: "54px",
+  textAlign: "center" as const,
+};
+
+const eyebrowStyle = {
+  fontSize: "12px",
+  textTransform: "uppercase" as const,
+  letterSpacing: "2px",
+  color: "#777",
+  marginBottom: "16px",
+};
+
+const titleStyle = {
+  fontSize: "52px",
+  lineHeight: 1,
+  letterSpacing: "-2px",
+  marginBottom: "18px",
+  fontWeight: 800,
+};
+
+const textStyle = {
+  fontSize: "16px",
+  lineHeight: 1.7,
+  color: "#666",
+  marginBottom: "34px",
+};
+
+const buttonsStyle = {
+  display: "flex",
+  gap: "14px",
+  justifyContent: "center",
+  flexWrap: "wrap" as const,
+};
+
+const primaryButtonStyle = {
+  background: "#111",
+  color: "#fff",
+  textDecoration: "none",
+  padding: "16px 24px",
+  borderRadius: "999px",
+  fontWeight: 700,
+};
+
+const secondaryButtonStyle = {
+  background: "#efefea",
+  color: "#111",
+  textDecoration: "none",
+  padding: "16px 24px",
+  borderRadius: "999px",
+  fontWeight: 700,
+};

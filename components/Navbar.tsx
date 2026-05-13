@@ -6,24 +6,34 @@ import { useEffect, useState } from "react";
 export default function Navbar() {
   const [cartCount, setCartCount] = useState(0);
 
+  const updateCartCount = () => {
+    const cart = localStorage.getItem("athmov_cart");
+
+    if (!cart) {
+      setCartCount(0);
+      return;
+    }
+
+    try {
+      const parsedCart = JSON.parse(cart);
+      setCartCount(Array.isArray(parsedCart) ? parsedCart.length : 0);
+    } catch {
+      setCartCount(0);
+    }
+  };
+
   useEffect(() => {
-    const updateCartCount = () => {
-      const cart = localStorage.getItem("athmov_cart");
-
-      if (cart) {
-        const parsedCart = JSON.parse(cart);
-        setCartCount(parsedCart.length);
-      } else {
-        setCartCount(0);
-      }
-    };
-
     updateCartCount();
 
     window.addEventListener("storage", updateCartCount);
+    window.addEventListener("focus", updateCartCount);
+
+    const interval = setInterval(updateCartCount, 500);
 
     return () => {
       window.removeEventListener("storage", updateCartCount);
+      window.removeEventListener("focus", updateCartCount);
+      clearInterval(interval);
     };
   }, []);
 
@@ -63,36 +73,15 @@ export default function Navbar() {
           alignItems: "center",
         }}
       >
-        <Link
-          href="/products"
-          style={{
-            textDecoration: "none",
-            color: "#444",
-            fontWeight: 500,
-          }}
-        >
+        <Link href="/products" style={linkStyle}>
           Marketplace
         </Link>
 
-        <Link
-          href="/sell"
-          style={{
-            textDecoration: "none",
-            color: "#444",
-            fontWeight: 500,
-          }}
-        >
+        <Link href="/sell" style={linkStyle}>
           Vender
         </Link>
 
-        <Link
-          href="/cart"
-          style={{
-            textDecoration: "none",
-            color: "#111",
-            fontWeight: 700,
-          }}
-        >
+        <Link href="/cart" style={cartLinkStyle}>
           Carrito ({cartCount})
         </Link>
 
@@ -113,3 +102,15 @@ export default function Navbar() {
     </nav>
   );
 }
+
+const linkStyle = {
+  textDecoration: "none",
+  color: "#444",
+  fontWeight: 500,
+};
+
+const cartLinkStyle = {
+  textDecoration: "none",
+  color: "#111",
+  fontWeight: 800,
+};

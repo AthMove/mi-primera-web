@@ -107,11 +107,11 @@ export default function CartPage() {
             </div>
 
             <a
-              href={`/api/checkout?productId=${items[0].id}`}
-              style={checkoutButtonStyle}
-            >
-              Ir al pago
-            </a>
+  href={`/api/checkout?productIds=${items.map((item) => item.id).join(",")}`}
+  style={checkoutButtonStyle}
+>
+  Ir al pago
+</a>
           </aside>
         </section>
       )}
