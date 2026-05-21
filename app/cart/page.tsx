@@ -1,320 +1,226 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
-
-type CartItem = {
-  id: string;
-  title: string;
-  brand: string;
-  price: number;
-  image: string;
-};
+import Image from "next/image";
+import Link from "next/link";
+import { supabase } from "@/lib/supabase";
 
 export default function CartPage() {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [cart, setCart] = useState<any[]>([]);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
   useEffect(() => {
-    const savedCart = localStorage.getItem("athmov_cart");
+    setCart(JSON.parse(localStorage.getItem("athmov_cart") || "[]"));
 
-    if (savedCart) {
-      setItems(JSON.parse(savedCart));
-    }
+    const getUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      setUserEmail(user?.email || null);
+    };
+
+    getUser();
   }, []);
 
-  const removeItem = (productId: string) => {
-    const updated = items.filter((item) => item.id !== productId);
-
-    setItems(updated);
+  const removeItem = (id: string) => {
+    const updated = cart.filter((item) => item.id !== id);
+    setCart(updated);
     localStorage.setItem("athmov_cart", JSON.stringify(updated));
   };
 
-  const total = items.reduce((sum, item) => sum + Number(item.price), 0);
+  const total = cart.reduce((acc, item) => {
+    return acc + Number(String(item.precio).replace("€", ""));
+  }, 0);
+
+  const handleCheckout = async () => {
+    if (cart.length === 0) {
+      alert("El carrito está vacío");
+      return;
+    }
+
+    const response = await fetch("/api/checkout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ 
+        items: cart,
+        email: userEmail,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert(data.error || "Error creando checkout");
+    }
+  };
 
   return (
     <main style={pageStyle}>
-      <section style={headerStyle}>
-        <div>
-          <p style={eyebrowStyle}>ATHMOV</p>
-          <h1 style={titleStyle}>Carrito</h1>
-          <p style={subtitleStyle}>Revisa tus productos antes del pago.</p>
-        </div>
+      <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
+        <p style={eyebrowStyle}>ATHMOV CHECKOUT</p>
+        <h1 style={titleStyle}>Your Cart</h1>
 
-        <Link href="/products" style={backButtonStyle}>
-          Seguir comprando
-        </Link>
-      </section>
+        {cart.length === 0 ? (
+          <section style={emptyStyle}>
+            <h2 style={{ fontSize: "42px", margin: 0 }}>Your cart is empty</h2>
+            <p style={{ color: "#666", marginTop: "14px" }}>
+              Discover premium sports equipment from athletes and sellers.
+            </p>
+            <Link href="/products" style={shopButtonStyle}>
+              Continue shopping
+            </Link>
+          </section>
+        ) : (
+          <div style={layoutStyle}>
+            <section style={itemsStyle}>
+              {cart.map((item) => (
+                <article key={item.id} style={itemStyle}>
+                  <div style={imageWrapperStyle}>
+                    <Image
+                      src={item.imagen}
+                      alt={item.nombre}
+                      fill
+                      style={{ objectFit: "cover" }}
+                    />
+                  </div>
 
-      {items.length === 0 ? (
-        <section style={emptyStyle}>
-          <h2 style={emptyTitleStyle}>Tu carrito está vacío</h2>
-          <p style={emptyTextStyle}>
-            Añade productos desde el marketplace.
-          </p>
-
-          <Link href="/products" style={shopButtonStyle}>
-            Ir al marketplace
-          </Link>
-        </section>
-      ) : (
-        <section style={layoutStyle}>
-          <div style={itemsStyle}>
-            {items.map((item) => (
-              <article key={item.id} style={itemStyle}>
-                <div style={imageBoxStyle}>
-                  <img
-                    src={
-                      item.image ||
-                      "https://placehold.co/700x700?text=ATHMOV"
-                    }
-                    alt={item.title}
-                    style={imageStyle}
-                  />
-                </div>
-
-                <div style={infoStyle}>
-                  <p style={brandStyle}>{item.brand}</p>
-                  <h2 style={productTitleStyle}>{item.title}</h2>
-                  <p style={priceStyle}>€{item.price}</p>
+                  <div>
+                    <p style={sportStyle}>{item.deporte}</p>
+                    <h2 style={itemTitleStyle}>{item.nombre}</h2>
+                    <p style={priceStyle}>{item.precio}</p>
+                  </div>
 
                   <button
                     onClick={() => removeItem(item.id)}
                     style={removeButtonStyle}
                   >
-                    Eliminar
+                    Remove
                   </button>
-                </div>
-              </article>
-            ))}
+                </article>
+              ))}
+            </section>
+
+            <aside style={summaryStyle}>
+              <p style={eyebrowStyle}>ORDER SUMMARY</p>
+
+              <div style={summaryRowStyle}>
+                <span>Subtotal</span>
+                <strong>€{total}</strong>
+              </div>
+
+              <div style={summaryRowStyle}>
+                <span>Service</span>
+                <strong>Included</strong>
+              </div>
+
+              <div style={dividerStyle} />
+
+              <div style={totalRowStyle}>
+                <span>Total</span>
+                <strong>€{total}</strong>
+              </div>
+
+              <button onClick={handleCheckout} style={checkoutButtonStyle}>
+                Checkout
+              </button>
+
+              <p style={secureTextStyle}>
+                Secure checkout. Buyer protection included.
+              </p>
+            </aside>
           </div>
-
-          <aside style={summaryStyle}>
-            <p style={summaryLabelStyle}>Resumen</p>
-
-            <div style={summaryRowStyle}>
-              <span>Subtotal</span>
-              <strong>€{total}</strong>
-            </div>
-
-            <div style={summaryRowStyle}>
-              <span>Envío</span>
-              <strong>Por confirmar</strong>
-            </div>
-
-            <div style={totalRowStyle}>
-              <span>Total</span>
-              <strong>€{total}</strong>
-            </div>
-
-            <a
-  href={`/api/checkout?productIds=${items.map((item) => item.id).join(",")}`}
-  style={checkoutButtonStyle}
->
-  Ir al pago
-</a>
-          </aside>
-        </section>
-      )}
+        )}
+      </div>
     </main>
   );
 }
 
-const fontFamily =
-  "'Manrope', 'Satoshi', 'Avenir Next', system-ui, sans-serif";
-
 const pageStyle = {
   minHeight: "100vh",
-  background: "#f6f6f3",
-  padding: "46px",
-  fontFamily,
+  background: "linear-gradient(to bottom, #f8f8f4, #eeeeea)",
+  padding: "70px 60px",
+  fontFamily: "Inter, sans-serif",
 };
 
-const headerStyle = {
-  maxWidth: "1180px",
-  margin: "0 auto 44px",
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "flex-end",
-  gap: "24px",
-};
-
-const eyebrowStyle = {
-  fontSize: "12px",
-  letterSpacing: "2px",
-  textTransform: "uppercase" as const,
-  color: "#777",
-  marginBottom: "10px",
-};
-
-const titleStyle = {
-  fontSize: "56px",
-  lineHeight: 1,
-  margin: 0,
-  letterSpacing: "-2px",
-};
-
-const subtitleStyle = {
-  color: "#666",
-  marginTop: "12px",
-};
-
-const backButtonStyle = {
-  background: "#111",
-  color: "#fff",
-  textDecoration: "none",
-  borderRadius: "999px",
-  padding: "14px 22px",
-  fontWeight: 700,
-  fontSize: "14px",
-};
-
-const emptyStyle = {
-  maxWidth: "720px",
-  margin: "80px auto 0",
-  background: "#fff",
-  padding: "48px",
-  borderRadius: "32px",
-  textAlign: "center" as const,
-};
-
-const emptyTitleStyle = {
-  fontSize: "32px",
-  marginBottom: "12px",
-};
-
-const emptyTextStyle = {
-  color: "#666",
-  marginBottom: "28px",
-};
-
-const shopButtonStyle = {
-  background: "#111",
-  color: "#fff",
-  textDecoration: "none",
-  borderRadius: "999px",
-  padding: "14px 22px",
-  fontWeight: 700,
-  fontSize: "14px",
-};
-
-const layoutStyle = {
-  maxWidth: "1180px",
-  margin: "0 auto",
-  display: "grid",
-  gridTemplateColumns: "1fr 360px",
-  gap: "28px",
-  alignItems: "start",
-};
-
-const itemsStyle = {
-  display: "flex",
-  flexDirection: "column" as const,
-  gap: "18px",
-};
+const eyebrowStyle = { fontSize: "12px", letterSpacing: "3px", opacity: 0.5, marginBottom: "14px" };
+const titleStyle = { fontSize: "76px", lineHeight: 1, letterSpacing: "-4px", margin: "0 0 50px" };
+const layoutStyle = { display: "grid", gridTemplateColumns: "1fr 420px", gap: "34px", alignItems: "start" };
+const itemsStyle = { display: "grid", gap: "22px" };
 
 const itemStyle = {
-  background: "#fff",
-  borderRadius: "28px",
-  padding: "18px",
   display: "grid",
-  gridTemplateColumns: "160px 1fr",
-  gap: "22px",
-};
-
-const imageBoxStyle = {
-  height: "160px",
-  background: "#efefea",
-  borderRadius: "20px",
-  display: "flex",
+  gridTemplateColumns: "210px 1fr auto",
+  gap: "30px",
+  background: "rgba(255,255,255,0.78)",
+  backdropFilter: "blur(18px)",
+  padding: "24px",
+  borderRadius: "34px",
   alignItems: "center",
-  justifyContent: "center",
+  border: "1px solid rgba(0,0,0,0.05)",
+};
+
+const imageWrapperStyle = {
+  position: "relative" as const,
+  height: "170px",
+  borderRadius: "24px",
   overflow: "hidden",
+  background: "#fff",
 };
 
-const imageStyle = {
-  width: "90%",
-  height: "90%",
-  objectFit: "contain" as const,
-};
-
-const infoStyle = {
-  display: "flex",
-  flexDirection: "column" as const,
-  justifyContent: "center",
-};
-
-const brandStyle = {
-  fontSize: "12px",
-  letterSpacing: "2px",
-  textTransform: "uppercase" as const,
-  color: "#777",
-  marginBottom: "8px",
-};
-
-const productTitleStyle = {
-  fontSize: "28px",
-  lineHeight: 1,
-  marginBottom: "12px",
-};
-
-const priceStyle = {
-  fontSize: "22px",
-  fontWeight: 700,
-  marginBottom: "18px",
-};
+const sportStyle = { fontSize: "11px", letterSpacing: "3px", opacity: 0.45, marginBottom: "12px" };
+const itemTitleStyle = { fontSize: "32px", margin: 0, letterSpacing: "-1px" };
+const priceStyle = { fontSize: "28px", fontWeight: 800 };
 
 const removeButtonStyle = {
-  width: "fit-content",
-  background: "#fff",
-  color: "#c0392b",
-  border: "1px solid #f0c7c1",
+  background: "transparent",
+  border: "1px solid rgba(0,0,0,0.12)",
   borderRadius: "999px",
-  padding: "10px 16px",
-  fontWeight: 700,
+  padding: "14px 22px",
   cursor: "pointer",
+  fontWeight: 700,
 };
 
 const summaryStyle = {
-  background: "#fff",
-  borderRadius: "28px",
-  padding: "28px",
   position: "sticky" as const,
-  top: "24px",
+  top: "120px",
+  background: "#111",
+  color: "#fff",
+  padding: "34px",
+  borderRadius: "34px",
+  boxShadow: "0 40px 120px rgba(0,0,0,0.18)",
 };
 
-const summaryLabelStyle = {
-  fontSize: "12px",
-  letterSpacing: "2px",
-  textTransform: "uppercase" as const,
-  color: "#777",
-  marginBottom: "22px",
-};
-
-const summaryRowStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-  marginBottom: "16px",
-  color: "#555",
-};
-
-const totalRowStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-  borderTop: "1px solid #eee",
-  paddingTop: "18px",
-  marginTop: "18px",
-  marginBottom: "24px",
-  fontSize: "20px",
-};
+const summaryRowStyle = { display: "flex", justifyContent: "space-between", fontSize: "16px", marginBottom: "18px", color: "rgba(255,255,255,0.75)" };
+const dividerStyle = { height: "1px", background: "rgba(255,255,255,0.14)", margin: "26px 0" };
+const totalRowStyle = { display: "flex", justifyContent: "space-between", fontSize: "28px", marginBottom: "30px" };
 
 const checkoutButtonStyle = {
-  display: "block",
   width: "100%",
-  textAlign: "center" as const,
+  background: "#fff",
+  color: "#111",
+  border: "none",
+  padding: "20px",
+  borderRadius: "999px",
+  fontSize: "16px",
+  fontWeight: 800,
+  cursor: "pointer",
+};
+
+const secureTextStyle = { fontSize: "13px", color: "rgba(255,255,255,0.55)", textAlign: "center" as const, marginTop: "18px" };
+const emptyStyle = { background: "#fff", padding: "60px", borderRadius: "36px" };
+
+const shopButtonStyle = {
+  display: "inline-block",
+  marginTop: "28px",
   background: "#111",
   color: "#fff",
   textDecoration: "none",
+  padding: "16px 26px",
   borderRadius: "999px",
-  padding: "16px",
-  fontWeight: 700,
+  fontWeight: 800,
 };

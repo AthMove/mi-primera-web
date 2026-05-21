@@ -1,32 +1,42 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 export default function SellPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
 
   const [title, setTitle] = useState("");
   const [brand, setBrand] = useState("");
+  const [category, setCategory] = useState("PADEL");
+  const [condition, setCondition] = useState("Excellent");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("PADEL");
-  const [condition, setCondition] = useState("Usada");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [previews, setPreviews] = useState<string[]>([]);
+  const handleImage = (file: File | null) => {
+    if (!file) return;
 
-  const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []).slice(0, 5);
-
-    setImageFiles(files);
-    setPreviews(files.map((file) => URL.createObjectURL(file)));
+    setImageFile(file);
+    setPreview(URL.createObjectURL(file));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const publishProduct = async () => {
+    if (!title.trim() || !brand.trim() || !price.trim() || !description.trim()) {
+      alert("Completa todos los campos");
+      return;
+    }
+
+    const numericPrice = Number(price);
+
+    if (!numericPrice || numericPrice <= 0) {
+      alert("Introduce un precio válido");
+      return;
+    }
 
     const {
       data: { user },
@@ -34,317 +44,359 @@ export default function SellPage() {
 
     if (!user) {
       alert("Debes iniciar sesión para vender");
-      router.push("/auth?mode=login");
-      return;
-    }
-
-    if (imageFiles.length < 3) {
-      alert("Sube al menos 3 fotos reales del producto.");
+      router.push("/auth");
       return;
     }
 
     try {
       setLoading(true);
 
-      const imageUrls: string[] = [];
+      let imageUrl = "/logo.png";
 
-      for (const file of imageFiles) {
-        const fileExt = file.type.split("/")[1] || "jpg";
-        const fileName = `${crypto.randomUUID()}.${fileExt}`;
+      if (imageFile) {
+        const fileExt = imageFile.name.split(".").pop() || "jpg";
+        const fileName = `${user.id}-${Date.now()}.${fileExt}`;
 
         const { error: uploadError } = await supabase.storage
-          .from("products")
-          .upload(fileName, file, {
-            cacheControl: "3600",
-            upsert: false,
-            contentType: file.type,
-          });
+          .from("product-images")
+          .upload(fileName, imageFile);
 
         if (uploadError) {
-          alert(`Error subiendo imagen: ${uploadError.message}`);
+          alert(uploadError.message);
           return;
         }
 
         const { data } = supabase.storage
-          .from("products")
+          .from("product-images")
           .getPublicUrl(fileName);
 
-        imageUrls.push(data.publicUrl);
+        imageUrl = data.publicUrl;
       }
 
-      const { error } = await supabase.from("products").insert([
-        {
-          title,
-          brand,
-          price: Number(price),
-          description,
-          category,
-          condition,
-          image: imageUrls[0],
-          images: imageUrls,
-          seller_id: user.id,
-        },
-      ]);
+      const { data, error } = await supabase
+        .from("products")
+        .insert([
+          {
+            title: title.trim(),
+            brand: brand.trim(),
+            category,
+            condition,
+            price: numericPrice,
+            description: description.trim(),
+            image: imageUrl,
+            images: [imageUrl],
+            seller_id: user.id,
+            seller_email: user.email,
+            sold: false,
+          },
+        ])
+        .select()
+        .single();
 
       if (error) {
-        alert(`Error guardando producto: ${error.message}`);
+        alert(error.message);
         return;
       }
 
-      alert("Producto publicado correctamente");
-      router.push("/products");
-    } catch (error: any) {
-      alert(error.message || "Error");
+      alert("Product published");
+      router.push(`/products/${data.id}`);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main style={pageStyle}>
-      <div style={cardStyle}>
-        <h1 style={titleStyle}>Vender producto</h1>
+    <main style={pageStyle} className="sell-page">
+      <section style={heroStyle}>
+        <p style={heroEyebrowStyle}>ATHMOV VERIFIED MARKETPLACE</p>
 
-        <p style={subtitleStyle}>
-          Sube entre 3 y 5 fotos reales. La primera será la portada del producto.
+        <h1 style={heroTitleStyle} className="sell-title">
+          Sell Premium
+          <br />
+          Sports Gear
+        </h1>
+
+        <p style={heroTextStyle}>
+          List your second-hand sports equipment in a curated premium marketplace.
         </p>
+      </section>
 
-        <form onSubmit={handleSubmit} style={formStyle}>
-          <div>
-            <label>Marca</label>
-            <input
-              value={brand}
-              onChange={(e) => setBrand(e.target.value)}
-              placeholder="Ej: Bullpadel"
-              required
-              style={inputStyle}
+      <section style={formWrapperStyle} className="sell-form-wrapper">
+        <label style={uploadBoxStyle}>
+          {preview ? (
+            <Image
+              src={preview}
+              alt="Product preview"
+              fill
+              style={{ objectFit: "cover" }}
             />
-          </div>
+          ) : (
+            <div style={emptyUploadStyle}>
+              <div style={uploadIconStyle}>＋</div>
+              <p style={uploadTitleStyle}>Product image</p>
+              <span style={uploadTextStyle}>Upload a clear premium photo</span>
+            </div>
+          )}
 
-          <div>
-            <label>Modelo</label>
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Ej: Vertex 03 2024"
-              required
-              style={inputStyle}
-            />
-          </div>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => handleImage(e.target.files?.[0] || null)}
+            style={{ display: "none" }}
+          />
+        </label>
 
-          <div>
-            <label>Precio</label>
-            <input
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder="Ej: 185"
-              required
-              style={inputStyle}
-            />
-          </div>
+        <div style={formStyle}>
+          <input
+            placeholder="Product title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            style={inputStyle}
+          />
 
-          <div>
-            <label>Categoría</label>
+          <input
+            placeholder="Brand"
+            value={brand}
+            onChange={(e) => setBrand(e.target.value)}
+            style={inputStyle}
+          />
+
+          <div style={rowStyle}>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               style={inputStyle}
             >
-              <option>PADEL</option>
-              <option>TENNIS</option>
-              <option>GOLF</option>
-              <option>RUNNING</option>
-              <option>ROPA</option>
+              <option value="PADEL">PADEL</option>
+              <option value="GOLF">GOLF</option>
+              <option value="TENNIS">TENNIS</option>
+              <option value="CYCLING">CYCLING</option>
+              <option value="RUNNING">RUNNING</option>
             </select>
-          </div>
 
-          <div>
-            <label>Estado</label>
             <select
               value={condition}
               onChange={(e) => setCondition(e.target.value)}
               style={inputStyle}
             >
-              <option>Usada</option>
-              <option>Como nueva</option>
-              <option>Nueva</option>
+              <option value="New">New</option>
+              <option value="Like new">Like new</option>
+              <option value="Excellent">Excellent</option>
+              <option value="Good">Good</option>
+              <option value="Used">Used</option>
             </select>
           </div>
 
-          <div>
-            <label>Descripción</label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe el estado real del producto..."
-              required
-              style={textareaStyle}
-            />
+          <input
+            placeholder="Price (€)"
+            type="number"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            style={inputStyle}
+          />
+
+          <textarea
+            placeholder="Describe condition, usage, serial number, invoice availability..."
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            style={textareaStyle}
+          />
+
+          <div style={noticeStyle}>
+            <strong>Beta trust tip:</strong> include serial numbers, close-up
+            photos and any proof of purchase to increase buyer confidence.
           </div>
 
-          <div>
-            <label>Fotos reales del producto</label>
-
-            <label style={uploadButtonStyle}>
-              Subir fotos
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleImagesChange}
-                style={{ display: "none" }}
-              />
-            </label>
-
-            <p style={helpTextStyle}>
-              Mínimo 3 fotos, máximo 5. La primera será la imagen principal.
-            </p>
-
-            {previews.length > 0 && (
-              <div style={previewGridStyle}>
-                {previews.map((preview, index) => (
-                  <div key={index} style={previewBoxStyle}>
-                    <img
-                      src={preview}
-                      alt={`Preview ${index + 1}`}
-                      style={previewImageStyle}
-                    />
-
-                    {index === 0 && (
-                      <span style={mainBadgeStyle}>Portada</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
+          <div style={trustRowStyle}>
+            <div style={trustBadgeStyle}>✓ VERIFIED MARKETPLACE</div>
+            <div style={trustBadgeStyle}>✓ BUYER PROTECTION</div>
+            <div style={trustBadgeStyle}>✓ PREMIUM SPORTS COMMUNITY</div>
           </div>
 
-          <button type="submit" disabled={loading} style={buttonStyle}>
-            {loading ? "PUBLICANDO..." : "Publicar producto"}
+          <button onClick={publishProduct} style={submitButtonStyle}>
+            {loading ? "Publishing..." : "Publish product"}
           </button>
-        </form>
-      </div>
+        </div>
+      </section>
+
+      <style>{`
+        @media (max-width: 900px) {
+          .sell-page {
+            padding: 120px 18px 34px !important;
+          }
+
+          .sell-title {
+            font-size: 48px !important;
+            letter-spacing: -2px !important;
+          }
+
+          .sell-form-wrapper {
+            grid-template-columns: 1fr !important;
+            padding: 18px !important;
+          }
+        }
+      `}</style>
     </main>
   );
 }
 
-const fontFamily =
-  "'Manrope', 'Satoshi', 'Avenir Next', system-ui, sans-serif";
-
 const pageStyle = {
   minHeight: "100vh",
-  background: "#f6f6f3",
-  padding: "60px 20px",
-  fontFamily,
+  background: "linear-gradient(to bottom, #f8f8f4, #eeeeea)",
+  padding: "70px 60px",
+  fontFamily: "Inter, sans-serif",
 };
 
-const cardStyle = {
-  maxWidth: "620px",
-  margin: "0 auto",
-  background: "#fff",
-  padding: "36px",
-  borderRadius: "30px",
-  boxShadow: "0 8px 28px rgba(0,0,0,0.045)",
+const heroStyle = {
+  maxWidth: "1200px",
+  margin: "0 auto 50px",
 };
 
-const titleStyle = {
-  fontSize: "40px",
-  marginBottom: "10px",
-  fontWeight: 650,
-  letterSpacing: "-1.4px",
+const heroEyebrowStyle = {
+  fontSize: "11px",
+  letterSpacing: "3px",
+  opacity: 0.5,
 };
 
-const subtitleStyle = {
+const heroTitleStyle = {
+  fontSize: "82px",
+  lineHeight: 0.95,
+  letterSpacing: "-5px",
+  marginTop: "20px",
+  marginBottom: "24px",
+};
+
+const heroTextStyle = {
+  fontSize: "18px",
   color: "#666",
-  marginBottom: "34px",
-  fontSize: "15px",
-  lineHeight: 1.6,
+  maxWidth: "620px",
+  lineHeight: 1.7,
+};
+
+const formWrapperStyle = {
+  maxWidth: "1200px",
+  margin: "0 auto",
+  display: "grid",
+  gridTemplateColumns: "0.9fr 1.1fr",
+  gap: "34px",
+  background: "#fff",
+  borderRadius: "40px",
+  padding: "34px",
+  boxShadow: "0 25px 90px rgba(0,0,0,0.06)",
+  border: "1px solid rgba(0,0,0,0.05)",
+};
+
+const uploadBoxStyle = {
+  position: "relative" as const,
+  height: "620px",
+  borderRadius: "34px",
+  border: "2px dashed rgba(0,0,0,0.12)",
+  background: "#f8f8f5",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  flexDirection: "column" as const,
+  cursor: "pointer",
+  overflow: "hidden",
+};
+
+const emptyUploadStyle = {
+  textAlign: "center" as const,
+};
+
+const uploadIconStyle = {
+  width: "52px",
+  height: "52px",
+  borderRadius: "999px",
+  background: "#111",
+  color: "#fff",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: "28px",
+  margin: "0 auto 18px",
+};
+
+const uploadTitleStyle = {
+  margin: 0,
+  fontWeight: 900,
+};
+
+const uploadTextStyle = {
+  color: "#777",
+  fontSize: "13px",
 };
 
 const formStyle = {
   display: "flex",
   flexDirection: "column" as const,
-  gap: "18px",
+};
+
+const rowStyle = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr",
+  gap: "14px",
 };
 
 const inputStyle = {
   width: "100%",
-  padding: "16px",
-  borderRadius: "14px",
-  border: "1px solid #ddd",
-  marginTop: "8px",
+  padding: "18px 22px",
+  borderRadius: "18px",
   fontSize: "15px",
-  boxSizing: "border-box" as const,
+  background: "#fafaf8",
+  border: "1px solid rgba(0,0,0,0.08)",
+  outline: "none",
+  marginBottom: "14px",
 };
 
 const textareaStyle = {
-  ...inputStyle,
-  minHeight: "120px",
+  width: "100%",
+  minHeight: "170px",
+  padding: "18px 22px",
+  borderRadius: "24px",
+  fontSize: "15px",
+  background: "#fafaf8",
+  border: "1px solid rgba(0,0,0,0.08)",
+  outline: "none",
   resize: "none" as const,
 };
 
-const uploadButtonStyle = {
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  background: "#111",
-  color: "#fff",
-  padding: "14px 22px",
-  borderRadius: "999px",
-  fontSize: "14px",
-  fontWeight: 600,
-  cursor: "pointer",
-  marginTop: "10px",
-  width: "fit-content",
+const noticeStyle = {
+  marginTop: "16px",
+  background: "#f5f5f1",
+  border: "1px solid rgba(0,0,0,0.06)",
+  borderRadius: "22px",
+  padding: "16px",
+  color: "#555",
+  lineHeight: 1.6,
 };
 
-const helpTextStyle = {
-  color: "#777",
-  fontSize: "13px",
-  marginTop: "8px",
-};
-
-const previewGridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(5, 1fr)",
+const trustRowStyle = {
+  display: "flex",
+  flexWrap: "wrap" as const,
   gap: "10px",
-  marginTop: "14px",
+  marginTop: "18px",
 };
 
-const previewBoxStyle = {
-  position: "relative" as const,
-  height: "90px",
-  borderRadius: "14px",
-  overflow: "hidden",
-  background: "#f4f4f1",
-};
-
-const previewImageStyle = {
-  width: "100%",
-  height: "100%",
-  objectFit: "cover" as const,
-};
-
-const mainBadgeStyle = {
-  position: "absolute" as const,
-  left: "6px",
-  bottom: "6px",
-  background: "#111",
-  color: "#fff",
-  fontSize: "10px",
-  padding: "4px 7px",
+const trustBadgeStyle = {
+  background: "#fff",
+  border: "1px solid rgba(0,0,0,0.08)",
   borderRadius: "999px",
+  padding: "10px 14px",
+  fontSize: "10px",
+  fontWeight: 900,
+  letterSpacing: "1.2px",
 };
 
-const buttonStyle = {
+const submitButtonStyle = {
+  width: "100%",
+  marginTop: "24px",
   background: "#111",
   color: "#fff",
   border: "none",
   borderRadius: "999px",
-  padding: "16px",
-  fontWeight: 700,
-  fontSize: "14px",
+  padding: "22px",
+  fontSize: "16px",
+  fontWeight: 800,
   cursor: "pointer",
-  marginTop: "14px",
 };

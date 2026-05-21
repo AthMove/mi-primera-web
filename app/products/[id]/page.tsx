@@ -1,401 +1,1078 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import FavoriteButton from "@/app/components/FavoriteButton";
 
-type Product = {
-  id: string;
-  title: string;
-  brand: string;
-  price: number;
-  description: string;
-  image: string;
-  images?: string[];
-  condition: string;
-  seller_id?: string;
-};
-
-export default function ProductPage() {
+export default function ProductDetail() {
   const params = useParams();
-  const id = params.id as string;
+  const id = String(params.id);
 
-  const [product, setProduct] = useState<Product | null>(null);
+  const [producto, setProducto] = useState<any>(null);
+  const [related, setRelated] = useState<any[]>([]);
   const [selectedImage, setSelectedImage] = useState("");
+  const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   useEffect(() => {
-    if (id) {
-      fetchProduct();
+    if (!id || id === "undefined") {
+      setLoading(false);
+      setNotFound(true);
+      return;
     }
+
+    const getProduct = async () => {
+      try {
+        setLoading(true);
+        setNotFound(false);
+
+        const { data, error } = await supabase
+          .from("products")
+          .select("*")
+          .eq("id", id)
+          .maybeSingle();
+
+        if (error || !data) {
+          setProducto(null);
+          setNotFound(true);
+          return;
+        }
+
+        setProducto(data);
+
+        const images =
+          data.images && Array.isArray(data.images) ? data.images : [data.image];
+
+        setSelectedImage(images[0] || "/logo.png");
+
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (user) {
+          const { data: favorite } = await supabase
+            .from("favorites")
+            .select("*")
+            .eq("user_id", user.id)
+            .eq("product_id", data.id)
+            .maybeSingle();
+
+          setIsFavorite(!!favorite);
+        }
+
+        const { data: relatedProducts } = await supabase
+          .from("products")
+          .select("*")
+          .neq("id", data.id)
+          .eq("sold", false)
+          .limit(3);
+
+        setRelated(relatedProducts || []);
+      } catch {
+        setNotFound(true);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getProduct();
   }, [id]);
 
-  const fetchProduct = async () => {
-    const { data, error } = await supabase
-      .from("products")
-      .select("*")
-      .eq("id", id)
-      .single();
+  const getBuyerGuide = () => {
+    const category = String(producto?.category || producto?.brand || "")
+      .toLowerCase()
+      .trim();
+
+    if (category.includes("padel") || category.includes("pádel")) {
+      return {
+        sport: "Pádel",
+        title: "Cómo revisar una pala antes de comprar",
+        tips: [
+          "Pide foto clara del QR, holograma o número de serie.",
+          "Comprueba el peso: normalmente debe estar entre 350 y 390 g.",
+          "Revisa bordes, serigrafía, grietas y acabado del marco.",
+        ],
+      };
+    }
+
+    if (category.includes("tennis") || category.includes("tenis")) {
+      return {
+        sport: "Tenis",
+        title: "Cómo revisar una raqueta antes de comprar",
+        tips: [
+          "Pide vídeo mostrando el código del mástil.",
+          "Compara medidas y modelo con la ficha oficial de la marca.",
+          "Revisa grip, encordado, marco y posibles fisuras.",
+        ],
+      };
+    }
+
+    if (category.includes("golf")) {
+      return {
+        sport: "Golf",
+        title: "Cómo revisar palos de golf antes de comprar",
+        tips: [
+          "Pide foto del serial grabado en el hosel.",
+          "Revisa soldaduras, cromado, face y shaft.",
+          "Si dudas, llévalo a una tienda de golf antes de aceptarlo.",
+        ],
+      };
+    }
+
+    return {
+      sport: "Buyer Guide",
+      title: "Qué revisar antes de comprar",
+      tips: [
+        "Pide fotos reales del producto, serial y detalles de desgaste.",
+        "Compara el modelo con la web oficial de la marca.",
+        "Solicita ticket, factura o prueba de compra si es posible.",
+      ],
+    };
+  };
+
+ const buyNow = async () => {
+  if (!producto) return;
+
+  if (producto.sold) {
+    alert("This product has already been sold");
+    return;
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    alert("Debes iniciar sesión");
+    return;
+  }
+
+  if (user.id === producto.seller_id) {
+    alert("No puedes comprar tu propio producto");
+    return;
+  }
+
+  try {
+    setCheckoutLoading(true);
+
+    const response = await fetch("/api/checkout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title: producto.title,
+        image: safeImage(producto.image),
+        price: Number(producto.price),
+        productId: producto.id,
+        sellerId: producto.seller_id,
+        buyerId: user.id,
+        origin: window.location.origin,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (data.url) {
+      window.location.href = data.url;
+      return;
+    }
+
+    alert(data.error || "No se pudo iniciar el checkout");
+  } catch (error) {
+    console.log(error);
+    alert("Error starting checkout");
+  } finally {
+    setCheckoutLoading(false);
+  }
+};
+
+  const toggleFavorite = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      alert("Debes iniciar sesión");
+      return;
+    }
+
+    if (!producto) return;
+
+    if (isFavorite) {
+      await supabase
+        .from("favorites")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("product_id", producto.id);
+
+      setIsFavorite(false);
+    } else {
+      await supabase.from("favorites").insert([
+        {
+          user_id: user.id,
+          product_id: producto.id,
+          user_email: user.email,
+        },
+      ]);
+
+      setIsFavorite(true);
+    }
+  };
+
+  const makeOffer = async () => {
+    if (!producto) return;
+
+    if (producto.sold) {
+      alert("This product has already been sold");
+      return;
+    }
+
+    if (!producto?.seller_id) {
+      alert("Este producto no tiene vendedor asociado");
+      return;
+    }
+
+    const amount = prompt("Enter your offer");
+    if (!amount) return;
+
+    const numericAmount = Number(amount);
+
+    if (!numericAmount || numericAmount <= 0) {
+      alert("Introduce una cantidad válida");
+      return;
+    }
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      alert("You must sign in");
+      return;
+    }
+
+    if (user.id === producto.seller_id) {
+      alert("No puedes hacer una oferta sobre tu propio producto");
+      return;
+    }
+
+    const { error } = await supabase.from("offers").insert([
+      {
+        product_id: producto.id,
+        seller_id: producto.seller_id,
+        buyer_id: user.id,
+        buyer_email: user.email,
+        amount: numericAmount,
+        status: "pending",
+      },
+    ]);
 
     if (error) {
-      console.log("Error cargando producto:", error);
+      alert(error.message);
+      return;
     }
 
-    if (data) {
-      setProduct(data);
+    alert("Offer sent");
+  };
 
-      const firstImage =
-        data.images?.[0] ||
-        data.image ||
-        "https://placehold.co/900x900?text=ATHMOV";
+  const messageSeller = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-      setSelectedImage(firstImage);
+    if (!user) {
+      alert("Debes iniciar sesión");
+      return;
     }
 
-    setLoading(false);
+    if (!producto?.seller_id) {
+      alert("Este producto no tiene vendedor asociado");
+      return;
+    }
+
+    if (user.id === producto.seller_id) {
+      alert("No puedes escribirte a ti mismo");
+      return;
+    }
+
+    const { data: existingConversation } = await supabase
+      .from("conversations")
+      .select("*")
+      .eq("buyer_id", user.id)
+      .eq("seller_id", producto.seller_id)
+      .eq("product_id", producto.id)
+      .maybeSingle();
+
+    let conversationId = existingConversation?.id;
+
+    if (!conversationId) {
+      const { data: newConversation, error } = await supabase
+        .from("conversations")
+        .insert([
+          {
+            buyer_id: user.id,
+            seller_id: producto.seller_id,
+            product_id: producto.id,
+          },
+        ])
+        .select()
+        .single();
+
+      if (error || !newConversation) {
+        alert(error?.message || "No se pudo crear la conversación");
+        return;
+      }
+
+      conversationId = newConversation.id;
+    }
+
+    await supabase.from("messages").insert([
+  {
+    conversation_id: conversationId,
+    sender_id: user.id,
+    text: `Hi! Could you send me a verification video of "${producto.title}" showing serial numbers, condition and branding?`,
+  },
+]);
+
+    window.location.href = `/messages/${conversationId}`;
+  };
+
+  const safeImage = (src: string) => {
+    return src?.startsWith("http") || src?.startsWith("/") ? src : "/logo.png";
   };
 
   if (loading) {
-    return <main style={loadingStyle}>Cargando producto...</main>;
+    return <div style={{ padding: "60px" }}>Cargando producto...</div>;
   }
 
-  if (!product) {
-    return <main style={loadingStyle}>Producto no encontrado</main>;
+  if (notFound || !producto) {
+    return <div style={{ padding: "60px" }}>Product not found</div>;
   }
 
-  const productImages =
-    product.images && product.images.length > 0
-      ? product.images
-      : [product.image];
+  if (producto.sold) {
+    return (
+      <main style={pageStyle}>
+        <button onClick={() => window.history.back()} style={backButtonStyle}>
+          ← Back
+        </button>
+
+        <section style={soldCardStyle}>
+          <p style={soldEyebrowStyle}>ATHMOV MARKETPLACE</p>
+          <h1 style={soldTitleStyle}>This product has been sold</h1>
+          <p style={soldTextStyle}>
+            This item is no longer available. You can continue browsing similar
+            premium sports gear.
+          </p>
+
+          <button
+            onClick={() => {
+              window.location.href = "/products";
+            }}
+            style={buyButtonStyle}
+          >
+            Back to marketplace
+          </button>
+        </section>
+      </main>
+    );
+  }
+
+  const images =
+    producto.images && Array.isArray(producto.images)
+      ? producto.images
+      : [producto.image];
+
+  const buyerGuide = getBuyerGuide();
 
   return (
-    <main style={pageStyle}>
-      <div style={containerStyle}>
-        <section>
-          <div style={imageSectionStyle}>
-            <img
-              src={
-                selectedImage ||
-                product.image ||
-                "https://placehold.co/900x900?text=ATHMOV"
-              }
-              alt={product.title}
-              style={imageStyle}
+    <main className="product-detail-page" style={pageStyle}>
+      <button onClick={() => window.history.back()} style={backButtonStyle}>
+        ← Back
+      </button>
+
+      <div style={layoutStyle} className="product-detail-layout">
+        <div>
+          <div style={mainImageStyle} className="product-detail-image">
+            <Image
+              src={safeImage(selectedImage)}
+              alt={producto.title || "Product"}
+              fill
+              sizes="(max-width: 900px) 100vw, 50vw"
+              className="main-product-image"
+              style={{ objectFit: "cover", transition: "transform 0.5s ease" }}
             />
           </div>
 
-          <div style={thumbsStyle}>
-            {productImages.map((img, index) => (
+          <div style={thumbGridStyle} className="product-detail-thumbs">
+            {images.map((img: string, index: number) => (
               <button
                 key={index}
-                type="button"
                 onClick={() => setSelectedImage(img)}
                 style={{
                   ...thumbButtonStyle,
                   border:
                     selectedImage === img
                       ? "2px solid #111"
-                      : "1px solid #ddd",
+                      : "1px solid rgba(0,0,0,0.08)",
                 }}
               >
-                <img
-                  src={img}
-                  alt={`${product.title} ${index + 1}`}
-                  style={thumbImageStyle}
+                <Image
+                  src={safeImage(img)}
+                  alt={`Product ${index + 1}`}
+                  fill
+                  sizes="180px"
+                  style={{ objectFit: "cover" }}
                 />
               </button>
             ))}
           </div>
-        </section>
+        </div>
 
-        <section style={infoStyle}>
-          <p style={brandStyle}>{product.brand}</p>
-          <h1 style={titleStyle}>{product.title}</h1>
-          <p style={priceStyle}>€{product.price}</p>
-          <FavoriteButton productId={product.id} />
-          <span style={conditionStyle}>{product.condition}</span>
-          <p style={descriptionStyle}>{product.description}</p>
+        <div>
+          <p style={brandStyle}>{producto.brand}</p>
 
-          {product.seller_id && (
-  <>
-    <Link
-      href={`/seller/${product.seller_id}`}
-      style={sellerBoxStyle}
-    >
-      <span style={sellerLabelStyle}>Vendedor</span>
-      <strong style={sellerNameStyle}>Ver perfil del vendedor</strong>
-      <span style={sellerArrowStyle}>→</span>
-    </Link>
+          <h1 style={titleStyle} className="product-detail-title">
+            {producto.title}
+          </h1>
 
-    <button
-      onClick={async () => {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
+          <p style={priceStyle} className="product-detail-price">
+            €{producto.price}
+          </p>
 
-        if (!user) {
-          alert("Inicia sesión para contactar con el vendedor");
-          return;
-        }
+          <p style={descriptionStyle}>{producto.description}</p>
 
-        if (user.id === product.seller_id) {
-          alert("No puedes enviarte un mensaje a ti mismo");
-          return;
-        }
+          <div style={metaGridStyle} className="product-detail-meta">
+            {[
+              ["CONDITION", producto.condition || "Excellent"],
+              ["SELLER", "Verified"],
+              ["LOCATION", "Spain"],
+            ].map(([label, value]) => (
+              <div key={label} style={metaCardStyle}>
+                <p style={metaLabelStyle}>{label}</p>
+                <p style={metaValueStyle}>{value}</p>
+              </div>
+            ))}
+          </div>
 
-        const { error } = await supabase.from("messages").insert({
-          sender_id: user.id,
-          receiver_id: product.seller_id,
-          product_id: product.id,
-          content: `Hola, me interesa tu producto: ${product.brand} ${product.title}`,
-        });
+          <div style={trustBadgesStyle}>
+  <div style={trustBadgeStyle}>✓ VERIFIED PHOTOS</div>
 
-        if (error) {
-          alert(error.message);
-          return;
-        }
+  <div style={trustBadgeStyle}>✓ VIDEO REQUESTED</div>
 
-        alert("Mensaje enviado al vendedor");
-        window.location.href = "/messages";
-      }}
-      style={contactButtonStyle}
-    >
-      Contactar vendedor
-    </button>
-  </>
-)}
+  <div style={trustBadgeStyle}>✓ SERIAL CHECKED</div>
 
-          <div style={buttonsWrapperStyle}>
-  <button
-    onClick={() => {
-      const existingCart = localStorage.getItem("athmov_cart");
-
-      const cart = existingCart
-        ? JSON.parse(existingCart)
-        : [];
-
-      const alreadyExists = cart.find(
-        (item: any) => item.id === product.id
-      );
-
-      if (!alreadyExists) {
-        cart.push({
-          id: product.id,
-          title: product.title,
-          brand: product.brand,
-          price: product.price,
-          image: product.image,
-        });
-
-        localStorage.setItem(
-          "athmov_cart",
-          JSON.stringify(cart)
-        );
-      }
-
-      alert("Producto añadido al carrito");
-    }}
-    style={secondaryButtonStyle}
-  >
-    Añadir al carrito
-  </button>
-
-  <a
-    href={`/api/checkout?productId=${product.id}`}
-    style={buttonStyle}
-  >
-    Comprar ahora
-  </a>
+  <div style={trustBadgeStyle}>✓ PREMIUM MARKETPLACE</div>
 </div>
-        </section>
+
+  <section style={buyerGuideStyle}>
+  <div style={buyerGuideHeaderStyle}>
+    <div>
+      <p style={buyerGuideEyebrowStyle}>BUYER GUIDE · BETA</p>
+
+      <h2 style={buyerGuideTitleStyle}>{buyerGuide.title}</h2>
+    </div>
+
+    <div style={buyerGuideBadgeStyle}>{buyerGuide.sport}</div>
+  </div>
+
+  <p style={buyerGuideTextStyle}>
+    Learn how to verify this product before purchasing. We recommend checking
+    serials, asking for videos and comparing details with the official brand
+    catalog.
+  </p>
+
+  <div style={buyerGuideCardsStyle}>
+    {buyerGuide.tips.map((tip, index) => {
+      const icons = ["🔍", "🎥", "📋"];
+
+      return (
+        <div key={tip} style={buyerGuideCardStyle}>
+          <div style={buyerGuideIconStyle}>{icons[index] || "✓"}</div>
+
+          <div>
+            <h4 style={buyerGuideCardTitleStyle}>
+              {index === 0
+                ? "Check authenticity marks"
+                : index === 1
+                  ? "Request extra proof"
+                  : "Compare condition"}
+            </h4>
+
+            <p style={buyerGuideCardTextStyle}>{tip}</p>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+
+  <div style={buyerGuideFooterStyle}>
+    ATHMOV is currently in beta. Verification tools are educational and designed
+    to help buyers make safer decisions independently.
+  </div>
+</section>
+
+          {producto.seller_id && (
+            <button
+              onClick={() => {
+                window.location.href = `/seller/${producto.seller_id}`;
+              }}
+              style={sellerButtonStyle}
+            >
+              View seller profile
+            </button>
+          )}
+
+          <div style={actionsStyle} className="product-detail-actions">
+            <button
+  onClick={messageSeller}
+  style={secondaryButtonStyle}
+>
+  Request verification video
+</button>
+            <button onClick={buyNow} style={buyButtonStyle}>
+              {checkoutLoading ? "Redirecting..." : "Buy now"}
+            </button>
+
+            <button
+              onClick={() => {
+                const cart = JSON.parse(localStorage.getItem("athmov_cart") || "[]");
+                const exists = cart.some((item: any) => item.id === producto.id);
+
+                if (!exists) {
+                  cart.push({
+                    id: producto.id,
+                    nombre: producto.title,
+                    precio: `€${producto.price}`,
+                    imagen: producto.image,
+                    deporte: producto.brand,
+                  });
+
+                  localStorage.setItem("athmov_cart", JSON.stringify(cart));
+                }
+
+                alert("Added to cart");
+              }}
+              style={primaryButtonStyle}
+            >
+              Add to cart
+            </button>
+
+            <button onClick={toggleFavorite} style={secondaryButtonStyle}>
+              {isFavorite ? "❤️ Favorited" : "🤍 Add to favorites"}
+            </button>
+
+            <button onClick={messageSeller} style={secondaryButtonStyle}>
+              Message seller
+            </button>
+
+            <button onClick={makeOffer} style={secondaryButtonStyle}>
+              Make offer
+            </button>
+          </div>
+        </div>
       </div>
+
+      <section style={relatedSectionStyle}>
+        <p style={relatedEyebrowStyle}>ATHMOV SELECTION</p>
+        <h2 style={relatedTitleStyle}>You may also like</h2>
+
+        <div style={relatedGridStyle} className="product-detail-related">
+          {related.map((item) => (
+            <div
+              key={item.id}
+              onClick={() => (window.location.href = `/products/${item.id}`)}
+              style={relatedCardStyle}
+            >
+              <div style={relatedImageStyle}>
+                <Image
+                  src={safeImage(item.image)}
+                  alt={item.title || "Product"}
+                  fill
+                  sizes="33vw"
+                  style={{ objectFit: "cover" }}
+                />
+              </div>
+
+              <div style={{ padding: "24px" }}>
+                <p style={relatedBrandStyle}>{item.brand}</p>
+                <h3 style={relatedProductTitleStyle}>{item.title}</h3>
+                <p style={relatedPriceStyle}>€{item.price}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <style>{`
+        .main-product-image:hover {
+          transform: scale(1.04);
+        }
+
+        @media (max-width: 1000px) {
+          .product-detail-layout {
+            grid-template-columns: 1fr !important;
+            gap: 34px !important;
+          }
+
+          .product-detail-image {
+            height: 560px !important;
+          }
+
+          .product-detail-related {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+
+        @media (max-width: 700px) {
+          .product-detail-page {
+            padding: 30px 18px !important;
+          }
+
+          .product-detail-image {
+            height: 420px !important;
+            border-radius: 28px !important;
+          }
+
+          .product-detail-thumbs {
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 10px !important;
+          }
+
+          .product-detail-thumbs button {
+            height: 88px !important;
+            border-radius: 16px !important;
+          }
+
+          .product-detail-title {
+            font-size: 44px !important;
+            letter-spacing: -2px !important;
+          }
+
+          .product-detail-price {
+            font-size: 38px !important;
+          }
+
+          .product-detail-meta {
+            grid-template-columns: 1fr !important;
+          }
+
+          .product-detail-actions {
+            flex-direction: column !important;
+          }
+
+          .product-detail-actions button {
+            width: 100% !important;
+          }
+
+          .product-detail-related {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </main>
   );
 }
 
-const fontFamily = "'Manrope', 'Satoshi', 'Avenir Next', sans-serif";
-
-const loadingStyle = {
-  minHeight: "100vh",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  fontFamily,
-};
-
 const pageStyle = {
   minHeight: "100vh",
-  background: "#f6f6f3",
-  padding: "40px",
-  fontFamily,
+  background: "#f7f7f3",
+  padding: "60px",
+  fontFamily: "Inter, sans-serif",
 };
 
-const containerStyle = {
-  maxWidth: "1080px",
-  margin: "0 auto",
-  display: "grid",
-  gridTemplateColumns: "480px 1fr",
-  gap: "54px",
-  alignItems: "center",
-};
-
-const imageSectionStyle = {
-  background: "#efefea",
-  borderRadius: "28px",
-  height: "520px",
-  overflow: "hidden",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-};
-
-const imageStyle = {
-  width: "90%",
-  height: "90%",
-  objectFit: "contain" as const,
-  display: "block",
-};
-
-const thumbsStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(5, 1fr)",
-  gap: "10px",
-  marginTop: "14px",
-};
-
-const thumbButtonStyle = {
-  height: "78px",
-  borderRadius: "14px",
-  overflow: "hidden",
-  background: "#efefea",
-  padding: 0,
+const backButtonStyle = {
+  marginBottom: "32px",
+  background: "transparent",
+  border: "1px solid rgba(0,0,0,0.12)",
+  borderRadius: "999px",
+  padding: "12px 18px",
+  fontSize: "13px",
   cursor: "pointer",
 };
 
-const thumbImageStyle = {
-  width: "100%",
-  height: "100%",
-  objectFit: "cover" as const,
-  display: "block",
+const soldCardStyle = {
+  maxWidth: "760px",
+  margin: "80px auto 0",
+  background: "#fff",
+  borderRadius: "34px",
+  padding: "60px",
+  textAlign: "center" as const,
+  boxShadow: "0 20px 80px rgba(0,0,0,0.06)",
 };
 
-const infoStyle = {
-  maxWidth: "420px",
+const soldEyebrowStyle = {
+  fontSize: "12px",
+  letterSpacing: "3px",
+  opacity: 0.5,
+  marginBottom: "14px",
+};
+
+const soldTitleStyle = {
+  fontSize: "56px",
+  lineHeight: 1,
+  letterSpacing: "-3px",
+  margin: 0,
+};
+
+const soldTextStyle = {
+  color: "#666",
+  fontSize: "17px",
+  lineHeight: 1.7,
+  margin: "22px auto 34px",
+  maxWidth: "520px",
+};
+
+const layoutStyle = {
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr",
+  gap: "60px",
+  maxWidth: "1400px",
+  margin: "0 auto",
+  alignItems: "start",
+};
+
+const mainImageStyle = {
+  position: "relative" as const,
+  height: "700px",
+  borderRadius: "40px",
+  overflow: "hidden",
+  background: "#fff",
+  boxShadow: "0 40px 120px rgba(0,0,0,0.08)",
+};
+
+const thumbGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(3, 1fr)",
+  gap: "14px",
+  marginTop: "18px",
+};
+
+const thumbButtonStyle = {
+  position: "relative" as const,
+  height: "120px",
+  borderRadius: "22px",
+  overflow: "hidden",
+  background: "#fff",
+  cursor: "pointer",
 };
 
 const brandStyle = {
   fontSize: "12px",
-  letterSpacing: "2px",
-  textTransform: "uppercase" as const,
-  color: "#666",
-  marginBottom: "14px",
-  fontWeight: 600,
+  letterSpacing: "3px",
+  opacity: 0.5,
 };
 
 const titleStyle = {
-  fontSize: "42px",
+  fontSize: "72px",
   lineHeight: 1,
-  marginBottom: "22px",
-  fontWeight: 700,
-  color: "#111",
+  marginTop: "10px",
+  marginBottom: "24px",
 };
 
 const priceStyle = {
-  fontSize: "28px",
-  marginBottom: "22px",
-  fontWeight: 600,
-  color: "#111",
-};
-
-const conditionStyle = {
-  display: "inline-block",
-  padding: "10px 16px",
-  borderRadius: "999px",
-  background: "#e7e7e2",
-  color: "#666",
-  fontSize: "12px",
+  fontSize: "48px",
   fontWeight: 700,
-  marginBottom: "28px",
+  marginBottom: "32px",
 };
 
 const descriptionStyle = {
-  fontSize: "15px",
-  lineHeight: 1.7,
-  color: "#444",
-  marginBottom: "24px",
-};
-
-const sellerBoxStyle = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  gap: "14px",
-  textDecoration: "none",
-  color: "#111",
-  background: "#fff",
-  border: "1px solid #e5e5df",
-  borderRadius: "22px",
-  padding: "16px 18px",
-  marginBottom: "24px",
-};
-
-const sellerLabelStyle = {
-  fontSize: "11px",
-  textTransform: "uppercase" as const,
-  letterSpacing: "1.5px",
-  color: "#777",
-};
-
-const sellerNameStyle = {
-  flex: 1,
-  fontSize: "14px",
-};
-
-const sellerArrowStyle = {
   fontSize: "18px",
+  color: "#555",
+  lineHeight: 1.7,
+  maxWidth: "520px",
 };
 
-const buttonStyle = {
-  width: "100%",
-  display: "block",
-  textAlign: "center" as const,
-  textDecoration: "none",
-  background: "#111",
-  color: "#fff",
-  borderRadius: "999px",
+const metaGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(3, 1fr)",
+  gap: "12px",
+  marginTop: "34px",
+  maxWidth: "520px",
+};
+
+const metaCardStyle = {
+  border: "1px solid rgba(0,0,0,0.08)",
+  borderRadius: "20px",
   padding: "18px",
+  background: "rgba(255,255,255,0.55)",
+};
+
+const metaLabelStyle = {
+  fontSize: "10px",
+  letterSpacing: "2px",
+  opacity: 0.45,
+  margin: 0,
+};
+
+const metaValueStyle = {
   fontSize: "15px",
   fontWeight: 700,
+  marginTop: "8px",
+  marginBottom: 0,
+};
+
+const buyerGuideStyle = {
+  marginTop: "28px",
+  maxWidth: "560px",
+  background: "#111",
+  color: "#fff",
+  borderRadius: "28px",
+  padding: "26px",
+  boxShadow: "0 24px 80px rgba(0,0,0,0.12)",
+};
+
+const buyerGuideEyebrowStyle = {
+  fontSize: "10px",
+  letterSpacing: "2px",
+  opacity: 0.45,
+  marginBottom: "8px",
+};
+
+const buyerGuideTitleStyle = {
+  fontSize: "28px",
+  lineHeight: 1.05,
+  letterSpacing: "-1px",
+  margin: 0,
+};
+
+const buyerGuideBadgeStyle = {
+  background: "#fff",
+  color: "#111",
+  borderRadius: "999px",
+  padding: "8px 12px",
+  fontSize: "11px",
+  fontWeight: 900,
+  whiteSpace: "nowrap" as const,
+};
+
+const buyerGuideListStyle = {
+  display: "grid",
+  gap: "10px",
+  marginTop: "22px",
+};
+
+const buyerGuideItemStyle = {
+  display: "flex",
+  gap: "12px",
+  padding: "12px",
+  borderRadius: "18px",
+  background: "rgba(255,255,255,0.06)",
+  border: "1px solid rgba(255,255,255,0.08)",
+};
+
+const buyerGuideNumberStyle = {
+  fontSize: "11px",
+  fontWeight: 900,
+  opacity: 0.35,
+};
+
+const buyerGuideTextStyle = {
+  margin: 0,
+  color: "rgba(255,255,255,0.72)",
+  lineHeight: 1.5,
+  fontSize: "13px",
+};
+
+const buyerGuideBetaTextStyle = {
+  color: "rgba(255,255,255,0.42)",
+  lineHeight: 1.6,
+  fontSize: "12px",
+  marginTop: "18px",
+};
+
+const buyerGuideLinkStyle = {
+  display: "inline-block",
+  marginTop: "18px",
+  color: "#fff",
+  textDecoration: "none",
+  fontSize: "13px",
+  fontWeight: 900,
+};
+
+const sellerButtonStyle = {
+  marginTop: "24px",
+  background: "transparent",
+  color: "#111",
+  border: "1px solid rgba(0,0,0,0.14)",
+  padding: "14px 22px",
+  borderRadius: "999px",
+  fontSize: "14px",
+  fontWeight: 800,
   cursor: "pointer",
 };
-const buttonsWrapperStyle = {
+
+const actionsStyle = {
   display: "flex",
-  flexDirection: "column" as const,
-  gap: "12px",
+  gap: "14px",
+  marginTop: "40px",
+  flexWrap: "wrap" as const,
+};
+
+const buyButtonStyle = {
+  background: "#111",
+  color: "#fff",
+  border: "none",
+  padding: "18px 36px",
+  borderRadius: "999px",
+  fontSize: "16px",
+  fontWeight: 900,
+  cursor: "pointer",
+};
+
+const primaryButtonStyle = {
+  background: "#222",
+  color: "#fff",
+  border: "none",
+  padding: "18px 36px",
+  borderRadius: "999px",
+  fontSize: "16px",
+  fontWeight: 700,
+  cursor: "pointer",
 };
 
 const secondaryButtonStyle = {
-  width: "100%",
   background: "#fff",
   color: "#111",
-  border: "1px solid #ddd",
+  border: "1px solid rgba(0,0,0,0.12)",
+  padding: "18px 36px",
   borderRadius: "999px",
-  padding: "18px",
-  fontSize: "15px",
+  fontSize: "16px",
   fontWeight: 700,
   cursor: "pointer",
 };
-const contactButtonStyle = {
-  width: "100%",
+
+const relatedSectionStyle = {
+  maxWidth: "1400px",
+  margin: "90px auto 0",
+};
+
+const relatedEyebrowStyle = {
+  fontSize: "12px",
+  letterSpacing: "3px",
+  opacity: 0.5,
+  marginBottom: "10px",
+};
+
+const relatedTitleStyle = {
+  fontSize: "42px",
+  marginBottom: "30px",
+  letterSpacing: "-2px",
+};
+
+const relatedGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(3, 1fr)",
+  gap: "28px",
+};
+
+const relatedCardStyle = {
   background: "#fff",
-  color: "#111",
-  border: "1px solid #ddd",
-  borderRadius: "999px",
-  padding: "16px",
-  fontSize: "14px",
-  fontWeight: 700,
+  borderRadius: "28px",
+  overflow: "hidden",
   cursor: "pointer",
-  marginBottom: "24px",
+  border: "1px solid rgba(0,0,0,0.06)",
+};
+
+const relatedImageStyle = {
+  position: "relative" as const,
+  height: "260px",
+  background: "#f8f8f6",
+};
+
+const relatedBrandStyle = {
+  fontSize: "11px",
+  letterSpacing: "2px",
+  opacity: 0.45,
+};
+
+const relatedProductTitleStyle = {
+  fontSize: "26px",
+  marginTop: "10px",
+  marginBottom: "14px",
+};
+
+const relatedPriceStyle = {
+  fontSize: "24px",
+  fontWeight: 700,
+};
+
+const buyerGuideHeaderStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "flex-start",
+  gap: "18px",
+  marginBottom: "18px",
+};
+
+const trustBadgesStyle = {
+  display: "flex",
+  flexWrap: "wrap" as const,
+  gap: "10px",
+  marginTop: "22px",
+  marginBottom: "10px",
+};
+
+const trustBadgeStyle = {
+  background: "#fff",
+  border: "1px solid rgba(0,0,0,0.08)",
+  borderRadius: "999px",
+  padding: "10px 14px",
+  fontSize: "10px",
+  fontWeight: 800,
+  letterSpacing: "1.5px",
+  color: "#111",
+};
+
+const buyerGuideCardsStyle = {
+  display: "grid",
+  gap: "12px",
+  marginTop: "20px",
+};
+
+const buyerGuideCardStyle = {
+  display: "flex",
+  gap: "14px",
+  padding: "15px",
+  borderRadius: "20px",
+  background: "rgba(255,255,255,0.06)",
+  border: "1px solid rgba(255,255,255,0.08)",
+};
+
+const buyerGuideIconStyle = {
+  width: "34px",
+  height: "34px",
+  borderRadius: "999px",
+  background: "rgba(255,255,255,0.1)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  flexShrink: 0,
+};
+
+const buyerGuideCardTitleStyle = {
+  margin: 0,
+  fontSize: "14px",
+  color: "#fff",
+};
+
+const buyerGuideCardTextStyle = {
+  marginTop: "6px",
+  marginBottom: 0,
+  color: "rgba(255,255,255,0.55)",
+  fontSize: "12px",
+  lineHeight: 1.6,
+};
+
+const buyerGuideFooterStyle = {
+  marginTop: "18px",
+  paddingTop: "16px",
+  borderTop: "1px solid rgba(255,255,255,0.1)",
+  color: "rgba(255,255,255,0.42)",
+  fontSize: "12px",
+  lineHeight: 1.6,
 };

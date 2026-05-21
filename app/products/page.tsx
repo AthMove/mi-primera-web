@@ -1,310 +1,611 @@
 "use client";
 
-import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-
-type Product = {
-  id: string;
-  title: string;
-  brand: string;
-  price: number;
-  image: string;
-  condition: string;
-  category?: string;
-};
+import Filters from "@/components/Filters";
+import SearchBar from "@/components/SearchBar";
+import SortDropdown from "@/components/SortDropdown";
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const category = searchParams.get("category");
+
+  const [productos, setProductos] = useState<any[]>([]);
+  const [savedSearches, setSavedSearches] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [savingSearch, setSavingSearch] = useState(false);
+
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("TODAS");
-  const [condition, setCondition] = useState("TODOS");
-  const [sort, setSort] = useState("RECIENTES");
+  const [selectedCategory, setSelectedCategory] = useState("ALL");
+  const [selectedBrand, setSelectedBrand] = useState("ALL");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [showSold, setShowSold] = useState(false);
+  const [sort, setSort] = useState("newest");
 
   useEffect(() => {
-    fetchProducts();
+    if (category) {
+      setSelectedCategory(category.toUpperCase());
+    } else {
+      setSelectedCategory("ALL");
+    }
+  }, [category]);
+
+  useEffect(() => {
+    loadProducts();
+    loadSavedSearches();
   }, []);
 
-  const fetchProducts = async () => {
+  const loadProducts = async () => {
+    setLoading(true);
+
     const { data, error } = await supabase
       .from("products")
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (!error && data) setProducts(data);
+    if (error) {
+      console.log(error);
+      setProductos([]);
+      setLoading(false);
+      return;
+    }
+
+    setProductos(data || []);
+    setLoading(false);
+  };
+
+  const loadSavedSearches = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return;
+
+    const { data } = await supabase
+      .from("saved_searches")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+
+    setSavedSearches(data || []);
+  };
+
+  const saveCurrentSearch = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      alert("Debes iniciar sesión");
+      return;
+    }
+
+    const title =
+      search ||
+      selectedBrand !== "ALL"
+        ? `${selectedBrand !== "ALL" ? selectedBrand : ""} ${search}`.trim()
+        : selectedCategory !== "ALL"
+          ? selectedCategory
+          : "Saved search";
+
+    try {
+      setSavingSearch(true);
+
+      const { error } = await supabase.from("saved_searches").insert([
+        {
+          user_id: user.id,
+          title,
+          search,
+          category: selectedCategory,
+          brand: selectedBrand,
+          min_price: minPrice,
+          max_price: maxPrice,
+          show_sold: showSold,
+          sort,
+        },
+      ]);
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      await loadSavedSearches();
+      alert("Search saved");
+    } finally {
+      setSavingSearch(false);
+    }
+  };
+
+  const applySavedSearch = (item: any) => {
+    setSearch(item.search || "");
+    setSelectedCategory(item.category || "ALL");
+    setSelectedBrand(item.brand || "ALL");
+    setMinPrice(item.min_price || "");
+    setMaxPrice(item.max_price || "");
+    setShowSold(!!item.show_sold);
+    setSort(item.sort || "newest");
+  };
+
+  const deleteSavedSearch = async (
+    e: React.MouseEvent<HTMLButtonElement>,
+    id: string
+  ) => {
+    e.stopPropagation();
+
+    const confirmDelete = confirm("Delete saved search?");
+    if (!confirmDelete) return;
+
+    await supabase.from("saved_searches").delete().eq("id", id);
+    await loadSavedSearches();
+  };
+
+  const clearFilters = () => {
+    setSearch("");
+    setSelectedCategory("ALL");
+    setSelectedBrand("ALL");
+    setMinPrice("");
+    setMaxPrice("");
+    setShowSold(false);
+    setSort("newest");
   };
 
   const filteredProducts = useMemo(() => {
-    let result = [...products];
+    return productos
+      .filter((product) => {
+        const searchValue = search.toLowerCase().trim();
 
-    if (search.trim()) {
-      const value = search.toLowerCase();
+        const matchesSearch =
+          !searchValue ||
+          product.title?.toLowerCase().includes(searchValue) ||
+          product.brand?.toLowerCase().includes(searchValue) ||
+          product.category?.toLowerCase().includes(searchValue);
 
-      result = result.filter(
-        (product) =>
-          product.title?.toLowerCase().includes(value) ||
-          product.brand?.toLowerCase().includes(value)
-      );
-    }
+        const matchesCategory =
+          selectedCategory === "ALL" ||
+          product.category === selectedCategory;
 
-    if (category !== "TODAS") {
-      result = result.filter((product) => product.category === category);
-    }
+        const matchesBrand =
+          selectedBrand === "ALL" ||
+          product.brand?.toLowerCase() === selectedBrand.toLowerCase();
 
-    if (condition !== "TODOS") {
-      result = result.filter((product) => product.condition === condition);
-    }
+        const matchesMin =
+          !minPrice || Number(product.price) >= Number(minPrice);
 
-    if (sort === "PRECIO_ASC") {
-      result.sort((a, b) => Number(a.price) - Number(b.price));
-    }
+        const matchesMax =
+          !maxPrice || Number(product.price) <= Number(maxPrice);
 
-    if (sort === "PRECIO_DESC") {
-      result.sort((a, b) => Number(b.price) - Number(a.price));
-    }
+        const matchesSold = showSold ? true : !product.sold;
 
-    return result;
-  }, [products, search, category, condition, sort]);
+        return (
+          matchesSearch &&
+          matchesCategory &&
+          matchesBrand &&
+          matchesMin &&
+          matchesMax &&
+          matchesSold
+        );
+      })
+      .sort((a, b) => {
+        if (sort === "price-low") return Number(a.price) - Number(b.price);
+        if (sort === "price-high") return Number(b.price) - Number(a.price);
+        if (sort === "popular") return Number(b.likes || 0) - Number(a.likes || 0);
+
+        return (
+          new Date(b.created_at).getTime() -
+          new Date(a.created_at).getTime()
+        );
+      });
+  }, [
+    productos,
+    search,
+    selectedCategory,
+    selectedBrand,
+    minPrice,
+    maxPrice,
+    showSold,
+    sort,
+  ]);
+
+  const safeImage = (src: string) => {
+    return src?.startsWith("http") || src?.startsWith("/") ? src : "/logo.png";
+  };
 
   return (
-    <main style={pageStyle}>
-      <div style={topBarStyle}>
-        <Link href="/" style={logoStyle}>
-          ATHMOV
-        </Link>
-      </div>
+    <main style={pageStyle} className="products-page-main">
+      <section style={headerStyle}>
+        <p style={eyebrowStyle}>ATHMOV MARKETPLACE</p>
 
-      <section style={heroStyle}>
-        <h1 style={titleStyle}>Marketplace</h1>
-        <p style={subtitleStyle}>Equipamiento premium deportivo</p>
+        <h1 style={titleStyle} className="products-page-title">
+          {selectedCategory !== "ALL" ? selectedCategory : "All products"}
+        </h1>
       </section>
 
-      <section style={filtersStyle}>
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Buscar marca o modelo..."
-          style={searchStyle}
+      <section style={premiumFiltersWrapperStyle}>
+        <SearchBar value={search} onChange={setSearch} />
+
+        <Filters
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+          selectedBrand={selectedBrand}
+          setSelectedBrand={setSelectedBrand}
+          minPrice={minPrice}
+          setMinPrice={setMinPrice}
+          maxPrice={maxPrice}
+          setMaxPrice={setMaxPrice}
+          showSold={showSold}
+          setShowSold={setShowSold}
         />
 
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          style={selectStyle}
-        >
-          <option value="TODAS">Todas las categorías</option>
-          <option value="PADEL">PADEL</option>
-          <option value="TENNIS">TENNIS</option>
-          <option value="GOLF">GOLF</option>
-          <option value="RUNNING">RUNNING</option>
-          <option value="ROPA">ROPA</option>
-        </select>
+        <div style={filterActionsStyle}>
+          <button onClick={clearFilters} style={secondaryButtonStyle}>
+            Clear filters
+          </button>
 
-        <select
-          value={condition}
-          onChange={(e) => setCondition(e.target.value)}
-          style={selectStyle}
-        >
-          <option value="TODOS">Todos los estados</option>
-          <option value="Nueva">Nueva</option>
-          <option value="Como nueva">Como nueva</option>
-          <option value="Usada">Usada</option>
-        </select>
+          <button onClick={saveCurrentSearch} style={saveButtonStyle}>
+            {savingSearch ? "Saving..." : "Save search"}
+          </button>
 
-        <select
-          value={sort}
-          onChange={(e) => setSort(e.target.value)}
-          style={selectStyle}
-        >
-          <option value="RECIENTES">Más recientes</option>
-          <option value="PRECIO_ASC">Precio menor</option>
-          <option value="PRECIO_DESC">Precio mayor</option>
-        </select>
+          <SortDropdown value={sort} onChange={setSort} />
+        </div>
       </section>
 
-      {filteredProducts.length === 0 ? (
+      {savedSearches.length > 0 && (
+        <section style={savedSearchesStyle}>
+          <p style={savedEyebrowStyle}>SAVED SEARCHES</p>
+
+          <div style={savedListStyle}>
+            {savedSearches.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => applySavedSearch(item)}
+                style={savedItemStyle}
+              >
+                <span>{item.title}</span>
+
+                <small>
+                  {item.category || "ALL"} · {item.brand || "ALL"}
+                </small>
+
+                <button
+                  onClick={(e) => deleteSavedSearch(e, item.id)}
+                  style={deleteSavedStyle}
+                >
+                  ✕
+                </button>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {loading ? (
+        <section style={gridStyle} className="products-page-grid">
+          {[1, 2, 3, 4, 5, 6].map((item) => (
+            <div key={item} className="skeleton-card" style={cardStyle}>
+              <div className="skeleton-image" style={imageWrapperStyle} />
+
+              <div style={contentStyle}>
+                <div className="skeleton-line short" />
+                <div className="skeleton-line title" />
+                <div className="skeleton-line price" />
+              </div>
+            </div>
+          ))}
+        </section>
+      ) : filteredProducts.length === 0 ? (
         <section style={emptyStyle}>
-          No hay productos que coincidan con tu búsqueda.
+          <h2 style={emptyTitleStyle}>No products found</h2>
+          <p style={emptyTextStyle}>
+            Try clearing filters or choosing another category.
+          </p>
         </section>
       ) : (
-        <section style={gridStyle}>
-          {filteredProducts.map((product) => (
-            <Link
-              key={product.id}
-              href={`/products/${product.id}`}
+        <section style={gridStyle} className="products-page-grid">
+          {filteredProducts.map((producto) => (
+            <article
+              key={producto.id}
+              className="product-card"
+              onClick={() => router.push(`/products/${producto.id}`)}
               style={cardStyle}
             >
-              <div style={imageBoxStyle}>
-                <img
-                  src={
-                    product.image ||
-                    "https://placehold.co/600x600?text=ATHMOV"
-                  }
-                  alt={product.title}
-                  style={imageStyle}
+              <div style={imageWrapperStyle} className="products-page-image">
+                <Image
+                  src={safeImage(producto.image)}
+                  alt={producto.title || "Product"}
+                  fill
+                  sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 33vw"
+                  className="product-image"
+                  style={{ objectFit: "cover" }}
                 />
+
+                {producto.sold && <span style={soldBadgeStyle}>SOLD</span>}
               </div>
 
               <div style={contentStyle}>
-                <p style={brandStyle}>{product.brand}</p>
-                <h2 style={productTitleStyle}>{product.title}</h2>
-
-                <div style={bottomRowStyle}>
-                  <p style={priceStyle}>€{product.price}</p>
-                  <span style={conditionStyle}>{product.condition}</span>
-                </div>
+                <p style={brandStyle}>{producto.brand || "SPORT"}</p>
+                <h2 style={productTitleStyle}>{producto.title}</h2>
+                <p style={priceStyle}>€{producto.price}</p>
               </div>
-            </Link>
+            </article>
           ))}
         </section>
       )}
+
+      <style>{`
+        .product-card {
+          transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .product-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 30px 90px rgba(0,0,0,0.08);
+        }
+
+        .product-image {
+          transition: transform 0.45s ease, filter 0.45s ease;
+        }
+
+        .product-card:hover .product-image {
+          transform: scale(1.06);
+          filter: contrast(1.04) saturate(1.04);
+        }
+
+        .skeleton-image,
+        .skeleton-line {
+          animation: pulse 1.4s ease infinite;
+          background: linear-gradient(90deg, #f1f1ef 0%, #e7e7e4 50%, #f1f1ef 100%);
+          background-size: 200% 100%;
+        }
+
+        .skeleton-line {
+          height: 14px;
+          border-radius: 999px;
+          margin-bottom: 14px;
+        }
+
+        .skeleton-line.short {
+          width: 30%;
+        }
+
+        .skeleton-line.title {
+          width: 78%;
+          height: 24px;
+        }
+
+        .skeleton-line.price {
+          width: 40%;
+          height: 20px;
+          margin-top: 22px;
+        }
+
+        @keyframes pulse {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+
+        @media (max-width: 1100px) {
+          .products-page-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 24px !important;
+          }
+        }
+
+        @media (max-width: 700px) {
+          .products-page-main {
+            padding: 120px 18px 34px !important;
+          }
+
+          .products-page-title {
+            font-size: 46px !important;
+            letter-spacing: -2px !important;
+          }
+
+          .products-page-grid {
+            grid-template-columns: 1fr !important;
+            gap: 22px !important;
+          }
+
+          .products-page-image {
+            height: 260px !important;
+          }
+        }
+      `}</style>
     </main>
   );
 }
 
 const pageStyle = {
   minHeight: "100vh",
-  background: "#f5f5f1",
-  paddingBottom: "80px",
+  background: "#f7f7f3",
+  padding: "60px",
+  fontFamily: "Inter, sans-serif",
 };
 
-const topBarStyle = {
-  padding: "24px 32px 8px",
+const headerStyle = {
+  maxWidth: "1400px",
+  margin: "0 auto 30px",
 };
 
-const logoStyle = {
-  fontSize: "20px",
-  fontWeight: 800,
-  letterSpacing: "-1px",
-  textDecoration: "none",
-  color: "#111",
-};
-
-const heroStyle = {
-  padding: "0 32px 30px",
-};
-
-const titleStyle = {
-  fontSize: "56px",
-  lineHeight: 0.95,
-  letterSpacing: "-3px",
-  fontWeight: 800,
+const eyebrowStyle = {
+  fontSize: "12px",
+  letterSpacing: "3px",
+  opacity: 0.5,
   marginBottom: "12px",
 };
 
-const subtitleStyle = {
-  color: "#666",
-  fontSize: "15px",
+const titleStyle = {
+  fontSize: "64px",
+  lineHeight: 1,
+  margin: 0,
+  marginBottom: "34px",
+  letterSpacing: "-4px",
 };
 
-const filtersStyle = {
-  padding: "0 32px 34px",
+const premiumFiltersWrapperStyle = {
+  maxWidth: "1400px",
+  margin: "0 auto 24px",
   display: "grid",
-  gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-  gap: "14px",
+  gap: "18px",
 };
 
-const searchStyle = {
-  width: "100%",
-  padding: "15px 18px",
-  borderRadius: "999px",
-  border: "1px solid #ddd",
-  background: "#fff",
-  fontSize: "14px",
-  outline: "none",
-  boxSizing: "border-box" as const,
+const filterActionsStyle = {
+  display: "flex",
+  justifyContent: "flex-end",
+  alignItems: "center",
+  gap: "12px",
+  flexWrap: "wrap" as const,
 };
 
-const selectStyle = {
-  width: "100%",
-  padding: "15px 18px",
+const saveButtonStyle = {
+  background: "#111",
+  color: "#fff",
+  border: "none",
   borderRadius: "999px",
-  border: "1px solid #ddd",
+  padding: "13px 18px",
+  fontWeight: 800,
+  cursor: "pointer",
+};
+
+const secondaryButtonStyle = {
   background: "#fff",
-  fontSize: "13px",
-  fontWeight: 700,
-  outline: "none",
-  boxSizing: "border-box" as const,
+  color: "#111",
+  border: "1px solid rgba(0,0,0,0.1)",
+  borderRadius: "999px",
+  padding: "13px 18px",
+  fontWeight: 800,
+  cursor: "pointer",
+};
+
+const savedSearchesStyle = {
+  maxWidth: "1400px",
+  margin: "0 auto 34px",
+  background: "#fff",
+  borderRadius: "28px",
+  padding: "24px",
+  border: "1px solid rgba(0,0,0,0.06)",
+};
+
+const savedEyebrowStyle = {
+  fontSize: "11px",
+  letterSpacing: "2px",
+  opacity: 0.45,
+  marginBottom: "14px",
+};
+
+const savedListStyle = {
+  display: "flex",
+  flexWrap: "wrap" as const,
+  gap: "12px",
+};
+
+const savedItemStyle = {
+  position: "relative" as const,
+  background: "#f7f7f3",
+  border: "1px solid rgba(0,0,0,0.08)",
+  borderRadius: "999px",
+  padding: "12px 42px 12px 16px",
+  display: "flex",
+  flexDirection: "column" as const,
+  alignItems: "flex-start",
+  gap: "3px",
+  cursor: "pointer",
+  fontWeight: 800,
+};
+
+const deleteSavedStyle = {
+  position: "absolute" as const,
+  right: "10px",
+  top: "50%",
+  transform: "translateY(-50%)",
+  border: "none",
+  background: "#111",
+  color: "#fff",
+  borderRadius: "999px",
+  width: "22px",
+  height: "22px",
+  cursor: "pointer",
+  fontSize: "11px",
 };
 
 const gridStyle = {
+  maxWidth: "1400px",
+  margin: "0 auto",
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))",
-  gap: "24px",
-  padding: "0 32px",
+  gridTemplateColumns: "repeat(3, 1fr)",
+  gap: "40px",
 };
 
 const cardStyle = {
-  background: "#f7f7f4",
-  borderRadius: "26px",
+  background: "#fff",
+  borderRadius: "30px",
   overflow: "hidden",
-  textDecoration: "none",
-  color: "#111",
+  border: "1px solid rgba(0,0,0,0.06)",
+  cursor: "pointer",
+  boxShadow: "0 20px 70px rgba(0,0,0,0.035)",
 };
 
-const imageBoxStyle = {
-  width: "100%",
-  height: "250px",
-  background: "#f0f0ec",
+const imageWrapperStyle = {
+  height: "300px",
+  position: "relative" as const,
+  background: "#f8f8f6",
   overflow: "hidden",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
 };
 
-const imageStyle = {
-  width: "155%",
-  height: "155%",
-  objectFit: "cover" as const,
-  objectPosition: "center 42%",
-  display: "block",
+const soldBadgeStyle = {
+  position: "absolute" as const,
+  top: "18px",
+  right: "18px",
+  background: "#111",
+  color: "#fff",
+  borderRadius: "999px",
+  padding: "9px 13px",
+  fontSize: "11px",
+  fontWeight: 900,
+  letterSpacing: "1px",
 };
 
 const contentStyle = {
-  padding: "22px",
+  padding: "28px",
 };
 
 const brandStyle = {
   fontSize: "12px",
-  textTransform: "uppercase" as const,
-  color: "#777",
+  opacity: 0.5,
   letterSpacing: "2px",
-  marginBottom: "10px",
+  textTransform: "uppercase" as const,
 };
 
 const productTitleStyle = {
-  fontSize: "24px",
-  lineHeight: 1,
-  fontWeight: 700,
-  letterSpacing: "-1px",
+  fontSize: "30px",
+  marginTop: "10px",
   marginBottom: "18px",
 };
 
-const bottomRowStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-};
-
 const priceStyle = {
-  fontSize: "21px",
+  fontSize: "28px",
   fontWeight: 700,
 };
 
-const conditionStyle = {
-  background: "#ecece7",
-  padding: "8px 14px",
-  borderRadius: "999px",
-  fontSize: "12px",
-  fontWeight: 600,
-  color: "#666",
+const emptyStyle = {
+  maxWidth: "1400px",
+  margin: "0 auto",
+  background: "#fff",
+  borderRadius: "30px",
+  padding: "42px",
+  textAlign: "center" as const,
 };
 
-const emptyStyle = {
-  margin: "0 32px",
-  background: "#fff",
-  borderRadius: "28px",
-  padding: "46px",
-  textAlign: "center" as const,
+const emptyTitleStyle = {
+  fontSize: "28px",
+  margin: 0,
+};
+
+const emptyTextStyle = {
   color: "#666",
+  marginTop: "10px",
 };

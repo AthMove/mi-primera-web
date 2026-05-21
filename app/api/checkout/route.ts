@@ -1,79 +1,88 @@
-import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
-import { createClient } from "@supabase/supabase-js";
+import { NextResponse } from "next/server";
+import { stripe } from "@/lib/stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const PLATFORM_FEE_PERCENT = 8;
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
-export async function GET(req: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const { searchParams } = new URL(req.url);
+    const body = await req.json();
 
-    const productId = searchParams.get("productId");
-    const productIdsParam = searchParams.get("productIds");
+    const price = Number(body.price);
 
-    let productIds: string[] = [];
-
-    if (productIdsParam) {
-      productIds = productIdsParam.split(",").filter(Boolean);
-    } else if (productId) {
-      productIds = [productId];
-    }
-
-    if (productIds.length === 0) {
+    if (!price || price <= 0) {
       return NextResponse.json(
-        { error: "No product ids" },
+        { error: "Invalid price" },
         { status: 400 }
       );
     }
 
-    const { data: products, error } = await supabase
-      .from("products")
-      .select("*")
-      .in("id", productIds);
-
-    if (error || !products || products.length === 0) {
+    if (!body.stripeAccountId) {
       return NextResponse.json(
-        { error: "Productos no encontrados" },
-        { status: 404 }
+        { error: "Seller has not connected Stripe payouts" },
+        { status: 400 }
       );
     }
 
-    const lineItems = products.map((product) => {
-      const price = Math.round(Number(product.price) * 100);
+    const platformFee = Number(
+      ((price * PLATFORM_FEE_PERCENT) / 100).toFixed(2)
+    );
 
-      const imageUrl =
-        product.image && product.image.startsWith("http")
-          ? product.image
-          : "https://via.placeholder.com/400";
+    const sellerAmount = Number((price - platformFee).toFixed(2));
 
-      return {
-        price_data: {
-          currency: "eur",
-          product_data: {
-            name: product.title || "Producto ATHMOV",
-            description: product.description || "Producto ATHMOV",
-            images: [imageUrl],
-          },
-          unit_amount: price,
-        },
-        quantity: 1,
-      };
-    });
+    const stripeFeeEstimate = Number(
+      (price * 0.015 + 0.25).toFixed(2)
+    );
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
-      line_items: lineItems,
-      success_url: "http://localhost:3000/success",
-      cancel_url: "http://localhost:3000/cart",
+
+      payment_intent_data: {
+        application_fee_amount: Math.round(platformFee * 100),
+        transfer_data: {
+          destination: body.stripeAccountId,
+        },
+      },
+
+      line_items: [
+        {
+          price_data: {
+            currency: "eur",
+            product_data: {
+              name: body.title,
+              images: body.image?.startsWith("http")
+                ? [body.image]
+                : [],
+            },
+            unit_amount: Math.round(price * 100),
+          },
+          quantity: 1,
+        },
+      ],
+
+      metadata: {
+        product_id: body.productId,
+        seller_id: body.sellerId,
+        buyer_id: body.buyerId,
+        stripe_account_id: body.stripeAccountId,
+
+        amount: String(price),
+        platform_fee_percent: String(PLATFORM_FEE_PERCENT),
+        platform_fee: String(platformFee),
+        seller_amount: String(sellerAmount),
+        stripe_fee_estimate: String(stripeFeeEstimate),
+      },
+
+      success_url: `${body.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${body.origin}/products/${body.productId}`,
     });
 
-    return NextResponse.redirect(session.url!);
+    return NextResponse.json({
+      url: session.url,
+      platformFee,
+      sellerAmount,
+      stripeFeeEstimate,
+    });
   } catch (error) {
     console.log(error);
 

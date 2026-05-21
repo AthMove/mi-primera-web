@@ -1,36 +1,59 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 export default function SuccessPage() {
+  const params = useSearchParams();
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    localStorage.removeItem("athmov_cart");
+    saveOrder();
   }, []);
+
+  const saveOrder = async () => {
+    try {
+      const sessionId = params.get("session_id");
+
+      if (!sessionId) {
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch("/api/verify-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ sessionId }),
+      });
+
+      await response.json();
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  };
 
   return (
     <main style={pageStyle}>
-      <section style={cardStyle}>
-        <p style={eyebrowStyle}>Pago completado</p>
+      <div style={cardStyle}>
+        <p style={eyebrowStyle}>ATHMOV CHECKOUT</p>
 
         <h1 style={titleStyle}>
-          ¡Compra realizada correctamente!
+          {loading ? "Processing..." : "Payment successful"}
         </h1>
 
         <p style={textStyle}>
-          Tu pedido ha sido procesado y el vendedor será notificado.
+          Your order has been received. We'll prepare the next steps for your
+          premium gear.
         </p>
 
-        <div style={buttonsStyle}>
-          <Link href="/products" style={primaryButtonStyle}>
-            Seguir comprando
-          </Link>
-
-          <Link href="/messages" style={secondaryButtonStyle}>
-            Ver mensajes
-          </Link>
-        </div>
-      </section>
+        <button onClick={() => (window.location.href = "/products")} style={buttonStyle}>
+          Continue shopping
+        </button>
+      </div>
     </main>
   );
 }
@@ -41,62 +64,50 @@ const pageStyle = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  padding: "24px",
+  padding: "20px",
+  fontFamily: "Inter, sans-serif",
 };
 
 const cardStyle = {
-  width: "100%",
-  maxWidth: "620px",
   background: "#fff",
-  borderRadius: "36px",
-  padding: "54px",
+  padding: "60px",
+  borderRadius: "34px",
+  maxWidth: "720px",
+  width: "100%",
   textAlign: "center" as const,
+  boxShadow: "0 20px 80px rgba(0,0,0,0.06)",
 };
 
 const eyebrowStyle = {
   fontSize: "12px",
-  textTransform: "uppercase" as const,
-  letterSpacing: "2px",
-  color: "#777",
+  letterSpacing: "4px",
+  opacity: 0.45,
   marginBottom: "16px",
 };
 
 const titleStyle = {
-  fontSize: "52px",
+  fontSize: "72px",
   lineHeight: 1,
-  letterSpacing: "-2px",
-  marginBottom: "18px",
-  fontWeight: 800,
+  letterSpacing: "-4px",
+  marginBottom: "20px",
 };
 
 const textStyle = {
-  fontSize: "16px",
-  lineHeight: 1.7,
   color: "#666",
-  marginBottom: "34px",
+  fontSize: "18px",
+  lineHeight: 1.7,
+  maxWidth: "520px",
+  margin: "0 auto",
 };
 
-const buttonsStyle = {
-  display: "flex",
-  gap: "14px",
-  justifyContent: "center",
-  flexWrap: "wrap" as const,
-};
-
-const primaryButtonStyle = {
+const buttonStyle = {
+  marginTop: "40px",
   background: "#111",
   color: "#fff",
-  textDecoration: "none",
-  padding: "16px 24px",
+  border: "none",
   borderRadius: "999px",
-  fontWeight: 700,
-};
-
-const secondaryButtonStyle = {
-  background: "#efefea",
-  color: "#111",
-  textDecoration: "none",
-  padding: "16px 24px",
-  borderRadius: "999px",
-  fontWeight: 700,
+  padding: "18px 34px",
+  fontWeight: 800,
+  cursor: "pointer",
+  fontSize: "15px",
 };

@@ -1,203 +1,294 @@
 "use client";
 
-import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
-type Product = {
-  id: string;
-  title: string;
-  brand: string;
-  price: number;
-  image: string;
-  condition: string;
-};
-
 export default function AccountPage() {
-  const router = useRouter();
-
-  const [products, setProducts] = useState<Product[]>([]);
-  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  const [profile, setProfile] = useState({
+    username: "",
+    full_name: "",
+    bio: "",
+    location: "",
+    avatar_url: "",
+    email: "",
+    stripe_account_id: "",
+  });
 
   useEffect(() => {
-    loadAccount();
+    loadProfile();
   }, []);
 
-  const loadAccount = async () => {
+  const loadProfile = async () => {
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
     if (!user) {
-      router.push("/auth?mode=login");
+      window.location.href = "/auth";
       return;
     }
 
-    setEmail(user.email || "");
-
-    const { data, error } = await supabase
-      .from("products")
+    const { data } = await supabase
+      .from("profiles")
       .select("*")
-      .eq("seller_id", user.id)
-      .order("created_at", { ascending: false });
+      .eq("id", user.id)
+      .maybeSingle();
 
-    if (!error && data) {
-      setProducts(data);
+    if (!data) {
+      await supabase.from("profiles").insert([
+        {
+          id: user.id,
+          email: user.email,
+        },
+      ]);
+
+      setProfile({
+        username: "",
+        full_name: "",
+        bio: "",
+        location: "",
+        avatar_url: "",
+        email: user.email || "",
+        stripe_account_id: "",
+      });
+
+      setLoading(false);
+      return;
     }
+
+    setProfile({
+      username: data.username || "",
+      full_name: data.full_name || "",
+      bio: data.bio || "",
+      location: data.location || "",
+      avatar_url: data.avatar_url || "",
+      email: data.email || "",
+      stripe_account_id: data.stripe_account_id || "",
+    });
 
     setLoading(false);
   };
 
-  const handleDelete = async (productId: string) => {
-    const confirmDelete = confirm(
-      "¿Seguro que quieres eliminar este producto?"
-    );
+  const startStripeOnboarding = async () => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-    if (!confirmDelete) return;
+      if (!user) {
+        window.location.href = "/auth";
+        return;
+      }
 
-    const { error } = await supabase
-      .from("products")
-      .delete()
-      .eq("id", productId);
+      const response = await fetch("/api/connect/create-account", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          email: user.email,
+          origin: window.location.origin,
+        }),
+      });
 
-    if (error) {
-      alert(error.message);
-      return;
+      const data = await response.json();
+
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+
+      alert(data.error || "Could not start Stripe onboarding");
+    } catch (error) {
+      console.log(error);
+      alert("Stripe connection failed");
     }
-
-    setProducts((current) =>
-      current.filter((product) => product.id !== productId)
-    );
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/");
+  const saveProfile = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return;
+
+    try {
+      setSaving(true);
+
+      const { error } = await supabase.from("profiles").upsert({
+        id: user.id,
+        email: profile.email,
+        username: profile.username,
+        full_name: profile.full_name,
+        bio: profile.bio,
+        location: profile.location,
+        avatar_url: profile.avatar_url,
+        stripe_account_id: profile.stripe_account_id,
+      });
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      alert("Profile updated");
+      await loadProfile();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const safeAvatar = (src: string) => {
+    return src?.startsWith("http") ? src : "/logo.png";
   };
 
   if (loading) {
-    return <main style={loadingStyle}>Cargando cuenta...</main>;
+    return <main style={loadingStyle}>Loading profile...</main>;
   }
 
   return (
-    <main style={pageStyle}>
-      <section style={headerStyle}>
-        <div>
-          <p style={eyebrowStyle}>Mi cuenta</p>
+    <main style={pageStyle} className="account-page">
+      <section style={heroStyle}>
+        <p style={eyebrowStyle}>ATHMOV PROFILE</p>
 
-          <h1 style={titleStyle}>
-            Mis productos
-          </h1>
+        <h1 style={titleStyle} className="account-title">
+          Your Account
+        </h1>
 
-          <p style={emailStyle}>{email}</p>
+        <p style={subtitleStyle}>Manage your public seller profile.</p>
+      </section>
+
+      <section style={layoutStyle}>
+        <div style={avatarCardStyle}>
+          <div style={avatarWrapperStyle}>
+            <Image
+              src={safeAvatar(profile.avatar_url)}
+              alt="Avatar"
+              fill
+              sizes="200px"
+              style={{ objectFit: "cover" }}
+            />
+          </div>
+
+          <input
+            value={profile.avatar_url}
+            onChange={(e) =>
+              setProfile({
+                ...profile,
+                avatar_url: e.target.value,
+              })
+            }
+            placeholder="Avatar image URL"
+            style={inputStyle}
+          />
+
+          <p style={helperStyle}>Paste an image URL for your profile photo.</p>
         </div>
 
-        <div style={actionsStyle}>
-          <Link
-            href="/sell"
-            style={sellButtonStyle}
-          >
-            Vender producto
-          </Link>
+        <div style={formCardStyle}>
+          <div style={fieldStyle}>
+            <label style={labelStyle}>Username</label>
 
-          <button
-            onClick={handleLogout}
-            style={logoutButtonStyle}
-          >
-            Cerrar sesión
-          </button>
+            <input
+              value={profile.username}
+              onChange={(e) =>
+                setProfile({
+                  ...profile,
+                  username: e.target.value,
+                })
+              }
+              placeholder="@username"
+              style={inputStyle}
+            />
+          </div>
+
+          <div style={fieldStyle}>
+            <label style={labelStyle}>Full Name</label>
+
+            <input
+              value={profile.full_name}
+              onChange={(e) =>
+                setProfile({
+                  ...profile,
+                  full_name: e.target.value,
+                })
+              }
+              placeholder="Your full name"
+              style={inputStyle}
+            />
+          </div>
+
+          <div style={fieldStyle}>
+            <label style={labelStyle}>Location</label>
+
+            <input
+              value={profile.location}
+              onChange={(e) =>
+                setProfile({
+                  ...profile,
+                  location: e.target.value,
+                })
+              }
+              placeholder="Madrid, Spain"
+              style={inputStyle}
+            />
+          </div>
+
+          <div style={fieldStyle}>
+            <label style={labelStyle}>Bio</label>
+
+            <textarea
+              value={profile.bio}
+              onChange={(e) =>
+                setProfile({
+                  ...profile,
+                  bio: e.target.value,
+                })
+              }
+              placeholder="Tell buyers about yourself..."
+              style={textareaStyle}
+            />
+          </div>
+
+          <div style={buttonsRowStyle}>
+            <button onClick={saveProfile} style={buttonStyle}>
+              {saving ? "Saving..." : "Save profile"}
+            </button>
+
+            {!profile.stripe_account_id ? (
+              <button
+                onClick={startStripeOnboarding}
+                style={connectButtonStyle}
+              >
+                Connect Stripe payouts
+              </button>
+            ) : (
+              <div style={stripeConnectedStyle}>Stripe connected ✓</div>
+            )}
+          </div>
         </div>
       </section>
 
-      {products.length === 0 ? (
-        <section style={emptyStyle}>
-          <h2 style={emptyTitleStyle}>
-            Aún no has publicado productos
-          </h2>
+      <style>{`
+        @media (max-width: 900px) {
+          .account-page {
+            padding: 120px 18px 34px !important;
+          }
 
-          <p style={emptyTextStyle}>
-            Publica tu primer producto para verlo aquí.
-          </p>
-
-          <Link
-            href="/sell"
-            style={sellButtonStyle}
-          >
-            Publicar producto
-          </Link>
-        </section>
-      ) : (
-        <section style={gridStyle}>
-          {products.map((product) => (
-            <article
-              key={product.id}
-              style={cardStyle}
-            >
-              <Link
-                href={`/products/${product.id}`}
-                style={imageLinkStyle}
-              >
-                <div style={imageBoxStyle}>
-                  <img
-                    src={
-                      product.image ||
-                      "https://placehold.co/700x700?text=ATHMOV"
-                    }
-                    alt={product.title}
-                    style={imageStyle}
-                  />
-                </div>
-              </Link>
-
-              <div style={contentStyle}>
-                <p style={brandStyle}>
-                  {product.brand}
-                </p>
-
-                <h2 style={productTitleStyle}>
-                  {product.title}
-                </h2>
-
-                <div style={rowStyle}>
-                  <p style={priceStyle}>
-                    €{product.price}
-                  </p>
-
-                  <span style={conditionStyle}>
-                    {product.condition}
-                  </span>
-                </div>
-
-                <div style={buttonsRowStyle}>
-                  <Link
-                    href={`/account/edit/${product.id}`}
-                    style={editButtonStyle}
-                  >
-                    Editar
-                  </Link>
-
-                  <button
-                    onClick={() =>
-                      handleDelete(product.id)
-                    }
-                    style={deleteButtonStyle}
-                  >
-                    Eliminar
-                  </button>
-                </div>
-              </div>
-            </article>
-          ))}
-        </section>
-      )}
+          .account-title {
+            font-size: 52px !important;
+            letter-spacing: -2px !important;
+          }
+        }
+      `}</style>
     </main>
   );
 }
-
-const fontFamily =
-  "'Manrope', 'Satoshi', 'Avenir Next', system-ui, sans-serif";
 
 const loadingStyle = {
   minHeight: "100vh",
@@ -205,188 +296,141 @@ const loadingStyle = {
   alignItems: "center",
   justifyContent: "center",
   background: "#f6f6f3",
-  fontFamily,
+  fontFamily: "Inter, sans-serif",
 };
 
 const pageStyle = {
   minHeight: "100vh",
-  background: "#f6f6f3",
-  padding: "46px",
-  fontFamily,
+  background: "linear-gradient(to bottom, #f8f8f4, #eeeeea)",
+  padding: "70px 60px",
+  fontFamily: "Inter, sans-serif",
 };
 
-const headerStyle = {
-  maxWidth: "1180px",
-  margin: "0 auto 44px",
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "flex-end",
-  gap: "24px",
+const heroStyle = {
+  maxWidth: "1200px",
+  margin: "0 auto 40px",
 };
 
 const eyebrowStyle = {
   fontSize: "12px",
-  letterSpacing: "2px",
-  textTransform: "uppercase" as const,
-  color: "#777",
-  marginBottom: "10px",
+  letterSpacing: "3px",
+  opacity: 0.5,
 };
 
 const titleStyle = {
-  fontSize: "56px",
+  fontSize: "72px",
   lineHeight: 1,
-  margin: 0,
-  letterSpacing: "-2px",
+  margin: "14px 0",
+  letterSpacing: "-4px",
 };
 
-const emailStyle = {
+const subtitleStyle = {
   color: "#666",
+};
+
+const layoutStyle = {
+  maxWidth: "1200px",
+  margin: "0 auto",
+  display: "grid",
+  gridTemplateColumns: "320px 1fr",
+  gap: "30px",
+};
+
+const avatarCardStyle = {
+  background: "#fff",
+  borderRadius: "32px",
+  padding: "28px",
+  border: "1px solid rgba(0,0,0,0.06)",
+  height: "fit-content",
+};
+
+const avatarWrapperStyle = {
+  position: "relative" as const,
+  width: "220px",
+  height: "220px",
+  borderRadius: "999px",
+  overflow: "hidden",
+  margin: "0 auto 22px",
+  background: "#f3f3ef",
+};
+
+const helperStyle = {
+  color: "#666",
+  fontSize: "13px",
+  lineHeight: 1.6,
   marginTop: "12px",
 };
 
-const actionsStyle = {
-  display: "flex",
-  gap: "12px",
-};
-
-const sellButtonStyle = {
-  background: "#111",
-  color: "#fff",
-  textDecoration: "none",
-  borderRadius: "999px",
-  padding: "14px 22px",
-  fontWeight: 700,
-  fontSize: "14px",
-  border: "none",
-  cursor: "pointer",
-};
-
-const logoutButtonStyle = {
+const formCardStyle = {
   background: "#fff",
-  color: "#111",
-  border: "1px solid #ddd",
-  borderRadius: "999px",
-  padding: "14px 22px",
-  fontWeight: 700,
-  fontSize: "14px",
-  cursor: "pointer",
-};
-
-const emptyStyle = {
-  maxWidth: "720px",
-  margin: "80px auto 0",
-  background: "#fff",
-  padding: "48px",
   borderRadius: "32px",
-  textAlign: "center" as const,
+  padding: "34px",
+  border: "1px solid rgba(0,0,0,0.06)",
 };
 
-const emptyTitleStyle = {
-  fontSize: "32px",
-  marginBottom: "12px",
+const fieldStyle = {
+  marginBottom: "22px",
 };
 
-const emptyTextStyle = {
-  color: "#666",
-  marginBottom: "28px",
-};
-
-const gridStyle = {
-  maxWidth: "1180px",
-  margin: "0 auto",
-  display: "grid",
-  gridTemplateColumns:
-    "repeat(auto-fit, minmax(260px, 1fr))",
-  gap: "24px",
-};
-
-const cardStyle = {
-  background: "#fff",
-  borderRadius: "28px",
-  overflow: "hidden",
-};
-
-const imageLinkStyle = {
+const labelStyle = {
   display: "block",
-};
-
-const imageBoxStyle = {
-  height: "280px",
-  background: "#efefea",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-};
-
-const imageStyle = {
-  width: "90%",
-  height: "90%",
-  objectFit: "contain" as const,
-};
-
-const contentStyle = {
-  padding: "24px",
-};
-
-const brandStyle = {
-  fontSize: "12px",
-  letterSpacing: "2px",
-  textTransform: "uppercase" as const,
-  color: "#777",
   marginBottom: "10px",
-};
-
-const productTitleStyle = {
-  fontSize: "26px",
-  lineHeight: 1,
-  marginBottom: "18px",
-};
-
-const rowStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  marginBottom: "20px",
-};
-
-const priceStyle = {
-  fontSize: "22px",
-  fontWeight: 700,
-};
-
-const conditionStyle = {
-  background: "#efefef",
-  padding: "8px 13px",
-  borderRadius: "999px",
   fontSize: "12px",
-  color: "#555",
+  fontWeight: 800,
+  letterSpacing: "1px",
+  textTransform: "uppercase" as const,
+};
+
+const inputStyle = {
+  width: "100%",
+  border: "1px solid rgba(0,0,0,0.1)",
+  borderRadius: "18px",
+  padding: "16px",
+  fontSize: "15px",
+  outline: "none",
+  boxSizing: "border-box" as const,
+};
+
+const textareaStyle = {
+  ...inputStyle,
+  minHeight: "160px",
+  resize: "none" as const,
 };
 
 const buttonsRowStyle = {
   display: "flex",
-  gap: "12px",
+  gap: "14px",
+  flexWrap: "wrap" as const,
+  alignItems: "center",
 };
 
-const editButtonStyle = {
-  flex: 1,
-  textAlign: "center" as const,
+const buttonStyle = {
   background: "#111",
   color: "#fff",
-  textDecoration: "none",
+  border: "none",
   borderRadius: "999px",
-  padding: "13px",
-  fontWeight: 700,
-  fontSize: "13px",
+  padding: "18px 26px",
+  fontWeight: 800,
+  fontSize: "15px",
+  cursor: "pointer",
 };
 
-const deleteButtonStyle = {
-  flex: 1,
+const connectButtonStyle = {
   background: "#fff",
-  color: "#c0392b",
-  border: "1px solid #f0c7c1",
+  color: "#111",
+  border: "1px solid rgba(0,0,0,0.12)",
   borderRadius: "999px",
-  padding: "13px",
-  fontWeight: 700,
-  fontSize: "13px",
+  padding: "18px 26px",
+  fontWeight: 800,
+  fontSize: "15px",
   cursor: "pointer",
+};
+
+const stripeConnectedStyle = {
+  padding: "16px 22px",
+  border: "1px solid #16a34a",
+  borderRadius: "999px",
+  color: "#16a34a",
+  fontWeight: 800,
+  width: "fit-content",
 };
