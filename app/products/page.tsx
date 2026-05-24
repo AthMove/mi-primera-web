@@ -234,13 +234,7 @@ function ProductsContent() {
 
 export default function ProductsPage() {
   return (
-    <Suspense
-      fallback={
-        <main style={pageStyle}>
-          Loading products...
-        </main>
-      }
-    >
+    <Suspense fallback={<main style={pageStyle}>Loading products...</main>}>
       <ProductsContent />
     </Suspense>
   );
