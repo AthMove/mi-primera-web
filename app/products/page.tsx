@@ -1,14 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import Filters from "@/components/Filters";
 import SearchBar from "@/components/SearchBar";
 import SortDropdown from "@/components/SortDropdown";
 
-export default function ProductsPage() {
+function ProductsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const category = searchParams.get("category");
@@ -43,12 +43,12 @@ export default function ProductsPage() {
     setLoading(true);
 
     const { data, error } = await supabase
-  .from("products")
-  .select("*")
-  .eq("moderation_status", "approved")
-  .eq("sold", false)
-  .order("featured", { ascending: false })
-  .order("created_at", { ascending: false });
+      .from("products")
+      .select("*")
+      .eq("moderation_status", "approved")
+      .eq("sold", false)
+      .order("featured", { ascending: false })
+      .order("created_at", { ascending: false });
 
     if (error) {
       console.log(error);
@@ -88,8 +88,7 @@ export default function ProductsPage() {
     }
 
     const title =
-      search ||
-      selectedBrand !== "ALL"
+      search || selectedBrand !== "ALL"
         ? `${selectedBrand !== "ALL" ? selectedBrand : ""} ${search}`.trim()
         : selectedCategory !== "ALL"
           ? selectedCategory
@@ -169,19 +168,14 @@ export default function ProductsPage() {
           product.category?.toLowerCase().includes(searchValue);
 
         const matchesCategory =
-          selectedCategory === "ALL" ||
-          product.category === selectedCategory;
+          selectedCategory === "ALL" || product.category === selectedCategory;
 
         const matchesBrand =
           selectedBrand === "ALL" ||
           product.brand?.toLowerCase() === selectedBrand.toLowerCase();
 
-        const matchesMin =
-          !minPrice || Number(product.price) >= Number(minPrice);
-
-        const matchesMax =
-          !maxPrice || Number(product.price) <= Number(maxPrice);
-
+        const matchesMin = !minPrice || Number(product.price) >= Number(minPrice);
+        const matchesMax = !maxPrice || Number(product.price) <= Number(maxPrice);
         const matchesSold = showSold ? true : !product.sold;
 
         return (
@@ -198,10 +192,7 @@ export default function ProductsPage() {
         if (sort === "price-high") return Number(b.price) - Number(a.price);
         if (sort === "popular") return Number(b.likes || 0) - Number(a.likes || 0);
 
-        return (
-          new Date(b.created_at).getTime() -
-          new Date(a.created_at).getTime()
-        );
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       });
   }, [
     productos,
@@ -263,65 +254,58 @@ export default function ProductsPage() {
 
           <div style={savedListStyle}>
             {savedSearches.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => applySavedSearch(item)}
-                style={savedItemStyle}
-              >
+              <div key={item.id} onClick={() => applySavedSearch(item)} style={savedItemStyle}>
                 <span>{item.title}</span>
 
                 <small>
                   {item.category || "ALL"} · {item.brand || "ALL"}
                 </small>
 
-                <button
-                  onClick={(e) => deleteSavedSearch(e, item.id)}
-                  style={deleteSavedStyle}
-                >
+                <button onClick={(e) => deleteSavedSearch(e, item.id)} style={deleteSavedStyle}>
                   ✕
                 </button>
-              </button>
+              </div>
             ))}
           </div>
         </section>
       )}
 
-{filteredProducts.some((product) => product.featured) && (
-  <section style={featuredSectionStyle}>
-    <p style={eyebrowStyle}>CURATED BY ATHMOV</p>
-    <h2 style={featuredTitleStyle}>Featured Drops</h2>
+      {filteredProducts.some((product) => product.featured) && (
+        <section style={featuredSectionStyle}>
+          <p style={eyebrowStyle}>CURATED BY ATHMOV</p>
+          <h2 style={featuredTitleStyle}>Featured Drops</h2>
 
-    <div style={featuredGridStyle}>
-      {filteredProducts
-        .filter((product) => product.featured)
-        .slice(0, 3)
-        .map((product) => (
-          <article
-            key={product.id}
-            onClick={() => router.push(`/products/${product.id}`)}
-            style={featuredCardStyle}
-          >
-            <Image
-              src={safeImage(product.image)}
-              alt={product.title || "Product"}
-              fill
-              sizes="33vw"
-              style={{ objectFit: "cover" }}
-            />
+          <div style={featuredGridStyle}>
+            {filteredProducts
+              .filter((product) => product.featured)
+              .slice(0, 3)
+              .map((product) => (
+                <article
+                  key={product.id}
+                  onClick={() => router.push(`/products/${product.id}`)}
+                  style={featuredCardStyle}
+                >
+                  <Image
+                    src={safeImage(product.image)}
+                    alt={product.title || "Product"}
+                    fill
+                    sizes="33vw"
+                    style={{ objectFit: "cover" }}
+                  />
 
-            <div style={featuredOverlayStyle}>
-              <p style={featuredBrandStyle}>{product.brand}</p>
-              <h3 style={featuredProductTitleStyle}>{product.title}</h3>
-              <p style={featuredPriceStyle}>€{product.price}</p>
-            </div>
-          </article>
-        ))}
-    </div>
-  </section>
-)}
+                  <div style={featuredOverlayStyle}>
+                    <p style={featuredBrandStyle}>{product.brand}</p>
+                    <h3 style={featuredProductTitleStyle}>{product.title}</h3>
+                    <p style={featuredPriceStyle}>€{product.price}</p>
+                  </div>
+                </article>
+              ))}
+          </div>
+        </section>
+      )}
 
-{loading ? (
-  <section style={gridStyle} className="products-page-grid">
+      {loading ? (
+        <section style={gridStyle} className="products-page-grid">
           {[1, 2, 3, 4, 5, 6].map((item) => (
             <div key={item} className="skeleton-card" style={cardStyle}>
               <div className="skeleton-image" style={imageWrapperStyle} />
@@ -426,7 +410,8 @@ export default function ProductsPage() {
         }
 
         @media (max-width: 1100px) {
-          .products-page-grid {
+          .products-page-grid,
+          .featured-grid {
             grid-template-columns: repeat(2, 1fr) !important;
             gap: 24px !important;
           }
@@ -442,7 +427,8 @@ export default function ProductsPage() {
             letter-spacing: -2px !important;
           }
 
-          .products-page-grid {
+          .products-page-grid,
+          .featured-grid {
             grid-template-columns: 1fr !important;
             gap: 22px !important;
           }
@@ -453,6 +439,14 @@ export default function ProductsPage() {
         }
       `}</style>
     </main>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense fallback={<main style={pageStyle}>Loading products...</main>}>
+      <ProductsContent />
+    </Suspense>
   );
 }
 
