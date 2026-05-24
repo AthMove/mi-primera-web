@@ -153,9 +153,9 @@ export default function MessagesPage() {
     );
   };
 
-  const safeImage = (src: string) => {
-    return src?.startsWith("http") || src?.startsWith("/") ? src : "/logo.png";
-  };
+  const safeImage = (src?: string) => {
+  return src?.startsWith("http") || src?.startsWith("/") ? src : "/logo.png";
+};
 
   if (loading) {
     return <main style={loadingStyle}>Loading messages...</main>;
@@ -285,22 +285,27 @@ export default function MessagesPage() {
           box-shadow: 0 28px 90px rgba(0,0,0,0.07) !important;
         }
 
-        @media (max-width: 700px) {
-          .messages-page {
-            padding: 120px 18px 34px !important;
-          }
+       @media (max-width: 700px) {
+  .messages-page {
+    padding: 120px 18px 34px !important;
+  }
 
-          .messages-title {
-            font-size: 48px !important;
-            letter-spacing: -2px !important;
-          }
+  .messages-title {
+    font-size: 48px !important;
+    letter-spacing: -2px !important;
+  }
 
-          .conversation-card {
-            align-items: flex-start !important;
-            gap: 14px !important;
-            padding: 14px !important;
-          }
-        }
+  .conversation-card {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 14px !important;
+    padding: 16px !important;
+  }
+
+  .conversation-card > div {
+    width: 100% !important;
+  }
+}
       `}</style>
     </main>
   );

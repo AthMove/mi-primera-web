@@ -8,18 +8,20 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   const [stats, setStats] = useState({
-    grossRevenue: 0,
-    sellerEarnings: 0,
-    pendingEarnings: 0,
-    availableEarnings: 0,
-    platformFees: 0,
-    stripeFees: 0,
-    sales: 0,
-    activeOrders: 0,
-    activeProducts: 0,
-    soldProducts: 0,
-    averageRating: 0,
-  });
+  grossRevenue: 0,
+  sellerEarnings: 0,
+  pendingEarnings: 0,
+  availableEarnings: 0,
+  platformFees: 0,
+  stripeFees: 0,
+  sales: 0,
+  activeOrders: 0,
+  activeProducts: 0,
+  pendingProducts: 0,
+  rejectedProducts: 0,
+  soldProducts: 0,
+  averageRating: 0,
+});
 
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
 
@@ -89,8 +91,17 @@ export default function DashboardPage() {
           o.status === "delivered"
       ).length || 0;
 
-    const activeProducts = products?.filter((p) => !p.sold).length || 0;
-    const soldProducts = products?.filter((p) => p.sold).length || 0;
+    const activeProducts =
+  products?.filter((p) => !p.sold && p.moderation_status === "approved")
+    .length || 0;
+
+const pendingProducts =
+  products?.filter((p) => p.moderation_status === "pending").length || 0;
+
+const rejectedProducts =
+  products?.filter((p) => p.moderation_status === "rejected").length || 0;
+
+const soldProducts = products?.filter((p) => p.sold).length || 0;
 
     const averageRating =
       reviews && reviews.length > 0
@@ -100,19 +111,21 @@ export default function DashboardPage() {
           ).toFixed(1)
         : "0";
 
-    setStats({
-      grossRevenue,
-      sellerEarnings,
-      pendingEarnings,
-      availableEarnings,
-      platformFees,
-      stripeFees,
-      sales,
-      activeOrders,
-      activeProducts,
-      soldProducts,
-      averageRating: Number(averageRating),
-    });
+   setStats({
+  grossRevenue,
+  sellerEarnings,
+  pendingEarnings,
+  availableEarnings,
+  platformFees,
+  stripeFees,
+  sales,
+  activeOrders,
+  activeProducts,
+  pendingProducts,
+  rejectedProducts,
+  soldProducts,
+  averageRating: Number(averageRating),
+});
 
     setRecentOrders(
       (orders || [])
@@ -191,6 +204,16 @@ export default function DashboardPage() {
           <p style={cardLabelStyle}>Active Products</p>
           <h2 style={cardValueStyle}>{stats.activeProducts}</h2>
         </div>
+
+        <div style={cardStyle}>
+  <p style={cardLabelStyle}>Pending Approval</p>
+  <h2 style={cardValueStyle}>{stats.pendingProducts}</h2>
+</div>
+
+<div style={cardStyle}>
+  <p style={cardLabelStyle}>Rejected Products</p>
+  <h2 style={cardValueStyle}>{stats.rejectedProducts}</h2>
+</div>
 
         <div style={cardStyle}>
           <p style={cardLabelStyle}>Sold Products</p>

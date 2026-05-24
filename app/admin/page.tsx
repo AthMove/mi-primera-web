@@ -8,25 +8,75 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
+  const [refundingId, setRefundingId] = useState("");
+  const [profiles, setProfiles] = useState<any[]>([]);
 
   useEffect(() => {
     loadAdmin();
   }, []);
 
   const loadAdmin = async () => {
-    const { data: ordersData } = await supabase
+    setLoading(true);
+
+    const { data: ordersData, error: ordersError } = await supabase
       .from("orders")
       .select("*")
       .order("created_at", { ascending: false });
 
-    const { data: productsData } = await supabase
+    if (ordersError) console.log("Orders error:", ordersError.message);
+
+    const { data: productsData, error: productsError } = await supabase
       .from("products")
       .select("*")
+      .order("featured", { ascending: false })
       .order("created_at", { ascending: false });
+
+    if (productsError) console.log("Products error:", productsError.message);
+
+    const { data: profilesData, error: profilesError } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("verification_status", "pending");
+
+    if (profilesError) console.log("Profiles error:", profilesError.message);
 
     setOrders(ordersData || []);
     setProducts(productsData || []);
+    setProfiles(profilesData || []);
     setLoading(false);
+  };
+
+  const refundOrder = async (order: any) => {
+    const confirmRefund = confirm(
+      `Refund this order of €${order.amount}? This action cannot be undone.`
+    );
+
+    if (!confirmRefund) return;
+
+    try {
+      setRefundingId(order.id);
+
+      const response = await fetch("/api/stripe/refund", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: order.id }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.error || "Refund failed");
+        return;
+      }
+
+      alert("Refund completed");
+      await loadAdmin();
+    } catch (error) {
+      console.log(error);
+      alert("Refund failed");
+    } finally {
+      setRefundingId("");
+    }
   };
 
   const totalSales = orders.reduce(
@@ -47,6 +97,10 @@ export default function AdminPage() {
   const pendingOrders = orders.filter(
     (order) => order.status !== "completed"
   ).length;
+
+  const openDisputes = orders.filter(
+    (order) => order.dispute_status === "open"
+  );
 
   if (loading) {
     return <main style={pageStyle}>Loading admin...</main>;
@@ -114,25 +168,53 @@ export default function AdminPage() {
 
       <section style={sectionStyle}>
         <div style={sectionHeaderStyle}>
-          <h2 style={sectionTitleStyle}>Recent Orders</h2>
+          <h2 style={sectionTitleStyle}>Pending Seller Verifications</h2>
         </div>
 
-        {orders.length === 0 ? (
-          <div style={emptyStyle}>No orders yet.</div>
+        {profiles.length === 0 ? (
+          <div style={emptyStyle}>No pending verifications.</div>
         ) : (
           <div style={listStyle}>
-            {orders.slice(0, 8).map((order) => (
-              <article key={order.id} style={rowStyle}>
+            {profiles.map((profile) => (
+              <article key={profile.id} style={rowStyle}>
                 <div>
-                  <p style={rowMetaStyle}>ORDER</p>
-                  <h3 style={rowTitleStyle}>€{order.amount}</h3>
-                  <p style={rowTextStyle}>
-                    ATHMOV fee: €{order.platform_fee || 0} · Seller payout: €
-                    {order.seller_amount || 0}
-                  </p>
+                  <p style={rowMetaStyle}>SELLER VERIFICATION</p>
+
+                  <h3 style={rowTitleStyle}>
+                    {profile.full_name || profile.username || profile.email}
+                  </h3>
+
+                  {profile.verification_document && (
+                    <a
+                      href={profile.verification_document}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={smallLinkStyle}
+                    >
+                      View document →
+                    </a>
+                  )}
                 </div>
 
-                <span style={statusStyle}>{order.status || "paid"}</span>
+                <button
+                  style={buttonStyle}
+                  onClick={async () => {
+                    await supabase
+                      .from("profiles")
+                      .update({
+                        verification_status: "verified",
+                        seller_verified: true,
+                        seller_verified_at: new Date().toISOString(),
+                        seller_level: "trusted",
+                        seller_badge: "trusted",
+                      })
+                      .eq("id", profile.id);
+
+                    await loadAdmin();
+                  }}
+                >
+                  Approve
+                </button>
               </article>
             ))}
           </div>
@@ -141,26 +223,221 @@ export default function AdminPage() {
 
       <section style={sectionStyle}>
         <div style={sectionHeaderStyle}>
-          <h2 style={sectionTitleStyle}>Latest Products</h2>
+          <h2 style={sectionTitleStyle}>Recent Orders</h2>
+        </div>
+
+        {orders.length === 0 ? (
+          <div style={emptyStyle}>No orders yet.</div>
+        ) : (
+          <div style={listStyle}>
+            {orders.slice(0, 12).map((order) => (
+              <article key={order.id} style={rowStyle}>
+                <div>
+                  <p style={rowMetaStyle}>ORDER</p>
+                  <h3 style={rowTitleStyle}>€{order.amount}</h3>
+
+                  <p style={rowTextStyle}>
+                    ATHMOV fee: €{order.platform_fee || 0} · Seller payout: €
+                    {order.seller_amount || 0}
+                  </p>
+
+                  <p style={rowTextStyle}>
+                    Payment: {order.payment_status || "pending"} · Transfer:{" "}
+                    {order.transfer_status || "pending"}
+                  </p>
+                </div>
+
+                <div style={rowActionsStyle}>
+                  <span style={statusStyle}>{order.status || "paid"}</span>
+
+                  {order.payment_status !== "refunded" &&
+                    order.stripe_payment_intent && (
+                      <button
+                        onClick={() => refundOrder(order)}
+                        style={dangerButtonStyle}
+                        disabled={refundingId === order.id}
+                      >
+                        {refundingId === order.id ? "Refunding..." : "Refund"}
+                      </button>
+                    )}
+
+                  {order.payment_status === "refunded" && (
+                    <span style={refundedStyle}>Refunded</span>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section style={sectionStyle}>
+        <div style={sectionHeaderStyle}>
+          <h2 style={sectionTitleStyle}>Open Disputes</h2>
+        </div>
+
+        {openDisputes.length === 0 ? (
+          <div style={emptyStyle}>No disputes open.</div>
+        ) : (
+          <div style={listStyle}>
+            {openDisputes.map((order) => (
+              <article key={order.id} style={rowStyle}>
+                <div>
+                  <p style={rowMetaStyle}>DISPUTE</p>
+                  <h3 style={rowTitleStyle}>Order €{order.amount}</h3>
+                  <p style={rowTextStyle}>{order.dispute_reason}</p>
+                </div>
+
+                <div style={rowActionsStyle}>
+                  <button
+                    style={buttonStyle}
+                    onClick={async () => {
+                      await supabase
+                        .from("orders")
+                        .update({
+                          dispute_status: "resolved",
+                          dispute_resolved_at: new Date().toISOString(),
+                          dispute_resolution: "Resolved by admin",
+                        })
+                        .eq("id", order.id);
+
+                      await loadAdmin();
+                    }}
+                  >
+                    Resolve
+                  </button>
+
+                  <button
+                    style={dangerButtonStyle}
+                    onClick={async () => {
+                      await supabase
+                        .from("orders")
+                        .update({
+                          dispute_status: "refunded",
+                          status: "refunded",
+                        })
+                        .eq("id", order.id);
+
+                      await fetch("/api/stripe/refund", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ orderId: order.id }),
+                      });
+
+                      await loadAdmin();
+                    }}
+                  >
+                    Refund buyer
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section style={sectionStyle}>
+        <div style={sectionHeaderStyle}>
+          <h2 style={sectionTitleStyle}>Product Moderation</h2>
         </div>
 
         {products.length === 0 ? (
           <div style={emptyStyle}>No products yet.</div>
         ) : (
           <div style={listStyle}>
-            {products.slice(0, 8).map((product) => (
+            {products.slice(0, 30).map((product) => (
               <article key={product.id} style={rowStyle}>
                 <div>
-                  <p style={rowMetaStyle}>{product.brand || "ATHMOV"}</p>
-                  <h3 style={rowTitleStyle}>{product.title}</h3>
+                  <p style={rowMetaStyle}>
+                    PRODUCT · {product.moderation_status || "pending"}
+                    {product.featured ? " · FEATURED" : ""}
+                  </p>
+
+                  <h3 style={rowTitleStyle}>{product.title || "Product"}</h3>
+
                   <p style={rowTextStyle}>
-                    €{product.price} · {product.sold ? "Sold" : "Active"}
+                    €{product.price} · {product.brand || "Brand"} ·{" "}
+                    {product.category || product.sport || "Category"}
                   </p>
                 </div>
 
-                <Link href={`/products/${product.id}`} style={smallLinkStyle}>
-                  Open →
-                </Link>
+                <div style={rowActionsStyle}>
+                  <Link href={`/products/${product.id}`} style={smallLinkStyle}>
+                    Open →
+                  </Link>
+
+                  <button
+                    style={buttonStyle}
+                    onClick={async () => {
+                      await supabase
+                        .from("products")
+                        .update({
+                          moderation_status: "approved",
+                          approved_at: new Date().toISOString(),
+                        })
+                        .eq("id", product.id);
+
+                      await loadAdmin();
+                    }}
+                  >
+                    Approve
+                  </button>
+
+                  <button
+                    style={dangerButtonStyle}
+                    onClick={async () => {
+                      await supabase
+                        .from("products")
+                        .update({
+                          moderation_status: "rejected",
+                          moderation_reason: "Rejected by admin",
+                        })
+                        .eq("id", product.id);
+
+                      await loadAdmin();
+                    }}
+                  >
+                    Reject
+                  </button>
+
+                  {product.featured ? (
+                    <button
+                      style={buttonStyle}
+                      onClick={async () => {
+                        await supabase
+                          .from("products")
+                          .update({
+                            featured: false,
+                            featured_at: null,
+                          })
+                          .eq("id", product.id);
+
+                        await loadAdmin();
+                      }}
+                    >
+                      Unfeature
+                    </button>
+                  ) : (
+                    <button
+                      style={buttonStyle}
+                      onClick={async () => {
+                        await supabase
+                          .from("products")
+                          .update({
+                            featured: true,
+                            featured_at: new Date().toISOString(),
+                            moderation_status: "approved",
+                            approved_at: new Date().toISOString(),
+                          })
+                          .eq("id", product.id);
+
+                        await loadAdmin();
+                      }}
+                    >
+                      Feature
+                    </button>
+                  )}
+                </div>
               </article>
             ))}
           </div>
@@ -255,12 +532,14 @@ const actionsStyle = {
 const buttonStyle = {
   background: "#111",
   color: "#fff",
+  border: "none",
   borderRadius: "999px",
   padding: "15px 22px",
   textDecoration: "none",
   fontWeight: 800,
   fontSize: "13px",
   letterSpacing: "1px",
+  cursor: "pointer",
 };
 
 const sectionStyle = {
@@ -320,6 +599,14 @@ const rowTextStyle = {
   marginBottom: 0,
 };
 
+const rowActionsStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: "10px",
+  flexWrap: "wrap" as const,
+  justifyContent: "flex-end",
+};
+
 const statusStyle = {
   background: "#111",
   color: "#fff",
@@ -327,6 +614,28 @@ const statusStyle = {
   padding: "10px 16px",
   fontSize: "11px",
   fontWeight: 800,
+  textTransform: "uppercase" as const,
+};
+
+const dangerButtonStyle = {
+  background: "#b91c1c",
+  color: "#fff",
+  border: "none",
+  borderRadius: "999px",
+  padding: "15px 22px",
+  fontSize: "13px",
+  fontWeight: 900,
+  cursor: "pointer",
+  textTransform: "uppercase" as const,
+};
+
+const refundedStyle = {
+  background: "#f3f3f3",
+  color: "#555",
+  borderRadius: "999px",
+  padding: "10px 16px",
+  fontSize: "11px",
+  fontWeight: 900,
   textTransform: "uppercase" as const,
 };
 

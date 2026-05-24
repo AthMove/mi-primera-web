@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 export default function AccountPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [checkingStripe, setCheckingStripe] = useState(false);
 
   const [profile, setProfile] = useState({
     username: "",
@@ -16,11 +17,34 @@ export default function AccountPage() {
     avatar_url: "",
     email: "",
     stripe_account_id: "",
+    stripe_onboarding_complete: false,
+    stripe_charges_enabled: false,
+    stripe_payouts_enabled: false,
   });
 
   useEffect(() => {
     loadProfile();
   }, []);
+
+  const syncStripeStatus = async (userId: string) => {
+    try {
+      setCheckingStripe(true);
+
+       await fetch("/api/stripe/connect/status", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+        }),
+      });
+    } catch (error) {
+      console.log("Stripe status sync error:", error);
+    } finally {
+      setCheckingStripe(false);
+    }
+  };
 
   const loadProfile = async () => {
     const {
@@ -31,6 +55,8 @@ export default function AccountPage() {
       window.location.href = "/auth";
       return;
     }
+
+    await syncStripeStatus(user.id);
 
     const { data } = await supabase
       .from("profiles")
@@ -54,6 +80,9 @@ export default function AccountPage() {
         avatar_url: "",
         email: user.email || "",
         stripe_account_id: "",
+        stripe_onboarding_complete: false,
+        stripe_charges_enabled: false,
+        stripe_payouts_enabled: false,
       });
 
       setLoading(false);
@@ -68,6 +97,9 @@ export default function AccountPage() {
       avatar_url: data.avatar_url || "",
       email: data.email || "",
       stripe_account_id: data.stripe_account_id || "",
+      stripe_onboarding_complete: data.stripe_onboarding_complete || false,
+      stripe_charges_enabled: data.stripe_charges_enabled || false,
+      stripe_payouts_enabled: data.stripe_payouts_enabled || false,
     });
 
     setLoading(false);
@@ -146,6 +178,12 @@ export default function AccountPage() {
   const safeAvatar = (src: string) => {
     return src?.startsWith("http") ? src : "/logo.png";
   };
+
+  const stripeReady =
+    profile.stripe_account_id &&
+    profile.stripe_onboarding_complete &&
+    profile.stripe_charges_enabled &&
+    profile.stripe_payouts_enabled;
 
   if (loading) {
     return <main style={loadingStyle}>Loading profile...</main>;
@@ -261,15 +299,22 @@ export default function AccountPage() {
             </button>
 
             {!profile.stripe_account_id ? (
-              <button
-                onClick={startStripeOnboarding}
-                style={connectButtonStyle}
-              >
+              <button onClick={startStripeOnboarding} style={connectButtonStyle}>
                 Connect Stripe payouts
               </button>
+            ) : stripeReady ? (
+              <div style={stripeConnectedStyle}>
+                Stripe payouts active ✓
+              </div>
             ) : (
-              <div style={stripeConnectedStyle}>Stripe connected ✓</div>
+              <button onClick={startStripeOnboarding} style={connectButtonStyle}>
+                Complete Stripe onboarding
+              </button>
             )}
+
+            <button onClick={loadProfile} style={refreshButtonStyle}>
+              {checkingStripe ? "Checking..." : "Refresh Stripe status"}
+            </button>
           </div>
         </div>
       </section>
@@ -423,6 +468,17 @@ const connectButtonStyle = {
   padding: "18px 26px",
   fontWeight: 800,
   fontSize: "15px",
+  cursor: "pointer",
+};
+
+const refreshButtonStyle = {
+  background: "#f5f5f2",
+  color: "#111",
+  border: "1px solid rgba(0,0,0,0.08)",
+  borderRadius: "999px",
+  padding: "18px 22px",
+  fontWeight: 800,
+  fontSize: "14px",
   cursor: "pointer",
 };
 

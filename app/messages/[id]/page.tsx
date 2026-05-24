@@ -106,6 +106,7 @@ export default function ConversationPage() {
 
     const otherId = isSeller ? conversation.buyer_id : conversation.seller_id;
     setOtherUserId(otherId);
+
     await loadOtherProfile(otherId);
 
     await supabase
@@ -202,7 +203,10 @@ export default function ConversationPage() {
     window.addEventListener("beforeunload", onBeforeUnload);
 
     return () => {
-      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+
       updateMyPresence(false);
       window.removeEventListener("beforeunload", onBeforeUnload);
       supabase.removeChannel(channel);
@@ -221,6 +225,7 @@ export default function ConversationPage() {
     if (user) {
       setUserId(user.id);
       userIdRef.current = user.id;
+
       await updateMyPresence(true, user.id);
       await markMessagesAsRead(user.id);
     }
@@ -276,25 +281,24 @@ export default function ConversationPage() {
 
     setContent("");
 
-    const payload = {
-      conversation_id: conversationId,
-      sender_id: user.id,
-      content: imageUrl || text,
-      is_image: !!imageUrl,
-      is_offer: false,
-      read_by_buyer: false,
-      read_by_seller: false,
-    };
-
     const { data, error } = await supabase
       .from("conversation_messages")
-      .insert(payload)
+      .insert({
+        conversation_id: conversationId,
+        sender_id: user.id,
+        content: imageUrl || text,
+        is_image: !!imageUrl,
+        is_offer: false,
+        read_by_buyer: false,
+        read_by_seller: false,
+      })
       .select("*")
       .single();
 
     if (error) {
       console.log(error);
       alert("No se pudo enviar el mensaje");
+
       if (!imageUrl) setContent(text);
       return;
     }
@@ -386,7 +390,8 @@ export default function ConversationPage() {
 
   const updateOfferStatus = async (
     messageId: string,
-    status: "accepted" | "rejected"
+    status: "accepted" | "rejected",
+    message?: Message
   ) => {
     const { error } = await supabase
       .from("conversation_messages")
@@ -404,6 +409,103 @@ export default function ConversationPage() {
         item.id === messageId ? { ...item, offer_status: status } : item
       )
     );
+
+    if (status !== "accepted" || !message) return;
+
+    const { data: conversation } = await supabase
+      .from("conversations")
+      .select("*")
+      .eq("id", conversationId)
+      .maybeSingle();
+
+    if (!conversation) return;
+
+    const { data: product } = await supabase
+      .from("products")
+      .select("*")
+      .eq("id", conversation.product_id)
+      .maybeSingle();
+
+    if (!product) return;
+
+    if (product.sold) {
+      alert("This product has already been sold");
+      return;
+    }
+
+    const { data: sellerProfile } = await supabase
+      .from("profiles")
+      .select("stripe_account_id, stripe_charges_enabled, stripe_payouts_enabled")
+      .eq("id", conversation.seller_id)
+      .maybeSingle();
+
+    if (
+      !sellerProfile?.stripe_account_id ||
+      !sellerProfile?.stripe_charges_enabled ||
+      !sellerProfile?.stripe_payouts_enabled
+    ) {
+      alert("Seller has not connected Stripe payouts");
+      return;
+    }
+
+    const price = Number(message.offer_price);
+    const platformFee = Number(((price * 8) / 100).toFixed(2));
+    const sellerAmount = Number((price - platformFee).toFixed(2));
+    const stripeFeeEstimate = Number((price * 0.015 + 0.25).toFixed(2));
+
+    const { data: order, error: orderError } = await supabase
+      .from("orders")
+      .insert({
+        product_id: product.id,
+        seller_id: conversation.seller_id,
+        buyer_id: conversation.buyer_id,
+        amount: price,
+        platform_fee_percent: 8,
+        platform_fee: platformFee,
+        seller_amount: sellerAmount,
+        stripe_fee_estimate: stripeFeeEstimate,
+        seller_stripe_account_id: sellerProfile.stripe_account_id,
+        status: "pending",
+        payment_status: "pending",
+        transfer_status: "pending",
+      })
+      .select("*")
+      .single();
+
+    if (orderError || !order) {
+      console.log(orderError);
+      alert("No se pudo crear la orden");
+      return;
+    }
+
+    const response = await fetch("/api/checkout-offer", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        orderId: order.id,
+        offerId: message.id,
+        title: product.title,
+        image: product.image,
+        price,
+        productId: product.id,
+        sellerId: conversation.seller_id,
+        buyerId: conversation.buyer_id,
+        stripeAccountId: sellerProfile.stripe_account_id,
+        conversationId,
+        origin: window.location.origin,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.url) {
+      alert(data.error || "Checkout error");
+      return;
+    }
+
+    window.location.href = data.url;
   };
 
   const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -497,6 +599,7 @@ export default function ConversationPage() {
                       }}
                     >
                       <p style={offerEyebrowStyle}>OFFER</p>
+
                       <h2 style={offerPriceStyle}>€{message.offer_price}</h2>
 
                       <p style={offerStatusStyle}>
@@ -507,7 +610,7 @@ export default function ConversationPage() {
                         <div style={offerActionsStyle}>
                           <button
                             onClick={() =>
-                              updateOfferStatus(message.id, "accepted")
+                              updateOfferStatus(message.id, "accepted", message)
                             }
                             style={acceptButtonStyle}
                           >
@@ -539,7 +642,9 @@ export default function ConversationPage() {
                         padding: message.is_image ? 0 : "16px 20px",
                         boxShadow: message.is_image
                           ? "none"
-                          : "0 6px 24px rgba(0,0,0,0.05)",
+                          : mine
+                            ? "0 10px 30px rgba(0,0,0,0.18)"
+                            : "0 6px 24px rgba(0,0,0,0.05)",
                         borderBottomRightRadius: mine ? "8px" : "26px",
                         borderBottomLeftRadius: mine ? "26px" : "8px",
                       }}
@@ -574,7 +679,7 @@ export default function ConversationPage() {
 
           {otherTyping && (
             <div style={typingStyle}>
-              Escribiendo<span className="typing-dots">...</span>
+              Typing<span className="typing-dots">...</span>
             </div>
           )}
 
@@ -595,7 +700,7 @@ export default function ConversationPage() {
                 sendMessage();
               }
             }}
-            placeholder="Escribe un mensaje..."
+            placeholder="Write a message..."
             style={inputStyle}
           />
 
@@ -701,6 +806,10 @@ const headerStyle = {
   padding: "24px 28px",
   borderBottom: "1px solid rgba(0,0,0,0.06)",
   background: "#fff",
+  backdropFilter: "blur(18px)",
+  position: "sticky" as const,
+  top: 0,
+  zIndex: 20,
 };
 
 const backButtonStyle = {
@@ -760,7 +869,7 @@ const messagesStyle = {
   flexDirection: "column" as const,
   gap: "22px",
   overflowY: "auto" as const,
-  background: "#f7f7f3",
+  background: "linear-gradient(to bottom, #f8f8f4 0%, #f3f2ed 100%)",
   scrollBehavior: "smooth" as const,
 };
 

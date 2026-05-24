@@ -10,64 +10,63 @@ export default function SellerPage() {
   const router = useRouter();
   const sellerId = String(params.id);
 
-  const [products, setProducts] = useState<any[]>([]);
-  const [soldCount, setSoldCount] = useState(0);
-  const [sellerEmail, setSellerEmail] = useState("");
   const [loading, setLoading] = useState(true);
-
+  const [seller, setSeller] = useState<any>(null);
+  const [products, setProducts] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
-  const [average, setAverage] = useState(0);
 
   useEffect(() => {
     loadSeller();
   }, []);
 
   const loadSeller = async () => {
+    const { data: sellerProfile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", sellerId)
+      .maybeSingle();
+
     const { data: sellerProducts } = await supabase
       .from("products")
       .select("*")
       .eq("seller_id", sellerId)
-      .eq("sold", false)
+      .eq("moderation_status", "approved")
       .order("created_at", { ascending: false });
 
-    const { data: allSellerProducts } = await supabase
-      .from("products")
-      .select("*")
-      .eq("seller_id", sellerId);
-
-    setProducts(sellerProducts || []);
-    setSoldCount(allSellerProducts?.filter((item) => item.sold).length || 0);
-    setSellerEmail(allSellerProducts?.[0]?.seller_email || "Verified seller");
-
-   const { data: reviewsData } = await supabase
-  .from("seller_reviews")
+    const { data: sellerReviews } = await supabase
+      .from("reviews")
       .select("*")
       .eq("seller_id", sellerId)
       .order("created_at", { ascending: false });
 
-    if (reviewsData) {
-      setReviews(reviewsData);
-
-      if (reviewsData.length > 0) {
-        const avg =
-          reviewsData.reduce((acc, item) => acc + Number(item.rating), 0) /
-          reviewsData.length;
-
-        setAverage(Number(avg.toFixed(1)));
-      }
-    }
-
+    setSeller(sellerProfile);
+    setProducts(sellerProducts || []);
+    setReviews(sellerReviews || []);
     setLoading(false);
   };
 
-  const safeImage = (src: string) => {
+  const safeImage = (src?: string) => {
     return src?.startsWith("http") || src?.startsWith("/") ? src : "/logo.png";
   };
 
-  const stars = (value: number) => {
-    const rounded = Math.round(value || 0);
-    return "★".repeat(rounded) + "☆".repeat(5 - rounded);
-  };
+  const sellerName =
+    seller?.full_name ||
+    seller?.username ||
+    seller?.email ||
+    "ATHMOV Seller";
+
+  const soldCount = products.filter((p) => p.sold).length;
+  const activeCount = products.filter((p) => !p.sold).length;
+
+  const averageRating =
+    reviews.length > 0
+      ? (
+          reviews.reduce(
+            (acc, item) => acc + Number(item.rating || 0),
+            0
+          ) / reviews.length
+        ).toFixed(1)
+      : "0";
 
   if (loading) {
     return <main style={pageStyle}>Loading seller...</main>;
@@ -75,109 +74,192 @@ export default function SellerPage() {
 
   return (
     <main style={pageStyle} className="seller-page">
-      <section style={heroStyle}>
-        <div>
-          <p style={eyebrowStyle}>ATHMOV SELLER</p>
+      <section style={heroStyle} className="seller-hero">
+        <div style={heroOverlayStyle} />
 
-          <h1 style={titleStyle} className="seller-title">
-            Verified Seller
-          </h1>
+        <div style={avatarWrapperStyle}>
+          <div style={avatarStyle}>
+            <Image
+              src={safeImage(seller?.avatar_url)}
+              alt={sellerName}
+              fill
+              sizes="140px"
+              style={{ objectFit: "cover" }}
+            />
+          </div>
 
-          <p style={subtitleStyle}>{sellerEmail}</p>
+          {seller?.seller_verified && (
+            <div style={verifiedCircleStyle}>✓</div>
+          )}
         </div>
 
-        <div style={statsGridStyle}>
-          <div style={statCardStyle}>
-            <p style={statNumberStyle}>{products.length}</p>
-            <p style={statLabelStyle}>Active listings</p>
+        <div style={{ flex: 1 }}>
+          <p style={eyebrowStyle}>ATHMOV VERIFIED SELLER</p>
+
+          <h1 style={titleStyle} className="seller-title">
+            {sellerName}
+          </h1>
+
+          <div style={badgesStyle}>
+            {seller?.seller_verified && (
+              <span style={verifiedBadgeStyle}>VERIFIED</span>
+            )}
+
+            <span style={levelBadgeStyle}>
+              {(
+                seller?.seller_badge ||
+                seller?.seller_level ||
+                "new"
+              )
+                .toString()
+                .toUpperCase()}{" "}
+              SELLER
+            </span>
+
+            <span style={trustBadgeStyle}>TRUSTED MARKETPLACE</span>
           </div>
 
-          <div style={statCardStyle}>
-            <p style={statNumberStyle}>{soldCount}</p>
-            <p style={statLabelStyle}>Sales</p>
-          </div>
+          <p style={bioStyle}>
+            {seller?.bio ||
+              "Premium ATHMOV seller focused on curated sports gear, fast shipping and trusted transactions."}
+          </p>
 
-          <div style={statCardStyle}>
-            <p style={statNumberStyle}>★ {average || 0}</p>
-            <p style={statLabelStyle}>{reviews.length} reviews</p>
+          <div style={infoRowStyle}>
+            <div style={infoCardStyle}>
+              <p style={infoLabelStyle}>Location</p>
+              <p style={infoValueStyle}>
+                {seller?.location || "Spain"}
+              </p>
+            </div>
+
+            <div style={infoCardStyle}>
+              <p style={infoLabelStyle}>Response time</p>
+              <p style={infoValueStyle}>
+                {seller?.response_time || "< 1 hour"}
+              </p>
+            </div>
+
+            <div style={infoCardStyle}>
+              <p style={infoLabelStyle}>Member since</p>
+              <p style={infoValueStyle}>
+                {seller?.created_at
+                  ? new Date(seller.created_at).getFullYear()
+                  : "2025"}
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      <section style={reviewsSummaryStyle}>
-        <div>
-          <p style={sectionEyebrowStyle}>SELLER RATING</p>
-          <h2 style={sectionTitleStyle}>
-            {average ? `${average}/5` : "No reviews yet"}
-          </h2>
-          <p style={starsLargeStyle}>{stars(average)}</p>
+      <section style={trustSectionStyle}>
+        <div style={trustCardStyle}>✓ Verified identity</div>
+        <div style={trustCardStyle}>✓ Secure payments</div>
+        <div style={trustCardStyle}>✓ Premium marketplace</div>
+        <div style={trustCardStyle}>✓ Trusted seller</div>
+      </section>
+
+      <section style={statsGridStyle}>
+        <div style={statCardStyle}>
+          <p style={statLabelStyle}>Rating</p>
+          <h2 style={statValueStyle}>★ {averageRating}</h2>
         </div>
 
-        <p style={summaryTextStyle}>
-          Reviews are created only after completed orders, helping buyers trust
-          verified ATHMOV sellers.
-        </p>
+        <div style={statCardStyle}>
+          <p style={statLabelStyle}>Reviews</p>
+          <h2 style={statValueStyle}>{reviews.length}</h2>
+        </div>
+
+        <div style={statCardStyle}>
+          <p style={statLabelStyle}>Active listings</p>
+          <h2 style={statValueStyle}>{activeCount}</h2>
+        </div>
+
+        <div style={statCardStyle}>
+          <p style={statLabelStyle}>Sold products</p>
+          <h2 style={statValueStyle}>{soldCount}</h2>
+        </div>
       </section>
 
       <section style={sectionStyle}>
-        <p style={sectionEyebrowStyle}>ACTIVE LISTINGS</p>
-        <h2 style={sectionTitleStyle}>Products for sale</h2>
+        <div style={sectionHeaderStyle}>
+          <div>
+            <p style={sectionEyebrowStyle}>SELLER INVENTORY</p>
+            <h2 style={sectionTitleStyle}>Active Products</h2>
+          </div>
+        </div>
 
-        {products.length === 0 ? (
-          <div style={emptyStyle}>This seller has no active products.</div>
+        {products.filter((p) => !p.sold).length === 0 ? (
+          <div style={emptyStyle}>
+            No active products from this seller.
+          </div>
         ) : (
-          <div style={gridStyle} className="seller-grid">
-            {products.map((product) => (
-              <article
-                key={product.id}
-                onClick={() => router.push(`/products/${product.id}`)}
-                style={cardStyle}
-                className="seller-product-card"
-              >
-                <div style={imageWrapperStyle}>
-                  <Image
-                    src={safeImage(product.image)}
-                    alt={product.title || "Product"}
-                    fill
-                    sizes="33vw"
-                    className="seller-product-image"
-                    style={{ objectFit: "cover" }}
-                  />
-                </div>
+          <div style={gridStyle}>
+            {products
+              .filter((p) => !p.sold)
+              .map((product) => (
+                <article
+                  key={product.id}
+                  style={cardStyle}
+                  className="seller-product-card"
+                  onClick={() =>
+                    router.push(`/products/${product.id}`)
+                  }
+                >
+                  <div style={imageWrapperStyle}>
+                    <Image
+                      src={safeImage(product.image)}
+                      alt={product.title || "Product"}
+                      fill
+                      sizes="33vw"
+                      style={{ objectFit: "cover" }}
+                    />
+                  </div>
 
-                <div style={{ padding: "24px" }}>
-                  <p style={brandStyle}>{product.brand}</p>
-                  <h2 style={productTitleStyle}>{product.title}</h2>
-                  <p style={priceStyle}>€{product.price}</p>
-                </div>
-              </article>
-            ))}
+                  <div style={cardContentStyle}>
+                    <p style={brandStyle}>
+                      {product.brand || "ATHMOV"}
+                    </p>
+
+                    <h3 style={cardTitleStyle}>
+                      {product.title}
+                    </h3>
+
+                    <p style={priceStyle}>€{product.price}</p>
+                  </div>
+                </article>
+              ))}
           </div>
         )}
       </section>
 
       <section style={sectionStyle}>
-        <p style={sectionEyebrowStyle}>BUYER FEEDBACK</p>
-        <h2 style={sectionTitleStyle}>Seller reviews</h2>
+        <div style={sectionHeaderStyle}>
+          <div>
+            <p style={sectionEyebrowStyle}>BUYER FEEDBACK</p>
+            <h2 style={sectionTitleStyle}>Reviews</h2>
+          </div>
+        </div>
 
         {reviews.length === 0 ? (
           <div style={emptyStyle}>No reviews yet.</div>
         ) : (
           <div style={reviewsGridStyle}>
             {reviews.map((review) => (
-              <div key={review.id} style={reviewCardStyle}>
-                <p style={reviewStarsStyle}>{stars(Number(review.rating))}</p>
-
-                <p style={reviewCommentStyle}>{review.comment}</p>
-
-                <p style={reviewMetaStyle}>
-                  {new Date(review.created_at).toLocaleDateString([], {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                  })}
+              <article
+                key={review.id}
+                style={reviewCardStyle}
+              >
+                <p style={reviewStarsStyle}>
+                  {"★".repeat(Number(review.rating || 0))}
+                  {"☆".repeat(
+                    5 - Number(review.rating || 0)
+                  )}
                 </p>
-              </div>
+
+                <p style={reviewTextStyle}>
+                  {review.comment}
+                </p>
+              </article>
             ))}
           </div>
         )}
@@ -185,34 +267,28 @@ export default function SellerPage() {
 
       <style>{`
         .seller-product-card {
-          transition: transform 0.24s ease, box-shadow 0.24s ease;
+          transition: all 0.35s ease;
         }
 
         .seller-product-card:hover {
           transform: translateY(-6px);
-          box-shadow: 0 30px 90px rgba(0,0,0,0.08);
-        }
-
-        .seller-product-image {
-          transition: transform 0.45s ease;
-        }
-
-        .seller-product-card:hover .seller-product-image {
-          transform: scale(1.06);
         }
 
         @media (max-width: 900px) {
+          .seller-hero {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+          }
+        }
+
+        @media (max-width: 700px) {
           .seller-page {
-            padding: 120px 18px 34px !important;
+            padding: 110px 18px 40px !important;
           }
 
           .seller-title {
-            font-size: 48px !important;
+            font-size: 44px !important;
             letter-spacing: -2px !important;
-          }
-
-          .seller-grid {
-            grid-template-columns: 1fr !important;
           }
         }
       `}</style>
@@ -222,191 +298,268 @@ export default function SellerPage() {
 
 const pageStyle = {
   minHeight: "100vh",
-  background: "linear-gradient(to bottom, #f8f8f4, #eeeeea)",
-  padding: "70px 60px",
+  background: "#f6f6f2",
+  padding: "80px 60px",
   fontFamily: "Inter, sans-serif",
 };
 
 const heroStyle = {
-  maxWidth: "1400px",
-  margin: "0 auto 34px",
+  position: "relative" as const,
+  overflow: "hidden",
+  maxWidth: "1280px",
+  margin: "0 auto 40px",
   background: "#111",
-  color: "#fff",
   borderRadius: "42px",
-  padding: "54px",
-  boxShadow: "0 40px 120px rgba(0,0,0,0.16)",
+  padding: "46px",
   display: "flex",
-  justifyContent: "space-between",
-  gap: "30px",
-  flexWrap: "wrap" as const,
+  gap: "34px",
+  alignItems: "center",
+  color: "#fff",
+};
+
+const heroOverlayStyle = {
+  position: "absolute" as const,
+  inset: 0,
+  background:
+    "radial-gradient(circle at top right, rgba(255,255,255,0.08), transparent 40%)",
+};
+
+const avatarWrapperStyle = {
+  position: "relative" as const,
+};
+
+const avatarStyle = {
+  width: "140px",
+  height: "140px",
+  borderRadius: "999px",
+  overflow: "hidden",
+  position: "relative" as const,
+  border: "4px solid rgba(255,255,255,0.12)",
+};
+
+const verifiedCircleStyle = {
+  position: "absolute" as const,
+  bottom: "4px",
+  right: "4px",
+  width: "34px",
+  height: "34px",
+  borderRadius: "999px",
+  background: "#fff",
+  color: "#111",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontWeight: 900,
 };
 
 const eyebrowStyle = {
-  fontSize: "12px",
+  fontSize: "11px",
   letterSpacing: "3px",
-  opacity: 0.55,
-  marginBottom: "16px",
+  opacity: 0.5,
+  marginBottom: "12px",
 };
 
 const titleStyle = {
-  fontSize: "72px",
+  fontSize: "74px",
   lineHeight: 1,
-  letterSpacing: "-4px",
   margin: 0,
+  letterSpacing: "-5px",
 };
 
-const subtitleStyle = {
+const badgesStyle = {
+  display: "flex",
+  gap: "10px",
+  flexWrap: "wrap" as const,
   marginTop: "18px",
-  color: "rgba(255,255,255,0.7)",
 };
 
-const statsGridStyle = {
+const verifiedBadgeStyle = {
+  background: "#fff",
+  color: "#111",
+  borderRadius: "999px",
+  padding: "10px 14px",
+  fontSize: "11px",
+  fontWeight: 900,
+};
+
+const levelBadgeStyle = {
+  background: "rgba(255,255,255,0.1)",
+  border: "1px solid rgba(255,255,255,0.16)",
+  color: "#fff",
+  borderRadius: "999px",
+  padding: "10px 14px",
+  fontSize: "11px",
+  fontWeight: 900,
+};
+
+const trustBadgeStyle = {
+  background: "rgba(255,255,255,0.06)",
+  border: "1px solid rgba(255,255,255,0.1)",
+  color: "#fff",
+  borderRadius: "999px",
+  padding: "10px 14px",
+  fontSize: "11px",
+  fontWeight: 900,
+};
+
+const bioStyle = {
+  marginTop: "18px",
+  color: "rgba(255,255,255,0.72)",
+  maxWidth: "700px",
+  lineHeight: 1.8,
+};
+
+const infoRowStyle = {
   display: "flex",
   gap: "14px",
   flexWrap: "wrap" as const,
-  alignItems: "flex-end",
+  marginTop: "26px",
+};
+
+const infoCardStyle = {
+  background: "rgba(255,255,255,0.06)",
+  border: "1px solid rgba(255,255,255,0.08)",
+  borderRadius: "20px",
+  padding: "16px 18px",
+};
+
+const infoLabelStyle = {
+  fontSize: "10px",
+  letterSpacing: "2px",
+  opacity: 0.5,
+  marginBottom: "6px",
+};
+
+const infoValueStyle = {
+  fontSize: "14px",
+  fontWeight: 700,
+};
+
+const trustSectionStyle = {
+  maxWidth: "1280px",
+  margin: "0 auto",
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
+  gap: "16px",
+};
+
+const trustCardStyle = {
+  background: "#fff",
+  borderRadius: "24px",
+  padding: "22px",
+  fontWeight: 800,
+};
+
+const statsGridStyle = {
+  maxWidth: "1280px",
+  margin: "28px auto 0",
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
+  gap: "18px",
 };
 
 const statCardStyle = {
   background: "#fff",
-  color: "#111",
-  borderRadius: "24px",
-  padding: "20px 24px",
-  minWidth: "140px",
-};
-
-const statNumberStyle = {
-  fontSize: "28px",
-  fontWeight: 900,
-  margin: 0,
+  borderRadius: "30px",
+  padding: "28px",
 };
 
 const statLabelStyle = {
   fontSize: "11px",
-  letterSpacing: "1.5px",
+  letterSpacing: "2px",
   opacity: 0.5,
-  marginTop: "8px",
-  marginBottom: 0,
-  textTransform: "uppercase" as const,
 };
 
-const reviewsSummaryStyle = {
-  maxWidth: "1400px",
-  margin: "0 auto 60px",
-  background: "#fff",
-  borderRadius: "34px",
-  padding: "34px",
-  border: "1px solid rgba(0,0,0,0.06)",
-  display: "flex",
-  justifyContent: "space-between",
-  gap: "24px",
-  alignItems: "center",
+const statValueStyle = {
+  fontSize: "42px",
+  marginTop: "14px",
 };
 
 const sectionStyle = {
-  maxWidth: "1400px",
+  maxWidth: "1280px",
   margin: "70px auto 0",
 };
 
+const sectionHeaderStyle = {
+  marginBottom: "26px",
+};
+
 const sectionEyebrowStyle = {
-  fontSize: "12px",
+  fontSize: "11px",
   letterSpacing: "3px",
   opacity: 0.5,
-  marginBottom: "10px",
+  marginBottom: "8px",
 };
 
 const sectionTitleStyle = {
-  fontSize: "42px",
-  margin: 0,
+  fontSize: "48px",
   letterSpacing: "-2px",
+  margin: 0,
 };
 
-const starsLargeStyle = {
-  fontSize: "24px",
-  marginTop: "12px",
-  marginBottom: 0,
-};
-
-const summaryTextStyle = {
-  maxWidth: "520px",
+const emptyStyle = {
+  background: "#fff",
+  borderRadius: "30px",
+  padding: "30px",
   color: "#666",
-  lineHeight: 1.7,
 };
 
 const gridStyle = {
-  marginTop: "28px",
   display: "grid",
-  gridTemplateColumns: "repeat(3, 1fr)",
-  gap: "34px",
+  gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))",
+  gap: "28px",
 };
 
 const cardStyle = {
   background: "#fff",
-  borderRadius: "32px",
+  borderRadius: "30px",
   overflow: "hidden",
   cursor: "pointer",
-  border: "1px solid rgba(0,0,0,0.06)",
 };
 
 const imageWrapperStyle = {
+  height: "320px",
   position: "relative" as const,
-  height: "300px",
-  background: "#f8f8f6",
-  overflow: "hidden",
+  background: "#f4f4f1",
+};
+
+const cardContentStyle = {
+  padding: "24px",
 };
 
 const brandStyle = {
   fontSize: "11px",
   letterSpacing: "2px",
   opacity: 0.5,
-  textTransform: "uppercase" as const,
 };
 
-const productTitleStyle = {
+const cardTitleStyle = {
   fontSize: "28px",
-  marginTop: "10px",
-  marginBottom: "16px",
+  margin: "10px 0 14px",
 };
 
 const priceStyle = {
-  fontSize: "26px",
-  fontWeight: 800,
+  fontSize: "28px",
+  fontWeight: 900,
 };
 
 const reviewsGridStyle = {
   display: "grid",
   gap: "18px",
-  marginTop: "28px",
 };
 
 const reviewCardStyle = {
   background: "#fff",
   borderRadius: "28px",
-  padding: "28px",
-  border: "1px solid rgba(0,0,0,0.06)",
+  padding: "26px",
 };
 
 const reviewStarsStyle = {
-  fontSize: "18px",
-  fontWeight: 900,
-  marginBottom: "14px",
+  fontSize: "20px",
+  marginBottom: "12px",
 };
 
-const reviewCommentStyle = {
-  color: "#444",
-  lineHeight: 1.7,
-  marginBottom: "18px",
-};
-
-const reviewMetaStyle = {
-  fontSize: "12px",
-  opacity: 0.45,
-};
-
-const emptyStyle = {
-  marginTop: "28px",
-  background: "#fff",
-  borderRadius: "28px",
-  padding: "34px",
-  color: "#666",
+const reviewTextStyle = {
+  color: "#555",
+  lineHeight: 1.8,
 };

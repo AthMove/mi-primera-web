@@ -52,6 +52,7 @@ export default function Navbar() {
 
     for (const conversation of conversations || []) {
       const isSeller = conversation.seller_id === user.id;
+
       const archived = isSeller
         ? conversation.archived_by_seller
         : conversation.archived_by_buyer;
@@ -69,6 +70,7 @@ export default function Navbar() {
         : query.eq("read_by_buyer", false);
 
       const { data: unreadMessages } = await query;
+
       unreadTotal += unreadMessages?.length || 0;
     }
 
@@ -124,11 +126,31 @@ export default function Navbar() {
 
     const channel = supabase
       .channel("navbar-notifications")
-      .on("postgres_changes", { event: "*", schema: "public", table: "conversation_messages" }, loadNotifications)
-      .on("postgres_changes", { event: "*", schema: "public", table: "conversations" }, loadNotifications)
-      .on("postgres_changes", { event: "*", schema: "public", table: "offers" }, loadNotifications)
-      .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, loadNotifications)
-      .on("postgres_changes", { event: "*", schema: "public", table: "notifications" }, loadNotifications)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "conversation_messages" },
+        loadNotifications
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "conversations" },
+        loadNotifications
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "offers" },
+        loadNotifications
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "orders" },
+        loadNotifications
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "notifications" },
+        loadNotifications
+      )
       .subscribe();
 
     window.addEventListener("storage", updateCartCount);
@@ -147,99 +169,93 @@ export default function Navbar() {
 
   const badge = (count: number) => (count > 0 ? ` (${count})` : "");
 
-  const mobileLinks = (
-    <>
-      <Link href="/products" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-        SHOP
-      </Link>
+ const mobileLinks = (
+  <>
+    <p style={drawerSectionTitleStyle}>MARKETPLACE</p>
 
-      <Link href="/how-it-works" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-        HOW IT WORKS
-      </Link>
+    <Link href="/products" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
+      SHOP
+    </Link>
 
-      <Link href="/buyer-guide" style={linkStyle}>
-  BUYER GUIDE
-</Link>
+    <Link href="/products?category=PADEL" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
+      PADEL
+    </Link>
 
-      <Link href="/feed" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-        FEED
-      </Link>
+    <Link href="/products?category=GOLF" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
+      GOLF
+    </Link>
 
-      <Link href="/sell" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-        SELL
-      </Link>
+    <Link href="/products?category=TENNIS" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
+      TENNIS
+    </Link>
 
-      <Link href="/products?category=PADEL" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-        PADEL
-      </Link>
+    <Link href="/products?category=RUNNING" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
+      RUNNING
+    </Link>
 
-      <Link href="/products?category=GOLF" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-        GOLF
-      </Link>
+    <p style={drawerSectionTitleStyle}>SELLER</p>
 
-      <Link href="/products?category=TENNIS" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-        TENNIS
-      </Link>
+    <Link href="/sell" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
+      SELL
+    </Link>
 
-      <Link href="/products?category=CYCLING" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-        CYCLING
-      </Link>
+    {userEmail && (
+      <>
+        <Link href="/seller-dashboard" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
+          DASHBOARD
+        </Link>
 
-      <Link href="/products?category=RUNNING" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-        RUNNING
-      </Link>
+        <Link href="/orders" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
+          ORDERS{badge(ordersCount)}
+        </Link>
 
-      <Link href="/buyer-guide" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-  BUYER GUIDE
-</Link>
+        <Link href="/offers" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
+          OFFERS{badge(offersCount)}
+        </Link>
+      </>
+    )}
 
-      <Link href="/cart" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-        CART ({cartCount})
-      </Link>
+    <p style={drawerSectionTitleStyle}>ACCOUNT</p>
 
-      {userEmail ? (
-        <>
-          <Link href="/favorites" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-            FAVORITES
-          </Link>
+    <Link href="/cart" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
+      CART ({cartCount})
+    </Link>
 
-          <Link href="/messages" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-            MESSAGES{badge(messagesCount)}
-          </Link>
+    {userEmail ? (
+      <>
+        <Link href="/favorites" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
+          FAVORITES
+        </Link>
 
-          <Link href="/offers" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-            OFFERS{badge(offersCount)}
-          </Link>
+        <Link href="/messages" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
+          MESSAGES{badge(messagesCount)}
+        </Link>
 
-          <Link href="/orders" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-            ORDERS{badge(ordersCount)}
-          </Link>
+        <Link href="/notifications" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
+          NOTIFICATIONS{badge(notificationsCount)}
+        </Link>
 
-          <Link href="/notifications" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-            NOTIFICATIONS{badge(notificationsCount)}
-          </Link>
+        <Link href="/account" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
+          ACCOUNT
+        </Link>
 
-          <Link href="/account" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-            ACCOUNT
-          </Link>
+        <button onClick={handleLogout} style={drawerButtonStyle}>
+          LOG OUT
+        </button>
+      </>
+    ) : (
+      <>
+        <Link href="/auth" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
+          SIGN IN
+        </Link>
 
-          <button onClick={handleLogout} style={drawerButtonStyle}>
-            LOG OUT
-          </button>
-        </>
-      ) : (
-        <>
-          <Link href="/auth" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-            SIGN IN
-          </Link>
-
-          <Link href="/auth" style={drawerButtonStyle} onClick={() => setMenuOpen(false)}>
-            REGISTER
-          </Link>
-        </>
-      )}
-    </>
-  );
+        <Link href="/auth" style={drawerButtonStyle} onClick={() => setMenuOpen(false)}>
+          REGISTER
+        </Link>
+      </>
+    )}
+  </>
+);
 
   return (
     <>
@@ -257,44 +273,6 @@ export default function Navbar() {
             priority
           />
         </Link>
-
-        <div style={centerLinksStyle} className="desktop-only">
-          <Link href="/products" style={linkStyle}>
-            SHOP
-          </Link>
-
-          <Link href="/how-it-works" style={linkStyle}>
-            HOW IT WORKS
-          </Link>
-
-          <Link href="/feed" style={linkStyle}>
-            FEED
-          </Link>
-
-          <Link href="/sell" style={linkStyle}>
-            SELL
-          </Link>
-
-          <Link href="/products?category=PADEL" style={linkStyle}>
-            PADEL
-          </Link>
-
-          <Link href="/products?category=GOLF" style={linkStyle}>
-            GOLF
-          </Link>
-
-          <Link href="/products?category=TENNIS" style={linkStyle}>
-            TENNIS
-          </Link>
-
-          <Link href="/products?category=CYCLING" style={linkStyle}>
-            CYCLING
-          </Link>
-
-          <Link href="/products?category=RUNNING" style={linkStyle}>
-            RUNNING
-          </Link>
-        </div>
 
         <div style={rightLinksStyle} className="desktop-only">
           <Link href="/cart" style={cartLinkStyle}>
@@ -318,18 +296,6 @@ export default function Navbar() {
               <Link href="/orders" style={signInStyle}>
                 ORDERS{badge(ordersCount)}
               </Link>
-
-              <Link href="/notifications" style={signInStyle}>
-                NOTIFICATIONS{badge(notificationsCount)}
-              </Link>
-
-              <Link href="/account" style={signInStyle}>
-                ACCOUNT
-              </Link>
-
-              <button onClick={handleLogout} style={logoutStyle}>
-                LOG OUT
-              </button>
             </>
           ) : (
             <>
@@ -342,12 +308,19 @@ export default function Navbar() {
               </Link>
             </>
           )}
+
+          <button
+            onClick={() => setMenuOpen(true)}
+            style={menuButtonStyle}
+          >
+            MENU
+          </button>
         </div>
 
         <button
           onClick={() => setMenuOpen(true)}
           style={menuButtonStyle}
-          className="mobile-menu-button"
+          className="mobile-only"
         >
           MENU
         </button>
@@ -364,14 +337,16 @@ export default function Navbar() {
               </button>
             </div>
 
-            <div style={drawerLinksStyle}>{mobileLinks}</div>
+            <div style={drawerLinksStyle}>
+              {mobileLinks}
+            </div>
           </aside>
         </div>
       )}
 
       <style>{`
-        .mobile-menu-button {
-          display: none;
+        .mobile-only {
+          display: none !important;
         }
 
         @media (max-width: 1100px) {
@@ -379,7 +354,7 @@ export default function Navbar() {
             display: none !important;
           }
 
-          .mobile-menu-button {
+          .mobile-only {
             display: flex !important;
             align-items: center;
             justify-content: center;
@@ -425,28 +400,12 @@ const logoStyle = {
   flexShrink: 0,
 };
 
-const centerLinksStyle = {
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  gap: "22px",
-  flex: 1,
-};
-
 const rightLinksStyle = {
   display: "flex",
   justifyContent: "flex-end",
   alignItems: "center",
   gap: "12px",
   flexWrap: "wrap" as const,
-};
-
-const linkStyle = {
-  textDecoration: "none",
-  color: "#111",
-  fontSize: "11px",
-  fontWeight: 800,
-  letterSpacing: "2px",
 };
 
 const cartLinkStyle = {
@@ -474,17 +433,6 @@ const registerStyle = {
   color: "#fff",
   borderRadius: "999px",
   padding: "12px 18px",
-  fontSize: "11px",
-  fontWeight: 800,
-  letterSpacing: "1.5px",
-};
-
-const logoutStyle = {
-  background: "transparent",
-  border: "1px solid rgba(0,0,0,0.12)",
-  borderRadius: "999px",
-  padding: "10px 14px",
-  cursor: "pointer",
   fontSize: "11px",
   fontWeight: 800,
   letterSpacing: "1.5px",
@@ -572,4 +520,12 @@ const drawerButtonStyle = {
   letterSpacing: "1.5px",
   cursor: "pointer",
   textAlign: "center" as const,
+};
+
+const drawerSectionTitleStyle = {
+  fontSize: "10px",
+  letterSpacing: "3px",
+  opacity: 0.35,
+  marginTop: "18px",
+  marginBottom: "-4px",
 };

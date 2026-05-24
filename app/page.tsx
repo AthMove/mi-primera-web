@@ -19,13 +19,16 @@ export default function Home() {
     const { data: drops } = await supabase
       .from("products")
       .select("*")
+      .eq("moderation_status", "approved")
       .eq("sold", false)
+      .order("featured", { ascending: false })
       .order("created_at", { ascending: false })
       .limit(6);
 
     const { data: sold } = await supabase
       .from("products")
       .select("*")
+      .eq("moderation_status", "approved")
       .eq("sold", true)
       .order("created_at", { ascending: false })
       .limit(4);
@@ -34,14 +37,35 @@ export default function Home() {
     setSoldProducts(sold || []);
   };
 
-  const safeImage = (src: string) => {
+  const safeImage = (src?: string) => {
     return src?.startsWith("http") || src?.startsWith("/") ? src : "/logo.png";
   };
 
   const categories = [
-    { title: "PADEL", text: "Premium rackets & gear", href: "/products?category=padel", image: "/padel.jpg" },
-    { title: "GOLF", text: "Clubs, bags & essentials", href: "/products?category=golf", image: "/golf.jpg" },
-    { title: "TENNIS", text: "Rackets & performance pieces", href: "/products?category=tennis", image: "/tennis.jpg" },
+    {
+      title: "PADEL",
+      text: "Premium rackets & gear",
+      href: "/products?category=padel",
+      image: "/padel.jpg",
+    },
+    {
+      title: "GOLF",
+      text: "Clubs, bags & essentials",
+      href: "/products?category=golf",
+      image: "/golf.jpg",
+    },
+    {
+      title: "TENNIS",
+      text: "Rackets & performance pieces",
+      href: "/products?category=tennis",
+      image: "/tennis.jpg",
+    },
+    {
+      title: "RUNNING",
+      text: "Performance footwear & apparel",
+      href: "/products?category=running",
+      image: "/running.jpg",
+    },
   ];
 
   return (
@@ -87,9 +111,37 @@ export default function Home() {
             style={{ objectFit: "cover" }}
           />
 
-          <div style={heroBadgeStyle}>
-            Curated premium gear
-          </div>
+          <div style={heroBadgeStyle}>Curated premium gear</div>
+        </div>
+      </section>
+
+      <section style={trustSectionStyle} className="trust-grid">
+        <div style={trustCardStyle}>
+          <p style={trustCardTitleStyle}>Verified Sellers</p>
+          <p style={trustCardTextStyle}>
+            ATHMOV manually reviews premium sellers and sports collectors.
+          </p>
+        </div>
+
+        <div style={trustCardStyle}>
+          <p style={trustCardTitleStyle}>Buyer Protection</p>
+          <p style={trustCardTextStyle}>
+            Secure transactions and protected premium marketplace payments.
+          </p>
+        </div>
+
+        <div style={trustCardStyle}>
+          <p style={trustCardTitleStyle}>Curated Marketplace</p>
+          <p style={trustCardTextStyle}>
+            Only premium sports brands across padel, golf, tennis and running.
+          </p>
+        </div>
+
+        <div style={trustCardStyle}>
+          <p style={trustCardTitleStyle}>Luxury Second Hand</p>
+          <p style={trustCardTextStyle}>
+            Curated performance gear from trusted athletes and collectors.
+          </p>
         </div>
       </section>
 
@@ -144,17 +196,23 @@ export default function Home() {
         <div style={trustGridStyle}>
           <div>
             <h3 style={trustTitleStyle}>Curated marketplace</h3>
-            <p style={trustTextStyle}>A premium space for high-quality second-hand sports equipment.</p>
+            <p style={trustTextStyle}>
+              A premium space for high-quality second-hand sports equipment.
+            </p>
           </div>
 
           <div>
             <h3 style={trustTitleStyle}>Seller reputation</h3>
-            <p style={trustTextStyle}>Reviews, orders, tracking and seller profiles build trust.</p>
+            <p style={trustTextStyle}>
+              Reviews, orders, tracking and seller profiles build trust.
+            </p>
           </div>
 
           <div>
             <h3 style={trustTitleStyle}>Built for athletes</h3>
-            <p style={trustTextStyle}>Padel, golf, tennis, cycling, running and more.</p>
+            <p style={trustTextStyle}>
+              Padel, golf, tennis and running premium gear.
+            </p>
           </div>
         </div>
       </section>
@@ -233,7 +291,9 @@ export default function Home() {
 
       <section style={sellerCtaStyle}>
         <h2 style={ctaTitleStyle}>Ready to sell premium gear?</h2>
-        <p style={ctaTextStyle}>List your sports equipment and reach buyers looking for quality pieces.</p>
+        <p style={ctaTextStyle}>
+          List your sports equipment and reach buyers looking for quality pieces.
+        </p>
 
         <button onClick={() => router.push("/sell")} style={primaryButtonStyle}>
           Start selling
@@ -241,8 +301,72 @@ export default function Home() {
       </section>
 
       <footer style={footerStyle}>
-        © 2025 ATHMOV. Premium second-hand sports marketplace.
-      </footer>
+  <div style={footerGridStyle}>
+    <div>
+      <h3 style={footerLogoStyle}>ATHMOV</h3>
+
+      <p style={footerTextStyle}>
+        Premium second-hand marketplace for athletes, collectors and sports enthusiasts.
+      </p>
+    </div>
+
+    <div style={footerColumnStyle}>
+      <p style={footerTitleStyle}>Marketplace</p>
+
+      <button onClick={() => router.push("/products")} style={footerLinkStyle}>
+        Shop
+      </button>
+
+      <button onClick={() => router.push("/sell")} style={footerLinkStyle}>
+        Sell
+      </button>
+
+      <button onClick={() => router.push("/feed")} style={footerLinkStyle}>
+        Feed
+      </button>
+    </div>
+
+    <div style={footerColumnStyle}>
+      <p style={footerTitleStyle}>Support</p>
+
+      <button onClick={() => router.push("/how-it-works")} style={footerLinkStyle}>
+        How it works
+      </button>
+
+      <button onClick={() => router.push("/buyer-guide")} style={footerLinkStyle}>
+        Buyer guide
+      </button>
+
+      <button style={footerLinkStyle}>
+        Buyer protection
+      </button>
+    </div>
+
+    <div style={footerColumnStyle}>
+      <p style={footerTitleStyle}>Categories</p>
+
+      <button onClick={() => router.push("/products?category=padel")} style={footerLinkStyle}>
+        Padel
+      </button>
+
+      <button onClick={() => router.push("/products?category=golf")} style={footerLinkStyle}>
+        Golf
+      </button>
+
+      <button onClick={() => router.push("/products?category=tennis")} style={footerLinkStyle}>
+        Tennis
+      </button>
+
+      <button onClick={() => router.push("/products?category=running")} style={footerLinkStyle}>
+        Running
+      </button>
+    </div>
+  </div>
+
+  <div style={footerBottomStyle}>
+    © 2025 ATHMOV. All rights reserved.
+  </div>
+</footer>
 
       <style>{`
         .home-card {
@@ -272,6 +396,10 @@ export default function Home() {
           .hero-title {
             font-size: 58px !important;
           }
+
+          .trust-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
         }
 
         @media (max-width: 700px) {
@@ -282,6 +410,10 @@ export default function Home() {
           .hero-title {
             font-size: 44px !important;
             letter-spacing: -2px !important;
+          }
+
+          .trust-grid {
+            grid-template-columns: 1fr !important;
           }
         }
       `}</style>
@@ -373,6 +505,33 @@ const heroBadgeStyle = {
   padding: "13px 18px",
   fontSize: "12px",
   fontWeight: 900,
+};
+
+const trustSectionStyle = {
+  maxWidth: "1400px",
+  margin: "40px auto 80px",
+  padding: "0 60px",
+  display: "grid",
+  gridTemplateColumns: "repeat(4, 1fr)",
+  gap: "20px",
+};
+
+const trustCardStyle = {
+  background: "#fff",
+  borderRadius: "30px",
+  padding: "28px",
+  border: "1px solid rgba(0,0,0,0.06)",
+};
+
+const trustCardTitleStyle = {
+  fontSize: "18px",
+  fontWeight: 800,
+  marginBottom: "12px",
+};
+
+const trustCardTextStyle = {
+  color: "#666",
+  lineHeight: 1.7,
 };
 
 const sectionStyle = {
@@ -564,6 +723,60 @@ const ctaTextStyle = {
 const footerStyle = {
   borderTop: "1px solid rgba(0,0,0,0.06)",
   padding: "34px",
+  textAlign: "center" as const,
+  color: "#777",
+  fontSize: "13px",
+};
+
+const footerGridStyle = {
+  maxWidth: "1400px",
+  margin: "0 auto",
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
+  gap: "40px",
+  paddingBottom: "40px",
+};
+
+const footerColumnStyle = {
+  display: "flex",
+  flexDirection: "column" as const,
+  gap: "14px",
+};
+
+const footerLogoStyle = {
+  fontSize: "34px",
+  marginBottom: "16px",
+  letterSpacing: "-2px",
+};
+
+const footerTitleStyle = {
+  fontSize: "13px",
+  fontWeight: 900,
+  letterSpacing: "2px",
+  textTransform: "uppercase" as const,
+  marginBottom: "8px",
+};
+
+const footerTextStyle = {
+  color: "#666",
+  lineHeight: 1.7,
+  maxWidth: "320px",
+};
+
+const footerLinkStyle = {
+  background: "transparent",
+  border: "none",
+  padding: 0,
+  textAlign: "left" as const,
+  cursor: "pointer",
+  color: "#555",
+  fontSize: "15px",
+};
+
+const footerBottomStyle = {
+  borderTop: "1px solid rgba(0,0,0,0.06)",
+  paddingTop: "24px",
+  marginTop: "20px",
   textAlign: "center" as const,
   color: "#777",
   fontSize: "13px",

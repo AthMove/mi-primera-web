@@ -17,6 +17,7 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [sellerProfile, setSellerProfile] = useState<any>(null);
 
   useEffect(() => {
     if (!id || id === "undefined") {
@@ -44,6 +45,14 @@ export default function ProductDetail() {
 
         setProducto(data);
 
+        const { data: sellerData } = await supabase
+  .from("profiles")
+  .select("seller_verified, seller_level, seller_badge")
+  .eq("id", data.seller_id)
+  .maybeSingle();
+
+setSellerProfile(sellerData);
+
         const images =
           data.images && Array.isArray(data.images) ? data.images : [data.image];
 
@@ -65,11 +74,12 @@ export default function ProductDetail() {
         }
 
         const { data: relatedProducts } = await supabase
-          .from("products")
-          .select("*")
-          .neq("id", data.id)
-          .eq("sold", false)
-          .limit(3);
+  .from("products")
+  .select("*")
+  .neq("id", data.id)
+  .eq("sold", false)
+  .eq("moderation_status", "approved")
+  .limit(3);
 
         setRelated(relatedProducts || []);
       } catch {
@@ -134,62 +144,113 @@ export default function ProductDetail() {
     };
   };
 
- const buyNow = async () => {
-  if (!producto) return;
+  const buyNow = async () => {
+    if (!producto) return;
 
-  if (producto.sold) {
-    alert("This product has already been sold");
-    return;
-  }
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    alert("Debes iniciar sesión");
-    return;
-  }
-
-  if (user.id === producto.seller_id) {
-    alert("No puedes comprar tu propio producto");
-    return;
-  }
-
-  try {
-    setCheckoutLoading(true);
-
-    const response = await fetch("/api/checkout", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title: producto.title,
-        image: safeImage(producto.image),
-        price: Number(producto.price),
-        productId: producto.id,
-        sellerId: producto.seller_id,
-        buyerId: user.id,
-        origin: window.location.origin,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (data.url) {
-      window.location.href = data.url;
+    if (producto.sold) {
+      alert("This product has already been sold");
       return;
     }
 
-    alert(data.error || "No se pudo iniciar el checkout");
-  } catch (error) {
-    console.log(error);
-    alert("Error starting checkout");
-  } finally {
-    setCheckoutLoading(false);
-  }
-};
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      alert("Debes iniciar sesión");
+      return;
+    }
+
+    if (user.id === producto.seller_id) {
+      alert("No puedes comprar tu propio producto");
+      return;
+    }
+
+const { data: sellerProfile, error: sellerError } = await supabase
+  .from("profiles")
+  .select(
+    "seller_verified, seller_level, seller_badge, stripe_account_id, stripe_charges_enabled, stripe_payouts_enabled"
+  )
+  .eq("id", producto.seller_id)
+  .maybeSingle();
+
+    if (
+      sellerError ||
+      !sellerProfile?.stripe_account_id ||
+      !sellerProfile?.stripe_charges_enabled ||
+      !sellerProfile?.stripe_payouts_enabled
+    ) {
+      alert("Seller has not connected Stripe payouts");
+      return;
+    }
+
+    try {
+      setCheckoutLoading(true);
+
+      const price = Number(producto.price);
+      const platformFee = Number(((price * 8) / 100).toFixed(2));
+      const sellerAmount = Number((price - platformFee).toFixed(2));
+      const stripeFeeEstimate = Number((price * 0.015 + 0.25).toFixed(2));
+
+      const { data: order, error: orderError } = await supabase
+        .from("orders")
+        .insert([
+          {
+            product_id: producto.id,
+            buyer_id: user.id,
+            seller_id: producto.seller_id,
+            amount: price,
+            platform_fee_percent: 8,
+            platform_fee: platformFee,
+            seller_amount: sellerAmount,
+            stripe_fee_estimate: stripeFeeEstimate,
+            seller_stripe_account_id: sellerProfile.stripe_account_id,
+            status: "pending",
+            payment_status: "pending",
+            transfer_status: "pending",
+          },
+        ])
+        .select()
+        .single();
+
+      if (orderError || !order) {
+        alert(orderError?.message || "Could not create order");
+        return;
+      }
+
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderId: order.id,
+          title: producto.title,
+          image: safeImage(producto.image),
+          price,
+          productId: producto.id,
+          sellerId: producto.seller_id,
+          buyerId: user.id,
+          stripeAccountId: sellerProfile.stripe_account_id,
+          origin: window.location.origin,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+
+      alert(data.error || "No se pudo iniciar el checkout");
+    } catch (error) {
+      console.log(error);
+      alert("Error starting checkout");
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
 
   const toggleFavorite = async () => {
     const {
@@ -332,12 +393,12 @@ export default function ProductDetail() {
     }
 
     await supabase.from("messages").insert([
-  {
-    conversation_id: conversationId,
-    sender_id: user.id,
-    text: `Hi! Could you send me a verification video of "${producto.title}" showing serial numbers, condition and branding?`,
-  },
-]);
+      {
+        conversation_id: conversationId,
+        sender_id: user.id,
+        text: `Hi! Could you send me a verification video of "${producto.title}" showing serial numbers, condition and branding?`,
+      },
+    ]);
 
     window.location.href = `/messages/${conversationId}`;
   };
@@ -459,63 +520,66 @@ export default function ProductDetail() {
             ))}
           </div>
 
-          <div style={trustBadgesStyle}>
-  <div style={trustBadgeStyle}>✓ VERIFIED PHOTOS</div>
-
-  <div style={trustBadgeStyle}>✓ VIDEO REQUESTED</div>
-
-  <div style={trustBadgeStyle}>✓ SERIAL CHECKED</div>
-
-  <div style={trustBadgeStyle}>✓ PREMIUM MARKETPLACE</div>
+        <div style={trustPanelStyle}>
+  <div style={trustPanelItemStyle}>✓ Buyer Protection</div>
+  <div style={trustPanelItemStyle}>✓ Secure Checkout</div>
+  <div style={trustPanelItemStyle}>
+    {sellerProfile?.seller_verified ? "✓ Verified Seller" : "Seller Profile Available"}
+  </div>
+  <div style={trustPanelItemStyle}>✓ Curated Marketplace</div>
 </div>
 
-  <section style={buyerGuideStyle}>
-  <div style={buyerGuideHeaderStyle}>
-    <div>
-      <p style={buyerGuideEyebrowStyle}>BUYER GUIDE · BETA</p>
+          <section style={buyerGuideStyle}>
+            <div style={buyerGuideHeaderStyle}>
+              <div>
+                <p style={buyerGuideEyebrowStyle}>BUYER GUIDE · BETA</p>
+                <h2 style={buyerGuideTitleStyle}>{buyerGuide.title}</h2>
+              </div>
 
-      <h2 style={buyerGuideTitleStyle}>{buyerGuide.title}</h2>
-    </div>
+              <div style={buyerGuideBadgeStyle}>{buyerGuide.sport}</div>
+            </div>
 
-    <div style={buyerGuideBadgeStyle}>{buyerGuide.sport}</div>
+            <p style={buyerGuideTextStyle}>
+              Learn how to verify this product before purchasing. We recommend
+              checking serials, asking for videos and comparing details with the
+              official brand catalog.
+            </p>
+
+            <div style={buyerGuideCardsStyle}>
+              {buyerGuide.tips.map((tip, index) => {
+                const icons = ["🔍", "🎥", "📋"];
+
+                return (
+                  <div key={tip} style={buyerGuideCardStyle}>
+                    <div style={buyerGuideIconStyle}>{icons[index] || "✓"}</div>
+
+                    <div>
+                      <h4 style={buyerGuideCardTitleStyle}>
+                        {index === 0
+                          ? "Check authenticity marks"
+                          : index === 1
+                            ? "Request extra proof"
+                            : "Compare condition"}
+                      </h4>
+
+                      <p style={buyerGuideCardTextStyle}>{tip}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div style={buyerGuideFooterStyle}>
+              ATHMOV is currently in beta. Verification tools are educational
+              and designed to help buyers make safer decisions independently.
+            </div>
+          </section>
+
+{sellerProfile?.seller_verified && (
+  <div style={verifiedSellerBadgeStyle}>
+    ✓ Verified seller
   </div>
-
-  <p style={buyerGuideTextStyle}>
-    Learn how to verify this product before purchasing. We recommend checking
-    serials, asking for videos and comparing details with the official brand
-    catalog.
-  </p>
-
-  <div style={buyerGuideCardsStyle}>
-    {buyerGuide.tips.map((tip, index) => {
-      const icons = ["🔍", "🎥", "📋"];
-
-      return (
-        <div key={tip} style={buyerGuideCardStyle}>
-          <div style={buyerGuideIconStyle}>{icons[index] || "✓"}</div>
-
-          <div>
-            <h4 style={buyerGuideCardTitleStyle}>
-              {index === 0
-                ? "Check authenticity marks"
-                : index === 1
-                  ? "Request extra proof"
-                  : "Compare condition"}
-            </h4>
-
-            <p style={buyerGuideCardTextStyle}>{tip}</p>
-          </div>
-        </div>
-      );
-    })}
-  </div>
-
-  <div style={buyerGuideFooterStyle}>
-    ATHMOV is currently in beta. Verification tools are educational and designed
-    to help buyers make safer decisions independently.
-  </div>
-</section>
-
+)}
           {producto.seller_id && (
             <button
               onClick={() => {
@@ -528,19 +592,19 @@ export default function ProductDetail() {
           )}
 
           <div style={actionsStyle} className="product-detail-actions">
-            <button
-  onClick={messageSeller}
-  style={secondaryButtonStyle}
->
-  Request verification video
-</button>
+            <button onClick={messageSeller} style={secondaryButtonStyle}>
+              Request verification video
+            </button>
+
             <button onClick={buyNow} style={buyButtonStyle}>
               {checkoutLoading ? "Redirecting..." : "Buy now"}
             </button>
 
             <button
               onClick={() => {
-                const cart = JSON.parse(localStorage.getItem("athmov_cart") || "[]");
+                const cart = JSON.parse(
+                  localStorage.getItem("athmov_cart") || "[]"
+                );
                 const exists = cart.some((item: any) => item.id === producto.id);
 
                 if (!exists) {
@@ -850,48 +914,11 @@ const buyerGuideBadgeStyle = {
   whiteSpace: "nowrap" as const,
 };
 
-const buyerGuideListStyle = {
-  display: "grid",
-  gap: "10px",
-  marginTop: "22px",
-};
-
-const buyerGuideItemStyle = {
-  display: "flex",
-  gap: "12px",
-  padding: "12px",
-  borderRadius: "18px",
-  background: "rgba(255,255,255,0.06)",
-  border: "1px solid rgba(255,255,255,0.08)",
-};
-
-const buyerGuideNumberStyle = {
-  fontSize: "11px",
-  fontWeight: 900,
-  opacity: 0.35,
-};
-
 const buyerGuideTextStyle = {
   margin: 0,
   color: "rgba(255,255,255,0.72)",
   lineHeight: 1.5,
   fontSize: "13px",
-};
-
-const buyerGuideBetaTextStyle = {
-  color: "rgba(255,255,255,0.42)",
-  lineHeight: 1.6,
-  fontSize: "12px",
-  marginTop: "18px",
-};
-
-const buyerGuideLinkStyle = {
-  display: "inline-block",
-  marginTop: "18px",
-  color: "#fff",
-  textDecoration: "none",
-  fontSize: "13px",
-  fontWeight: 900,
 };
 
 const sellerButtonStyle = {
@@ -1075,4 +1102,38 @@ const buyerGuideFooterStyle = {
   color: "rgba(255,255,255,0.42)",
   fontSize: "12px",
   lineHeight: 1.6,
+};
+
+const verifiedSellerBadgeStyle = {
+  marginTop: "24px",
+  display: "inline-flex",
+  alignItems: "center",
+  background: "#111",
+  color: "#fff",
+  borderRadius: "999px",
+  padding: "10px 14px",
+  fontSize: "11px",
+  fontWeight: 800,
+  letterSpacing: "1px",
+  textTransform: "uppercase" as const,
+};
+
+const trustPanelStyle = {
+  marginTop: "24px",
+  maxWidth: "560px",
+  background: "#fff",
+  border: "1px solid rgba(0,0,0,0.06)",
+  borderRadius: "26px",
+  padding: "18px",
+  display: "grid",
+  gridTemplateColumns: "repeat(2, 1fr)",
+  gap: "12px",
+};
+
+const trustPanelItemStyle = {
+  background: "#f7f7f3",
+  borderRadius: "999px",
+  padding: "12px 14px",
+  fontSize: "12px",
+  fontWeight: 900,
 };

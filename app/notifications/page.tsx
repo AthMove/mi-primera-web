@@ -106,13 +106,19 @@ export default function NotificationsPage() {
     await loadNotifications();
   };
 
-  const getIcon = (type?: string) => {
-    if (type === "order") return "✓";
-    if (type === "message") return "✉";
-    if (type === "offer") return "€";
-    if (type === "review") return "★";
-    return "•";
-  };
+  const getIcon = (type?: string, title?: string) => {
+  const value = `${type || ""} ${title || ""}`.toLowerCase();
+
+  if (value.includes("message")) return "✉";
+  if (value.includes("offer")) return "€";
+  if (value.includes("review")) return "★";
+  if (value.includes("shipped") || value.includes("tracking")) return "↗";
+  if (value.includes("payout")) return "€";
+  if (value.includes("order") || value.includes("sold") || value.includes("completed")) return "✓";
+  if (value.includes("verified") || value.includes("approved")) return "✓";
+
+  return "•";
+};
 
   const formatDate = (date: string) => {
     return new Date(date).toLocaleString([], {
@@ -191,7 +197,7 @@ export default function NotificationsPage() {
                     color: notification.is_read ? "#111" : "#fff",
                   }}
                 >
-                  {getIcon(notification.type)}
+                  {getIcon(notification.type, notification.title)}
                 </div>
 
                 <div>
@@ -246,6 +252,18 @@ export default function NotificationsPage() {
           .notifications-page {
             padding: 120px 18px 34px !important;
           }
+
+          .notification-card {
+  flex-direction: column !important;
+}
+
+.notification-card > div {
+  width: 100% !important;
+}
+
+.notification-card button {
+  align-self: flex-start !important;
+}
 
           .notifications-title {
             font-size: 48px !important;

@@ -43,9 +43,12 @@ export default function ProductsPage() {
     setLoading(true);
 
     const { data, error } = await supabase
-      .from("products")
-      .select("*")
-      .order("created_at", { ascending: false });
+  .from("products")
+  .select("*")
+  .eq("moderation_status", "approved")
+  .eq("sold", false)
+  .order("featured", { ascending: false })
+  .order("created_at", { ascending: false });
 
     if (error) {
       console.log(error);
@@ -283,8 +286,42 @@ export default function ProductsPage() {
         </section>
       )}
 
-      {loading ? (
-        <section style={gridStyle} className="products-page-grid">
+{filteredProducts.some((product) => product.featured) && (
+  <section style={featuredSectionStyle}>
+    <p style={eyebrowStyle}>CURATED BY ATHMOV</p>
+    <h2 style={featuredTitleStyle}>Featured Drops</h2>
+
+    <div style={featuredGridStyle}>
+      {filteredProducts
+        .filter((product) => product.featured)
+        .slice(0, 3)
+        .map((product) => (
+          <article
+            key={product.id}
+            onClick={() => router.push(`/products/${product.id}`)}
+            style={featuredCardStyle}
+          >
+            <Image
+              src={safeImage(product.image)}
+              alt={product.title || "Product"}
+              fill
+              sizes="33vw"
+              style={{ objectFit: "cover" }}
+            />
+
+            <div style={featuredOverlayStyle}>
+              <p style={featuredBrandStyle}>{product.brand}</p>
+              <h3 style={featuredProductTitleStyle}>{product.title}</h3>
+              <p style={featuredPriceStyle}>€{product.price}</p>
+            </div>
+          </article>
+        ))}
+    </div>
+  </section>
+)}
+
+{loading ? (
+  <section style={gridStyle} className="products-page-grid">
           {[1, 2, 3, 4, 5, 6].map((item) => (
             <div key={item} className="skeleton-card" style={cardStyle}>
               <div className="skeleton-image" style={imageWrapperStyle} />
@@ -608,4 +645,57 @@ const emptyTitleStyle = {
 const emptyTextStyle = {
   color: "#666",
   marginTop: "10px",
+};
+
+const featuredSectionStyle = {
+  maxWidth: "1400px",
+  margin: "0 auto 46px",
+};
+
+const featuredTitleStyle = {
+  fontSize: "42px",
+  margin: "0 0 24px",
+  letterSpacing: "-2px",
+};
+
+const featuredGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(3, 1fr)",
+  gap: "22px",
+};
+
+const featuredCardStyle = {
+  position: "relative" as const,
+  height: "360px",
+  borderRadius: "34px",
+  overflow: "hidden",
+  cursor: "pointer",
+  background: "#111",
+};
+
+const featuredOverlayStyle = {
+  position: "absolute" as const,
+  inset: 0,
+  padding: "28px",
+  display: "flex",
+  flexDirection: "column" as const,
+  justifyContent: "flex-end",
+  background: "linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.05))",
+  color: "#fff",
+};
+
+const featuredBrandStyle = {
+  fontSize: "11px",
+  letterSpacing: "2px",
+  opacity: 0.75,
+};
+
+const featuredProductTitleStyle = {
+  fontSize: "30px",
+  margin: "8px 0 10px",
+};
+
+const featuredPriceStyle = {
+  fontSize: "24px",
+  fontWeight: 800,
 };

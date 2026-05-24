@@ -10,10 +10,11 @@ export async function POST(req: Request) {
     const price = Number(body.price);
 
     if (!price || price <= 0) {
-      return NextResponse.json(
-        { error: "Invalid price" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid offer price" }, { status: 400 });
+    }
+
+    if (!body.orderId) {
+      return NextResponse.json({ error: "Missing order ID" }, { status: 400 });
     }
 
     if (!body.stripeAccountId) {
@@ -23,15 +24,9 @@ export async function POST(req: Request) {
       );
     }
 
-    const platformFee = Number(
-      ((price * PLATFORM_FEE_PERCENT) / 100).toFixed(2)
-    );
-
+    const platformFee = Number(((price * PLATFORM_FEE_PERCENT) / 100).toFixed(2));
     const sellerAmount = Number((price - platformFee).toFixed(2));
-
-    const stripeFeeEstimate = Number(
-      (price * 0.015 + 0.25).toFixed(2)
-    );
+    const stripeFeeEstimate = Number((price * 0.015 + 0.25).toFixed(2));
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -43,8 +38,9 @@ export async function POST(req: Request) {
           destination: body.stripeAccountId,
         },
         metadata: {
-  order_id: body.orderId,
-},
+          order_id: body.orderId,
+          offer_id: body.offerId || "",
+        },
       },
 
       line_items: [
@@ -52,10 +48,8 @@ export async function POST(req: Request) {
           price_data: {
             currency: "eur",
             product_data: {
-              name: body.title,
-              images: body.image?.startsWith("http")
-                ? [body.image]
-                : [],
+              name: body.title || "ATHMOV offer",
+              images: body.image?.startsWith("http") ? [body.image] : [],
             },
             unit_amount: Math.round(price * 100),
           },
@@ -64,22 +58,22 @@ export async function POST(req: Request) {
       ],
 
       metadata: {
-  order_id: body.orderId,
-
-  product_id: body.productId,
-  seller_id: body.sellerId,
-  buyer_id: body.buyerId,
-  stripe_account_id: body.stripeAccountId,
-
-  amount: String(price),
-  platform_fee_percent: String(PLATFORM_FEE_PERCENT),
-  platform_fee: String(platformFee),
-  seller_amount: String(sellerAmount),
-  stripe_fee_estimate: String(stripeFeeEstimate),
-},
+        order_id: body.orderId,
+        offer_id: body.offerId || "",
+        product_id: body.productId,
+        seller_id: body.sellerId,
+        buyer_id: body.buyerId,
+        stripe_account_id: body.stripeAccountId,
+        amount: String(price),
+        platform_fee_percent: String(PLATFORM_FEE_PERCENT),
+        platform_fee: String(platformFee),
+        seller_amount: String(sellerAmount),
+        stripe_fee_estimate: String(stripeFeeEstimate),
+        checkout_type: "offer",
+      },
 
       success_url: `${body.origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${body.origin}/products/${body.productId}`,
+      cancel_url: `${body.origin}/messages/${body.conversationId}`,
     });
 
     return NextResponse.json({
@@ -91,9 +85,6 @@ export async function POST(req: Request) {
   } catch (error) {
     console.log(error);
 
-    return NextResponse.json(
-      { error: "Stripe error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Stripe offer checkout error" }, { status: 500 });
   }
 }

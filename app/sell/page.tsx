@@ -1,22 +1,42 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+
+const PREMIUM_BRANDS: Record<string, string[]> = {
+  PADEL: ["NOX", "Bullpadel", "Siux", "Babolat", "Wilson", "Head"],
+  GOLF: ["Titleist", "TaylorMade", "Callaway", "PXG", "Scotty Cameron", "Ping"],
+  TENNIS: ["Nike", "Wilson", "Yonex", "Lacoste", "Babolat", "Head"],
+  RUNNING: ["Nike", "Hoka", "On", "ASICS", "New Balance", "Salomon"],
+};
+
+const SPORTS = ["PADEL", "GOLF", "TENNIS", "RUNNING"];
+const GENDERS = ["MEN", "WOMEN", "UNISEX", "JUNIOR"];
 
 export default function SellPage() {
   const router = useRouter();
 
   const [title, setTitle] = useState("");
-  const [brand, setBrand] = useState("");
+  const [brand, setBrand] = useState(PREMIUM_BRANDS.PADEL[0]);
   const [category, setCategory] = useState("PADEL");
+  const [gender, setGender] = useState("UNISEX");
   const [condition, setCondition] = useState("Excellent");
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [preview, setPreview] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const availableBrands = useMemo(() => {
+    return PREMIUM_BRANDS[category] || [];
+  }, [category]);
+
+  const handleCategoryChange = (value: string) => {
+    setCategory(value);
+    setBrand(PREMIUM_BRANDS[value]?.[0] || "");
+  };
 
   const handleImage = (file: File | null) => {
     if (!file) return;
@@ -26,7 +46,14 @@ export default function SellPage() {
   };
 
   const publishProduct = async () => {
-    if (!title.trim() || !brand.trim() || !price.trim() || !description.trim()) {
+    if (
+      !title.trim() ||
+      !brand.trim() ||
+      !category.trim() ||
+      !gender.trim() ||
+      !price.trim() ||
+      !description.trim()
+    ) {
       alert("Completa todos los campos");
       return;
     }
@@ -35,6 +62,21 @@ export default function SellPage() {
 
     if (!numericPrice || numericPrice <= 0) {
       alert("Introduce un precio válido");
+      return;
+    }
+
+    if (!SPORTS.includes(category)) {
+      alert("Categoría no permitida");
+      return;
+    }
+
+    if (!GENDERS.includes(gender)) {
+      alert("Género no permitido");
+      return;
+    }
+
+    if (!availableBrands.includes(brand)) {
+      alert("Marca no permitida para esta categoría");
       return;
     }
 
@@ -78,8 +120,10 @@ export default function SellPage() {
         .insert([
           {
             title: title.trim(),
-            brand: brand.trim(),
+            brand,
             category,
+            sport: category,
+            gender,
             condition,
             price: numericPrice,
             description: description.trim(),
@@ -88,6 +132,7 @@ export default function SellPage() {
             seller_id: user.id,
             seller_email: user.email,
             sold: false,
+            moderation_status: "pending",
           },
         ])
         .select()
@@ -98,7 +143,7 @@ export default function SellPage() {
         return;
       }
 
-      alert("Product published");
+      alert("Product submitted for review");
       router.push(`/products/${data.id}`);
     } finally {
       setLoading(false);
@@ -108,7 +153,7 @@ export default function SellPage() {
   return (
     <main style={pageStyle} className="sell-page">
       <section style={heroStyle}>
-        <p style={heroEyebrowStyle}>ATHMOV VERIFIED MARKETPLACE</p>
+        <p style={heroEyebrowStyle}>ATHMOV CURATED MARKETPLACE</p>
 
         <h1 style={heroTitleStyle} className="sell-title">
           Sell Premium
@@ -117,7 +162,8 @@ export default function SellPage() {
         </h1>
 
         <p style={heroTextStyle}>
-          List your second-hand sports equipment in a curated premium marketplace.
+          Only selected premium brands in padel, golf, tennis and running are
+          accepted. Every listing is reviewed before going live.
         </p>
       </section>
 
@@ -154,24 +200,42 @@ export default function SellPage() {
             style={inputStyle}
           />
 
-          <input
-            placeholder="Brand"
-            value={brand}
-            onChange={(e) => setBrand(e.target.value)}
-            style={inputStyle}
-          />
-
           <div style={rowStyle}>
             <select
               value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={(e) => handleCategoryChange(e.target.value)}
               style={inputStyle}
             >
-              <option value="PADEL">PADEL</option>
-              <option value="GOLF">GOLF</option>
-              <option value="TENNIS">TENNIS</option>
-              <option value="CYCLING">CYCLING</option>
-              <option value="RUNNING">RUNNING</option>
+              {SPORTS.map((sport) => (
+                <option key={sport} value={sport}>
+                  {sport}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={brand}
+              onChange={(e) => setBrand(e.target.value)}
+              style={inputStyle}
+            >
+              {availableBrands.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div style={rowStyle}>
+            <select
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+              style={inputStyle}
+            >
+              <option value="MEN">MEN</option>
+              <option value="WOMEN">WOMEN</option>
+              <option value="UNISEX">UNISEX</option>
+              <option value="JUNIOR">JUNIOR</option>
             </select>
 
             <select
@@ -203,18 +267,18 @@ export default function SellPage() {
           />
 
           <div style={noticeStyle}>
-            <strong>Beta trust tip:</strong> include serial numbers, close-up
-            photos and any proof of purchase to increase buyer confidence.
+            <strong>Curated listing:</strong> your product will be reviewed by
+            ATHMOV before appearing publicly.
           </div>
 
           <div style={trustRowStyle}>
-            <div style={trustBadgeStyle}>✓ VERIFIED MARKETPLACE</div>
+            <div style={trustBadgeStyle}>✓ PREMIUM BRANDS ONLY</div>
             <div style={trustBadgeStyle}>✓ BUYER PROTECTION</div>
-            <div style={trustBadgeStyle}>✓ PREMIUM SPORTS COMMUNITY</div>
+            <div style={trustBadgeStyle}>✓ MANUAL REVIEW</div>
           </div>
 
           <button onClick={publishProduct} style={submitButtonStyle}>
-            {loading ? "Publishing..." : "Publish product"}
+            {loading ? "Submitting..." : "Submit for review"}
           </button>
         </div>
       </section>
@@ -347,6 +411,7 @@ const inputStyle = {
   border: "1px solid rgba(0,0,0,0.08)",
   outline: "none",
   marginBottom: "14px",
+  boxSizing: "border-box" as const,
 };
 
 const textareaStyle = {
@@ -359,6 +424,7 @@ const textareaStyle = {
   border: "1px solid rgba(0,0,0,0.08)",
   outline: "none",
   resize: "none" as const,
+  boxSizing: "border-box" as const,
 };
 
 const noticeStyle = {

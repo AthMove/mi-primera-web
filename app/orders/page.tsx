@@ -21,6 +21,10 @@ export default function OrdersPage() {
   const [trackingNumber, setTrackingNumber] = useState("");
   const [savingTracking, setSavingTracking] = useState(false);
 
+  const [disputeOrder, setDisputeOrder] = useState<any>(null);
+  const [disputeReason, setDisputeReason] = useState("");
+  const [savingDispute, setSavingDispute] = useState(false);
+
   useEffect(() => {
     loadOrders();
 
@@ -118,10 +122,27 @@ export default function OrdersPage() {
     }
 
     if (status === "completed") {
+      await fetch("/api/stripe/release-payment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderId: order.id,
+        }),
+      });
+
       await createNotification({
         user_id: order.buyer_id,
         title: "Order completed",
         message: "Your order has been completed.",
+        link: "/orders",
+      });
+
+      await createNotification({
+        user_id: order.seller_id,
+        title: "Payout released",
+        message: "Your payout has been released.",
         link: "/orders",
       });
     }
@@ -177,6 +198,46 @@ export default function OrdersPage() {
     }
   };
 
+  const openDispute = async () => {
+    if (!disputeOrder) return;
+
+    if (!disputeReason.trim()) {
+      alert("Describe the issue");
+      return;
+    }
+
+    try {
+      setSavingDispute(true);
+
+      const { error } = await supabase
+        .from("orders")
+        .update({
+          dispute_status: "open",
+          dispute_reason: disputeReason.trim(),
+          dispute_opened_at: new Date().toISOString(),
+        })
+        .eq("id", disputeOrder.id);
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      await createNotification({
+        user_id: disputeOrder.seller_id,
+        title: "Dispute opened",
+        message: "The buyer has reported an issue with the order.",
+        link: "/orders",
+      });
+
+      setDisputeOrder(null);
+      setDisputeReason("");
+      await loadOrders();
+    } finally {
+      setSavingDispute(false);
+    }
+  };
+
   const submitReview = async () => {
     if (!reviewOrder) return;
 
@@ -211,6 +272,29 @@ export default function OrdersPage() {
         link: `/seller/${reviewOrder.seller_id}`,
       });
 
+      const { data: sellerReviews } = await supabase
+  .from("reviews")
+  .select("rating")
+  .eq("seller_id", reviewOrder.seller_id);
+
+if (sellerReviews) {
+  const totalReviews = sellerReviews.length;
+
+  const averageRating =
+    sellerReviews.reduce(
+      (acc, item) => acc + Number(item.rating || 0),
+      0
+    ) / totalReviews;
+
+  await supabase
+    .from("profiles")
+    .update({
+      total_reviews: totalReviews,
+      average_rating: averageRating.toFixed(1),
+    })
+    .eq("id", reviewOrder.seller_id);
+}
+
       setReviewOrder(null);
       setRating(5);
       setComment("");
@@ -220,7 +304,7 @@ export default function OrdersPage() {
     }
   };
 
-  const safeImage = (src: string) => {
+  const safeImage = (src?: string) => {
     return src?.startsWith("http") || src?.startsWith("/") ? src : "/logo.png";
   };
 
@@ -235,11 +319,53 @@ export default function OrdersPage() {
   };
 
   const getStatusLabel = (status: string) => {
-    if (status === "paid") return "Paid";
-    if (status === "shipped") return "Shipped";
-    if (status === "delivered") return "Delivered";
-    if (status === "completed") return "Completed";
-    return status || "Paid";
+  if (status === "paid") return "Paid";
+  if (status === "preparing") return "Preparing";
+  if (status === "shipped") return "Shipped";
+  if (status === "delivered") return "Delivered";
+  if (status === "completed") return "Completed";
+  if (status === "refunded") return "Refunded";
+  return status || "Paid";
+};
+
+  const getStepIndex = (status: string) => {
+  const steps = ["paid", "preparing", "shipped", "delivered", "completed"];
+  const index = steps.indexOf(status || "paid");
+  return index === -1 ? 0 : index;
+};
+
+const getEstimatedDelivery = (order: any) => {
+  const baseDate = order.shipped_at || order.created_at;
+  if (!baseDate) return "Estimated after shipment";
+
+  const start = new Date(baseDate);
+  const end = new Date(baseDate);
+
+  start.setDate(start.getDate() + 2);
+  end.setDate(end.getDate() + 5);
+
+  return `${formatDate(start.toISOString())} - ${formatDate(end.toISOString())}`;
+};
+
+  const getTrackingUrl = (carrier?: string, tracking?: string) => {
+    if (!carrier || !tracking) return "";
+
+    const cleanCarrier = carrier.toLowerCase();
+    const cleanTracking = encodeURIComponent(tracking.trim());
+
+    if (cleanCarrier.includes("mrw")) {
+      return `https://www.mrw.es/seguimiento_envios/MRW_resultados_consultas.asp?txtCodigo=${cleanTracking}`;
+    }
+
+    if (cleanCarrier.includes("seur")) {
+      return `https://www.seur.com/livetracking/pages/seguimiento-online-busqueda.do?segOnlineIdentificador=${cleanTracking}`;
+    }
+
+    if (cleanCarrier.includes("dhl")) {
+      return `https://www.dhl.com/es-es/home/tracking/tracking-express.html?submit=1&tracking-id=${cleanTracking}`;
+    }
+
+    return "";
   };
 
   const filteredOrders = orders.filter((order) => {
@@ -255,28 +381,39 @@ export default function OrdersPage() {
   return (
     <main style={pageStyle} className="orders-page">
       <section style={headerStyle}>
-        <p style={eyebrowStyle}>ATHMOV ORDERS</p>
-        <h1 style={titleStyle} className="orders-title">Orders</h1>
+        <h1 style={titleStyle} className="orders-title">
+          Orders
+        </h1>
+
         <p style={subtitleStyle}>Track your purchases and sales.</p>
 
         <div style={tabsStyle} className="orders-tabs">
           <button
             onClick={() => setFilter("all")}
-            style={{ ...tabButtonStyle, ...(filter === "all" ? activeTabStyle : {}) }}
+            style={{
+              ...tabButtonStyle,
+              ...(filter === "all" ? activeTabStyle : {}),
+            }}
           >
             All
           </button>
 
           <button
             onClick={() => setFilter("buying")}
-            style={{ ...tabButtonStyle, ...(filter === "buying" ? activeTabStyle : {}) }}
+            style={{
+              ...tabButtonStyle,
+              ...(filter === "buying" ? activeTabStyle : {}),
+            }}
           >
             Buying
           </button>
 
           <button
             onClick={() => setFilter("selling")}
-            style={{ ...tabButtonStyle, ...(filter === "selling" ? activeTabStyle : {}) }}
+            style={{
+              ...tabButtonStyle,
+              ...(filter === "selling" ? activeTabStyle : {}),
+            }}
           >
             Selling
           </button>
@@ -301,7 +438,11 @@ export default function OrdersPage() {
               <article key={order.id} style={orderStyle} className="order-card">
                 <div style={imageWrapperStyle}>
                   <Image
-                    src={safeImage(order.product?.image)}
+                    src={safeImage(
+                      order.product?.image ||
+                        order.product?.image_url ||
+                        order.product?.images?.[0]
+                    )}
                     alt={order.product?.title || "Product"}
                     fill
                     sizes="120px"
@@ -317,92 +458,120 @@ export default function OrdersPage() {
                   </h2>
 
                   <p style={buyerStyle}>
-                    {isSeller ? "Buyer" : "Seller"} · {formatDate(order.created_at)}
+                    {isSeller ? "Buyer" : "Seller"} ·{" "}
+                    {formatDate(order.created_at)}
                   </p>
 
                   {(order.carrier || order.tracking_number) && (
                     <div style={trackingBoxStyle}>
                       <strong>Tracking</strong>
-                      <span>{order.carrier || "Carrier"} · {order.tracking_number}</span>
-                      {order.shipped_at && <small>Shipped {formatDate(order.shipped_at)}</small>}
+
+                      <span>
+                        {order.carrier || "Carrier"} · {order.tracking_number}
+                      </span>
+
+                      {order.shipped_at && (
+                        <small>Shipped {formatDate(order.shipped_at)}</small>
+                      )}
+
+                      {getTrackingUrl(order.carrier, order.tracking_number) && (
+                        <a
+                          href={getTrackingUrl(order.carrier, order.tracking_number)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={trackingLinkStyle}
+                        >
+                          Track shipment →
+                        </a>
+                      )}
                     </div>
+                  )}
+
+                  {order.dispute_status === "open" && (
+                    <p style={disputeBadgeStyle}>Issue reported</p>
                   )}
 
                   {order.review && (
                     <p style={reviewPreviewStyle}>
                       {"★".repeat(order.review.rating)}
-                      {"☆".repeat(5 - order.review.rating)} · {order.review.comment}
+                      {"☆".repeat(5 - order.review.rating)} ·{" "}
+                      {order.review.comment}
                     </p>
                   )}
 
-                  <div style={stepsStyle} className="order-steps">
-                    {["paid", "shipped", "delivered", "completed"].map((step) => {
-                      const stepOrder = ["paid", "shipped", "delivered", "completed"];
-                      const currentIndex = stepOrder.indexOf(status);
-                      const stepIndex = stepOrder.indexOf(step);
-                      const active = stepIndex <= currentIndex;
+                  <div style={timelineStyle} className="order-timeline">
+  {["paid", "preparing", "shipped", "delivered", "completed"].map((step, index) => {
+    const active = index <= getStepIndex(status);
 
-                      return (
-                        <span
-                          key={step}
-                          style={{
-                            ...stepStyle,
-                            ...(active ? activeStepStyle : {}),
-                          }}
-                        >
-                          {getStatusLabel(step)}
-                        </span>
-                      );
-                    })}
-                  </div>
-                </div>
+    return (
+      <div key={step} style={timelineStepStyle}>
+        <div
+          style={{
+            ...timelineDotStyle,
+            ...(active ? activeTimelineDotStyle : {}),
+          }}
+        >
+          {active ? "✓" : ""}
+        </div>
 
-                <div style={rightStyle}>
+        {index < 4 && (
+          <div
+            style={{
+              ...timelineLineStyle,
+              ...(index < getStepIndex(status) ? activeTimelineLineStyle : {}),
+            }}
+          />
+        )}
+
+        <span
+          style={{
+            ...timelineLabelStyle,
+            ...(active ? activeTimelineLabelStyle : {}),
+          }}
+        >
+          {getStatusLabel(step)}
+        </span>
+      </div>
+    );
+  })}
+</div>
+
+<div style={protectionGridStyle}>
+  <div style={protectionCardStyle}>
+    <span style={protectionLabelStyle}>Estimated delivery</span>
+    <strong>{getEstimatedDelivery(order)}</strong>
+  </div>
+
+  <div style={protectionCardStyle}>
+    <span style={protectionLabelStyle}>ATHMOV Protection</span>
+    <strong>Secure payment & dispute support</strong>
+  </div>
+</div>
+
+                                </div>
+
+                <div style={rightStyle} className="order-actions">
                   <strong style={amountStyle}>€{order.amount}</strong>
 
                   <span style={statusStyle}>{getStatusLabel(status)}</span>
 
-                  {isSeller && (
-  <div style={payoutBoxStyle}>
-    <div style={payoutRowStyle}>
-      <span>Sale price</span>
-      <strong>€{order.amount}</strong>
-    </div>
-
-    <div style={payoutRowStyle}>
-      <span>ATHMOV fee</span>
-      <strong>-€{order.platform_fee || 0}</strong>
-    </div>
-
-    <div style={payoutRowStyle}>
-      <span>Stripe estimate</span>
-      <strong>-€{order.stripe_fee_estimate || 0}</strong>
-    </div>
-
-    <div style={payoutNetRowStyle}>
-      <span>Seller payout</span>
-      <strong>€{order.seller_amount || 0}</strong>
-    </div>
-  </div>
+                  {isSeller && status === "paid" && (
+  <button
+    onClick={() => updateOrderStatus(order, "preparing")}
+    style={buttonStyle}
+  >
+    Start preparing
+  </button>
 )}
 
-                  {isSeller && status === "paid" && (
-                    <button
-                      onClick={() => openTrackingModal(order)}
-                      style={buttonStyle}
-                    >
-                      Add tracking
-                    </button>
-                  )}
-
-                  {isSeller && status === "shipped" && (
-                    <button
-                      onClick={() => openTrackingModal(order)}
-                      style={reviewButtonStyle}
-                    >
-                      Edit tracking
-                    </button>
-                  )}
+{isSeller && status === "preparing" && (
+  <button
+    onClick={() => openTrackingModal(order)}
+    style={buttonStyle}
+  >
+    Add tracking
+  </button>
+)}
 
                   {isBuyer && status === "shipped" && (
                     <button
@@ -413,14 +582,27 @@ export default function OrdersPage() {
                     </button>
                   )}
 
-                  {isSeller && status === "delivered" && (
-                    <button
-                      onClick={() => updateOrderStatus(order, "completed")}
-                      style={buttonStyle}
-                    >
-                      Complete
-                    </button>
-                  )}
+                  {isBuyer &&
+                    ["paid", "shipped", "delivered"].includes(status) &&
+                    order.dispute_status !== "open" && (
+                      <button
+                        onClick={() => setDisputeOrder(order)}
+                        style={reviewButtonStyle}
+                      >
+                        Report issue
+                      </button>
+                    )}
+
+                  {isSeller &&
+                    status === "delivered" &&
+                    order.dispute_status !== "open" && (
+                      <button
+                        onClick={() => updateOrderStatus(order, "completed")}
+                        style={buttonStyle}
+                      >
+                        Complete
+                      </button>
+                    )}
 
                   {isBuyer && status === "completed" && !order.review && (
                     <button
@@ -455,12 +637,16 @@ export default function OrdersPage() {
               {trackingOrder.product?.title || "Product"}
             </p>
 
-            <input
+            <select
               value={carrier}
               onChange={(e) => setCarrier(e.target.value)}
-              placeholder="Carrier, e.g. Correos, DHL, UPS"
               style={modalInputStyle}
-            />
+            >
+              <option value="">Select carrier</option>
+              <option value="SEUR">SEUR</option>
+              <option value="MRW">MRW</option>
+              <option value="DHL Express">DHL Express</option>
+            </select>
 
             <input
               value={trackingNumber}
@@ -471,6 +657,39 @@ export default function OrdersPage() {
 
             <button onClick={saveTracking} style={buttonStyle}>
               {savingTracking ? "Saving..." : "Save tracking"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {disputeOrder && (
+        <div style={modalOverlayStyle}>
+          <div style={modalStyle}>
+            <button
+              onClick={() => setDisputeOrder(null)}
+              style={closeButtonStyle}
+            >
+              ✕
+            </button>
+
+            <p style={eyebrowStyle}>ATHMOV PROTECTION</p>
+
+            <h2 style={modalTitleStyle}>Report issue</h2>
+
+            <p style={modalTextStyle}>
+              Tell us what happened with this order. ATHMOV will review the case
+              before the payout is released.
+            </p>
+
+            <textarea
+              value={disputeReason}
+              onChange={(e) => setDisputeReason(e.target.value)}
+              placeholder="Example: item arrived damaged, tracking does not work, item is not authentic..."
+              style={textareaStyle}
+            />
+
+            <button onClick={openDispute} style={buttonStyle}>
+              {savingDispute ? "Submitting..." : "Submit issue"}
             </button>
           </div>
         </div>
@@ -522,24 +741,29 @@ export default function OrdersPage() {
         </div>
       )}
 
-      <style>{`
+            <style>{`
         .order-card {
           transition: transform 0.22s ease, box-shadow 0.22s ease;
         }
 
         .order-card:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 28px 90px rgba(0,0,0,0.07) !important;
+          transform: translateY(-4px);
+          box-shadow: 0 30px 80px rgba(0,0,0,0.06) !important;
+        }
+
+        .order-timeline {
+          overflow-x: auto;
+          padding-bottom: 4px;
         }
 
         @media (max-width: 800px) {
           .orders-page {
-            padding: 120px 18px 34px !important;
+            padding: 110px 16px 40px !important;
           }
 
           .orders-title {
             font-size: 48px !important;
-            letter-spacing: -2px !important;
+            letter-spacing: -3px !important;
           }
 
           .orders-tabs {
@@ -548,13 +772,21 @@ export default function OrdersPage() {
           }
 
           .order-card {
+            flex-direction: column !important;
             align-items: flex-start !important;
-            gap: 14px !important;
-            padding: 14px !important;
+            gap: 18px !important;
+            padding: 20px !important;
+            border-radius: 28px !important;
           }
 
-          .order-steps {
-            flex-wrap: wrap !important;
+          .order-timeline {
+            width: 100% !important;
+            overflow-x: auto !important;
+          }
+
+          .order-actions {
+            width: 100% !important;
+            align-items: flex-start !important;
           }
         }
       `}</style>
@@ -564,13 +796,13 @@ export default function OrdersPage() {
 
 const pageStyle = {
   minHeight: "100vh",
-  background: "linear-gradient(to bottom, #f8f8f4, #eeeeea)",
-  padding: "70px 60px",
+  background: "#f6f3ee",
+  padding: "150px 64px 90px",
   fontFamily: "Inter, sans-serif",
 };
 
 const headerStyle = {
-  maxWidth: "1100px",
+  maxWidth: "980px",
   margin: "0 auto 34px",
 };
 
@@ -585,7 +817,8 @@ const titleStyle = {
   fontSize: "72px",
   lineHeight: 1,
   margin: 0,
-  letterSpacing: "-4px",
+  letterSpacing: "-5px",
+  fontWeight: 500,
 };
 
 const subtitleStyle = {
@@ -629,25 +862,26 @@ const listStyle = {
   maxWidth: "1100px",
   margin: "0 auto",
   display: "grid",
-  gap: "18px",
+  gap: "24px",
 };
 
 const orderStyle = {
   display: "flex",
   alignItems: "center",
-  gap: "22px",
-  background: "rgba(255,255,255,0.82)",
-  border: "1px solid rgba(0,0,0,0.06)",
-  borderRadius: "30px",
-  padding: "20px",
-  boxShadow: "0 20px 70px rgba(0,0,0,0.04)",
+  gap: "28px",
+  background: "rgba(255,255,255,0.92)",
+  backdropFilter: "blur(10px)",
+  border: "1px solid rgba(0,0,0,0.04)",
+  borderRadius: "32px",
+  padding: "36px",
+  boxShadow: "none",
 };
 
 const imageWrapperStyle = {
   position: "relative" as const,
   width: "110px",
   height: "110px",
-  borderRadius: "24px",
+  borderRadius: "18px",
   overflow: "hidden",
   background: "#f6f6f3",
   flexShrink: 0,
@@ -662,7 +896,7 @@ const metaStyle = {
 };
 
 const orderTitleStyle = {
-  fontSize: "26px",
+  fontSize: "30px",
   margin: 0,
   letterSpacing: "-1px",
 };
@@ -687,36 +921,21 @@ const trackingBoxStyle = {
   maxWidth: "420px",
 };
 
+const disputeBadgeStyle = {
+  marginTop: "12px",
+  color: "#b91c1c",
+  fontSize: "12px",
+  fontWeight: 900,
+  textTransform: "uppercase" as const,
+  letterSpacing: "1px",
+};
+
 const reviewPreviewStyle = {
   color: "#111",
   marginTop: "10px",
   marginBottom: 0,
   fontSize: "13px",
   fontWeight: 700,
-};
-
-const stepsStyle = {
-  display: "flex",
-  gap: "8px",
-  marginTop: "16px",
-};
-
-const stepStyle = {
-  border: "1px solid rgba(0,0,0,0.08)",
-  color: "#999",
-  background: "#fff",
-  borderRadius: "999px",
-  padding: "7px 10px",
-  fontSize: "10px",
-  fontWeight: 900,
-  textTransform: "uppercase" as const,
-  letterSpacing: "1px",
-};
-
-const activeStepStyle = {
-  background: "#111",
-  color: "#fff",
-  border: "1px solid #111",
 };
 
 const rightStyle = {
@@ -727,7 +946,8 @@ const rightStyle = {
 };
 
 const amountStyle = {
-  fontSize: "28px",
+  fontSize: "34px",
+  fontWeight: 500,
 };
 
 const statusStyle = {
@@ -742,18 +962,22 @@ const buttonStyle = {
   color: "#fff",
   border: "none",
   borderRadius: "999px",
-  padding: "12px 18px",
-  fontWeight: 800,
+  padding: "13px 20px",
+  fontWeight: 700,
+  fontSize: "13px",
+  letterSpacing: "0.3px",
   cursor: "pointer",
 };
 
 const reviewButtonStyle = {
   background: "#fff",
   color: "#111",
-  border: "1px solid rgba(0,0,0,0.12)",
+  border: "1px solid rgba(0,0,0,0.08)",
   borderRadius: "999px",
-  padding: "12px 18px",
-  fontWeight: 800,
+  padding: "13px 20px",
+  fontWeight: 700,
+  fontSize: "13px",
+  letterSpacing: "0.3px",
   cursor: "pointer",
 };
 
@@ -850,32 +1074,100 @@ const textareaStyle = {
   boxSizing: "border-box" as const,
 };
 
-const payoutBoxStyle = {
-  width: "220px",
-  background: "#fff",
-  border: "1px solid rgba(0,0,0,0.08)",
-  borderRadius: "20px",
-  padding: "14px",
-  display: "grid",
-  gap: "8px",
-};
-
-const payoutRowStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-  gap: "12px",
-  fontSize: "12px",
-  color: "#666",
-};
-
-const payoutNetRowStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-  gap: "12px",
-  fontSize: "13px",
-  fontWeight: 900,
+const trackingLinkStyle = {
+  marginTop: "6px",
   color: "#111",
-  borderTop: "1px solid rgba(0,0,0,0.08)",
-  paddingTop: "10px",
-  marginTop: "4px",
+  fontWeight: 900,
+  textDecoration: "none",
+  fontSize: "12px",
+};
+
+const timelineStyle = {
+  display: "flex",
+  alignItems: "flex-start",
+  marginTop: "22px",
+  marginBottom: "18px",
+  maxWidth: "520px",
+};
+
+const timelineStepStyle = {
+  position: "relative" as const,
+  flex: 1,
+  minWidth: "86px",
+};
+
+const timelineDotStyle = {
+  width: "28px",
+  height: "28px",
+  borderRadius: "999px",
+  background: "#eee",
+  color: "#aaa",
+  border: "1px solid rgba(0,0,0,0.08)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: "11px",
+  fontWeight: 900,
+  position: "relative" as const,
+  zIndex: 2,
+};
+
+const activeTimelineDotStyle = {
+  background: "#111",
+  color: "#fff",
+  border: "1px solid #111",
+};
+
+const timelineLineStyle = {
+  position: "absolute" as const,
+  top: "14px",
+  left: "28px",
+  right: "0",
+  height: "2px",
+  background: "#e1e1dc",
+  zIndex: 1,
+};
+
+const activeTimelineLineStyle = {
+  background: "#111",
+};
+
+const timelineLabelStyle = {
+  display: "block",
+  marginTop: "10px",
+  fontSize: "10px",
+  letterSpacing: "1.4px",
+  fontWeight: 900,
+  color: "#aaa",
+  textTransform: "uppercase" as const,
+};
+
+const activeTimelineLabelStyle = {
+  color: "#111",
+};
+
+const protectionGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+  gap: "10px",
+  maxWidth: "520px",
+  marginTop: "14px",
+};
+
+const protectionCardStyle = {
+  background: "#fff",
+  border: "1px solid rgba(0,0,0,0.06)",
+  borderRadius: "18px",
+  padding: "14px",
+  display: "flex",
+  flexDirection: "column" as const,
+  gap: "6px",
+};
+
+const protectionLabelStyle = {
+  fontSize: "10px",
+  letterSpacing: "1.8px",
+  textTransform: "uppercase" as const,
+  opacity: 0.45,
+  fontWeight: 900,
 };

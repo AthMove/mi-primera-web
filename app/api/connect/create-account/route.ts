@@ -40,27 +40,41 @@ export async function POST(req: Request) {
 
     let accountId = profile?.stripe_account_id;
 
-    if (!accountId) {
-      const account = await stripe.accounts.create({
-        type: "express",
-        country: "ES",
-        email: undefined,
-        capabilities: {
-          transfers: {
-            requested: true,
-          },
-        },
-      });
+ if (!accountId) {
+  const account = await stripe.accounts.create({
+    type: "express",
+    country: "ES",
 
-      accountId = account.id;
+    email: body.email,
 
-      await supabase
-        .from("profiles")
-        .update({
-          stripe_account_id: accountId,
-        })
-        .eq("id", userId);
-    }
+    capabilities: {
+      transfers: {
+        requested: true,
+      },
+    },
+  });
+
+  accountId = account.id;
+
+  const { error: updateError } = await supabase
+    .from("profiles")
+    .update({
+      stripe_account_id: accountId,
+    })
+    .eq("id", userId);
+
+  if (updateError) {
+    console.log(
+      "PROFILE UPDATE ERROR:",
+      updateError
+    );
+  }
+
+  console.log(
+    "CONNECTED ACCOUNT SAVED:",
+    accountId
+  );
+}
 
     const accountLink = await stripe.accountLinks.create({
       account: accountId,

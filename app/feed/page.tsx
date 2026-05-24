@@ -2,10 +2,15 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 export default function FeedPage() {
+  const router = useRouter();
+
   const [posts, setPosts] = useState<any[]>([]);
+  const [featuredDrops, setFeaturedDrops] = useState<any[]>([]);
+  const [recentDrops, setRecentDrops] = useState<any[]>([]);
   const [comments, setComments] = useState<Record<string, any[]>>({});
   const [commentInputs, setCommentInputs] = useState<Record<string, string>>({});
   const [content, setContent] = useState("");
@@ -13,20 +18,13 @@ export default function FeedPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadPosts();
+    loadFeed();
 
     const channel = supabase
       .channel("feed-realtime")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "feed_posts" },
-        () => loadPosts()
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "feed_comments" },
-        () => loadPosts()
-      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "feed_posts" }, loadFeed)
+      .on("postgres_changes", { event: "*", schema: "public", table: "feed_comments" }, loadFeed)
+      .on("postgres_changes", { event: "*", schema: "public", table: "products" }, loadFeed)
       .subscribe();
 
     return () => {
@@ -34,36 +32,45 @@ export default function FeedPage() {
     };
   }, []);
 
-  const loadPosts = async () => {
-    const { data, error } = await supabase
+  const loadFeed = async () => {
+    const { data: postData } = await supabase
       .from("feed_posts")
       .select("*")
       .order("created_at", { ascending: false });
-
-    if (error || !data) {
-      setPosts([]);
-      setLoading(false);
-      return;
-    }
-
-    setPosts(data);
 
     const { data: commentsData } = await supabase
       .from("feed_comments")
       .select("*")
       .order("created_at", { ascending: true });
 
+    const { data: featured } = await supabase
+      .from("products")
+      .select("*")
+      .eq("moderation_status", "approved")
+      .eq("sold", false)
+      .eq("featured", true)
+      .order("created_at", { ascending: false })
+      .limit(3);
+
+    const { data: recent } = await supabase
+      .from("products")
+      .select("*")
+      .eq("moderation_status", "approved")
+      .eq("sold", false)
+      .order("created_at", { ascending: false })
+      .limit(6);
+
     const grouped: Record<string, any[]> = {};
 
     for (const comment of commentsData || []) {
-      if (!grouped[comment.post_id]) {
-        grouped[comment.post_id] = [];
-      }
-
+      if (!grouped[comment.post_id]) grouped[comment.post_id] = [];
       grouped[comment.post_id].push(comment);
     }
 
+    setPosts(postData || []);
     setComments(grouped);
+    setFeaturedDrops(featured || []);
+    setRecentDrops(recent || []);
     setLoading(false);
   };
 
@@ -89,18 +96,16 @@ export default function FeedPage() {
     ]);
 
     if (error) {
-      console.log(error);
       alert(error.message);
       return;
     }
 
     setContent("");
-    await loadPosts();
+    await loadFeed();
   };
 
   const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-
     if (!file) return;
 
     try {
@@ -114,7 +119,6 @@ export default function FeedPage() {
         .upload(fileName, file);
 
       if (error) {
-        console.log(error);
         alert(error.message);
         return;
       }
@@ -133,17 +137,14 @@ export default function FeedPage() {
   const likePost = async (post: any) => {
     await supabase
       .from("feed_posts")
-      .update({
-        likes: (post.likes || 0) + 1,
-      })
+      .update({ likes: (post.likes || 0) + 1 })
       .eq("id", post.id);
 
-    await loadPosts();
+    await loadFeed();
   };
 
   const addComment = async (postId: string) => {
     const text = commentInputs[postId]?.trim();
-
     if (!text) return;
 
     const {
@@ -174,7 +175,7 @@ export default function FeedPage() {
       [postId]: "",
     }));
 
-    await loadPosts();
+    await loadFeed();
   };
 
   const deleteComment = async (commentId: string) => {
@@ -182,7 +183,11 @@ export default function FeedPage() {
     if (!confirmDelete) return;
 
     await supabase.from("feed_comments").delete().eq("id", commentId);
-    await loadPosts();
+    await loadFeed();
+  };
+
+  const safeImage = (src?: string) => {
+    return src?.startsWith("http") || src?.startsWith("/") ? src : "/logo.png";
   };
 
   return (
@@ -191,15 +196,93 @@ export default function FeedPage() {
         <p style={eyebrowStyle}>ATHMOV FEED</p>
 
         <h1 style={titleStyle} className="feed-title">
-          Community
+          Drops & Community
         </h1>
 
-        <p style={subtitleStyle}>Athletes. Gear. Lifestyle.</p>
+        <p style={subtitleStyle}>
+          Premium sports gear, curated drops and community updates.
+        </p>
+      </section>
+
+      {featuredDrops.length > 0 && (
+        <section style={featuredSectionStyle}>
+          <div style={sectionHeaderStyle}>
+            <div>
+              <p style={eyebrowStyle}>CURATED</p>
+              <h2 style={sectionTitleStyle}>Featured Drops</h2>
+            </div>
+
+            <button onClick={() => router.push("/products")} style={smallButtonStyle}>
+              Shop all →
+            </button>
+          </div>
+
+          <div style={featuredGridStyle}>
+            {featuredDrops.map((product) => (
+              <article
+                key={product.id}
+                style={featuredCardStyle}
+                onClick={() => router.push(`/products/${product.id}`)}
+              >
+                <Image
+                  src={safeImage(product.image)}
+                  alt={product.title || "Product"}
+                  fill
+                  sizes="33vw"
+                  style={{ objectFit: "cover" }}
+                />
+
+                <div style={featuredOverlayStyle}>
+                  <p style={featuredBrandStyle}>{product.brand || "ATHMOV"}</p>
+                  <h3 style={featuredTitleStyle}>{product.title}</h3>
+                  <p style={featuredPriceStyle}>€{product.price}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section style={recentSectionStyle}>
+        <div style={sectionHeaderStyle}>
+          <div>
+            <p style={eyebrowStyle}>LATEST LISTINGS</p>
+            <h2 style={sectionTitleStyle}>New Gear</h2>
+          </div>
+        </div>
+
+        <div style={recentGridStyle}>
+          {recentDrops.map((product) => (
+            <article
+              key={product.id}
+              style={dropCardStyle}
+              onClick={() => router.push(`/products/${product.id}`)}
+            >
+              <div style={dropImageStyle}>
+                <Image
+                  src={safeImage(product.image)}
+                  alt={product.title || "Product"}
+                  fill
+                  sizes="220px"
+                  style={{ objectFit: "cover" }}
+                />
+              </div>
+
+              <div style={dropContentStyle}>
+                <p style={dropBrandStyle}>{product.brand || "ATHMOV"}</p>
+                <h3 style={dropTitleStyle}>{product.title}</h3>
+                <p style={dropPriceStyle}>€{product.price}</p>
+              </div>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section style={createStyle}>
+        <p style={createEyebrowStyle}>COMMUNITY POST</p>
+
         <textarea
-          placeholder="Share something with the community..."
+          placeholder="Share a drop, fit, match day moment or gear insight..."
           value={content}
           onChange={(e) => setContent(e.target.value)}
           style={textareaStyle}
@@ -207,7 +290,7 @@ export default function FeedPage() {
 
         <div style={actionsStyle}>
           <label style={uploadButtonStyle}>
-            {uploading ? "..." : "Add image"}
+            {uploading ? "Uploading..." : "Add image"}
 
             <input
               type="file"
@@ -259,7 +342,7 @@ export default function FeedPage() {
 
               <div style={footerStyle}>
                 <button onClick={() => likePost(post)} style={likeButtonStyle}>
-                  ♥️ {post.likes || 0}
+                  ♥ {post.likes || 0}
                 </button>
               </div>
 
@@ -328,13 +411,19 @@ export default function FeedPage() {
           box-shadow: 0 30px 90px rgba(0,0,0,0.08);
         }
 
+        @media (max-width: 900px) {
+          .feed-featured-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+
         @media (max-width: 700px) {
           .feed-page {
             padding: 120px 18px 34px !important;
           }
 
           .feed-title {
-            font-size: 48px !important;
+            font-size: 46px !important;
             letter-spacing: -2px !important;
           }
         }
@@ -351,8 +440,8 @@ const pageStyle = {
 };
 
 const heroStyle = {
-  maxWidth: "760px",
-  margin: "0 auto 40px",
+  maxWidth: "1200px",
+  margin: "0 auto 42px",
 };
 
 const eyebrowStyle = {
@@ -362,7 +451,7 @@ const eyebrowStyle = {
 };
 
 const titleStyle = {
-  fontSize: "72px",
+  fontSize: "76px",
   lineHeight: 1,
   margin: "12px 0",
   letterSpacing: "-4px",
@@ -370,6 +459,124 @@ const titleStyle = {
 
 const subtitleStyle = {
   color: "#666",
+  fontSize: "17px",
+};
+
+const featuredSectionStyle = {
+  maxWidth: "1200px",
+  margin: "0 auto 54px",
+};
+
+const sectionHeaderStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "flex-end",
+  gap: "18px",
+  marginBottom: "24px",
+};
+
+const sectionTitleStyle = {
+  fontSize: "42px",
+  margin: 0,
+  letterSpacing: "-2px",
+};
+
+const smallButtonStyle = {
+  background: "#111",
+  color: "#fff",
+  border: "none",
+  borderRadius: "999px",
+  padding: "12px 18px",
+  fontWeight: 900,
+  cursor: "pointer",
+};
+
+const featuredGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(3, 1fr)",
+  gap: "22px",
+};
+
+const featuredCardStyle = {
+  position: "relative" as const,
+  height: "420px",
+  borderRadius: "34px",
+  overflow: "hidden",
+  cursor: "pointer",
+  background: "#111",
+};
+
+const featuredOverlayStyle = {
+  position: "absolute" as const,
+  inset: 0,
+  padding: "28px",
+  display: "flex",
+  flexDirection: "column" as const,
+  justifyContent: "flex-end",
+  background: "linear-gradient(to top, rgba(0,0,0,0.74), rgba(0,0,0,0.05))",
+  color: "#fff",
+};
+
+const featuredBrandStyle = {
+  fontSize: "11px",
+  letterSpacing: "2px",
+  opacity: 0.75,
+};
+
+const featuredTitleStyle = {
+  fontSize: "30px",
+  margin: "8px 0 10px",
+  letterSpacing: "-1px",
+};
+
+const featuredPriceStyle = {
+  fontSize: "24px",
+  fontWeight: 900,
+};
+
+const recentSectionStyle = {
+  maxWidth: "1200px",
+  margin: "0 auto 54px",
+};
+
+const recentGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
+  gap: "18px",
+};
+
+const dropCardStyle = {
+  background: "#fff",
+  borderRadius: "28px",
+  overflow: "hidden",
+  cursor: "pointer",
+  border: "1px solid rgba(0,0,0,0.06)",
+};
+
+const dropImageStyle = {
+  position: "relative" as const,
+  height: "210px",
+  background: "#f3f3f0",
+};
+
+const dropContentStyle = {
+  padding: "18px",
+};
+
+const dropBrandStyle = {
+  fontSize: "10px",
+  letterSpacing: "2px",
+  opacity: 0.45,
+};
+
+const dropTitleStyle = {
+  fontSize: "20px",
+  margin: "8px 0 10px",
+};
+
+const dropPriceStyle = {
+  fontSize: "20px",
+  fontWeight: 900,
 };
 
 const createStyle = {
@@ -379,6 +586,14 @@ const createStyle = {
   padding: "24px",
   borderRadius: "30px",
   boxShadow: "0 20px 60px rgba(0,0,0,0.05)",
+};
+
+const createEyebrowStyle = {
+  fontSize: "11px",
+  letterSpacing: "2px",
+  opacity: 0.45,
+  marginBottom: "12px",
+  fontWeight: 900,
 };
 
 const textareaStyle = {
