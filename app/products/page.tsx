@@ -256,7 +256,7 @@ export default function ProductsPage() {
 
 const pageStyle = {
   minHeight: "100vh",
-  background: "#f7f7f3",
+ background: "#f7f7f3",
   padding: "60px",
   fontFamily: "Inter, sans-serif",
 };
