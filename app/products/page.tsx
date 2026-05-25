@@ -1,20 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import {
-  Suspense,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-
-import {
-  useSearchParams,
-  useRouter,
-} from "next/navigation";
-
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-
 import Filters from "@/components/Filters";
 import SearchBar from "@/components/SearchBar";
 import SortDropdown from "@/components/SortDropdown";
@@ -22,13 +11,10 @@ import SortDropdown from "@/components/SortDropdown";
 function ProductsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-
   const category = searchParams.get("category");
 
   const [productos, setProductos] = useState<any[]>([]);
-  const [savedSearches, setSavedSearches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [savingSearch, setSavingSearch] = useState(false);
 
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("ALL");
@@ -39,16 +25,11 @@ function ProductsContent() {
   const [sort, setSort] = useState("newest");
 
   useEffect(() => {
-    if (category) {
-      setSelectedCategory(category.toUpperCase());
-    } else {
-      setSelectedCategory("ALL");
-    }
+    setSelectedCategory(category ? category.toUpperCase() : "ALL");
   }, [category]);
 
   useEffect(() => {
     loadProducts();
-    loadSavedSearches();
   }, []);
 
   const loadProducts = async () => {
@@ -58,7 +39,6 @@ function ProductsContent() {
       .from("products")
       .select("*")
       .eq("moderation_status", "approved")
-      .eq("sold", false)
       .order("featured", { ascending: false })
       .order("created_at", { ascending: false });
 
@@ -71,99 +51,6 @@ function ProductsContent() {
 
     setProductos(data || []);
     setLoading(false);
-  };
-
-  const loadSavedSearches = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) return;
-
-    const { data } = await supabase
-      .from("saved_searches")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
-
-    setSavedSearches(data || []);
-  };
-
-  const saveCurrentSearch = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      alert("Debes iniciar sesión");
-      return;
-    }
-
-    const title =
-      search || selectedBrand !== "ALL"
-        ? `${selectedBrand !== "ALL" ? selectedBrand : ""} ${search}`.trim()
-        : selectedCategory !== "ALL"
-        ? selectedCategory
-        : "Saved search";
-
-    try {
-      setSavingSearch(true);
-
-      const { error } = await supabase
-        .from("saved_searches")
-        .insert([
-          {
-            user_id: user.id,
-            title,
-            search,
-            category: selectedCategory,
-            brand: selectedBrand,
-            min_price: minPrice,
-            max_price: maxPrice,
-            show_sold: showSold,
-            sort,
-          },
-        ]);
-
-      if (error) {
-        alert(error.message);
-        return;
-      }
-
-      await loadSavedSearches();
-
-      alert("Search saved");
-    } finally {
-      setSavingSearch(false);
-    }
-  };
-
-  const applySavedSearch = (item: any) => {
-    setSearch(item.search || "");
-    setSelectedCategory(item.category || "ALL");
-    setSelectedBrand(item.brand || "ALL");
-    setMinPrice(item.min_price || "");
-    setMaxPrice(item.max_price || "");
-    setShowSold(!!item.show_sold);
-    setSort(item.sort || "newest");
-  };
-
-  const deleteSavedSearch = async (
-    e: React.MouseEvent<HTMLButtonElement>,
-    id: string
-  ) => {
-    e.stopPropagation();
-
-    const confirmDelete = confirm("Delete saved search?");
-
-    if (!confirmDelete) return;
-
-    await supabase
-      .from("saved_searches")
-      .delete()
-      .eq("id", id);
-
-    await loadSavedSearches();
   };
 
   const clearFilters = () => {
@@ -183,36 +70,20 @@ function ProductsContent() {
 
         const matchesSearch =
           !searchValue ||
-          product.title
-            ?.toLowerCase()
-            .includes(searchValue) ||
-          product.brand
-            ?.toLowerCase()
-            .includes(searchValue) ||
-          product.category
-            ?.toLowerCase()
-            .includes(searchValue);
+          product.title?.toLowerCase().includes(searchValue) ||
+          product.brand?.toLowerCase().includes(searchValue) ||
+          product.category?.toLowerCase().includes(searchValue);
 
         const matchesCategory =
-          selectedCategory === "ALL" ||
-          product.category === selectedCategory;
+          selectedCategory === "ALL" || product.category === selectedCategory;
 
         const matchesBrand =
           selectedBrand === "ALL" ||
-          product.brand?.toLowerCase() ===
-            selectedBrand.toLowerCase();
+          product.brand?.toLowerCase() === selectedBrand.toLowerCase();
 
-        const matchesMin =
-          !minPrice ||
-          Number(product.price) >= Number(minPrice);
-
-        const matchesMax =
-          !maxPrice ||
-          Number(product.price) <= Number(maxPrice);
-
-        const matchesSold = showSold
-          ? true
-          : !product.sold;
+        const matchesMin = !minPrice || Number(product.price) >= Number(minPrice);
+        const matchesMax = !maxPrice || Number(product.price) <= Number(maxPrice);
+        const matchesSold = showSold ? true : !product.sold;
 
         return (
           matchesSearch &&
@@ -224,17 +95,9 @@ function ProductsContent() {
         );
       })
       .sort((a, b) => {
-        if (sort === "price-low") {
-          return Number(a.price) - Number(b.price);
-        }
-
-        if (sort === "price-high") {
-          return Number(b.price) - Number(a.price);
-        }
-
-        if (sort === "popular") {
-          return Number(b.likes || 0) - Number(a.likes || 0);
-        }
+        if (sort === "price-low") return Number(a.price) - Number(b.price);
+        if (sort === "price-high") return Number(b.price) - Number(a.price);
+        if (sort === "popular") return Number(b.likes || 0) - Number(a.likes || 0);
 
         return (
           new Date(b.created_at).getTime() -
@@ -252,35 +115,22 @@ function ProductsContent() {
     sort,
   ]);
 
-  const safeImage = (src: string) => {
-    return src?.startsWith("http") ||
-      src?.startsWith("/")
-      ? src
-      : "/logo.png";
+  const safeImage = (src?: string) => {
+    return src?.startsWith("http") || src?.startsWith("/") ? src : "/logo.png";
   };
 
   return (
     <main style={pageStyle} className="products-page-main">
       <section style={headerStyle}>
-        <p style={eyebrowStyle}>
-          ATHMOV MARKETPLACE
-        </p>
+        <p style={eyebrowStyle}>ATHMOV MARKETPLACE</p>
 
-        <h1
-          style={titleStyle}
-          className="products-page-title"
-        >
-          {selectedCategory !== "ALL"
-            ? selectedCategory
-            : "All products"}
+        <h1 style={titleStyle} className="products-page-title">
+          {selectedCategory !== "ALL" ? selectedCategory : "All products"}
         </h1>
       </section>
 
-      <section style={premiumFiltersWrapperStyle}>
-        <SearchBar
-          value={search}
-          onChange={setSearch}
-        />
+      <section style={filtersWrapperStyle}>
+        <SearchBar value={search} onChange={setSearch} />
 
         <Filters
           selectedCategory={selectedCategory}
@@ -296,132 +146,109 @@ function ProductsContent() {
         />
 
         <div style={filterActionsStyle}>
-          <button
-            onClick={clearFilters}
-            style={secondaryButtonStyle}
-          >
+          <button onClick={clearFilters} style={secondaryButtonStyle}>
             Clear filters
           </button>
 
-          <button
-            onClick={saveCurrentSearch}
-            style={saveButtonStyle}
-          >
-            {savingSearch
-              ? "Saving..."
-              : "Save search"}
-          </button>
-
-          <SortDropdown
-            value={sort}
-            onChange={setSort}
-          />
+          <SortDropdown value={sort} onChange={setSort} />
         </div>
       </section>
 
       {loading ? (
-        <section
-          style={gridStyle}
-          className="products-page-grid"
-        >
+        <section style={gridStyle} className="products-page-grid">
           {[1, 2, 3, 4, 5, 6].map((item) => (
-            <div
-              key={item}
-              className="skeleton-card"
-              style={cardStyle}
-            >
-              <div
-                className="skeleton-image"
-                style={imageWrapperStyle}
-              />
-
+            <div key={item} style={cardStyle}>
+              <div style={imageWrapperStyle} />
               <div style={contentStyle}>
-                <div className="skeleton-line short" />
-                <div className="skeleton-line title" />
-                <div className="skeleton-line price" />
+                <div style={skeletonLineStyle} />
+                <div style={skeletonTitleStyle} />
+                <div style={skeletonPriceStyle} />
               </div>
             </div>
           ))}
         </section>
       ) : filteredProducts.length === 0 ? (
         <section style={emptyStyle}>
-          <h2 style={emptyTitleStyle}>
-            No products found
-          </h2>
-
+          <h2 style={emptyTitleStyle}>No products found</h2>
           <p style={emptyTextStyle}>
-            Try clearing filters or choosing
-            another category.
+            Try clearing filters or choosing another category.
           </p>
         </section>
       ) : (
-        <section
-          style={gridStyle}
-          className="products-page-grid"
-        >
+        <section style={gridStyle} className="products-page-grid">
           {filteredProducts.map((producto) => (
             <article
               key={producto.id}
-              className="product-card"
-              onClick={() =>
-                router.push(`/products/${producto.id}`)
-              }
+              onClick={() => router.push(`/products/${producto.id}`)}
               style={cardStyle}
+              className="product-card"
             >
-              <div
-                style={imageWrapperStyle}
-                className="products-page-image"
-              >
+              <div style={imageWrapperStyle} className="products-page-image">
                 <Image
                   src={safeImage(producto.image)}
-                  alt={
-                    producto.title || "Product"
-                  }
+                  alt={producto.title || "Product"}
                   fill
                   sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 33vw"
-                  className="product-image"
-                  style={{
-                    objectFit: "cover",
-                  }}
+                  style={{ objectFit: "cover" }}
                 />
 
-                {producto.sold && (
-                  <span style={soldBadgeStyle}>
-                    SOLD
-                  </span>
-                )}
+                {producto.sold && <span style={soldBadgeStyle}>SOLD</span>}
               </div>
 
               <div style={contentStyle}>
-                <p style={brandStyle}>
-                  {producto.brand || "SPORT"}
-                </p>
-
-                <h2 style={productTitleStyle}>
-                  {producto.title}
-                </h2>
-
-                <p style={priceStyle}>
-                  €{producto.price}
-                </p>
+                <p style={brandStyle}>{producto.brand || "SPORT"}</p>
+                <h2 style={productTitleStyle}>{producto.title}</h2>
+                <p style={priceStyle}>€{producto.price}</p>
               </div>
             </article>
           ))}
         </section>
       )}
+
+      <style>{`
+        .product-card {
+          transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .product-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 30px 90px rgba(0,0,0,0.08);
+        }
+
+        @media (max-width: 1100px) {
+          .products-page-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 24px !important;
+          }
+        }
+
+        @media (max-width: 700px) {
+          .products-page-main {
+            padding: 120px 18px 34px !important;
+          }
+
+          .products-page-title {
+            font-size: 46px !important;
+            letter-spacing: -2px !important;
+          }
+
+          .products-page-grid {
+            grid-template-columns: 1fr !important;
+            gap: 22px !important;
+          }
+
+          .products-page-image {
+            height: 260px !important;
+          }
+        }
+      `}</style>
     </main>
   );
 }
 
 export default function ProductsPage() {
   return (
-    <Suspense
-      fallback={
-        <main style={pageStyle}>
-          Loading products...
-        </main>
-      }
-    >
+    <Suspense fallback={<main style={pageStyle}>Loading products...</main>}>
       <ProductsContent />
     </Suspense>
   );
@@ -454,7 +281,7 @@ const titleStyle = {
   letterSpacing: "-4px",
 };
 
-const premiumFiltersWrapperStyle = {
+const filtersWrapperStyle = {
   maxWidth: "1400px",
   margin: "0 auto 24px",
   display: "grid",
@@ -467,16 +294,6 @@ const filterActionsStyle = {
   alignItems: "center",
   gap: "12px",
   flexWrap: "wrap" as const,
-};
-
-const saveButtonStyle = {
-  background: "#111",
-  color: "#fff",
-  border: "none",
-  borderRadius: "999px",
-  padding: "13px 18px",
-  fontWeight: 800,
-  cursor: "pointer",
 };
 
 const secondaryButtonStyle = {
@@ -503,6 +320,7 @@ const cardStyle = {
   overflow: "hidden",
   border: "1px solid rgba(0,0,0,0.06)",
   cursor: "pointer",
+  boxShadow: "0 20px 70px rgba(0,0,0,0.035)",
 };
 
 const imageWrapperStyle = {
@@ -564,4 +382,27 @@ const emptyTitleStyle = {
 const emptyTextStyle = {
   color: "#666",
   marginTop: "10px",
+};
+
+const skeletonLineStyle = {
+  width: "35%",
+  height: "14px",
+  borderRadius: "999px",
+  background: "#ececec",
+  marginBottom: "14px",
+};
+
+const skeletonTitleStyle = {
+  width: "80%",
+  height: "24px",
+  borderRadius: "999px",
+  background: "#ececec",
+  marginBottom: "18px",
+};
+
+const skeletonPriceStyle = {
+  width: "40%",
+  height: "20px",
+  borderRadius: "999px",
+  background: "#ececec",
 };
