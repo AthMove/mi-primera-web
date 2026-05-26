@@ -167,8 +167,8 @@ export default function ProductsClient() {
             <div
               key={product.id}
               style={cardStyle}
-              onClick={() => router.push(`/product/${product.id}`)}
-            >
+onClick={() => router.push(`/products/${product.id}`)}
+>
               <div
                 className="products-page-image"
                 style={imageWrapperStyle}
