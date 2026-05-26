@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
+ import { createClient } from "@supabase/supabase-js";
 
 const PLATFORM_FEE_PERCENT = 8;
 
@@ -33,6 +34,34 @@ export async function POST(req: Request) {
       (price * 0.015 + 0.25).toFixed(2)
     );
 
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL as string,
+  process.env.SUPABASE_SERVICE_ROLE_KEY as string
+);
+
+const { data: order, error: orderError } = await supabase
+  .from("orders")
+  .insert([
+    {
+      product_id: body.productId,
+      seller_id: body.sellerId,
+      buyer_id: body.buyerId,
+      amount: price,
+      status: "paid",
+      transfer_status: "pending",
+      stripe_account_id: body.stripeAccountId,
+    },
+  ])
+  .select()
+  .single();
+
+if (orderError) {
+  return NextResponse.json(
+    { error: orderError.message },
+    { status: 500 }
+  );
+}
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
@@ -43,7 +72,7 @@ export async function POST(req: Request) {
           destination: body.stripeAccountId,
         },
         metadata: {
-  order_id: body.orderId,
+  order_id: order.id,
 },
       },
 

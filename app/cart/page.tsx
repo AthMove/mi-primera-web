@@ -34,30 +34,47 @@ export default function CartPage() {
   }, 0);
 
   const handleCheckout = async () => {
-    if (cart.length === 0) {
-      alert("El carrito está vacío");
-      return;
-    }
+  if (cart.length === 0) {
+    alert("El carrito está vacío");
+    return;
+  }
 
-    const response = await fetch("/api/checkout", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ 
-        items: cart,
-        email: userEmail,
-      }),
-    });
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-    const data = await response.json();
+  if (!user) {
+    window.location.href = "/auth";
+    return;
+  }
 
-    if (data.url) {
-      window.location.href = data.url;
-    } else {
-      alert(data.error || "Error creando checkout");
-    }
-  };
+  const item = cart[0];
+
+  const response = await fetch("/api/checkout", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      price: Number(String(item.precio).replace("€", "")),
+      title: item.nombre,
+      image: item.imagen,
+      productId: item.id,
+      sellerId: item.seller_id || item.user_id || item.owner_id,
+      buyerId: user.id,
+      email: user.email,
+      stripeAccountId: item.stripe_account_id,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (data.url) {
+    window.location.href = data.url;
+  } else {
+    alert(data.error || "Error creando checkout");
+  }
+};
 
   return (
     <main style={pageStyle}>
