@@ -63,7 +63,7 @@ export async function POST(req: Request) {
         product_id: body.productId,
         seller_id: body.sellerId,
         buyer_id: body.buyerId,
-        stripe_account_id: body.stripeAccountId,
+        seller_stripe_account_id: body.stripeAccountId,
         amount: String(price),
         platform_fee_percent: String(PLATFORM_FEE_PERCENT),
         platform_fee: String(platformFee),

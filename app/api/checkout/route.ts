@@ -39,27 +39,42 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY as string
 );
 
-const { data: order, error: orderError } = await supabase
+const { data: existingOrder } = await supabase
   .from("orders")
-  .insert([
-    {
-      product_id: body.productId,
-      seller_id: body.sellerId,
-      buyer_id: body.buyerId,
-      amount: price,
-      status: "paid",
-      transfer_status: "pending",
-      stripe_account_id: body.stripeAccountId,
-    },
-  ])
-  .select()
-  .single();
+  .select("*")
+  .eq("product_id", body.productId)
+  .eq("buyer_id", body.buyerId)
+  .eq("seller_id", body.sellerId)
+  .in("status", ["pending", "paid"])
+  .order("created_at", { ascending: false })
+  .limit(1)
+  .maybeSingle();
 
-if (orderError) {
-  return NextResponse.json(
-    { error: orderError.message },
-    { status: 500 }
-  );
+let order = existingOrder;
+
+if (!order) {
+  const { data: newOrder, error: orderError } = await supabase
+    .from("orders")
+    .insert([
+      {
+        product_id: body.productId,
+        seller_id: body.sellerId,
+        buyer_id: body.buyerId,
+        amount: price,
+        status: "pending",
+        payment_status: "pending",
+        transfer_status: "pending",
+        seller_stripe_account_id: body.stripeAccountId,
+      },
+    ])
+    .select()
+    .single();
+
+  if (orderError) {
+    return NextResponse.json({ error: orderError.message }, { status: 500 });
+  }
+
+  order = newOrder;
 }
 
     const session = await stripe.checkout.sessions.create({
@@ -92,14 +107,12 @@ if (orderError) {
         },
       ],
 
-      metadata: {
-  order_id: body.orderId,
-
+    metadata: {
+  order_id: order.id,
   product_id: body.productId,
   seller_id: body.sellerId,
   buyer_id: body.buyerId,
-  stripe_account_id: body.stripeAccountId,
-
+  seller_stripe_account_id: body.stripeAccountId,
   amount: String(price),
   platform_fee_percent: String(PLATFORM_FEE_PERCENT),
   platform_fee: String(platformFee),

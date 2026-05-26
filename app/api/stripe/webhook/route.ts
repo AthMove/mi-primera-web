@@ -70,7 +70,7 @@ export async function POST(req: Request) {
             platform_fee: Number(metadata.platform_fee || 0),
             seller_amount: Number(metadata.seller_amount || 0),
             stripe_fee_estimate: Number(metadata.stripe_fee_estimate || 0),
-            seller_stripe_account_id: metadata.stripe_account_id,
+           seller_stripe_account_id: metadata.seller_stripe_account_id,
           })
           .eq("id", orderId);
 

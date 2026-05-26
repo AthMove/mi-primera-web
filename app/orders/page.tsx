@@ -97,6 +97,11 @@ export default function OrdersPage() {
     const confirmUpdate = confirm(`Mark this order as ${status}?`);
     if (!confirmUpdate) return;
 
+    if (status === "completed" && order.dispute_status === "open") {
+  alert("This order has an open dispute. Payout cannot be released yet.");
+  return;
+}
+
     const payload: any = { status };
 
     if (status === "delivered") payload.delivered_at = new Date().toISOString();
@@ -555,7 +560,7 @@ const getEstimatedDelivery = (order: any) => {
 
                   <span style={statusStyle}>{getStatusLabel(status)}</span>
 
-                  {isSeller && status === "paid" && (
+                  {isSeller && ["paid", "pending"].includes(status) && (
   <button
     onClick={() => updateOrderStatus(order, "preparing")}
     style={buttonStyle}
