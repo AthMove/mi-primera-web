@@ -2,27 +2,25 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 
-const stripe = new Stripe(
-  process.env.STRIPE_SECRET_KEY as string
-);
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-  process.env.SUPABASE_SERVICE_ROLE_KEY as string
-);
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   try {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
     const body = await req.json();
 
     const userId = body.userId;
-    const origin = body.origin || "http://localhost:3000";
+    const origin = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
     if (!userId) {
-      return NextResponse.json(
-        { error: "Missing userId" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing userId" }, { status: 400 });
     }
 
     const { data: profile, error: profileError } = await supabase
@@ -32,49 +30,38 @@ export async function POST(req: Request) {
       .single();
 
     if (profileError) {
-      return NextResponse.json(
-        { error: profileError.message },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: profileError.message }, { status: 500 });
     }
 
     let accountId = profile?.stripe_account_id;
 
- if (!accountId) {
-  const account = await stripe.accounts.create({
-    type: "express",
-    country: "ES",
+    if (!accountId) {
+      const account = await stripe.accounts.create({
+        type: "express",
+        country: "ES",
+        email: body.email,
+        capabilities: {
+          transfers: {
+            requested: true,
+          },
+        },
+      });
 
-    email: body.email,
+      accountId = account.id;
 
-    capabilities: {
-      transfers: {
-        requested: true,
-      },
-    },
-  });
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({
+          stripe_account_id: accountId,
+        })
+        .eq("id", userId);
 
-  accountId = account.id;
+      if (updateError) {
+        console.log("PROFILE UPDATE ERROR:", updateError);
+      }
 
-  const { error: updateError } = await supabase
-    .from("profiles")
-    .update({
-      stripe_account_id: accountId,
-    })
-    .eq("id", userId);
-
-  if (updateError) {
-    console.log(
-      "PROFILE UPDATE ERROR:",
-      updateError
-    );
-  }
-
-  console.log(
-    "CONNECTED ACCOUNT SAVED:",
-    accountId
-  );
-}
+      console.log("CONNECTED ACCOUNT SAVED:", accountId);
+    }
 
     const accountLink = await stripe.accountLinks.create({
       account: accountId,
@@ -86,12 +73,8 @@ export async function POST(req: Request) {
     return NextResponse.json({
       url: accountLink.url,
     });
-
   } catch (error: any) {
-    console.log(
-      "STRIPE CONNECT ERROR:",
-      error?.message || error
-    );
+    console.log("STRIPE CONNECT ERROR:", error?.message || error);
 
     return NextResponse.json(
       {

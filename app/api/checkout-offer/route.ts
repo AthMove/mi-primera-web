@@ -71,9 +71,8 @@ export async function POST(req: Request) {
         stripe_fee_estimate: String(stripeFeeEstimate),
         checkout_type: "offer",
       },
-
-      success_url: `${body.origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${body.origin}/messages/${body.conversationId}`,
+success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/cart`,
     });
 
     return NextResponse.json({
