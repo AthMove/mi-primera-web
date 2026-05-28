@@ -25,6 +25,8 @@ export async function GET(req: Request) {
       .select("*")
       .eq("status", "delivered")
       .neq("dispute_status", "open")
+      .neq("transfer_status", "paid")
+      .not("delivered_at", "is", null)
       .lte("delivered_at", limitDate.toISOString());
 
     if (error) {
@@ -42,6 +44,7 @@ export async function GET(req: Request) {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              ...(cronSecret ? { Authorization: `Bearer ${cronSecret}` } : {}),
             },
             body: JSON.stringify({
               orderId: order.id,
@@ -63,7 +66,14 @@ export async function GET(req: Request) {
           .from("orders")
           .update({
             status: "completed",
+            transfer_status: "paid",
             completed_at: new Date().toISOString(),
+            payout_released_at: new Date().toISOString(),
+            stripe_transfer_id:
+              releaseData.transferId ||
+              releaseData.stripe_transfer_id ||
+              order.stripe_transfer_id ||
+              null,
           })
           .eq("id", order.id);
 

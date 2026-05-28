@@ -7,6 +7,8 @@ import { supabase } from "@/lib/supabase";
 import { createNotification } from "@/lib/createNotification";
 
 const PROFILE_TABLE = "profiles";
+const [conversationData, setConversationData] = useState<any>(null);
+const [productData, setProductData] = useState<any>(null);
 
 type Message = {
   id: string;
@@ -101,6 +103,17 @@ export default function ConversationPage() {
       .maybeSingle();
 
     if (!conversation) return;
+    setConversationData(conversation);
+
+if (conversation.product_id) {
+  const { data: product } = await supabase
+    .from("products")
+    .select("*")
+    .eq("id", conversation.product_id)
+    .maybeSingle();
+
+  setProductData(product);
+}
 
     const isSeller = conversation.seller_id === currentUserId;
     setCurrentUserIsSeller(isSeller);
@@ -594,6 +607,34 @@ export default function ConversationPage() {
           </div>
         </div>
 
+{productData && (
+  <div style={orderPreviewStyle}>
+    <div style={orderPreviewImageStyle}>
+      <Image
+        src={
+          productData.image ||
+          productData.image_url ||
+          productData.images?.[0] ||
+          "/logo.png"
+        }
+        alt={productData.title || "Product"}
+        fill
+        sizes="64px"
+        style={{ objectFit: "cover" }}
+      />
+    </div>
+
+    <div>
+      <strong>{productData.title || productData.nombre || "Product"}</strong>
+      {conversationData?.order_id && (
+        <p style={orderPreviewTextStyle}>
+          Order #{conversationData.order_id.slice(0, 8)}
+        </p>
+      )}
+    </div>
+  </div>
+)}
+
         <div style={messagesStyle} className="chat-messages">
           {loading ? (
             <div style={emptyStateStyle}>Loading conversation...</div>
@@ -1053,3 +1094,28 @@ const emptyStateStyle = {
   color: "#777",
   fontSize: "14px",
 }; 
+
+const orderPreviewStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: "14px",
+  padding: "14px 24px",
+  background: "#fff",
+  borderBottom: "1px solid rgba(0,0,0,0.06)",
+};
+
+const orderPreviewImageStyle = {
+  position: "relative" as const,
+  width: "64px",
+  height: "64px",
+  borderRadius: "16px",
+  overflow: "hidden",
+  background: "#eee",
+  flexShrink: 0,
+};
+
+const orderPreviewTextStyle = {
+  margin: "4px 0 0",
+  fontSize: "12px",
+  color: "#666",
+};
