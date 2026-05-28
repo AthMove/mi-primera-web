@@ -406,6 +406,43 @@ const getEstimatedDelivery = (order: any) => {
     return "";
   };
 
+const openOrderChat = async (order: any) => {
+  const receiverId = order.buyer_id === userId ? order.seller_id : order.buyer_id;
+
+  const { data: existing } = await supabase
+    .from("conversations")
+    .select("id")
+    .eq("order_id", order.id)
+    .maybeSingle();
+
+  if (existing?.id) {
+    window.location.href = `/messages/${existing.id}`;
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from("conversations")
+    .insert([
+      {
+        buyer_id: order.buyer_id,
+        seller_id: order.seller_id,
+        product_id: order.product_id,
+        order_id: order.id,
+        last_message: "Conversation started",
+        last_message_at: new Date().toISOString(),
+      },
+    ])
+    .select("id")
+    .single();
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  window.location.href = `/messages/${data.id}`;
+};
+
   const filteredOrders = orders.filter((order) => {
     if (filter === "buying") return order.buyer_id === userId;
     if (filter === "selling") return order.seller_id === userId;
@@ -592,6 +629,13 @@ const getEstimatedDelivery = (order: any) => {
                   <strong style={amountStyle}>€{order.amount}</strong>
 
                   <span style={statusStyle}>{getStatusLabel(status)}</span>
+
+                  <button
+  onClick={() => openOrderChat(order)}
+  style={reviewButtonStyle}
+>
+  {isSeller ? "Message buyer" : "Message seller"}
+</button>
 
                   {isSeller && ["paid", "pending"].includes(status) && (
   <button
