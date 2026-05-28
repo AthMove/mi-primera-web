@@ -22,10 +22,13 @@ const checkAdmin = async () => {
     return;
   }
 
-  // CAMBIA ESTE EMAIL POR EL TUYO
-  const adminEmail = "tuemail@gmail.com";
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
 
-  if (user.email !== adminEmail) {
+  if (profile?.role !== "admin") {
     window.location.href = "/";
     return;
   }
