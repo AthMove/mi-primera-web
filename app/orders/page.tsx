@@ -719,9 +719,11 @@ const getEstimatedDelivery = (order: any) => {
               before the payout is released.
             </p>
 
-           <textarea
+      <textarea
   value={disputeReason}
   onChange={(e) => setDisputeReason(e.target.value)}
+  placeholder="Example: item arrived damaged, tracking does not work, item is not authentic..."
+  style={textareaStyle}
 />
 
 <input
@@ -732,6 +734,7 @@ const getEstimatedDelivery = (order: any) => {
       setDisputeFile(e.target.files[0]);
     }
   }}
+  style={modalInputStyle}
 />
 
             <button onClick={openDispute} style={buttonStyle}>
