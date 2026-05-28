@@ -8,9 +8,30 @@ export default function AdminDisputesPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadDisputes();
-  }, []);
+ useEffect(() => {
+  checkAdmin();
+}, []);
+
+const checkAdmin = async () => {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    window.location.href = "/auth";
+    return;
+  }
+
+  // CAMBIA ESTE EMAIL POR EL TUYO
+  const adminEmail = "tuemail@gmail.com";
+
+  if (user.email !== adminEmail) {
+    window.location.href = "/";
+    return;
+  }
+
+  loadDisputes();
+};
 
  const loadDisputes = async () => {
   setLoading(true);
