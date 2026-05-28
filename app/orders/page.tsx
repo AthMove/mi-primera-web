@@ -24,6 +24,7 @@ export default function OrdersPage() {
   const [disputeOrder, setDisputeOrder] = useState<any>(null);
   const [disputeReason, setDisputeReason] = useState("");
   const [savingDispute, setSavingDispute] = useState(false);
+  const [disputeFile, setDisputeFile] = useState<File | null>(null);
 
   useEffect(() => {
     loadOrders();
@@ -204,44 +205,76 @@ export default function OrdersPage() {
   };
 
   const openDispute = async () => {
-    if (!disputeOrder) return;
+  if (!disputeOrder) return;
 
-    if (!disputeReason.trim()) {
-      alert("Describe the issue");
-      return;
-    }
+  if (!disputeReason.trim()) {
+    alert("Describe the issue");
+    return;
+  }
 
-    try {
-      setSavingDispute(true);
+  try {
+    setSavingDispute(true);
 
-      const { error } = await supabase
-        .from("orders")
-        .update({
-          dispute_status: "open",
-          dispute_reason: disputeReason.trim(),
-          dispute_opened_at: new Date().toISOString(),
-        })
-        .eq("id", disputeOrder.id);
+    let fileUrl = "";
 
-      if (error) {
-        alert(error.message);
+    if (disputeFile) {
+      const fileExt = disputeFile.name.split(".").pop();
+      const fileName = `${disputeOrder.id}-${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("disputes")
+        .upload(fileName, disputeFile);
+
+      if (uploadError) {
+        alert(uploadError.message);
         return;
       }
 
-      await createNotification({
-        user_id: disputeOrder.seller_id,
-        title: "Dispute opened",
-        message: "The buyer has reported an issue with the order.",
-        link: "/orders",
-      });
+      const { data } = supabase.storage
+        .from("disputes")
+        .getPublicUrl(fileName);
 
-      setDisputeOrder(null);
-      setDisputeReason("");
-      await loadOrders();
-    } finally {
-      setSavingDispute(false);
+      fileUrl = data.publicUrl;
     }
-  };
+
+    const { error } = await supabase
+      .from("orders")
+      .update({
+        dispute_status: "open",
+        dispute_reason: disputeReason.trim(),
+        dispute_opened_at: new Date().toISOString(),
+      })
+      .eq("id", disputeOrder.id);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    await supabase.from("dispute_evidence").insert([
+      {
+        order_id: disputeOrder.id,
+        user_id: userId,
+        message: disputeReason.trim(),
+        file_url: fileUrl || null,
+      },
+    ]);
+
+    await createNotification({
+      user_id: disputeOrder.seller_id,
+      title: "Dispute opened",
+      message: "The buyer has reported an issue with the order.",
+      link: "/orders",
+    });
+
+    setDisputeOrder(null);
+    setDisputeReason("");
+    setDisputeFile(null);
+    await loadOrders();
+  } finally {
+    setSavingDispute(false);
+  }
+};
 
   const submitReview = async () => {
     if (!reviewOrder) return;
@@ -686,12 +719,20 @@ const getEstimatedDelivery = (order: any) => {
               before the payout is released.
             </p>
 
-            <textarea
-              value={disputeReason}
-              onChange={(e) => setDisputeReason(e.target.value)}
-              placeholder="Example: item arrived damaged, tracking does not work, item is not authentic..."
-              style={textareaStyle}
-            />
+           <textarea
+  value={disputeReason}
+  onChange={(e) => setDisputeReason(e.target.value)}
+/>
+
+<input
+  type="file"
+  accept="image/*,video/*"
+  onChange={(e) => {
+    if (e.target.files?.[0]) {
+      setDisputeFile(e.target.files[0]);
+    }
+  }}
+/>
 
             <button onClick={openDispute} style={buttonStyle}>
               {savingDispute ? "Submitting..." : "Submit issue"}
