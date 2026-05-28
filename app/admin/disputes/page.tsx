@@ -8,92 +8,86 @@ export default function AdminDisputesPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
- useEffect(() => {
-  checkAdmin();
-}, []);
+  useEffect(() => {
+    checkAdmin();
+  }, []);
 
-const checkAdmin = async () => {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const checkAdmin = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  if (!user) {
-    window.location.href = "/auth";
-    return;
-  }
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (profile?.role !== "admin") {
-    window.location.href = "/";
-    return;
-  }
-
-  loadDisputes();
-};
-
- const loadDisputes = async () => {
-  setLoading(true);
-
-  const { data: evidence, error: evidenceError } = await supabase
-    .from("dispute_evidence")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  if (evidenceError) {
-    alert(evidenceError.message);
-    setOrders([]);
-    setLoading(false);
-    return;
-  }
-
-  const orderIds = evidence?.map((item) => item.order_id) || [];
-
-  const { data: ordersData, error: ordersError } = await supabase
-    .from("orders")
-    .select("*")
-    .in("id", orderIds);
-
-  if (ordersError) {
-    alert(ordersError.message);
-    setOrders([]);
-    setLoading(false);
-    return;
-  }
-
-  const ordersWithEvidence = await Promise.all(
-  (evidence || []).map(async (item) => {
-    const order = ordersData?.find(
-      (order) => order.id === item.order_id
-    );
-
-    let product = null;
-
-    if (order?.product_id) {
-      const { data } = await supabase
-        .from("products")
-        .select("*")
-        .eq("id", order.product_id)
-        .maybeSingle();
-
-      product = data;
+    if (!user) {
+      window.location.href = "/auth";
+      return;
     }
 
-    return {
-      ...order,
-      product,
-      evidence: item,
-    };
-  })
-);
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
 
-  setOrders(ordersWithEvidence);
-  setLoading(false);
-};
+    if (profile?.role !== "admin") {
+      window.location.href = "/";
+      return;
+    }
+
+    loadDisputes();
+  };
+
+  const loadDisputes = async () => {
+    setLoading(true);
+
+    const { data: ordersData, error: ordersError } = await supabase
+      .from("orders")
+      .select("*")
+      .eq("dispute_status", "open")
+      .order("dispute_opened_at", { ascending: false });
+
+    if (ordersError) {
+      alert(ordersError.message);
+      setOrders([]);
+      setLoading(false);
+      return;
+    }
+
+    const ordersWithDetails = await Promise.all(
+      (ordersData || []).map(async (order) => {
+        let product = null;
+        let evidence = null;
+
+        if (order.product_id) {
+          const { data } = await supabase
+            .from("products")
+            .select("*")
+            .eq("id", order.product_id)
+            .maybeSingle();
+
+          product = data;
+        }
+
+        const { data: evidenceData } = await supabase
+          .from("dispute_evidence")
+          .select("*")
+          .eq("order_id", order.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        evidence = evidenceData;
+
+        return {
+          ...order,
+          product,
+          evidence,
+        };
+      })
+    );
+
+    setOrders(ordersWithDetails);
+    setLoading(false);
+  };
 
   const resolveDispute = async (
     orderId: string,
@@ -150,21 +144,22 @@ const checkAdmin = async () => {
               <div>
                 <p style={eyebrowStyle}>DISPUTE</p>
 
-               <h2 style={productTitleStyle}>
-  {order.product?.title ||
-    order.product?.nombre ||
-    `Order #${order.id.slice(0, 8)}`}
-</h2>
+                <h2 style={productTitleStyle}>
+                  {order.product?.title ||
+                    order.product?.nombre ||
+                    `Order #${order.id.slice(0, 8)}`}
+                </h2>
 
                 <p>
                   <strong>Product:</strong>{" "}
-{order.product?.title ||
- order.product?.nombre ||
- "Unknown"}
+                  {order.product?.title ||
+                    order.product?.nombre ||
+                    "Unknown"}
                 </p>
 
                 <p>
-                  <strong>Status:</strong> {order.dispute_status || "open"}
+                  <strong>Status:</strong>{" "}
+                  {order.dispute_status || "open"}
                 </p>
 
                 <p>
@@ -198,14 +193,18 @@ const checkAdmin = async () => {
 
                 <div style={actionsStyle}>
                   <button
-                    onClick={() => resolveDispute(order.id, "seller_wins")}
+                    onClick={() =>
+                      resolveDispute(order.id, "seller_wins")
+                    }
                     style={primaryButtonStyle}
                   >
                     Release payout
                   </button>
 
                   <button
-                    onClick={() => resolveDispute(order.id, "buyer_refund")}
+                    onClick={() =>
+                      resolveDispute(order.id, "buyer_refund")
+                    }
                     style={secondaryButtonStyle}
                   >
                     Refund buyer

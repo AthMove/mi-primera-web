@@ -679,11 +679,13 @@ const openOrderChat = async (order: any) => {
                     status === "delivered" &&
                     order.dispute_status !== "open" && (
                       <button
-                        onClick={() => updateOrderStatus(order, "completed")}
-                        style={buttonStyle}
-                      >
-                        Complete
-                      </button>
+  onClick={() => {
+    window.location.href = `/disputes/create?order=${order.id}`;
+  }}
+  style={reviewButtonStyle}
+>
+  Report issue
+</button>
                     )}
 
                   {isBuyer && status === "completed" && !order.review && (
