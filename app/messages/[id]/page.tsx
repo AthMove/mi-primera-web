@@ -40,6 +40,7 @@ export default function ConversationPage() {
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const typingChannelRef = useRef<any>(null);
   const userIdRef = useRef("");
+  const otherUserIdRef = useRef("");
 
   const scrollToBottom = () => {
     setTimeout(() => {
@@ -106,6 +107,7 @@ export default function ConversationPage() {
 
     const otherId = isSeller ? conversation.buyer_id : conversation.seller_id;
     setOtherUserId(otherId);
+    otherUserIdRef.current = otherId;
 
     await loadOtherProfile(otherId);
 
@@ -114,6 +116,11 @@ export default function ConversationPage() {
       .update(isSeller ? { read_by_seller: true } : { read_by_buyer: true })
       .eq("conversation_id", conversationId)
       .neq("sender_id", currentUserId);
+
+    await supabase
+      .from("conversations")
+      .update(isSeller ? { unread_seller: 0 } : { unread_buyer: 0 })
+      .eq("id", conversationId);
   };
 
   const getSeenStatus = (message: Message) => {
@@ -124,6 +131,35 @@ export default function ConversationPage() {
       : message.read_by_seller;
 
     return otherHasRead ? "Seen" : "Delivered";
+  };
+
+  const loadMessages = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      setUserId(user.id);
+      userIdRef.current = user.id;
+
+      await updateMyPresence(true, user.id);
+      await markMessagesAsRead(user.id);
+    }
+
+    const { data, error } = await supabase
+      .from("conversation_messages")
+      .select("*")
+      .eq("conversation_id", conversationId)
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      console.log(error);
+      setLoading(false);
+      return;
+    }
+
+    setMessages(data || []);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -173,7 +209,7 @@ export default function ConversationPage() {
         (payload) => {
           const profile = payload.new as any;
 
-          if (profile.id === otherUserId) {
+          if (profile.id === otherUserIdRef.current) {
             setOtherOnline(!!profile.is_online);
             setOtherLastSeen(profile.last_seen || null);
           }
@@ -211,40 +247,11 @@ export default function ConversationPage() {
       window.removeEventListener("beforeunload", onBeforeUnload);
       supabase.removeChannel(channel);
     };
-  }, [conversationId, otherUserId]);
+  }, [conversationId]);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages, otherTyping]);
-
-  const loadMessages = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (user) {
-      setUserId(user.id);
-      userIdRef.current = user.id;
-
-      await updateMyPresence(true, user.id);
-      await markMessagesAsRead(user.id);
-    }
-
-    const { data, error } = await supabase
-      .from("conversation_messages")
-      .select("*")
-      .eq("conversation_id", conversationId)
-      .order("created_at", { ascending: true });
-
-    if (error) {
-      console.log(error);
-      setLoading(false);
-      return;
-    }
-
-    setMessages(data || []);
-    setLoading(false);
-  };
 
   const sendTyping = () => {
     if (!typingChannelRef.current || !userIdRef.current) return;
@@ -256,6 +263,37 @@ export default function ConversationPage() {
         user_id: userIdRef.current,
       },
     });
+  };
+
+  const updateConversationUnread = async (
+    text: string,
+    currentUserId: string
+  ) => {
+    const { data: conversation } = await supabase
+      .from("conversations")
+      .select("*")
+      .eq("id", conversationId)
+      .maybeSingle();
+
+    if (!conversation) return;
+
+    const senderIsSeller = conversation.seller_id === currentUserId;
+
+    await supabase
+      .from("conversations")
+      .update({
+        last_message: text,
+        last_message_at: new Date().toISOString(),
+        archived_by_buyer: false,
+        archived_by_seller: false,
+        unread_buyer: senderIsSeller
+          ? Number(conversation.unread_buyer || 0) + 1
+          : Number(conversation.unread_buyer || 0),
+        unread_seller: senderIsSeller
+          ? Number(conversation.unread_seller || 0)
+          : Number(conversation.unread_seller || 0) + 1,
+      })
+      .eq("id", conversationId);
   };
 
   const sendMessage = async (imageUrl?: string) => {
@@ -270,14 +308,6 @@ export default function ConversationPage() {
     if (!user) return;
 
     await updateMyPresence(true, user.id);
-
-    await supabase
-      .from("conversations")
-      .update({
-        archived_by_buyer: false,
-        archived_by_seller: false,
-      })
-      .eq("id", conversationId);
 
     setContent("");
 
@@ -302,6 +332,8 @@ export default function ConversationPage() {
       if (!imageUrl) setContent(text);
       return;
     }
+
+    await updateConversationUnread(imageUrl ? "Image" : text, user.id);
 
     if (otherUserId) {
       await createNotification({
@@ -340,14 +372,6 @@ export default function ConversationPage() {
 
     await updateMyPresence(true, user.id);
 
-    await supabase
-      .from("conversations")
-      .update({
-        archived_by_buyer: false,
-        archived_by_seller: false,
-      })
-      .eq("id", conversationId);
-
     const { data, error } = await supabase
       .from("conversation_messages")
       .insert({
@@ -369,6 +393,8 @@ export default function ConversationPage() {
       alert("No se pudo enviar la oferta");
       return;
     }
+
+    await updateConversationUnread(`Offer: €${numericAmount}`, user.id);
 
     if (otherUserId) {
       await createNotification({
@@ -498,14 +524,14 @@ export default function ConversationPage() {
       }),
     });
 
-    const data = await response.json();
+    const checkoutData = await response.json();
 
-    if (!response.ok || !data.url) {
-      alert(data.error || "Checkout error");
+    if (!response.ok || !checkoutData.url) {
+      alert(checkoutData.error || "Checkout error");
       return;
     }
 
-    window.location.href = data.url;
+    window.location.href = checkoutData.url;
   };
 
   const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1026,4 +1052,4 @@ const emptyStateStyle = {
   margin: "auto",
   color: "#777",
   fontSize: "14px",
-};
+}; 
