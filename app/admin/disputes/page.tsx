@@ -1,218 +1,318 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 
 export default function AdminDisputesPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [resolvingId, setResolvingId] = useState<string | null>(null);
 
   useEffect(() => {
-    checkAdmin();
+    loadDisputes();
   }, []);
 
-  const checkAdmin = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      window.location.href = "/auth";
-      return;
-    }
-
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .maybeSingle();
-
-    if (profile?.role !== "admin") {
-      window.location.href = "/";
-      return;
-    }
-
-    loadDisputes();
+  const shortId = (value?: string | null) => {
+    if (!value) return "Unknown";
+    return value.slice(0, 8);
   };
 
   const loadDisputes = async () => {
     setLoading(true);
 
-    const { data: ordersData, error: ordersError } = await supabase
-      .from("orders")
-      .select("*")
-      .eq("dispute_status", "open")
-      .order("dispute_opened_at", { ascending: false });
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
-    if (ordersError) {
-      alert(ordersError.message);
+      if (!session) {
+        window.location.href = "/auth";
+        return;
+      }
+
+      const response = await fetch("/api/admin/disputes", {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.error || "Error loading disputes");
+        setOrders([]);
+        return;
+      }
+
+      setOrders(data.orders || []);
+    } catch (error: any) {
+      alert(error.message || "Error loading disputes");
       setOrders([]);
+    } finally {
       setLoading(false);
-      return;
     }
-
-    const ordersWithDetails = await Promise.all(
-      (ordersData || []).map(async (order) => {
-        let product = null;
-        let evidence = null;
-
-        if (order.product_id) {
-          const { data } = await supabase
-            .from("products")
-            .select("*")
-            .eq("id", order.product_id)
-            .maybeSingle();
-
-          product = data;
-        }
-
-        const { data: evidenceData } = await supabase
-          .from("dispute_evidence")
-          .select("*")
-          .eq("order_id", order.id)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
-
-        evidence = evidenceData;
-
-        return {
-          ...order,
-          product,
-          evidence,
-        };
-      })
-    );
-
-    setOrders(ordersWithDetails);
-    setLoading(false);
   };
 
   const resolveDispute = async (
     orderId: string,
     resolution: "seller_wins" | "buyer_refund"
   ) => {
-    const confirmed = confirm("Resolve dispute?");
+    const confirmed = confirm(
+      resolution === "seller_wins"
+        ? "Release payout to seller?"
+        : "Refund buyer?"
+    );
+
     if (!confirmed) return;
 
-    const response = await fetch("/api/admin/resolve-dispute", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ orderId, resolution }),
-    });
+    setResolvingId(orderId);
 
-    const data = await response.json();
+    try {
+      const response = await fetch("/api/resolve-dispute", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderId,
+          resolution,
+        }),
+      });
 
-    if (!response.ok) {
-      alert(data.error || "Error");
-      return;
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.error || "Error resolving dispute");
+        return;
+      }
+
+      alert("Dispute resolved");
+      setOrders((prev) => prev.filter((order) => order.id !== orderId));
+    } catch (error: any) {
+      alert(error.message || "Error resolving dispute");
+    } finally {
+      setResolvingId(null);
     }
-
-    await loadDisputes();
-    alert("Dispute resolved");
   };
 
   return (
     <main style={pageStyle}>
+      <p style={eyebrowStyle}>ATHMOV ADMIN</p>
       <h1 style={titleStyle}>Disputes</h1>
 
       {loading ? (
         <p>Loading...</p>
       ) : orders.length === 0 ? (
-        <p>No disputes found.</p>
+        <p>No open disputes found.</p>
       ) : (
         <div style={listStyle}>
-          {orders.map((order) => (
-            <div key={order.id} style={cardStyle}>
-              <div style={imageBoxStyle}>
-                {order.evidence?.file_url ? (
-                  <Image
-                    src={order.evidence.file_url}
-                    alt="Evidence"
-                    fill
-                    sizes="180px"
-                    style={{ objectFit: "cover" }}
-                  />
-                ) : (
-                  <span style={noEvidenceStyle}>No evidence</span>
-                )}
-              </div>
+          {orders.map((order) => {
+            const product =
+              Array.isArray(order.products) && order.products.length > 0
+                ? order.products[0]
+                : order.products || null;
 
-              <div>
-                <p style={eyebrowStyle}>DISPUTE</p>
+            const productImages = Array.from(
+              new Set(
+                [
+                  ...(product?.image ? [product.image] : []),
+                  ...(Array.isArray(product?.images) ? product.images : []),
+                ].filter(Boolean)
+              )
+            );
 
-                <h2 style={productTitleStyle}>
-                  {order.product?.title ||
-                    order.product?.nombre ||
-                    `Order #${order.id.slice(0, 8)}`}
-                </h2>
+            return (
+              <article key={order.id} style={cardStyle}>
+                <div style={productRowStyle}>
+                  <div style={imageBoxStyle}>
+                    {productImages[0] ? (
+                      <img
+                        src={productImages[0] as string}
+                        alt={product?.title || "Product"}
+                        style={imageStyle}
+                      />
+                    ) : (
+                      <span style={imagePlaceholderStyle}>No image</span>
+                    )}
+                  </div>
 
-                <p>
-                  <strong>Product:</strong>{" "}
-                  {order.product?.title ||
-                    order.product?.nombre ||
-                    "Unknown"}
-                </p>
+                  <div style={{ flex: 1 }}>
+                    <p style={eyebrowStyle}>DISPUTE</p>
 
-                <p>
-                  <strong>Status:</strong>{" "}
-                  {order.dispute_status || "open"}
-                </p>
+                    <h2 style={productTitleStyle}>
+                      {product?.title || `Order #${shortId(order.id)}`}
+                    </h2>
 
-                <p>
-                  <strong>Order status:</strong> {order.status}
-                </p>
+                    <p style={mutedTextStyle}>Order #{shortId(order.id)}</p>
 
-                <p>
-                  <strong>Amount:</strong> €{order.amount}
-                </p>
+                    {productImages.length > 1 && (
+                      <div style={galleryStyle}>
+                        {productImages
+                          .slice(0, 6)
+                          .map((img: unknown, index: number) => (
+                            <img
+                              key={`${String(img)}-${index}`}
+                              src={String(img)}
+                              alt={`${product?.title || "Product"} ${index + 1}`}
+                              style={thumbStyle}
+                            />
+                          ))}
+                      </div>
+                    )}
 
-                <p>
-                  <strong>Reason:</strong>
-                </p>
+                    <div style={detailsGridStyle}>
+                      <p>
+                        <strong>Dispute status:</strong>{" "}
+                        <span
+                          style={{
+                            color:
+                              order.dispute_status === "open"
+                                ? "#d97706"
+                                : "#16a34a",
+                            fontWeight: 700,
+                          }}
+                        >
+                          {order.dispute_status || "open"}
+                        </span>
+                      </p>
 
-                <p style={reasonBoxStyle}>
-                  {order.dispute_reason ||
-                    order.evidence?.message ||
-                    "No reason provided"}
-                </p>
+                     <p>
+  <strong>Order status:</strong>{" "}
+  <span
+    style={{
+      color:
+        order.status === "paid"
+          ? "#16a34a"
+          : order.status === "shipped"
+          ? "#2563eb"
+          : order.status === "refunded"
+          ? "#dc2626"
+          : "#d97706",
+      fontWeight: 700,
+    }}
+  >
+    {order.status || "Unknown"}
+  </span>
+</p>
 
-                {order.evidence?.file_url && (
-                  <a
-                    href={order.evidence.file_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={linkStyle}
-                  >
-                    Open evidence
-                  </a>
-                )}
+                      <p>
+                        <strong>Order amount:</strong> €{order.amount || 0}
+                      </p>
 
-                <div style={actionsStyle}>
-                  <button
-                    onClick={() =>
-                      resolveDispute(order.id, "seller_wins")
-                    }
-                    style={primaryButtonStyle}
-                  >
-                    Release payout
-                  </button>
+                      <p>
+                        <strong>Product price:</strong> €{product?.price || 0}
+                      </p>
 
-                  <button
-                    onClick={() =>
-                      resolveDispute(order.id, "buyer_refund")
-                    }
-                    style={secondaryButtonStyle}
-                  >
-                    Refund buyer
-                  </button>
+                      <p>
+                        <strong>Buyer:</strong>{" "}
+                        {order.buyer_email || "Unknown"}
+                      </p>
+
+                      <p>
+                        <strong>Seller:</strong>{" "}
+                        {product?.seller_email || "Unknown"}
+                      </p>
+
+                      <p>
+                        <strong>Sport:</strong> {product?.sport || "Unknown"}
+                      </p>
+
+                      <p>
+                        <strong>Purchased:</strong>{" "}
+                        {order.created_at
+                          ? new Date(order.created_at).toLocaleString()
+                          : "Unknown"}
+                      </p>
+
+                      <p>
+                        <strong>Dispute opened:</strong>{" "}
+                        {order.dispute_opened_at
+                          ? new Date(order.dispute_opened_at).toLocaleString()
+                          : "Unknown"}
+                      </p>
+
+                      <p>
+                        <strong>Carrier:</strong>{" "}
+                        {order.carrier || "No carrier"}
+                      </p>
+
+                      <p>
+                        <strong>Tracking:</strong>{" "}
+                        {order.tracking_number || "No tracking"}
+                      </p>
+
+                      <p>
+  <strong>Product ID:</strong> {shortId(order.product_id)}
+</p>
+
+                      <p>
+                        <strong>Buyer ID:</strong> {shortId(order.buyer_id)}
+                      </p>
+
+                      <p>
+                        <strong>Seller ID:</strong> {shortId(order.seller_id)}
+                      </p>
+
+                      <p>
+                        <strong>Resolution:</strong>{" "}
+                        <span
+                          style={{
+                            background:
+                              order.dispute_resolution === "seller_wins"
+                                ? "#dcfce7"
+                                : order.dispute_resolution === "buyer_refund"
+                                ? "#fee2e2"
+                                : "#f3f4f6",
+                            padding: "6px 12px",
+                            borderRadius: "999px",
+                            fontWeight: 600,
+                          }}
+                        >
+                          {order.dispute_resolution || "Pending"}
+                        </span>
+                      </p>
+                    </div>
+
+                    <p style={reasonLabelStyle}>
+                      <strong>Reason:</strong>
+                    </p>
+
+                    <p style={reasonBoxStyle}>
+                      {order.dispute_reason || "No reason provided"}
+                    </p>
+
+                    <div style={actionsStyle}>
+                      <button
+                        onClick={() => resolveDispute(order.id, "seller_wins")}
+                        style={{
+                          ...primaryButtonStyle,
+                          opacity: resolvingId === order.id ? 0.5 : 1,
+                        }}
+                        disabled={resolvingId === order.id}
+                      >
+                        {resolvingId === order.id
+                          ? "Resolving..."
+                          : "Release payout"}
+                      </button>
+
+                      <button
+                        onClick={() => resolveDispute(order.id, "buyer_refund")}
+                        style={{
+                          ...secondaryButtonStyle,
+                          opacity: resolvingId === order.id ? 0.5 : 1,
+                        }}
+                        disabled={resolvingId === order.id}
+                      >
+                        {resolvingId === order.id
+                          ? "Resolving..."
+                          : "Refund buyer"}
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          ))}
+              </article>
+            );
+          })}
         </div>
       )}
     </main>
@@ -228,7 +328,7 @@ const pageStyle = {
 
 const titleStyle = {
   fontSize: "64px",
-  marginBottom: "40px",
+  margin: "0 0 40px",
 };
 
 const listStyle = {
@@ -239,39 +339,82 @@ const listStyle = {
 const cardStyle = {
   background: "#fff",
   borderRadius: "28px",
-  padding: "28px",
-  display: "grid",
-  gridTemplateColumns: "180px 1fr",
-  gap: "24px",
-  alignItems: "start",
+  padding: "32px",
+  maxWidth: "1200px",
+  margin: "0 auto",
+};
+
+const productRowStyle = {
+  display: "flex",
+  gap: "28px",
+  alignItems: "flex-start",
 };
 
 const imageBoxStyle = {
-  position: "relative" as const,
   width: "180px",
   height: "180px",
   borderRadius: "20px",
   overflow: "hidden",
   background: "#eee",
+  flexShrink: 0,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
 };
 
-const noEvidenceStyle = {
+const imageStyle = {
+  width: "100%",
+  height: "100%",
+  objectFit: "cover" as const,
+};
+
+const imagePlaceholderStyle = {
   fontSize: "13px",
   color: "#777",
+};
+
+const galleryStyle = {
+  display: "flex",
+  gap: "10px",
+  margin: "16px 0 24px",
+  flexWrap: "wrap" as const,
+};
+
+const thumbStyle = {
+  width: "76px",
+  height: "76px",
+  objectFit: "cover" as const,
+  borderRadius: "12px",
+  background: "#eee",
 };
 
 const eyebrowStyle = {
   fontSize: "12px",
   letterSpacing: "2px",
   opacity: 0.5,
+  margin: 0,
 };
 
 const productTitleStyle = {
   fontSize: "38px",
-  margin: "8px 0 18px",
+  margin: "8px 0 8px",
+};
+
+const mutedTextStyle = {
+  color: "#777",
+  marginTop: 0,
+};
+
+const detailsGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+  gap: "20px",
+  marginTop: "20px",
+  marginBottom: "24px",
+};
+
+const reasonLabelStyle = {
+  marginTop: "10px",
 };
 
 const reasonBoxStyle = {
@@ -279,12 +422,8 @@ const reasonBoxStyle = {
   padding: "18px",
   borderRadius: "16px",
   lineHeight: 1.6,
-};
-
-const linkStyle = {
-  display: "inline-block",
-  marginTop: "18px",
-  fontWeight: 700,
+  width: "100%",
+  marginTop: "10px",
 };
 
 const actionsStyle = {

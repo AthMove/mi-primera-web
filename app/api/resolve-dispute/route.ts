@@ -15,85 +15,41 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    const disputeId = body.disputeId;
+    const orderId = body.orderId;
     const resolution = body.resolution;
 
-    if (!disputeId || !resolution) {
+    if (!orderId || !resolution) {
       return NextResponse.json(
         { error: "Missing fields" },
         { status: 400 }
       );
     }
 
-    const { data: dispute, error: disputeError } = await supabase
-      .from("disputes")
-      .select(`
-        *,
-        orders (*)
-      `)
-      .eq("id", disputeId)
+    const { data: order, error: orderError } = await supabase
+      .from("orders")
+      .select("*")
+      .eq("id", orderId)
       .single();
 
-    if (disputeError || !dispute) {
-      return NextResponse.json(
-        { error: "Dispute not found" },
-        { status: 404 }
-      );
-    }
-
-    const order = dispute.orders;
-
-    if (!order) {
+    if (orderError || !order) {
       return NextResponse.json(
         { error: "Order not found" },
         { status: 404 }
       );
     }
 
-    // SELLER WINS
     if (resolution === "seller_wins") {
-      const payoutResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_SITE_URL}/api/stripe/release-payment`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            orderId: order.id,
-          }),
-        }
-      );
-
-      const payoutData = await payoutResponse.json();
-
-      if (!payoutResponse.ok) {
-        return NextResponse.json(
-          { error: payoutData.error || "Payout failed" },
-          { status: 500 }
-        );
-      }
-
       await supabase
         .from("orders")
         .update({
           status: "completed",
           dispute_status: "resolved",
-          completed_at: new Date().toISOString(),
+          dispute_resolved_at: new Date().toISOString(),
+          dispute_resolution: "seller_wins",
         })
         .eq("id", order.id);
-
-      await supabase
-        .from("disputes")
-        .update({
-          status: "resolved",
-          resolution: "seller_wins",
-          resolved_at: new Date().toISOString(),
-        })
-        .eq("id", dispute.id);
     }
 
-    // BUYER REFUND
     if (resolution === "buyer_refund") {
       if (!order.stripe_payment_intent) {
         return NextResponse.json(
@@ -110,18 +66,12 @@ export async function POST(req: Request) {
         .from("orders")
         .update({
           status: "refunded",
+          refund_status: "refunded",
           dispute_status: "resolved",
+          dispute_resolved_at: new Date().toISOString(),
+          dispute_resolution: "buyer_refund",
         })
         .eq("id", order.id);
-
-      await supabase
-        .from("disputes")
-        .update({
-          status: "resolved",
-          resolution: "buyer_refund",
-          resolved_at: new Date().toISOString(),
-        })
-        .eq("id", dispute.id);
     }
 
     await supabase.from("notifications").insert([
@@ -147,9 +97,7 @@ export async function POST(req: Request) {
       },
     ]);
 
-    return NextResponse.json({
-      success: true,
-    });
+    return NextResponse.json({ success: true });
   } catch (error: any) {
     console.log("RESOLVE DISPUTE ERROR:", error);
 

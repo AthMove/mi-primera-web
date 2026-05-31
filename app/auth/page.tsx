@@ -1,33 +1,49 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 export default function AuthPage() {
-  const router = useRouter();
-
   const [mode, setMode] = useState<"login" | "register">("login");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState("athmovco@gmail.com");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [debug, setDebug] = useState("");
 
   const handleAuth = async () => {
-    if (!email || !password) {
-      alert("Introduce email y contraseña");
-      return;
+    try {
+      setLoading(true);
+      setDebug("Starting login...");
+
+      if (!email || !password) {
+        setDebug("Missing email or password");
+        alert("Introduce email y contraseña");
+        return;
+      }
+
+      const cleanEmail = email.trim().toLowerCase();
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: cleanEmail,
+        password,
+      });
+
+      if (error) {
+        setDebug(`Login error: ${error.message}`);
+        alert(error.message);
+        return;
+      }
+
+      setDebug(`Logged in as: ${data.user?.email}`);
+      if (cleanEmail === "athmovco@gmail.com") {
+  window.location.href = "/admin/disputes";
+  return;
+}
+
+      window.location.href = "/products";
+    } finally {
+      setLoading(false);
     }
-
-    const { error } =
-      mode === "login"
-        ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({ email, password });
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    router.push("/products");
   };
 
   return (
@@ -35,9 +51,7 @@ export default function AuthPage() {
       <section style={cardStyle}>
         <p style={eyebrowStyle}>ATHMOV ACCOUNT</p>
 
-        <h1 style={titleStyle}>
-          {mode === "login" ? "Welcome back" : "Create account"}
-        </h1>
+        <h1 style={titleStyle}>Welcome back</h1>
 
         <input
           type="email"
@@ -55,18 +69,11 @@ export default function AuthPage() {
           style={inputStyle}
         />
 
-        <button onClick={handleAuth} style={buttonStyle}>
-          {mode === "login" ? "Sign in" : "Register"}
+        <button onClick={handleAuth} disabled={loading} style={buttonStyle}>
+          {loading ? "Signing in..." : "Sign in"}
         </button>
 
-        <button
-          onClick={() => setMode(mode === "login" ? "register" : "login")}
-          style={switchStyle}
-        >
-          {mode === "login"
-            ? "No account? Create one"
-            : "Already have an account? Sign in"}
-        </button>
+        <p style={{ marginTop: 16, fontSize: 13 }}>{debug}</p>
       </section>
     </main>
   );
@@ -115,6 +122,7 @@ const inputStyle = {
   marginBottom: "14px",
   fontSize: "15px",
   outline: "none",
+  boxSizing: "border-box" as const,
 };
 
 const buttonStyle = {
@@ -128,14 +136,4 @@ const buttonStyle = {
   fontWeight: 800,
   cursor: "pointer",
   marginTop: "12px",
-};
-
-const switchStyle = {
-  width: "100%",
-  marginTop: "18px",
-  background: "transparent",
-  border: "none",
-  color: "#111",
-  fontWeight: 700,
-  cursor: "pointer",
 };
