@@ -174,15 +174,17 @@ const { data: sellerProfile, error: sellerError } = await supabase
   .eq("id", producto.seller_id)
   .maybeSingle();
 
-    if (
-      sellerError ||
-      !sellerProfile?.stripe_account_id ||
-      !sellerProfile?.stripe_charges_enabled ||
-      !sellerProfile?.stripe_payouts_enabled
-    ) {
-      alert("Seller has not connected Stripe payouts");
-      return;
-    }
+console.log("PRODUCT SELLER ID:", producto.seller_id);
+console.log(
+  "SELLER PROFILE JSON:",
+  JSON.stringify(sellerProfile, null, 2)
+);
+console.log("SELLER ERROR:", sellerError);
+
+if (sellerError || !sellerProfile?.stripe_account_id) {
+  alert("Seller has not connected Stripe payouts");
+  return;
+}
 
     try {
       setCheckoutLoading(true);

@@ -74,44 +74,58 @@ export default function OffersPage() {
     setLoading(false);
   };
 
-  const updateOffer = async (
-    offer: any,
-    status: string
-  ) => {
-    const { error } = await supabase
-      .from("offers")
-      .update({ status })
-      .eq("id", offer.id);
+const updateOffer = async (offer: any, status: string) => {
+  const confirmed = confirm(
+    status === "accepted" ? "Accept this offer?" : "Reject this offer?"
+  );
 
-    if (error) {
-      alert(error.message);
+  if (!confirmed) return;
+
+  const { data: updatedOffer, error: updateError } = await supabase
+    .from("offers")
+    .update({ status })
+    .eq("id", offer.id)
+    .select("*")
+    .single();
+
+  if (updateError || !updatedOffer) {
+    console.log("OFFER UPDATE ERROR:", updateError);
+    alert(updateError?.message || "Offer could not be updated");
+    return;
+  }
+
+  if (status === "accepted") {
+    const { error: orderError } = await supabase.from("orders").insert([
+      {
+        product_id: offer.product_id,
+        seller_id: offer.seller_id,
+        buyer_id: offer.buyer_id,
+        buyer_email: offer.buyer_email,
+        amount: offer.amount,
+        status: "paid",
+      },
+    ]);
+
+    if (orderError) {
+      console.log("ORDER ERROR:", orderError);
+      alert(orderError.message);
       return;
     }
 
-    if (status === "accepted") {
-      await supabase.from("orders").insert([
-        {
-          product_id: offer.product_id,
-          seller_id: offer.seller_id,
-          buyer_id: offer.buyer_id,
-          buyer_email: offer.buyer_email,
-          amount: offer.amount,
-          status: "paid",
-        },
-      ]);
+    const { error: productError } = await supabase
+      .from("products")
+      .update({ sold: true })
+      .eq("id", offer.product_id);
 
-      await supabase
-        .from("products")
-        .update({
-          sold: true,
-        })
-        .eq("id", offer.product_id);
+    if (productError) {
+      console.log("PRODUCT ERROR:", productError);
+      alert(productError.message);
+      return;
     }
+  }
 
-    setOffers((current) =>
-      current.filter((item) => item.id !== offer.id)
-    );
-  };
+  await loadOffers();
+};
 
   const safeImage = (src: string) => {
     return src?.startsWith("http") || src?.startsWith("/")

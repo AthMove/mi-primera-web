@@ -3,9 +3,6 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-console.log("SUPABASE URL:", supabaseUrl);
-console.log("SUPABASE KEY EXISTS:", !!supabaseAnonKey);
-
 export const supabase = createClient(
   supabaseUrl || "",
   supabaseAnonKey || "",
@@ -14,6 +11,7 @@ export const supabase = createClient(
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
+      storageKey: "athmov-auth-session-v2",
     },
   }
 );

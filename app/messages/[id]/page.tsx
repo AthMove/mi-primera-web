@@ -7,8 +7,11 @@ import { supabase } from "@/lib/supabase";
 import { createNotification } from "@/lib/createNotification";
 
 const PROFILE_TABLE = "profiles";
-const [conversationData, setConversationData] = useState<any>(null);
-const [productData, setProductData] = useState<any>(null);
+
+const isValidUuid = (value: string) =>
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    value
+  );
 
 type Message = {
   id: string;
@@ -27,6 +30,13 @@ export default function ConversationPage() {
   const params = useParams();
   const conversationId = String(params.id);
 
+  const invalidConversationId =
+    !conversationId ||
+    conversationId === "[id]" ||
+    !isValidUuid(conversationId);
+
+  const [conversationData, setConversationData] = useState<any>(null);
+  const [productData, setProductData] = useState<any>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [content, setContent] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -103,17 +113,18 @@ export default function ConversationPage() {
       .maybeSingle();
 
     if (!conversation) return;
+
     setConversationData(conversation);
 
-if (conversation.product_id) {
-  const { data: product } = await supabase
-    .from("products")
-    .select("*")
-    .eq("id", conversation.product_id)
-    .maybeSingle();
+    if (conversation.product_id) {
+      const { data: product } = await supabase
+        .from("products")
+        .select("*")
+        .eq("id", conversation.product_id)
+        .maybeSingle();
 
-  setProductData(product);
-}
+      setProductData(product);
+    }
 
     const isSeller = conversation.seller_id === currentUserId;
     setCurrentUserIsSeller(isSeller);
@@ -147,6 +158,11 @@ if (conversation.product_id) {
   };
 
   const loadMessages = async () => {
+    if (invalidConversationId) {
+      setLoading(false);
+      return;
+    }
+
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -176,6 +192,11 @@ if (conversation.product_id) {
   };
 
   useEffect(() => {
+    if (invalidConversationId) {
+      setLoading(false);
+      return;
+    }
+
     loadMessages();
 
     const channel = supabase
@@ -313,6 +334,7 @@ if (conversation.product_id) {
     const text = content.trim();
 
     if (!text && !imageUrl) return;
+    if (invalidConversationId) return;
 
     const {
       data: { user },
@@ -339,10 +361,8 @@ if (conversation.product_id) {
       .single();
 
     if (error) {
-      console.log(error);
-      alert("No se pudo enviar el mensaje");
-
-      if (!imageUrl) setContent(text);
+      console.log("MESSAGE ERROR:", error);
+      alert(error.message);
       return;
     }
 
@@ -376,6 +396,8 @@ if (conversation.product_id) {
       alert("Introduce una cantidad válida");
       return;
     }
+
+    if (invalidConversationId) return;
 
     const {
       data: { user },
@@ -432,6 +454,8 @@ if (conversation.product_id) {
     status: "accepted" | "rejected",
     message?: Message
   ) => {
+    if (invalidConversationId) return;
+
     const { error } = await supabase
       .from("conversation_messages")
       .update({ offer_status: status })
@@ -548,6 +572,8 @@ if (conversation.product_id) {
   };
 
   const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (invalidConversationId) return;
+
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -555,7 +581,7 @@ if (conversation.product_id) {
       setUploading(true);
 
       const fileExt = file.name.split(".").pop() || "jpg";
-      const fileName = `${conversationId}/${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
+      const fileName = `${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
 
       const { error } = await supabase.storage
         .from("chat-images")
@@ -566,8 +592,8 @@ if (conversation.product_id) {
         });
 
       if (error) {
-        console.log(error);
-        alert("No se pudo subir la imagen");
+        console.log("UPLOAD ERROR:", error);
+        alert(error.message);
         return;
       }
 
@@ -581,6 +607,19 @@ if (conversation.product_id) {
       e.target.value = "";
     }
   };
+
+  if (invalidConversationId) {
+    return (
+      <main style={pageStyle}>
+        <div style={chatStyle}>
+          <div style={emptyStateStyle}>
+            Invalid conversation. Open the chat from Messages, not from
+            /messages/[id].
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main style={pageStyle} className="chat-page">
@@ -607,33 +646,33 @@ if (conversation.product_id) {
           </div>
         </div>
 
-{productData && (
-  <div style={orderPreviewStyle}>
-    <div style={orderPreviewImageStyle}>
-      <Image
-        src={
-          productData.image ||
-          productData.image_url ||
-          productData.images?.[0] ||
-          "/logo.png"
-        }
-        alt={productData.title || "Product"}
-        fill
-        sizes="64px"
-        style={{ objectFit: "cover" }}
-      />
-    </div>
+        {productData && (
+          <div style={orderPreviewStyle}>
+            <div style={orderPreviewImageStyle}>
+              <Image
+                src={
+                  productData.image ||
+                  productData.image_url ||
+                  productData.images?.[0] ||
+                  "/logo.png"
+                }
+                alt={productData.title || "Product"}
+                fill
+                sizes="64px"
+                style={{ objectFit: "cover" }}
+              />
+            </div>
 
-    <div>
-      <strong>{productData.title || productData.nombre || "Product"}</strong>
-      {conversationData?.order_id && (
-        <p style={orderPreviewTextStyle}>
-          Order #{conversationData.order_id.slice(0, 8)}
-        </p>
-      )}
-    </div>
-  </div>
-)}
+            <div>
+              <strong>{productData.title || productData.nombre || "Product"}</strong>
+              {conversationData?.order_id && (
+                <p style={orderPreviewTextStyle}>
+                  Order #{conversationData.order_id.slice(0, 8)}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
 
         <div style={messagesStyle} className="chat-messages">
           {loading ? (
@@ -1093,7 +1132,7 @@ const emptyStateStyle = {
   margin: "auto",
   color: "#777",
   fontSize: "14px",
-}; 
+};
 
 const orderPreviewStyle = {
   display: "flex",

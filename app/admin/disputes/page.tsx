@@ -6,52 +6,50 @@ import { supabase } from "@/lib/supabase";
 export default function AdminDisputesPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [debug, setDebug] = useState("");
   const [resolvingId, setResolvingId] = useState<string | null>(null);
 
+const loadDisputes = async () => {
+  setDebug("Checking session...");
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  setDebug(`User: ${user?.id || "NO USER"}`);
+
+  if (!user) {
+    return;
+  }
+
+const { data, error } = await supabase
+  .from("orders")
+  .select("*, products(*)", { count: "exact" });
+
+  console.log("DATA:", data);
+  console.log("ERROR:", error);
+
+  if (error) {
+    setDebug("ERROR: " + error.message);
+    return;
+  }
+
+  const disputes = (data || []).filter(
+    (o: any) => String(o.dispute_status).trim().toLowerCase() === "open"
+  );
+
+  setDebug(`User: ${user.id} | Orders: ${data?.length || 0} | Open: ${disputes.length}`);
+  setOrders(disputes);
+};
+
   useEffect(() => {
-    loadDisputes();
-  }, []);
+  loadDisputes();
+}, []);
 
   const shortId = (value?: string | null) => {
-    if (!value) return "Unknown";
-    return value.slice(0, 8);
-  };
-
-  const loadDisputes = async () => {
-    setLoading(true);
-
-    try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session) {
-        window.location.href = "/auth";
-        return;
-      }
-
-      const response = await fetch("/api/admin/disputes", {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        alert(data.error || "Error loading disputes");
-        setOrders([]);
-        return;
-      }
-
-      setOrders(data.orders || []);
-    } catch (error: any) {
-      alert(error.message || "Error loading disputes");
-      setOrders([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (!value) return "Unknown";
+  return value.slice(0, 8);
+};
 
   const resolveDispute = async (
     orderId: string,
@@ -99,12 +97,11 @@ export default function AdminDisputesPage() {
     <main style={pageStyle}>
       <p style={eyebrowStyle}>ATHMOV ADMIN</p>
       <h1 style={titleStyle}>Disputes</h1>
+      <p>{debug}</p>
 
-      {loading ? (
-        <p>Loading...</p>
-      ) : orders.length === 0 ? (
-        <p>No open disputes found.</p>
-      ) : (
+     {orders.length === 0 ? (
+  <p>No open disputes found.</p>
+) : (
         <div style={listStyle}>
           {orders.map((order) => {
             const product =
@@ -147,16 +144,14 @@ export default function AdminDisputesPage() {
 
                     {productImages.length > 1 && (
                       <div style={galleryStyle}>
-                        {productImages
-                          .slice(0, 6)
-                          .map((img: unknown, index: number) => (
-                            <img
-                              key={`${String(img)}-${index}`}
-                              src={String(img)}
-                              alt={`${product?.title || "Product"} ${index + 1}`}
-                              style={thumbStyle}
-                            />
-                          ))}
+                        {productImages.slice(0, 6).map((img, index) => (
+                          <img
+                            key={`${String(img)}-${index}`}
+                            src={String(img)}
+                            alt={`${product?.title || "Product"} ${index + 1}`}
+                            style={thumbStyle}
+                          />
+                        ))}
                       </div>
                     )}
 
@@ -176,24 +171,24 @@ export default function AdminDisputesPage() {
                         </span>
                       </p>
 
-                     <p>
-  <strong>Order status:</strong>{" "}
-  <span
-    style={{
-      color:
-        order.status === "paid"
-          ? "#16a34a"
-          : order.status === "shipped"
-          ? "#2563eb"
-          : order.status === "refunded"
-          ? "#dc2626"
-          : "#d97706",
-      fontWeight: 700,
-    }}
-  >
-    {order.status || "Unknown"}
-  </span>
-</p>
+                      <p>
+                        <strong>Order status:</strong>{" "}
+                        <span
+                          style={{
+                            color:
+                              order.status === "paid"
+                                ? "#16a34a"
+                                : order.status === "shipped"
+                                ? "#2563eb"
+                                : order.status === "refunded"
+                                ? "#dc2626"
+                                : "#d97706",
+                            fontWeight: 700,
+                          }}
+                        >
+                          {order.status || "Unknown"}
+                        </span>
+                      </p>
 
                       <p>
                         <strong>Order amount:</strong> €{order.amount || 0}
@@ -205,12 +200,12 @@ export default function AdminDisputesPage() {
 
                       <p>
                         <strong>Buyer:</strong>{" "}
-                        {order.buyer_email || "Unknown"}
+                       {order.buyer_email || order.user_email || order.buyer_id || "Unknown"}
                       </p>
 
                       <p>
                         <strong>Seller:</strong>{" "}
-                        {product?.seller_email || "Unknown"}
+                        {product?.seller_email || order.seller_id || "Unknown"}
                       </p>
 
                       <p>
@@ -242,8 +237,8 @@ export default function AdminDisputesPage() {
                       </p>
 
                       <p>
-  <strong>Product ID:</strong> {shortId(order.product_id)}
-</p>
+                        <strong>Product ID:</strong> {shortId(order.product_id)}
+                      </p>
 
                       <p>
                         <strong>Buyer ID:</strong> {shortId(order.buyer_id)}
@@ -418,12 +413,13 @@ const reasonLabelStyle = {
 };
 
 const reasonBoxStyle = {
-  background: "#f7f7f7",
-  padding: "18px",
+  background: "#fff7ed",
+  padding: "24px",
+  border: "1px solid #fdba74",
   borderRadius: "16px",
-  lineHeight: 1.6,
-  width: "100%",
-  marginTop: "10px",
+  fontSize: "16px",
+  fontWeight: 500,
+  lineHeight: 1.7,
 };
 
 const actionsStyle = {

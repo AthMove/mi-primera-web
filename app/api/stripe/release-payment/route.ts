@@ -30,8 +30,23 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
-    if (order.transfer_status === "paid") {
-      return NextResponse.json({ success: true, alreadyPaid: true });
+    if (
+      order.transfer_status === "released" ||
+      order.transfer_status === "paid" ||
+      order.stripe_transfer_id
+    ) {
+      return NextResponse.json({
+        success: true,
+        alreadyReleased: true,
+        transferId: order.stripe_transfer_id,
+      });
+    }
+
+    if (order.status !== "completed") {
+      return NextResponse.json(
+        { error: "Order is not completed yet" },
+        { status: 400 }
+      );
     }
 
     if (order.dispute_status === "open") {
@@ -71,7 +86,7 @@ export async function POST(req: Request) {
       .from("orders")
       .update({
         status: "completed",
-        transfer_status: "paid",
+        transfer_status: "released",
         payout_released_at: new Date().toISOString(),
         stripe_transfer_id: transfer.id,
       })

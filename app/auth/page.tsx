@@ -13,7 +13,7 @@ export default function AuthPage() {
   const handleAuth = async () => {
     try {
       setLoading(true);
-      setDebug("Starting login...");
+      setDebug("Starting...");
 
       if (!email || !password) {
         setDebug("Missing email or password");
@@ -23,24 +23,36 @@ export default function AuthPage() {
 
       const cleanEmail = email.trim().toLowerCase();
 
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: cleanEmail,
-        password,
-      });
+      const result =
+        mode === "login"
+          ? await supabase.auth.signInWithPassword({
+              email: cleanEmail,
+              password,
+            })
+          : await supabase.auth.signUp({
+              email: cleanEmail,
+              password,
+            });
+
+      const { data, error } = result;
+
+      console.log("AUTH DATA:", data);
+      console.log("AUTH ERROR:", error);
 
       if (error) {
-        setDebug(`Login error: ${error.message}`);
+        setDebug(`Auth error: ${error.message}`);
         alert(error.message);
         return;
       }
 
-      setDebug(`Logged in as: ${data.user?.email}`);
-      if (cleanEmail === "athmovco@gmail.com") {
-  window.location.href = "/admin/disputes";
-  return;
-}
+      setDebug(`Logged in as: ${data.user?.email || cleanEmail}`);
 
-      window.location.href = "/products";
+      window.location.href =
+        cleanEmail === "athmovco@gmail.com" ? "/products" : "/orders";
+    } catch (e: any) {
+      console.log("AUTH CATCH:", e);
+      setDebug(`Catch: ${e.message}`);
+      alert(e.message || "Auth error");
     } finally {
       setLoading(false);
     }
@@ -51,7 +63,33 @@ export default function AuthPage() {
       <section style={cardStyle}>
         <p style={eyebrowStyle}>ATHMOV ACCOUNT</p>
 
-        <h1 style={titleStyle}>Welcome back</h1>
+        <h1 style={titleStyle}>
+          {mode === "login" ? "Welcome back" : "Create account"}
+        </h1>
+
+        <div style={switchStyle}>
+          <button
+            onClick={() => setMode("login")}
+            style={{
+              ...switchButtonStyle,
+              background: mode === "login" ? "#111" : "#fff",
+              color: mode === "login" ? "#fff" : "#111",
+            }}
+          >
+            Sign in
+          </button>
+
+          <button
+            onClick={() => setMode("register")}
+            style={{
+              ...switchButtonStyle,
+              background: mode === "register" ? "#111" : "#fff",
+              color: mode === "register" ? "#fff" : "#111",
+            }}
+          >
+            Register
+          </button>
+        </div>
 
         <input
           type="email"
@@ -70,7 +108,7 @@ export default function AuthPage() {
         />
 
         <button onClick={handleAuth} disabled={loading} style={buttonStyle}>
-          {loading ? "Signing in..." : "Sign in"}
+          {loading ? "Loading..." : mode === "login" ? "Sign in" : "Register"}
         </button>
 
         <p style={{ marginTop: 16, fontSize: 13 }}>{debug}</p>
@@ -111,7 +149,22 @@ const titleStyle = {
   fontSize: "54px",
   lineHeight: 1,
   letterSpacing: "-3px",
-  marginBottom: "34px",
+  marginBottom: "24px",
+};
+
+const switchStyle = {
+  display: "flex",
+  gap: "10px",
+  marginBottom: "22px",
+};
+
+const switchButtonStyle = {
+  flex: 1,
+  border: "1px solid rgba(0,0,0,0.12)",
+  borderRadius: "999px",
+  padding: "12px",
+  fontWeight: 800,
+  cursor: "pointer",
 };
 
 const inputStyle = {

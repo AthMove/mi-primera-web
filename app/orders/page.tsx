@@ -31,15 +31,11 @@ export default function OrdersPage() {
 
     const channel = supabase
       .channel("orders-realtime")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "orders" },
-        () => loadOrders()
+      .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, () =>
+        loadOrders()
       )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "reviews" },
-        () => loadOrders()
+      .on("postgres_changes", { event: "*", schema: "public", table: "reviews" }, () =>
+        loadOrders()
       )
       .subscribe();
 
@@ -59,18 +55,25 @@ export default function OrdersPage() {
     }
 
     setUserId(user.id);
-
+    console.log("LOAD ORDERS RUNNING");
+console.log("CURRENT USER ID:", user.id);
     const { data, error } = await supabase
       .from("orders")
       .select("*")
       .or(`buyer_id.eq.${user.id},seller_id.eq.${user.id}`)
       .order("created_at", { ascending: false });
 
+      console.log("ORDERS DATA:", data);
+console.log("ORDERS ERROR:", error);
+
     if (error || !data) {
       setOrders([]);
       setLoading(false);
       return;
     }
+
+    console.log("ORDERS FOUND:", data.length);
+console.log(data);
 
     const enriched = await Promise.all(
       data.map(async (order) => {
@@ -99,19 +102,16 @@ export default function OrdersPage() {
     if (!confirmUpdate) return;
 
     if (status === "completed" && order.dispute_status === "open") {
-  alert("This order has an open dispute. Payout cannot be released yet.");
-  return;
-}
+      alert("This order has an open dispute. Payout cannot be released yet.");
+      return;
+    }
 
     const payload: any = { status };
 
     if (status === "delivered") payload.delivered_at = new Date().toISOString();
     if (status === "completed") payload.completed_at = new Date().toISOString();
 
-    const { error } = await supabase
-      .from("orders")
-      .update(payload)
-      .eq("id", order.id);
+    const { error } = await supabase.from("orders").update(payload).eq("id", order.id);
 
     if (error) {
       alert(error.message);
@@ -128,6 +128,10 @@ export default function OrdersPage() {
     }
 
     if (status === "completed") {
+      await supabase.rpc("update_seller_reputation", {
+        target_seller_id: order.seller_id,
+      });
+
       await fetch("/api/stripe/release-payment", {
         method: "POST",
         headers: {
@@ -205,76 +209,74 @@ export default function OrdersPage() {
   };
 
   const openDispute = async () => {
-  if (!disputeOrder) return;
+    if (!disputeOrder) return;
 
-  if (!disputeReason.trim()) {
-    alert("Describe the issue");
-    return;
-  }
-
-  try {
-    setSavingDispute(true);
-
-    let fileUrl = "";
-
-    if (disputeFile) {
-      const fileExt = disputeFile.name.split(".").pop();
-      const fileName = `${disputeOrder.id}-${Date.now()}.${fileExt}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("disputes")
-        .upload(fileName, disputeFile);
-
-      if (uploadError) {
-        alert(uploadError.message);
-        return;
-      }
-
-      const { data } = supabase.storage
-        .from("disputes")
-        .getPublicUrl(fileName);
-
-      fileUrl = data.publicUrl;
-    }
-
-    const { error } = await supabase
-      .from("orders")
-      .update({
-        dispute_status: "open",
-        dispute_reason: disputeReason.trim(),
-        dispute_opened_at: new Date().toISOString(),
-      })
-      .eq("id", disputeOrder.id);
-
-    if (error) {
-      alert(error.message);
+    if (!disputeReason.trim()) {
+      alert("Describe the issue");
       return;
     }
 
-    await supabase.from("dispute_evidence").insert([
-      {
-        order_id: disputeOrder.id,
-        user_id: userId,
-        message: disputeReason.trim(),
-        file_url: fileUrl || null,
-      },
-    ]);
+    try {
+      setSavingDispute(true);
 
-    await createNotification({
-      user_id: disputeOrder.seller_id,
-      title: "Dispute opened",
-      message: "The buyer has reported an issue with the order.",
-      link: "/orders",
-    });
+      let fileUrl = "";
 
-    setDisputeOrder(null);
-    setDisputeReason("");
-    setDisputeFile(null);
-    await loadOrders();
-  } finally {
-    setSavingDispute(false);
-  }
-};
+      if (disputeFile) {
+        const fileExt = disputeFile.name.split(".").pop();
+        const fileName = `${disputeOrder.id}-${Date.now()}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("disputes")
+          .upload(fileName, disputeFile);
+
+        if (uploadError) {
+          alert(uploadError.message);
+          return;
+        }
+
+        const { data } = supabase.storage.from("disputes").getPublicUrl(fileName);
+
+        fileUrl = data.publicUrl;
+      }
+
+      const { error } = await supabase
+        .from("orders")
+        .update({
+          dispute_status: "open",
+          dispute_reason: disputeReason.trim(),
+          dispute_opened_at: new Date().toISOString(),
+        })
+        .eq("id", disputeOrder.id);
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      await supabase.from("dispute_evidence").insert([
+        {
+          order_id: disputeOrder.id,
+          user_id: userId,
+          message: disputeReason.trim(),
+          file_url: fileUrl || null,
+        },
+      ]);
+
+      await createNotification({
+        user_id: disputeOrder.seller_id,
+        title: "Dispute opened",
+        message: "The buyer has reported an issue with the order.",
+        link: "/orders",
+      });
+
+      setDisputeOrder(null);
+      setDisputeReason("");
+      setDisputeFile(null);
+      await loadOrders();
+    } finally {
+      setSavingDispute(false);
+    }
+  };
 
   const submitReview = async () => {
     if (!reviewOrder) return;
@@ -287,21 +289,32 @@ export default function OrdersPage() {
     try {
       setSavingReview(true);
 
-      const { error } = await supabase.from("reviews").insert([
-        {
-          order_id: reviewOrder.id,
-          product_id: reviewOrder.product_id,
-          seller_id: reviewOrder.seller_id,
-          buyer_id: reviewOrder.buyer_id,
-          rating,
-          comment: comment.trim(),
-        },
-      ]);
+      const { data, error } = await supabase
+        .from("reviews")
+        .insert([
+          {
+            order_id: reviewOrder.id,
+            product_id: reviewOrder.product_id,
+            seller_id: reviewOrder.seller_id,
+            buyer_id: reviewOrder.buyer_id,
+            rating,
+            comment: comment.trim(),
+          },
+        ])
+        .select()
+        .single();
+
+      console.log("REVIEW INSERTED:", data);
+      console.log("REVIEW ERROR:", error);
 
       if (error) {
         alert(error.message);
         return;
       }
+
+      await supabase.rpc("update_seller_reputation", {
+        target_seller_id: reviewOrder.seller_id,
+      });
 
       await createNotification({
         user_id: reviewOrder.seller_id,
@@ -310,33 +323,13 @@ export default function OrdersPage() {
         link: `/seller/${reviewOrder.seller_id}`,
       });
 
-      const { data: sellerReviews } = await supabase
-  .from("reviews")
-  .select("rating")
-  .eq("seller_id", reviewOrder.seller_id);
-
-if (sellerReviews) {
-  const totalReviews = sellerReviews.length;
-
-  const averageRating =
-    sellerReviews.reduce(
-      (acc, item) => acc + Number(item.rating || 0),
-      0
-    ) / totalReviews;
-
-  await supabase
-    .from("profiles")
-    .update({
-      total_reviews: totalReviews,
-      average_rating: averageRating.toFixed(1),
-    })
-    .eq("id", reviewOrder.seller_id);
-}
-
       setReviewOrder(null);
       setRating(5);
       setComment("");
+
       await loadOrders();
+    } catch (err) {
+      console.error("SUBMIT REVIEW ERROR:", err);
     } finally {
       setSavingReview(false);
     }
@@ -357,33 +350,33 @@ if (sellerReviews) {
   };
 
   const getStatusLabel = (status: string) => {
-  if (status === "paid") return "Paid";
-  if (status === "preparing") return "Preparing";
-  if (status === "shipped") return "Shipped";
-  if (status === "delivered") return "Delivered";
-  if (status === "completed") return "Completed";
-  if (status === "refunded") return "Refunded";
-  return status || "Paid";
-};
+    if (status === "paid") return "Paid";
+    if (status === "preparing") return "Preparing";
+    if (status === "shipped") return "Shipped";
+    if (status === "delivered") return "Delivered";
+    if (status === "completed") return "Completed";
+    if (status === "refunded") return "Refunded";
+    return status || "Paid";
+  };
 
   const getStepIndex = (status: string) => {
-  const steps = ["paid", "preparing", "shipped", "delivered", "completed"];
-  const index = steps.indexOf(status || "paid");
-  return index === -1 ? 0 : index;
-};
+    const steps = ["paid", "preparing", "shipped", "delivered", "completed"];
+    const index = steps.indexOf(status || "paid");
+    return index === -1 ? 0 : index;
+  };
 
-const getEstimatedDelivery = (order: any) => {
-  const baseDate = order.shipped_at || order.created_at;
-  if (!baseDate) return "Estimated after shipment";
+  const getEstimatedDelivery = (order: any) => {
+    const baseDate = order.shipped_at || order.created_at;
+    if (!baseDate) return "Estimated after shipment";
 
-  const start = new Date(baseDate);
-  const end = new Date(baseDate);
+    const start = new Date(baseDate);
+    const end = new Date(baseDate);
 
-  start.setDate(start.getDate() + 2);
-  end.setDate(end.getDate() + 5);
+    start.setDate(start.getDate() + 2);
+    end.setDate(end.getDate() + 5);
 
-  return `${formatDate(start.toISOString())} - ${formatDate(end.toISOString())}`;
-};
+    return `${formatDate(start.toISOString())} - ${formatDate(end.toISOString())}`;
+  };
 
   const getTrackingUrl = (carrier?: string, tracking?: string) => {
     if (!carrier || !tracking) return "";
@@ -406,42 +399,40 @@ const getEstimatedDelivery = (order: any) => {
     return "";
   };
 
-const openOrderChat = async (order: any) => {
-  const receiverId = order.buyer_id === userId ? order.seller_id : order.buyer_id;
+  const openOrderChat = async (order: any) => {
+    const { data: existing } = await supabase
+      .from("conversations")
+      .select("id")
+      .eq("order_id", order.id)
+      .maybeSingle();
 
-  const { data: existing } = await supabase
-    .from("conversations")
-    .select("id")
-    .eq("order_id", order.id)
-    .maybeSingle();
+    if (existing?.id) {
+      window.location.href = `/messages/${existing.id}`;
+      return;
+    }
 
-  if (existing?.id) {
-    window.location.href = `/messages/${existing.id}`;
-    return;
-  }
+    const { data, error } = await supabase
+      .from("conversations")
+      .insert([
+        {
+          buyer_id: order.buyer_id,
+          seller_id: order.seller_id,
+          product_id: order.product_id,
+          order_id: order.id,
+          last_message: "Conversation started",
+          last_message_at: new Date().toISOString(),
+        },
+      ])
+      .select("id")
+      .single();
 
-  const { data, error } = await supabase
-    .from("conversations")
-    .insert([
-      {
-        buyer_id: order.buyer_id,
-        seller_id: order.seller_id,
-        product_id: order.product_id,
-        order_id: order.id,
-        last_message: "Conversation started",
-        last_message_at: new Date().toISOString(),
-      },
-    ])
-    .select("id")
-    .single();
+    if (error) {
+      alert(error.message);
+      return;
+    }
 
-  if (error) {
-    alert(error.message);
-    return;
-  }
-
-  window.location.href = `/messages/${data.id}`;
-};
+    window.location.href = `/messages/${data.id}`;
+  };
 
   const filteredOrders = orders.filter((order) => {
     if (filter === "buying") return order.buyer_id === userId;
@@ -532,10 +523,20 @@ const openOrderChat = async (order: any) => {
                     {order.product?.title || "Product"}
                   </h2>
 
-                  <p style={buyerStyle}>
-                    {isSeller ? "Buyer" : "Seller"} ·{" "}
-                    {formatDate(order.created_at)}
-                  </p>
+                  <p
+  style={{
+    ...buyerStyle,
+    cursor: "pointer",
+    fontWeight: 700,
+    textDecoration: "underline",
+  }}
+  onClick={() => {
+    const profileId = isSeller ? order.buyer_id : order.seller_id;
+    window.location.href = `/seller/${profileId}`;
+  }}
+>
+  {isSeller ? "Buyer" : "Seller"} · {formatDate(order.created_at)}
+</p>
 
                   {(order.carrier || order.tracking_number) && (
                     <div style={trackingBoxStyle}>
@@ -548,6 +549,14 @@ const openOrderChat = async (order: any) => {
                       {order.shipped_at && (
                         <small>Shipped {formatDate(order.shipped_at)}</small>
                       )}
+
+{status === "shipped" && (
+  <small>Waiting for carrier delivery confirmation</small>
+)}
+
+{status === "delivered" && order.delivered_at && (
+  <small>Delivered {formatDate(order.delivered_at)}</small>
+)}
 
                       {getTrackingUrl(order.carrier, order.tracking_number) && (
                         <a
@@ -569,104 +578,92 @@ const openOrderChat = async (order: any) => {
                   {order.review && (
                     <p style={reviewPreviewStyle}>
                       {"★".repeat(order.review.rating)}
-                      {"☆".repeat(5 - order.review.rating)} ·{" "}
-                      {order.review.comment}
+                      {"☆".repeat(5 - order.review.rating)} · {order.review.comment}
                     </p>
                   )}
 
                   <div style={timelineStyle} className="order-timeline">
-  {["paid", "preparing", "shipped", "delivered", "completed"].map((step, index) => {
-    const active = index <= getStepIndex(status);
+                    {["paid", "preparing", "shipped", "delivered", "completed"].map(
+                      (step, index) => {
+                        const active = index <= getStepIndex(status);
 
-    return (
-      <div key={step} style={timelineStepStyle}>
-        <div
-          style={{
-            ...timelineDotStyle,
-            ...(active ? activeTimelineDotStyle : {}),
-          }}
-        >
-          {active ? "✓" : ""}
-        </div>
+                        return (
+                          <div key={step} style={timelineStepStyle}>
+                            <div
+                              style={{
+                                ...timelineDotStyle,
+                                ...(active ? activeTimelineDotStyle : {}),
+                              }}
+                            >
+                              {active ? "✓" : ""}
+                            </div>
 
-        {index < 4 && (
-          <div
-            style={{
-              ...timelineLineStyle,
-              ...(index < getStepIndex(status) ? activeTimelineLineStyle : {}),
-            }}
-          />
-        )}
+                            {index < 4 && (
+                              <div
+                                style={{
+                                  ...timelineLineStyle,
+                                  ...(index < getStepIndex(status)
+                                    ? activeTimelineLineStyle
+                                    : {}),
+                                }}
+                              />
+                            )}
 
-        <span
-          style={{
-            ...timelineLabelStyle,
-            ...(active ? activeTimelineLabelStyle : {}),
-          }}
-        >
-          {getStatusLabel(step)}
-        </span>
-      </div>
-    );
-  })}
-</div>
+                            <span
+                              style={{
+                                ...timelineLabelStyle,
+                                ...(active ? activeTimelineLabelStyle : {}),
+                              }}
+                            >
+                              {getStatusLabel(step)}
+                            </span>
+                          </div>
+                        );
+                      }
+                    )}
+                  </div>
 
-<div style={protectionGridStyle}>
-  <div style={protectionCardStyle}>
-    <span style={protectionLabelStyle}>Estimated delivery</span>
-    <strong>{getEstimatedDelivery(order)}</strong>
-  </div>
+                  <div style={protectionGridStyle}>
+                    <div style={protectionCardStyle}>
+                      <span style={protectionLabelStyle}>Estimated delivery</span>
+                      <strong>{getEstimatedDelivery(order)}</strong>
+                    </div>
 
-  <div style={protectionCardStyle}>
-    <span style={protectionLabelStyle}>ATHMOV Protection</span>
-    <strong>Secure payment & dispute support</strong>
-  </div>
-</div>
-
-                                </div>
+                    <div style={protectionCardStyle}>
+                      <span style={protectionLabelStyle}>ATHMOV Protection</span>
+                      <strong>Secure payment & dispute support</strong>
+                    </div>
+                  </div>
+                </div>
 
                 <div style={rightStyle} className="order-actions">
                   <strong style={amountStyle}>€{order.amount}</strong>
 
                   <span style={statusStyle}>{getStatusLabel(status)}</span>
 
-                  <button
-  onClick={() => openOrderChat(order)}
-  style={reviewButtonStyle}
->
-  {isSeller ? "Message buyer" : "Message seller"}
-</button>
+                  <button onClick={() => openOrderChat(order)} style={reviewButtonStyle}>
+                    {isSeller ? "Message buyer" : "Message seller"}
+                  </button>
 
                   {isSeller && ["paid", "pending"].includes(status) && (
-  <button
-    onClick={() => updateOrderStatus(order, "preparing")}
-    style={buttonStyle}
-  >
-    Start preparing
-  </button>
-)}
-
-{isSeller && status === "preparing" && (
-  <button
-    onClick={() => openTrackingModal(order)}
-    style={buttonStyle}
-  >
-    Add tracking
-  </button>
-)}
-
-                  {isBuyer && status === "shipped" && (
                     <button
-                      onClick={() => updateOrderStatus(order, "delivered")}
+                      onClick={() => updateOrderStatus(order, "preparing")}
                       style={buttonStyle}
                     >
-                      Mark delivered
+                      Start preparing
                     </button>
                   )}
 
+                  {isSeller && status === "preparing" && (
+                    <button onClick={() => openTrackingModal(order)} style={buttonStyle}>
+                      Add tracking
+                    </button>
+                  )}
+
+
                   {isBuyer &&
-                    ["paid", "shipped", "delivered"].includes(status) &&
-                    order.dispute_status !== "open" && (
+  ["paid", "preparing", "shipped", "delivered"].includes(status) &&
+  order.dispute_status !== "open" && (
                       <button
                         onClick={() => setDisputeOrder(order)}
                         style={reviewButtonStyle}
@@ -679,13 +676,13 @@ const openOrderChat = async (order: any) => {
                     status === "delivered" &&
                     order.dispute_status !== "open" && (
                       <button
-  onClick={() => {
-    window.location.href = `/disputes/create?order=${order.id}`;
-  }}
-  style={reviewButtonStyle}
->
-  Report issue
-</button>
+                        onClick={() => {
+                          window.location.href = `/disputes/create?order=${order.id}`;
+                        }}
+                        style={reviewButtonStyle}
+                      >
+                        Report issue
+                      </button>
                     )}
 
                   {isBuyer && status === "completed" && !order.review && (
@@ -708,18 +705,13 @@ const openOrderChat = async (order: any) => {
       {trackingOrder && (
         <div style={modalOverlayStyle}>
           <div style={modalStyle}>
-            <button
-              onClick={() => setTrackingOrder(null)}
-              style={closeButtonStyle}
-            >
+            <button onClick={() => setTrackingOrder(null)} style={closeButtonStyle}>
               ✕
             </button>
 
             <p style={eyebrowStyle}>ATHMOV SHIPPING</p>
             <h2 style={modalTitleStyle}>Add tracking</h2>
-            <p style={modalTextStyle}>
-              {trackingOrder.product?.title || "Product"}
-            </p>
+            <p style={modalTextStyle}>{trackingOrder.product?.title || "Product"}</p>
 
             <select
               value={carrier}
@@ -749,15 +741,11 @@ const openOrderChat = async (order: any) => {
       {disputeOrder && (
         <div style={modalOverlayStyle}>
           <div style={modalStyle}>
-            <button
-              onClick={() => setDisputeOrder(null)}
-              style={closeButtonStyle}
-            >
+            <button onClick={() => setDisputeOrder(null)} style={closeButtonStyle}>
               ✕
             </button>
 
             <p style={eyebrowStyle}>ATHMOV PROTECTION</p>
-
             <h2 style={modalTitleStyle}>Report issue</h2>
 
             <p style={modalTextStyle}>
@@ -765,23 +753,23 @@ const openOrderChat = async (order: any) => {
               before the payout is released.
             </p>
 
-      <textarea
-  value={disputeReason}
-  onChange={(e) => setDisputeReason(e.target.value)}
-  placeholder="Example: item arrived damaged, tracking does not work, item is not authentic..."
-  style={textareaStyle}
-/>
+            <textarea
+              value={disputeReason}
+              onChange={(e) => setDisputeReason(e.target.value)}
+              placeholder="Example: item arrived damaged, tracking does not work, item is not authentic..."
+              style={textareaStyle}
+            />
 
-<input
-  type="file"
-  accept="image/*,video/*"
-  onChange={(e) => {
-    if (e.target.files?.[0]) {
-      setDisputeFile(e.target.files[0]);
-    }
-  }}
-  style={modalInputStyle}
-/>
+            <input
+              type="file"
+              accept="image/*,video/*"
+              onChange={(e) => {
+                if (e.target.files?.[0]) {
+                  setDisputeFile(e.target.files[0]);
+                }
+              }}
+              style={modalInputStyle}
+            />
 
             <button onClick={openDispute} style={buttonStyle}>
               {savingDispute ? "Submitting..." : "Submit issue"}
@@ -793,19 +781,14 @@ const openOrderChat = async (order: any) => {
       {reviewOrder && (
         <div style={modalOverlayStyle}>
           <div style={modalStyle}>
-            <button
-              onClick={() => setReviewOrder(null)}
-              style={closeButtonStyle}
-            >
+            <button onClick={() => setReviewOrder(null)} style={closeButtonStyle}>
               ✕
             </button>
 
             <p style={eyebrowStyle}>ATHMOV REVIEW</p>
             <h2 style={modalTitleStyle}>Review your purchase</h2>
 
-            <p style={modalTextStyle}>
-              {reviewOrder.product?.title || "Product"}
-            </p>
+            <p style={modalTextStyle}>{reviewOrder.product?.title || "Product"}</p>
 
             <div style={starsStyle}>
               {[1, 2, 3, 4, 5].map((star) => (
@@ -836,7 +819,7 @@ const openOrderChat = async (order: any) => {
         </div>
       )}
 
-            <style>{`
+      <style>{`
         .order-card {
           transition: transform 0.22s ease, box-shadow 0.22s ease;
         }

@@ -25,6 +25,8 @@ export default function SellerPage() {
       .select("*")
       .eq("id", sellerId)
       .maybeSingle();
+      console.log("SELLER PROFILE:", sellerProfile);
+console.log("SELLER ID PAGE:", sellerId);
 
     const { data: sellerProducts } = await supabase
       .from("products")
@@ -55,18 +57,20 @@ export default function SellerPage() {
     seller?.email ||
     "ATHMOV Seller";
 
-  const soldCount = products.filter((p) => p.sold).length;
-  const activeCount = products.filter((p) => !p.sold).length;
+  const soldCount = Number(seller?.total_sales || products.filter((p) => p.sold).length || 0);
+const activeCount = products.filter((p) => !p.sold).length;
 
-  const averageRating =
-    reviews.length > 0
-      ? (
-          reviews.reduce(
-            (acc, item) => acc + Number(item.rating || 0),
-            0
-          ) / reviews.length
-        ).toFixed(1)
-      : "0";
+const totalReviews = Number(seller?.total_reviews || reviews.length || 0);
+
+const averageRating =
+  seller?.average_rating && Number(seller.average_rating) > 0
+    ? Number(seller.average_rating).toFixed(1)
+    : reviews.length > 0
+    ? (
+        reviews.reduce((acc, item) => acc + Number(item.rating || 0), 0) /
+        reviews.length
+      ).toFixed(1)
+    : "0";
 
   if (loading) {
     return <main style={pageStyle}>Loading seller...</main>;
@@ -159,20 +163,20 @@ export default function SellerPage() {
       </section>
 
       <section style={statsGridStyle}>
-        <div style={statCardStyle}>
-          <p style={statLabelStyle}>Rating</p>
-          <h2 style={statValueStyle}>★ {averageRating}</h2>
-        </div>
+       <div style={statCardStyle}>
+  <p style={statLabelStyle}>Reviews</p>
+  <h2 style={statValueStyle}>{totalReviews}</h2>
+</div>
 
         <div style={statCardStyle}>
-          <p style={statLabelStyle}>Reviews</p>
-          <h2 style={statValueStyle}>{reviews.length}</h2>
-        </div>
+  <p style={statLabelStyle}>Rating</p>
+  <h2 style={statValueStyle}>★ {averageRating}</h2>
+</div>
 
-        <div style={statCardStyle}>
-          <p style={statLabelStyle}>Active listings</p>
-          <h2 style={statValueStyle}>{activeCount}</h2>
-        </div>
+<div style={statCardStyle}>
+  <p style={statLabelStyle}>Reviews</p>
+  <h2 style={statValueStyle}>{totalReviews}</h2>
+</div>
 
         <div style={statCardStyle}>
           <p style={statLabelStyle}>Sold products</p>
@@ -257,8 +261,14 @@ export default function SellerPage() {
                 </p>
 
                 <p style={reviewTextStyle}>
-                  {review.comment}
-                </p>
+  {review.comment || "No comment provided."}
+</p>
+
+<p style={reviewDateStyle}>
+  {review.created_at
+    ? new Date(review.created_at).toLocaleDateString()
+    : ""}
+</p>
               </article>
             ))}
           </div>
@@ -562,4 +572,10 @@ const reviewStarsStyle = {
 const reviewTextStyle = {
   color: "#555",
   lineHeight: 1.8,
+};
+
+const reviewDateStyle = {
+  marginTop: "14px",
+  fontSize: "12px",
+  color: "#999",
 };

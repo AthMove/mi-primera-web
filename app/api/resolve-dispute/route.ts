@@ -13,16 +13,14 @@ const supabase = createClient(
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-
-    const orderId = body.orderId;
-    const resolution = body.resolution;
+    const { orderId, resolution } = await req.json();
 
     if (!orderId || !resolution) {
-      return NextResponse.json(
-        { error: "Missing fields" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+    }
+
+    if (!["seller_wins", "buyer_refund"].includes(resolution)) {
+      return NextResponse.json({ error: "Invalid resolution" }, { status: 400 });
     }
 
     const { data: order, error: orderError } = await supabase
@@ -32,9 +30,13 @@ export async function POST(req: Request) {
       .single();
 
     if (orderError || !order) {
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    }
+
+    if (order.dispute_status !== "open") {
       return NextResponse.json(
-        { error: "Order not found" },
-        { status: 404 }
+        { error: "Dispute is not open" },
+        { status: 400 }
       );
     }
 
@@ -43,6 +45,7 @@ export async function POST(req: Request) {
         .from("orders")
         .update({
           status: "completed",
+          transfer_status: "approved",
           dispute_status: "resolved",
           dispute_resolved_at: new Date().toISOString(),
           dispute_resolution: "seller_wins",
@@ -58,7 +61,7 @@ export async function POST(req: Request) {
         );
       }
 
-      await stripe.refunds.create({
+      const refund = await stripe.refunds.create({
         payment_intent: order.stripe_payment_intent,
       });
 
@@ -67,6 +70,9 @@ export async function POST(req: Request) {
         .update({
           status: "refunded",
           refund_status: "refunded",
+          stripe_refund_id: refund.id,
+          refunded_at: new Date().toISOString(),
+          refund_amount: order.amount || null,
           dispute_status: "resolved",
           dispute_resolved_at: new Date().toISOString(),
           dispute_resolution: "buyer_refund",
@@ -91,7 +97,7 @@ export async function POST(req: Request) {
         title: "Dispute resolved",
         message:
           resolution === "seller_wins"
-            ? "Your payout has been released."
+            ? "Your payout has been approved."
             : "The buyer refund was approved.",
         link: "/orders",
       },
@@ -100,7 +106,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.log("RESOLVE DISPUTE ERROR:", error);
-
     return NextResponse.json(
       { error: error.message || "Resolve failed" },
       { status: 500 }
