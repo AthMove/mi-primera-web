@@ -72,15 +72,32 @@ export async function POST(req: Request) {
       );
     }
 
-    const transfer = await stripe.transfers.create({
-      amount: sellerAmount,
-      currency: "eur",
-      destination: order.seller_stripe_account_id,
-      metadata: {
-        order_id: order.id,
-        seller_id: order.seller_id,
-      },
-    });
+    const { error: lockError } = await supabase
+  .from("orders")
+  .update({
+    transfer_status: "processing",
+  })
+  .eq("id", order.id)
+  .is("stripe_transfer_id", null)
+  .neq("transfer_status", "released");
+
+if (lockError) {
+  return NextResponse.json(
+    { error: lockError.message },
+    { status: 500 }
+  );
+}
+
+const transfer = await stripe.transfers.create({
+  amount: sellerAmount,
+  currency: "eur",
+  destination: order.seller_stripe_account_id,
+  transfer_group: `order_${order.id}`,
+  metadata: {
+    order_id: order.id,
+    seller_id: order.seller_id,
+  },
+});
 
     await supabase
       .from("orders")

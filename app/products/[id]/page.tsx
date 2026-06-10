@@ -394,13 +394,37 @@ if (sellerError || !sellerProfile?.stripe_account_id) {
       conversationId = newConversation.id;
     }
 
-    await supabase.from("messages").insert([
-      {
-        conversation_id: conversationId,
-        sender_id: user.id,
-        text: `Hi! Could you send me a verification video of "${producto.title}" showing serial numbers, condition and branding?`,
-      },
-    ]);
+    const firstMessage = `Hi! Could you send me a verification video of "${producto.title}" showing serial numbers, condition and branding?`;
+
+const { error: messageError } = await supabase
+  .from("conversation_messages")
+  .insert([
+    {
+      conversation_id: conversationId,
+      sender_id: user.id,
+      content: firstMessage,
+      is_image: false,
+      is_offer: false,
+      read_by_buyer: false,
+      read_by_seller: false,
+    },
+  ]);
+
+if (messageError) {
+  alert(messageError.message);
+  return;
+}
+
+await supabase
+  .from("conversations")
+  .update({
+    last_message: firstMessage,
+    last_message_at: new Date().toISOString(),
+    unread_seller: 1,
+    archived_by_buyer: false,
+    archived_by_seller: false,
+  })
+  .eq("id", conversationId);
 
     window.location.href = `/messages/${conversationId}`;
   };

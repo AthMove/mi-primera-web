@@ -33,24 +33,83 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
-    if (order.dispute_status !== "open") {
+   if (order.dispute_resolution || order.dispute_resolved_at) {
+  return NextResponse.json(
+    { error: "Dispute has already been resolved" },
+    { status: 400 }
+  );
+}
+
+    if (order.stripe_refund_id || order.refund_status === "refunded") {
       return NextResponse.json(
-        { error: "Dispute is not open" },
+        { error: "Order has already been refunded" },
+        { status: 400 }
+      );
+    }
+
+    if (
+      resolution === "buyer_refund" &&
+      (order.transfer_status === "released" || order.stripe_transfer_id)
+    ) {
+      return NextResponse.json(
+        { error: "Seller payout has already been released" },
         { status: 400 }
       );
     }
 
     if (resolution === "seller_wins") {
-      await supabase
-        .from("orders")
-        .update({
-          status: "completed",
-          transfer_status: "approved",
-          dispute_status: "resolved",
-          dispute_resolved_at: new Date().toISOString(),
-          dispute_resolution: "seller_wins",
-        })
-        .eq("id", order.id);
+      if (order.transfer_status === "released" || order.stripe_transfer_id) {
+        await supabase
+          .from("orders")
+          .update({
+            status: "completed",
+            dispute_status: "resolved",
+            dispute_resolved_at: new Date().toISOString(),
+            dispute_resolution: "seller_wins",
+          })
+          .eq("id", order.id);
+      } else {
+        const sellerAmount = Math.round(Number(order.seller_amount || 0) * 100);
+
+        if (!sellerAmount || sellerAmount <= 0) {
+          return NextResponse.json(
+            { error: "Invalid seller amount" },
+            { status: 400 }
+          );
+        }
+
+        if (!order.seller_stripe_account_id) {
+          return NextResponse.json(
+            { error: "Missing seller Stripe account" },
+            { status: 400 }
+          );
+        }
+
+       const transfer = await stripe.transfers.create({
+  amount: sellerAmount,
+  currency: "eur",
+  destination: order.seller_stripe_account_id,
+  transfer_group: `order_${order.id}`,
+  metadata: {
+    order_id: order.id,
+    seller_id: order.seller_id,
+    dispute_resolution: "seller_wins",
+  },
+});
+
+        await supabase
+          .from("orders")
+          .update({
+            status: "completed",
+            transfer_status: "released",
+            payout_released_at: new Date().toISOString(),
+            stripe_transfer_id: transfer.id,
+            dispute_status: "resolved",
+            dispute_resolved_at: new Date().toISOString(),
+            dispute_resolution: "seller_wins",
+          })
+          .eq("id", order.id);
+      }
     }
 
     if (resolution === "buyer_refund") {
@@ -69,6 +128,8 @@ export async function POST(req: Request) {
         .from("orders")
         .update({
           status: "refunded",
+          payment_status: "refunded",
+          transfer_status: "cancelled",
           refund_status: "refunded",
           stripe_refund_id: refund.id,
           refunded_at: new Date().toISOString(),
@@ -79,6 +140,16 @@ export async function POST(req: Request) {
         })
         .eq("id", order.id);
     }
+
+await supabase
+  .from("disputes")
+  .update({
+    status: "resolved",
+    resolution,
+    resolved_at: new Date().toISOString(),
+  })
+  .eq("order_id", order.id)
+  .eq("status", "open");
 
     await supabase.from("notifications").insert([
       {
@@ -97,13 +168,34 @@ export async function POST(req: Request) {
         title: "Dispute resolved",
         message:
           resolution === "seller_wins"
-            ? "Your payout has been approved."
+            ? "Your payout has been released."
             : "The buyer refund was approved.",
         link: "/orders",
       },
     ]);
 
-    return NextResponse.json({ success: true });
+    const { data: finalOrder } = await supabase
+  .from("orders")
+  .select(
+    "id, status, dispute_status, dispute_resolution, dispute_resolved_at, transfer_status, refund_status, stripe_transfer_id, stripe_refund_id"
+  )
+  .eq("id", order.id)
+  .single();
+
+if (!finalOrder || finalOrder.dispute_status !== "resolved") {
+  return NextResponse.json(
+    {
+      error: "Dispute update verification failed",
+      order: finalOrder,
+    },
+    { status: 500 }
+  );
+}
+
+return NextResponse.json({
+  success: true,
+  order: finalOrder,
+});
   } catch (error: any) {
     console.log("RESOLVE DISPUTE ERROR:", error);
     return NextResponse.json(

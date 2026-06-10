@@ -46,20 +46,52 @@ export async function GET(req: Request) {
     .lt("delivered_at", deliveredLimit.toISOString())
     .or("dispute_status.is.null,dispute_status.neq.open");
 
+  let releaseSuccess = 0;
+  let releaseFailed = 0;
+
   for (const order of deliveredOrders || []) {
     await supabase
       .from("orders")
       .update({
         status: "completed",
         completed_at: now.toISOString(),
-       transfer_status: "ready_to_release",
+        transfer_status: "ready_to_release",
       })
       .eq("id", order.id);
+
+    try {
+      const siteUrl =
+        process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+      const response = await fetch(`${siteUrl}/api/stripe/release-payment`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.CRON_SECRET}`,
+        },
+        body: JSON.stringify({
+          orderId: order.id,
+        }),
+      });
+
+      if (response.ok) {
+        releaseSuccess++;
+      } else {
+        releaseFailed++;
+        const data = await response.json().catch(() => null);
+        console.log("RELEASE FAILED:", order.id, data);
+      }
+    } catch (error) {
+      releaseFailed++;
+      console.log("RELEASE ERROR:", order.id, error);
+    }
   }
 
   return NextResponse.json({
     success: true,
     shippedToDelivered: shippedOrders?.length || 0,
     deliveredToCompleted: deliveredOrders?.length || 0,
+    releaseSuccess,
+    releaseFailed,
   });
 }

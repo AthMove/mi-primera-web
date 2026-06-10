@@ -72,9 +72,9 @@ export async function POST(req: Request) {
       const { data: updatedOrder, error: updateError } = await supabase
         .from("orders")
         .update({
-          status: "paid",
-          payment_status: "paid",
-          transfer_status: "paid",
+         status: "paid",
+payment_status: "paid",
+transfer_status: "pending",
           stripe_payment_intent: paymentIntentId,
           paid_at: new Date().toISOString(),
           platform_fee: Number(metadata.platform_fee || 0),

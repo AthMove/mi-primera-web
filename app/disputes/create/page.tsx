@@ -51,7 +51,17 @@ function CreateDisputeContent() {
         .maybeSingle();
 
       if (orderError || !order) {
-        alert("Order not found");
+        alert(orderError?.message || "Order not found");
+        return;
+      }
+
+      if (user.id !== order.buyer_id && user.id !== order.seller_id) {
+        alert("You are not allowed to open a dispute for this order");
+        return;
+      }
+
+      if (order.dispute_status === "open") {
+        alert("This order already has an open dispute");
         return;
       }
 
@@ -78,9 +88,7 @@ function CreateDisputeContent() {
           .from("dispute-evidence")
           .getPublicUrl(fileName);
 
-        if (data.publicUrl) {
-          evidenceUrls.push(data.publicUrl);
-        }
+        if (data.publicUrl) evidenceUrls.push(data.publicUrl);
       }
 
       const { error: disputeError } = await supabase.from("disputes").insert({
@@ -97,32 +105,57 @@ function CreateDisputeContent() {
         return;
       }
 
-      const { error: orderUpdateError } = await supabase
-        .from("orders")
-        .update({
-          dispute_status: "open",
-          dispute_reason: reason.trim(),
-          dispute_opened_at: new Date().toISOString(),
-          dispute_evidence: evidenceUrls,
-        })
-        .eq("id", order.id);
+    const { error: orderUpdateError } = await supabase
+  .from("orders")
+  .update({
+    dispute_status: "open",
+    dispute_reason: reason.trim(),
+    dispute_opened_at: new Date().toISOString(),
+  })
+  .eq("id", order.id);
 
       if (orderUpdateError) {
         alert(orderUpdateError.message);
         return;
       }
 
-      await supabase.from("dispute_evidence").insert([
-        {
+      if (evidenceUrls.length > 0) {
+        const rows = evidenceUrls.map((url) => ({
           order_id: order.id,
           user_id: user.id,
           message: description.trim(),
-          file_url: evidenceUrls[0] || null,
-        },
-      ]);
+          file_url: url,
+        }));
+
+        const { error: evidenceError } = await supabase
+          .from("dispute_evidence")
+          .insert(rows);
+
+        if (evidenceError) {
+          alert(evidenceError.message);
+          return;
+        }
+      } else {
+        const { error: evidenceError } = await supabase
+          .from("dispute_evidence")
+          .insert({
+            order_id: order.id,
+            user_id: user.id,
+            message: description.trim(),
+            file_url: null,
+          });
+
+        if (evidenceError) {
+          alert(evidenceError.message);
+          return;
+        }
+      }
 
       alert("Dispute opened");
       window.location.href = "/orders";
+    } catch (err) {
+      console.error("CREATE DISPUTE ERROR:", err);
+      alert("Unexpected error opening dispute");
     } finally {
       setLoading(false);
     }
@@ -132,7 +165,6 @@ function CreateDisputeContent() {
     <main style={pageStyle}>
       <div style={cardStyle}>
         <p style={eyebrowStyle}>ATHMOV PROTECTION</p>
-
         <h1 style={titleStyle}>Open dispute</h1>
 
         <input
@@ -151,10 +183,7 @@ function CreateDisputeContent() {
 
         <div style={uploadBoxStyle}>
           <strong>Evidence photos</strong>
-
-          <p style={hintStyle}>
-            Upload up to 5 images to help ATHMOV review the case.
-          </p>
+          <p style={hintStyle}>Upload up to 5 images to help ATHMOV review the case.</p>
 
           <input
             type="file"

@@ -20,11 +20,11 @@ export default function ProductsClient() {
     try {
       setLoading(true);
 
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .eq("sold", false)
-        .order("created_at", { ascending: false });
+const { data, error } = await supabase
+  .from("products")
+  .select("*")
+  .eq("sold", false)
+  .order("created_at", { ascending: false });
 
       if (error) {
         console.error(error);

@@ -25,7 +25,7 @@ export async function POST(req: Request) {
 
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
-      .select("stripe_account_id")
+      .select("email, stripe_account_id")
       .eq("id", userId)
       .single();
 
@@ -35,17 +35,30 @@ export async function POST(req: Request) {
 
     let accountId = profile?.stripe_account_id;
 
+    if (accountId) {
+      try {
+        await stripe.accounts.retrieve(accountId);
+      } catch (error: any) {
+        console.log("OLD STRIPE ACCOUNT INVALID:", accountId, error.message);
+        accountId = null;
+      }
+    }
+
     if (!accountId) {
-      const account = await stripe.accounts.create({
-        type: "express",
-        country: "ES",
-        email: body.email,
-        capabilities: {
-          transfers: {
-            requested: true,
-          },
-        },
-      });
+   const account = await stripe.accounts.create({
+  type: "express",
+  country: "ES",
+  business_type: "individual",
+  email: body.email || profile?.email,
+  metadata: {
+    user_id: userId,
+  },
+  capabilities: {
+    transfers: {
+      requested: true,
+    },
+  },
+});
 
       accountId = account.id;
 
@@ -53,14 +66,20 @@ export async function POST(req: Request) {
         .from("profiles")
         .update({
           stripe_account_id: accountId,
+          stripe_charges_enabled: false,
+          stripe_payouts_enabled: false,
         })
         .eq("id", userId);
 
       if (updateError) {
         console.log("PROFILE UPDATE ERROR:", updateError);
+        return NextResponse.json(
+          { error: updateError.message },
+          { status: 500 }
+        );
       }
 
-      console.log("CONNECTED ACCOUNT SAVED:", accountId);
+      console.log("NEW CONNECTED ACCOUNT SAVED:", accountId);
     }
 
     const accountLink = await stripe.accountLinks.create({
@@ -72,6 +91,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       url: accountLink.url,
+      accountId,
     });
   } catch (error: any) {
     console.log("STRIPE CONNECT ERROR:", error?.message || error);

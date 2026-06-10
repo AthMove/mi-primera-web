@@ -80,10 +80,11 @@ export default function Navbar() {
       .eq("seller_id", user.id)
       .eq("status", "pending");
 
-    const { data: orders } = await supabase
-      .from("orders")
-      .select("id")
-      .or(`buyer_id.eq.${user.id},seller_id.eq.${user.id}`);
+const { data: orders } = await supabase
+  .from("orders")
+  .select("id")
+  .or(`buyer_id.eq.${user.id},seller_id.eq.${user.id}`)
+  .in("status", ["paid", "preparing", "shipped", "delivered"]);
 
     const { data: notifications } = await supabase
       .from("notifications")
@@ -208,6 +209,10 @@ export default function Navbar() {
         <Link href="/orders" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
           ORDERS{badge(ordersCount)}
         </Link>
+
+        <Link href="/notifications" style={signInStyle}>
+  NOTIFICATIONS{badge(notificationsCount)}
+</Link>
 
         <Link href="/offers" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
           OFFERS{badge(offersCount)}

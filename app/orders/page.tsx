@@ -279,61 +279,71 @@ console.log(data);
   };
 
   const submitReview = async () => {
-    if (!reviewOrder) return;
+  if (!reviewOrder) return;
 
-    if (!comment.trim()) {
-      alert("Write a short review");
+  if (!comment.trim()) {
+    alert("Write a short review");
+    return;
+  }
+
+  const { data: existingReview } = await supabase
+    .from("reviews")
+    .select("id")
+    .eq("order_id", reviewOrder.id)
+    .eq("buyer_id", reviewOrder.buyer_id)
+    .maybeSingle();
+
+  if (existingReview) {
+    alert("You have already reviewed this order");
+    setReviewOrder(null);
+    return;
+  }
+
+  try {
+    setSavingReview(true);
+
+    const { data, error } = await supabase
+      .from("reviews")
+      .insert([
+        {
+          order_id: reviewOrder.id,
+          product_id: reviewOrder.product_id,
+          seller_id: reviewOrder.seller_id,
+          buyer_id: reviewOrder.buyer_id,
+          rating,
+          comment: comment.trim(),
+        },
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      alert(error.message);
       return;
     }
 
-    try {
-      setSavingReview(true);
+    await supabase.rpc("update_seller_reputation", {
+      target_seller_id: reviewOrder.seller_id,
+    });
 
-      const { data, error } = await supabase
-        .from("reviews")
-        .insert([
-          {
-            order_id: reviewOrder.id,
-            product_id: reviewOrder.product_id,
-            seller_id: reviewOrder.seller_id,
-            buyer_id: reviewOrder.buyer_id,
-            rating,
-            comment: comment.trim(),
-          },
-        ])
-        .select()
-        .single();
+    await createNotification({
+      user_id: reviewOrder.seller_id,
+      title: "New review received",
+      message: `You received a ${rating}-star review.`,
+      link: `/seller/${reviewOrder.seller_id}`,
+    });
 
-      console.log("REVIEW INSERTED:", data);
-      console.log("REVIEW ERROR:", error);
+    setReviewOrder(null);
+    setRating(5);
+    setComment("");
 
-      if (error) {
-        alert(error.message);
-        return;
-      }
-
-      await supabase.rpc("update_seller_reputation", {
-        target_seller_id: reviewOrder.seller_id,
-      });
-
-      await createNotification({
-        user_id: reviewOrder.seller_id,
-        title: "New review received",
-        message: `You received a ${rating}-star review.`,
-        link: `/seller/${reviewOrder.seller_id}`,
-      });
-
-      setReviewOrder(null);
-      setRating(5);
-      setComment("");
-
-      await loadOrders();
-    } catch (err) {
-      console.error("SUBMIT REVIEW ERROR:", err);
-    } finally {
-      setSavingReview(false);
-    }
-  };
+    await loadOrders();
+  } catch (err) {
+    console.error("SUBMIT REVIEW ERROR:", err);
+  } finally {
+    setSavingReview(false);
+  }
+};
 
   const safeImage = (src?: string) => {
     return src?.startsWith("http") || src?.startsWith("/") ? src : "/logo.png";
@@ -499,6 +509,7 @@ console.log(data);
             const isSeller = order.seller_id === userId;
             const isBuyer = order.buyer_id === userId;
             const status = order.status || "paid";
+            const hasOpenDispute = order.dispute_status === "open";
 
             return (
               <article key={order.id} style={orderStyle} className="order-card">
@@ -571,9 +582,14 @@ console.log(data);
                     </div>
                   )}
 
-                  {order.dispute_status === "open" && (
-                    <p style={disputeBadgeStyle}>Issue reported</p>
-                  )}
+                 {hasOpenDispute && (
+  <div style={disputeWarningStyle}>
+    <strong>Issue reported</strong>
+    <span>
+      This order is under ATHMOV review. Reviews, delivery confirmation and payouts are temporarily locked.
+    </span>
+  </div>
+)}
 
                   {order.review && (
                     <p style={reviewPreviewStyle}>
@@ -661,20 +677,20 @@ console.log(data);
                   )}
 
 
-                  {isBuyer &&
-  ["paid", "preparing", "shipped", "delivered"].includes(status) &&
-  order.dispute_status !== "open" && (
-                      <button
-                        onClick={() => setDisputeOrder(order)}
-                        style={reviewButtonStyle}
-                      >
-                        Report issue
-                      </button>
-                    )}
+     {isBuyer &&
+  ["pending", "paid", "preparing", "shipped", "delivered", "completed"].includes(status) &&
+  !hasOpenDispute && (
+    <button
+      onClick={() => setDisputeOrder(order)}
+      style={reviewButtonStyle}
+    >
+      Report issue
+    </button>
+  )}
 
                   {isSeller &&
-                    status === "delivered" &&
-                    order.dispute_status !== "open" && (
+  ["paid", "pending", "preparing", "shipped", "delivered", "completed"].includes(status) &&
+  !hasOpenDispute&& (
                       <button
                         onClick={() => {
                           window.location.href = `/disputes/create?order=${order.id}`;
@@ -685,7 +701,7 @@ console.log(data);
                       </button>
                     )}
 
-                  {isBuyer && status === "completed" && !order.review && (
+                  {isBuyer && status === "completed" && !hasOpenDispute && !order.review && (
                     <button
                       onClick={() => setReviewOrder(order)}
                       style={reviewButtonStyle}
@@ -1248,4 +1264,19 @@ const protectionLabelStyle = {
   textTransform: "uppercase" as const,
   opacity: 0.45,
   fontWeight: 900,
+};
+
+const disputeWarningStyle = {
+  marginTop: "14px",
+  background: "#fff7ed",
+  border: "1px solid #fdba74",
+  borderRadius: "18px",
+  padding: "14px",
+  display: "flex",
+  flexDirection: "column" as const,
+  gap: "5px",
+  color: "#9a3412",
+  fontSize: "13px",
+  fontWeight: 700,
+  maxWidth: "520px",
 };

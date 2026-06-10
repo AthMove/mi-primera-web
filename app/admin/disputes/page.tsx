@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
 
 export default function AdminDisputesPage() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -10,36 +9,33 @@ export default function AdminDisputesPage() {
   const [resolvingId, setResolvingId] = useState<string | null>(null);
 
 const loadDisputes = async () => {
-  setDebug("Checking session...");
+  setDebug("Loading disputes...");
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  try {
+    const response = await fetch("/api/admin/disputes", {
+      method: "GET",
+      cache: "no-store",
+    });
 
-  setDebug(`User: ${user?.id || "NO USER"}`);
+    const result = await response.json();
 
-  if (!user) {
-    return;
+   console.log(
+  "ADMIN DISPUTES:",
+  JSON.stringify(result, null, 2)
+);
+
+    if (!response.ok) {
+      setDebug("ERROR: " + (result.error || "Could not load disputes"));
+      return;
+    }
+
+    setDebug(`Open disputes: ${result.orders?.length || 0}`);
+    setOrders(result.orders || []);
+  } catch (error: any) {
+    setDebug("ERROR: " + (error.message || "Could not load disputes"));
+  } finally {
+    setLoading(false);
   }
-
-const { data, error } = await supabase
-  .from("orders")
-  .select("*, products(*)", { count: "exact" });
-
-  console.log("DATA:", data);
-  console.log("ERROR:", error);
-
-  if (error) {
-    setDebug("ERROR: " + error.message);
-    return;
-  }
-
-  const disputes = (data || []).filter(
-    (o: any) => String(o.dispute_status).trim().toLowerCase() === "open"
-  );
-
-  setDebug(`User: ${user.id} | Orders: ${data?.length || 0} | Open: ${disputes.length}`);
-  setOrders(disputes);
 };
 
   useEffect(() => {
@@ -97,7 +93,6 @@ const { data, error } = await supabase
     <main style={pageStyle}>
       <p style={eyebrowStyle}>ATHMOV ADMIN</p>
       <h1 style={titleStyle}>Disputes</h1>
-      <p>{debug}</p>
 
      {orders.length === 0 ? (
   <p>No open disputes found.</p>
@@ -273,10 +268,37 @@ const { data, error } = await supabase
                     </p>
 
                     <p style={reasonBoxStyle}>
-                      {order.dispute_reason || "No reason provided"}
-                    </p>
+  {order.dispute_reason || "No reason provided"}
+</p>
 
-                    <div style={actionsStyle}>
+{order.evidence?.length > 0 && (
+  <div style={evidenceSectionStyle}>
+    <p style={reasonLabelStyle}>
+      <strong>Evidence:</strong>
+    </p>
+
+    <div style={evidenceGridStyle}>
+      {order.evidence.map((item: any, index: number) => (
+        item.file_url ? (
+          <a
+            key={`${item.file_url}-${index}`}
+            href={item.file_url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src={item.file_url}
+              alt={`Evidence ${index + 1}`}
+              style={evidenceImageStyle}
+            />
+          </a>
+        ) : null
+      ))}
+    </div>
+  </div>
+)}
+
+<div style={actionsStyle}>
                       <button
                         onClick={() => resolveDispute(order.id, "seller_wins")}
                         style={{
@@ -446,4 +468,22 @@ const secondaryButtonStyle = {
   padding: "16px 24px",
   cursor: "pointer",
   fontWeight: 700,
+};
+
+const evidenceSectionStyle = {
+  marginTop: "24px",
+};
+
+const evidenceGridStyle = {
+  display: "flex",
+  gap: "12px",
+  flexWrap: "wrap" as const,
+};
+
+const evidenceImageStyle = {
+  width: "120px",
+  height: "120px",
+  objectFit: "cover" as const,
+  borderRadius: "14px",
+  border: "1px solid rgba(0,0,0,0.08)",
 };

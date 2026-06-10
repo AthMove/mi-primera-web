@@ -64,30 +64,32 @@ export async function GET() {
       );
     }
 
-    const ordersWithBuyerEmail = await Promise.all(
+    const ordersWithDetails = await Promise.all(
       (data || []).map(async (order: any) => {
-        if (order.buyer_email) {
-          return order;
+        let buyerEmail = order.buyer_email || null;
+
+        if (!buyerEmail && order.buyer_id) {
+          const { data: userData } =
+            await supabaseAdmin.auth.admin.getUserById(order.buyer_id);
+
+          buyerEmail = userData?.user?.email || null;
         }
 
-        if (!order.buyer_id) {
-          return {
-            ...order,
-            buyer_email: null,
-          };
-        }
-
-        const { data: userData, error: userError } =
-          await supabaseAdmin.auth.admin.getUserById(order.buyer_id);
+        const { data: evidence } = await supabaseAdmin
+          .from("dispute_evidence")
+          .select("*")
+          .eq("order_id", order.id)
+          .order("created_at", { ascending: true });
 
         return {
           ...order,
-          buyer_email: userError ? null : userData?.user?.email || null,
+          buyer_email: buyerEmail,
+          evidence: evidence || [],
         };
       })
     );
 
-    return NextResponse.json({ orders: ordersWithBuyerEmail });
+    return NextResponse.json({ orders: ordersWithDetails });
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message || "Unknown server error" },

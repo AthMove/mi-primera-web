@@ -162,27 +162,27 @@ const averageRating =
         <div style={trustCardStyle}>✓ Trusted seller</div>
       </section>
 
-      <section style={statsGridStyle}>
-       <div style={statCardStyle}>
-  <p style={statLabelStyle}>Reviews</p>
-  <h2 style={statValueStyle}>{totalReviews}</h2>
-</div>
+    <section style={statsGridStyle}>
+  <div style={statCardStyle}>
+    <p style={statLabelStyle}>Reviews</p>
+    <h2 style={statValueStyle}>{totalReviews}</h2>
+  </div>
 
-        <div style={statCardStyle}>
-  <p style={statLabelStyle}>Rating</p>
-  <h2 style={statValueStyle}>★ {averageRating}</h2>
-</div>
+  <div style={statCardStyle}>
+    <p style={statLabelStyle}>Rating</p>
+    <h2 style={statValueStyle}>★ {averageRating}</h2>
+  </div>
 
-<div style={statCardStyle}>
-  <p style={statLabelStyle}>Reviews</p>
-  <h2 style={statValueStyle}>{totalReviews}</h2>
-</div>
+  <div style={statCardStyle}>
+    <p style={statLabelStyle}>Active products</p>
+    <h2 style={statValueStyle}>{activeCount}</h2>
+  </div>
 
-        <div style={statCardStyle}>
-          <p style={statLabelStyle}>Sold products</p>
-          <h2 style={statValueStyle}>{soldCount}</h2>
-        </div>
-      </section>
+  <div style={statCardStyle}>
+    <p style={statLabelStyle}>Sold products</p>
+    <h2 style={statValueStyle}>{soldCount}</h2>
+  </div>
+</section>
 
       <section style={sectionStyle}>
         <div style={sectionHeaderStyle}>
