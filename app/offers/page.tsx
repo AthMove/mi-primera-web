@@ -56,7 +56,7 @@ export default function OffersPage() {
     }
 
     const enriched = await Promise.all(
-      data.map(async (offer) => {
+      data.map(async (offer: any) => {
         const { data: product } = await supabase
           .from("products")
           .select("*")
@@ -163,7 +163,7 @@ const updateOffer = async (offer: any, status: string) => {
         </section>
       ) : (
         <section style={listStyle}>
-          {offers.map((offer) => (
+          {offers.map((offer: any) => (
             <article
               key={offer.id}
               style={offerStyle}

@@ -80,27 +80,27 @@ export default function AdminPage() {
   };
 
   const totalSales = orders.reduce(
-    (acc, item) => acc + Number(item.amount || 0),
-    0
-  );
+  (acc: number, item: any) => acc + Number(item.amount || 0),
+  0
+);
 
-  const athmovFees = orders.reduce(
-    (acc, item) => acc + Number(item.platform_fee || 0),
-    0
-  );
+const athmovFees = orders.reduce(
+  (acc: number, item: any) => acc + Number(item.platform_fee || 0),
+  0
+);
 
-  const sellerPayouts = orders.reduce(
-    (acc, item) => acc + Number(item.seller_amount || 0),
-    0
-  );
+const sellerPayouts = orders.reduce(
+  (acc: number, item: any) => acc + Number(item.seller_amount || 0),
+  0
+);
 
-  const pendingOrders = orders.filter(
-    (order) => order.status !== "completed"
-  ).length;
+const pendingOrders = orders.filter(
+  (order: any) => order.status !== "completed"
+).length;
 
-  const openDisputes = orders.filter(
-    (order) => order.dispute_status === "open"
-  );
+const openDisputes = orders.filter(
+  (order: any) => order.dispute_status === "open"
+);
 
   if (loading) {
     return <main style={pageStyle}>Loading admin...</main>;
@@ -175,7 +175,7 @@ export default function AdminPage() {
           <div style={emptyStyle}>No pending verifications.</div>
         ) : (
           <div style={listStyle}>
-            {profiles.map((profile) => (
+            {profiles.map((profile: any) => (
               <article key={profile.id} style={rowStyle}>
                 <div>
                   <p style={rowMetaStyle}>SELLER VERIFICATION</p>
@@ -230,7 +230,7 @@ export default function AdminPage() {
           <div style={emptyStyle}>No orders yet.</div>
         ) : (
           <div style={listStyle}>
-            {orders.slice(0, 12).map((order) => (
+            {orders.slice(0, 12).map((order: any) => (
               <article key={order.id} style={rowStyle}>
                 <div>
                   <p style={rowMetaStyle}>ORDER</p>
@@ -280,7 +280,7 @@ export default function AdminPage() {
           <div style={emptyStyle}>No disputes open.</div>
         ) : (
           <div style={listStyle}>
-            {openDisputes.map((order) => (
+            {openDisputes.map((order: any) => (
               <article key={order.id} style={rowStyle}>
                 <div>
                   <p style={rowMetaStyle}>DISPUTE</p>
@@ -345,7 +345,7 @@ export default function AdminPage() {
           <div style={emptyStyle}>No products yet.</div>
         ) : (
           <div style={listStyle}>
-            {products.slice(0, 30).map((product) => (
+            {products.slice(0, 30).map((product: any) => (
               <article key={product.id} style={rowStyle}>
                 <div>
                   <p style={rowMetaStyle}>

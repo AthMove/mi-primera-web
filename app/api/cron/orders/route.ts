@@ -2,18 +2,27 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const cronSecret = process.env.CRON_SECRET;
+
+  if (!supabaseUrl || !serviceRoleKey || !cronSecret) {
+    return NextResponse.json(
+      { error: "Missing server environment variables" },
+      { status: 500 }
+    );
+  }
+
   const authHeader = req.headers.get("authorization");
 
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const supabase = createClient(supabaseUrl, serviceRoleKey);
 
   const now = new Date();
 
@@ -60,14 +69,13 @@ export async function GET(req: Request) {
       .eq("id", order.id);
 
     try {
-      const siteUrl =
-        process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
       const response = await fetch(`${siteUrl}/api/stripe/release-payment`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.CRON_SECRET}`,
+          Authorization: `Bearer ${cronSecret}`,
         },
         body: JSON.stringify({
           orderId: order.id,

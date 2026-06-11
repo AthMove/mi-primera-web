@@ -2,26 +2,25 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   const [stats, setStats] = useState({
-  grossRevenue: 0,
-  sellerEarnings: 0,
-  pendingEarnings: 0,
-  availableEarnings: 0,
-  platformFees: 0,
-  stripeFees: 0,
-  sales: 0,
-  activeOrders: 0,
-  activeProducts: 0,
-  pendingProducts: 0,
-  rejectedProducts: 0,
-  soldProducts: 0,
-  averageRating: 0,
-});
+    grossRevenue: 0,
+    sellerEarnings: 0,
+    pendingEarnings: 0,
+    availableEarnings: 0,
+    platformFees: 0,
+    stripeFees: 0,
+    sales: 0,
+    activeOrders: 0,
+    activeProducts: 0,
+    pendingProducts: 0,
+    rejectedProducts: 0,
+    soldProducts: 0,
+    averageRating: 0,
+  });
 
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
 
@@ -30,6 +29,8 @@ export default function DashboardPage() {
   }, []);
 
   const loadDashboard = async () => {
+    const { supabase } = await import("@/lib/supabase");
+
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -55,82 +56,102 @@ export default function DashboardPage() {
       .eq("seller_id", user.id);
 
     const grossRevenue =
-      orders?.reduce((acc, item) => acc + Number(item.amount || 0), 0) || 0;
+      orders?.reduce(
+        (acc: number, item: any) => acc + Number(item.amount || 0),
+        0
+      ) || 0;
 
     const platformFees =
-      orders?.reduce((acc, item) => acc + Number(item.platform_fee || 0), 0) ||
-      0;
+      orders?.reduce(
+        (acc: number, item: any) => acc + Number(item.platform_fee || 0),
+        0
+      ) || 0;
 
     const stripeFees =
       orders?.reduce(
-        (acc, item) => acc + Number(item.stripe_fee_estimate || 0),
+        (acc: number, item: any) =>
+          acc + Number(item.stripe_fee_estimate || 0),
         0
       ) || 0;
 
     const sellerEarnings =
-      orders?.reduce((acc, item) => acc + Number(item.seller_amount || 0), 0) ||
-      0;
+      orders?.reduce(
+        (acc: number, item: any) => acc + Number(item.seller_amount || 0),
+        0
+      ) || 0;
 
     const pendingEarnings =
       orders
-        ?.filter((o) => o.status !== "completed")
-        .reduce((acc, item) => acc + Number(item.seller_amount || 0), 0) || 0;
+        ?.filter((o: any) => o.status !== "completed")
+        .reduce(
+          (acc: number, item: any) => acc + Number(item.seller_amount || 0),
+          0
+        ) || 0;
 
     const availableEarnings =
       orders
-        ?.filter((o) => o.status === "completed")
-        .reduce((acc, item) => acc + Number(item.seller_amount || 0), 0) || 0;
+        ?.filter((o: any) => o.status === "completed")
+        .reduce(
+          (acc: number, item: any) => acc + Number(item.seller_amount || 0),
+          0
+        ) || 0;
 
-    const sales = orders?.filter((o) => o.status === "completed").length || 0;
+    const sales =
+      orders?.filter((o: any) => o.status === "completed").length || 0;
 
     const activeOrders =
       orders?.filter(
-        (o) =>
+        (o: any) =>
           o.status === "paid" ||
           o.status === "shipped" ||
           o.status === "delivered"
       ).length || 0;
 
     const activeProducts =
-  products?.filter((p) => !p.sold && p.moderation_status === "approved")
-    .length || 0;
+      products?.filter(
+        (p: any) => !p.sold && p.moderation_status === "approved"
+      ).length || 0;
 
-const pendingProducts =
-  products?.filter((p) => p.moderation_status === "pending").length || 0;
+    const pendingProducts =
+      products?.filter((p: any) => p.moderation_status === "pending").length ||
+      0;
 
-const rejectedProducts =
-  products?.filter((p) => p.moderation_status === "rejected").length || 0;
+    const rejectedProducts =
+      products?.filter((p: any) => p.moderation_status === "rejected").length ||
+      0;
 
-const soldProducts = products?.filter((p) => p.sold).length || 0;
+    const soldProducts = products?.filter((p: any) => p.sold).length || 0;
 
     const averageRating =
       reviews && reviews.length > 0
         ? (
-            reviews.reduce((acc, item) => acc + Number(item.rating), 0) /
-            reviews.length
+            reviews.reduce(
+              (acc: number, item: any) => acc + Number(item.rating || 0),
+              0
+            ) / reviews.length
           ).toFixed(1)
         : "0";
 
-   setStats({
-  grossRevenue,
-  sellerEarnings,
-  pendingEarnings,
-  availableEarnings,
-  platformFees,
-  stripeFees,
-  sales,
-  activeOrders,
-  activeProducts,
-  pendingProducts,
-  rejectedProducts,
-  soldProducts,
-  averageRating: Number(averageRating),
-});
+    setStats({
+      grossRevenue,
+      sellerEarnings,
+      pendingEarnings,
+      availableEarnings,
+      platformFees,
+      stripeFees,
+      sales,
+      activeOrders,
+      activeProducts,
+      pendingProducts,
+      rejectedProducts,
+      soldProducts,
+      averageRating: Number(averageRating),
+    });
 
     setRecentOrders(
       (orders || [])
         .sort(
-          (a, b) =>
+          (a: any, b: any) =>
             new Date(b.created_at).getTime() -
             new Date(a.created_at).getTime()
         )
@@ -206,14 +227,14 @@ const soldProducts = products?.filter((p) => p.sold).length || 0;
         </div>
 
         <div style={cardStyle}>
-  <p style={cardLabelStyle}>Pending Approval</p>
-  <h2 style={cardValueStyle}>{stats.pendingProducts}</h2>
-</div>
+          <p style={cardLabelStyle}>Pending Approval</p>
+          <h2 style={cardValueStyle}>{stats.pendingProducts}</h2>
+        </div>
 
-<div style={cardStyle}>
-  <p style={cardLabelStyle}>Rejected Products</p>
-  <h2 style={cardValueStyle}>{stats.rejectedProducts}</h2>
-</div>
+        <div style={cardStyle}>
+          <p style={cardLabelStyle}>Rejected Products</p>
+          <h2 style={cardValueStyle}>{stats.rejectedProducts}</h2>
+        </div>
 
         <div style={cardStyle}>
           <p style={cardLabelStyle}>Sold Products</p>
@@ -257,7 +278,7 @@ const soldProducts = products?.filter((p) => p.sold).length || 0;
           <div style={emptyStyle}>No recent sales.</div>
         ) : (
           <div style={ordersListStyle}>
-            {recentOrders.map((order) => (
+            {recentOrders.map((order: any) => (
               <div key={order.id} style={orderCardStyle}>
                 <div>
                   <p style={orderMetaStyle}>ORDER</p>

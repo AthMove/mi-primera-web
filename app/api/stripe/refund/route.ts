@@ -3,21 +3,36 @@ import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-  process.env.SUPABASE_SERVICE_ROLE_KEY as string
-);
+export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!stripeSecretKey || !supabaseUrl || !serviceRoleKey) {
+      return NextResponse.json(
+        { error: "Missing server environment variables" },
+        { status: 500 }
+      );
+    }
+
+    const stripe = new Stripe(stripeSecretKey);
+
+    const supabase = createClient(
+      supabaseUrl,
+      serviceRoleKey
+    );
+
     const body = await req.json();
     const orderId = body.orderId;
 
     if (!orderId) {
-      return NextResponse.json({ error: "Missing orderId" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing orderId" },
+        { status: 400 }
+      );
     }
 
     const { data: order, error } = await supabase
@@ -27,7 +42,10 @@ export async function POST(req: Request) {
       .single();
 
     if (error || !order) {
-      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Order not found" },
+        { status: 404 }
+      );
     }
 
     if (!order.stripe_payment_intent) {
@@ -65,10 +83,10 @@ export async function POST(req: Request) {
       refundId: refund.id,
     });
   } catch (error: any) {
-    console.log("REFUND ERROR:", error.message);
+    console.log("REFUND ERROR:", error?.message || error);
 
     return NextResponse.json(
-      { error: error.message || "Refund failed" },
+      { error: error?.message || "Refund failed" },
       { status: 500 }
     );
   }

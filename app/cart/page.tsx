@@ -29,7 +29,7 @@ export default function CartPage() {
     localStorage.setItem("athmov_cart", JSON.stringify(updated));
   };
 
-  const total = cart.reduce((acc, item) => {
+  const total = cart.reduce((acc: number, item: any) => {
     return acc + Number(String(item.precio).replace("€", ""));
   }, 0);
 
@@ -95,7 +95,7 @@ export default function CartPage() {
         ) : (
           <div style={layoutStyle}>
             <section style={itemsStyle}>
-              {cart.map((item) => (
+              {cart.map((item: any) => (
                 <article key={item.id} style={itemStyle}>
                   <div style={imageWrapperStyle}>
                     <Image

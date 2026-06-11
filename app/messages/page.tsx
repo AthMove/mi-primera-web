@@ -65,15 +65,15 @@ export default function MessagesPage() {
       return;
     }
 
-    const visibleConversations = conversationsData.filter((conversation) => {
-      const isSeller = conversation.seller_id === user.id;
-      return isSeller
-        ? !conversation.archived_by_seller
-        : !conversation.archived_by_buyer;
-    });
+    const visibleConversations = conversationsData.filter((conversation: any) => {
+  const isSeller = conversation.seller_id === user.id;
+  return isSeller
+    ? !conversation.archived_by_seller
+    : !conversation.archived_by_buyer;
+});
 
     const enriched = await Promise.all(
-      visibleConversations.map(async (conversation) => {
+  visibleConversations.map(async (conversation: any) => {
         const isSeller = conversation.seller_id === user.id;
 
         const { data: product } = await supabase
@@ -111,13 +111,13 @@ export default function MessagesPage() {
       })
     );
 
-    setConversations(
-      enriched.sort((a, b) => {
-        const dateA = new Date(a.lastMessage?.created_at || a.created_at).getTime();
-        const dateB = new Date(b.lastMessage?.created_at || b.created_at).getTime();
-        return dateB - dateA;
-      })
-    );
+   setConversations(
+  enriched.sort((a: any, b: any) => {
+    const dateA = new Date(a.lastMessage?.created_at || a.created_at).getTime();
+    const dateB = new Date(b.lastMessage?.created_at || b.created_at).getTime();
+    return dateB - dateA;
+  })
+);
 
     setLoading(false);
   };
@@ -149,8 +149,8 @@ export default function MessagesPage() {
     }
 
     setConversations((current) =>
-      current.filter((item) => item.id !== conversation.id)
-    );
+  current.filter((item: any) => item.id !== conversation.id)
+);
   };
 
   const safeImage = (src?: string) => {
@@ -183,7 +183,7 @@ export default function MessagesPage() {
         </section>
       ) : (
         <section style={listStyle}>
-          {conversations.map((conversation) => {
+          {conversations.map((conversation: any) => {
             const product = conversation.product;
             const lastMessage = conversation.lastMessage;
             const isSeller = conversation.seller_id === userId;

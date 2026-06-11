@@ -209,7 +209,7 @@ export default function ConversationPage() {
           table: "conversation_messages",
           filter: `conversation_id=eq.${conversationId}`,
         },
-        async (payload) => {
+        async (payload: any) => {
           const updatedMessage = payload.new as Message;
 
           setMessages((current) => {
@@ -240,7 +240,7 @@ export default function ConversationPage() {
           schema: "public",
           table: PROFILE_TABLE,
         },
-        (payload) => {
+        (payload: any) => {
           const profile = payload.new as any;
 
           if (profile.id === otherUserIdRef.current) {
@@ -249,20 +249,20 @@ export default function ConversationPage() {
           }
         }
       )
-      .on("broadcast", { event: "typing" }, (payload) => {
+      .on("broadcast", { event: "typing" }, (payload: any) => {
         if (payload.payload.user_id === userIdRef.current) return;
 
         setOtherTyping(true);
 
-        if (typingTimeoutRef.current) {
-          clearTimeout(typingTimeoutRef.current);
-        }
+  if (typingTimeoutRef.current) {
+    clearTimeout(typingTimeoutRef.current);
+  }
 
-        typingTimeoutRef.current = setTimeout(() => {
-          setOtherTyping(false);
-        }, 1800);
-      })
-      .subscribe();
+  typingTimeoutRef.current = setTimeout(() => {
+    setOtherTyping(false);
+  }, 1800);
+})
+.subscribe();
 
     typingChannelRef.current = channel;
 
@@ -287,17 +287,17 @@ export default function ConversationPage() {
     scrollToBottom();
   }, [messages, otherTyping]);
 
-  const sendTyping = () => {
-    if (!typingChannelRef.current || !userIdRef.current) return;
+const sendTyping = () => {
+  if (!typingChannelRef.current || !userIdRef.current) return;
 
-    typingChannelRef.current.send({
-      type: "broadcast",
-      event: "typing",
-      payload: {
-        user_id: userIdRef.current,
-      },
-    });
-  };
+  typingChannelRef.current.send({
+    type: "broadcast",
+    event: "typing",
+    payload: {
+      user_id: userIdRef.current,
+    },
+  });
+};
 
   const updateConversationUnread = async (
     text: string,

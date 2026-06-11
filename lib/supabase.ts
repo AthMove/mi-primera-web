@@ -1,13 +1,38 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+let client: any = null;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
-    storageKey: "athmov-auth-session-v2",
-  },
-});
+function getSupabaseClient() {
+  if (client) return client;
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    if (typeof window === "undefined") {
+      return {};
+    }
+
+    throw new Error("Missing Supabase browser environment variables");
+  }
+
+  client = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      storageKey: "athmov-auth-session-v2",
+    },
+  });
+
+  return client;
+}
+
+export const supabase: any = new Proxy(
+  {},
+  {
+    get(_target, prop) {
+      return getSupabaseClient()[prop as keyof ReturnType<typeof createClient>];
+    },
+  }
+);

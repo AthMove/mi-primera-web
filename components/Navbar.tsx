@@ -110,20 +110,20 @@ const { data: orders } = await supabase
     window.location.href = "/";
   };
 
-  useEffect(() => {
-    updateCartCount();
+ useEffect(() => {
+  updateCartCount();
+  loadNotifications();
+
+  supabase.auth.getUser().then(({ data }: any) => {
+    setUserEmail(data.user?.email ?? null);
+  });
+
+ const { data: listener } = supabase.auth.onAuthStateChange(
+  (_event: any, session: any) => {
+    setUserEmail(session?.user?.email ?? null);
     loadNotifications();
-
-    supabase.auth.getUser().then(({ data }) => {
-      setUserEmail(data.user?.email ?? null);
-    });
-
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUserEmail(session?.user?.email ?? null);
-        loadNotifications();
-      }
-    );
+  }
+);
 
     const channel = supabase
       .channel("navbar-notifications")

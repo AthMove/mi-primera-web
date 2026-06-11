@@ -1,9 +1,10 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-export default function EarningsPage() {
+function EarningsPageContent() {
   const [orders, setOrders] = useState<any[]>([]);
   const [userId, setUserId] = useState("");
   const [loading, setLoading] = useState(true);
@@ -42,33 +43,32 @@ export default function EarningsPage() {
 
   const stats = useMemo(() => {
     const totalSales = orders.reduce(
-      (sum, order) => sum + Number(order.amount || 0),
-      0
-    );
+  (sum: number, order: any) => sum + Number(order.amount || 0),
+  0
+);
 
-    const totalSellerEarnings = orders.reduce(
-      (sum, order) => sum + Number(order.seller_amount || 0),
-      0
-    );
+const totalSellerEarnings = orders.reduce(
+  (sum: number, order: any) => sum + Number(order.seller_amount || 0),
+  0
+);
 
-    const pendingRelease = orders
+const pendingRelease = orders
   .filter(
-    (order) =>
+    (order: any) =>
       ["paid", "preparing", "shipped", "delivered", "completed"].includes(
         order.status
       ) && order.transfer_status !== "released"
   )
-      .reduce((sum, order) => sum + Number(order.seller_amount || 0), 0);
+  .reduce((sum: number, order: any) => sum + Number(order.seller_amount || 0), 0);
 
-    const released = orders
-      .filter((order) => order.transfer_status === "released")
-      .reduce((sum, order) => sum + Number(order.seller_amount || 0), 0);
+const released = orders
+  .filter((order: any) => order.transfer_status === "released")
+  .reduce((sum: number, order: any) => sum + Number(order.seller_amount || 0), 0);
 
-    const platformFees = orders.reduce(
-      (sum, order) => sum + Number(order.platform_fee || 0),
-      0
-    );
-
+const platformFees = orders.reduce(
+  (sum: number, order: any) => sum + Number(order.platform_fee || 0),
+  0
+);
     return {
       totalSales,
       totalSellerEarnings,
@@ -156,7 +156,7 @@ export default function EarningsPage() {
           </div>
         ) : (
           <div style={tableStyle}>
-            {orders.map((order) => (
+            {orders.map((order: any) => (
               <div key={order.id} style={rowStyle}>
                 <div>
                   <p style={rowTitleStyle}>Order #{String(order.id).slice(0, 8)}</p>
@@ -361,3 +361,7 @@ const pendingBadgeStyle = {
   background: "#f1efe8",
   color: "#111",
 };
+
+export default dynamic(() => Promise.resolve(EarningsPageContent), {
+  ssr: false,
+});

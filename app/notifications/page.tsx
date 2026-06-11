@@ -10,10 +10,10 @@ export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const unreadCount = useMemo(
-    () => notifications.filter((item) => !item.is_read).length,
-    [notifications]
-  );
+ const unreadCount = useMemo(
+  () => notifications.filter((item: any) => !item.is_read).length,
+  [notifications]
+);
 
   useEffect(() => {
     loadNotifications();
@@ -174,7 +174,7 @@ export default function NotificationsPage() {
         </section>
       ) : (
         <section style={listStyle}>
-          {notifications.map((notification) => (
+          {notifications.map((notification: any) => (
             <article
               key={notification.id}
               onClick={() => openNotification(notification)}

@@ -3,16 +3,24 @@ import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-  process.env.SUPABASE_SERVICE_ROLE_KEY as string
-);
+export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!stripeSecretKey || !supabaseUrl || !serviceRoleKey) {
+      return NextResponse.json(
+        { error: "Missing server environment variables" },
+        { status: 500 }
+      );
+    }
+
+    const stripe = new Stripe(stripeSecretKey);
+    const supabase = createClient(supabaseUrl, serviceRoleKey);
+
     const { orderId, resolution } = await req.json();
 
     if (!orderId || !resolution) {
@@ -33,12 +41,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
-   if (order.dispute_resolution || order.dispute_resolved_at) {
-  return NextResponse.json(
-    { error: "Dispute has already been resolved" },
-    { status: 400 }
-  );
-}
+    if (order.dispute_resolution || order.dispute_resolved_at) {
+      return NextResponse.json(
+        { error: "Dispute has already been resolved" },
+        { status: 400 }
+      );
+    }
 
     if (order.stripe_refund_id || order.refund_status === "refunded") {
       return NextResponse.json(
@@ -85,17 +93,17 @@ export async function POST(req: Request) {
           );
         }
 
-       const transfer = await stripe.transfers.create({
-  amount: sellerAmount,
-  currency: "eur",
-  destination: order.seller_stripe_account_id,
-  transfer_group: `order_${order.id}`,
-  metadata: {
-    order_id: order.id,
-    seller_id: order.seller_id,
-    dispute_resolution: "seller_wins",
-  },
-});
+        const transfer = await stripe.transfers.create({
+          amount: sellerAmount,
+          currency: "eur",
+          destination: order.seller_stripe_account_id,
+          transfer_group: `order_${order.id}`,
+          metadata: {
+            order_id: order.id,
+            seller_id: order.seller_id,
+            dispute_resolution: "seller_wins",
+          },
+        });
 
         await supabase
           .from("orders")
@@ -141,15 +149,15 @@ export async function POST(req: Request) {
         .eq("id", order.id);
     }
 
-await supabase
-  .from("disputes")
-  .update({
-    status: "resolved",
-    resolution,
-    resolved_at: new Date().toISOString(),
-  })
-  .eq("order_id", order.id)
-  .eq("status", "open");
+    await supabase
+      .from("disputes")
+      .update({
+        status: "resolved",
+        resolution,
+        resolved_at: new Date().toISOString(),
+      })
+      .eq("order_id", order.id)
+      .eq("status", "open");
 
     await supabase.from("notifications").insert([
       {
@@ -175,27 +183,27 @@ await supabase
     ]);
 
     const { data: finalOrder } = await supabase
-  .from("orders")
-  .select(
-    "id, status, dispute_status, dispute_resolution, dispute_resolved_at, transfer_status, refund_status, stripe_transfer_id, stripe_refund_id"
-  )
-  .eq("id", order.id)
-  .single();
+      .from("orders")
+      .select(
+        "id, status, dispute_status, dispute_resolution, dispute_resolved_at, transfer_status, refund_status, stripe_transfer_id, stripe_refund_id"
+      )
+      .eq("id", order.id)
+      .single();
 
-if (!finalOrder || finalOrder.dispute_status !== "resolved") {
-  return NextResponse.json(
-    {
-      error: "Dispute update verification failed",
+    if (!finalOrder || finalOrder.dispute_status !== "resolved") {
+      return NextResponse.json(
+        {
+          error: "Dispute update verification failed",
+          order: finalOrder,
+        },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
       order: finalOrder,
-    },
-    { status: 500 }
-  );
-}
-
-return NextResponse.json({
-  success: true,
-  order: finalOrder,
-});
+    });
   } catch (error: any) {
     console.log("RESOLVE DISPUTE ERROR:", error);
     return NextResponse.json(

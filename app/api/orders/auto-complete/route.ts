@@ -2,16 +2,24 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-  process.env.SUPABASE_SERVICE_ROLE_KEY as string
-);
+export const dynamic = "force-dynamic";
 
 export async function GET(req: Request) {
   try {
-    const authHeader = req.headers.get("authorization");
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     const cronSecret = process.env.CRON_SECRET;
+
+    if (!supabaseUrl || !serviceRoleKey) {
+      return NextResponse.json(
+        { error: "Missing server environment variables" },
+        { status: 500 }
+      );
+    }
+
+    const supabase = createClient(supabaseUrl, serviceRoleKey);
+
+    const authHeader = req.headers.get("authorization");
 
     if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -38,8 +46,11 @@ export async function GET(req: Request) {
 
     for (const order of orders || []) {
       try {
+        const siteUrl =
+          process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
         const releaseResponse = await fetch(
-          `${process.env.NEXT_PUBLIC_SITE_URL}/api/stripe/release-payment`,
+          `${siteUrl}/api/stripe/release-payment`,
           {
             method: "POST",
             headers: {

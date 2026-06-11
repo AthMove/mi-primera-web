@@ -69,62 +69,60 @@ export default function SellerDashboardPage() {
     const reviews = reviewsData || [];
 
     const totalSales = orders.reduce(
-      (sum, order) =>
-        order.payment_status === "paid"
-          ? sum + Number(order.seller_amount || 0)
-          : sum,
-      0
-    );
+  (sum: number, order: any) =>
+    order.payment_status === "paid"
+      ? sum + Number(order.seller_amount || 0)
+      : sum,
+  0
+);
 
-    const pendingPayouts = orders.reduce(
-      (sum, order) =>
-        order.transfer_status !== "paid" && order.payment_status === "paid"
-          ? sum + Number(order.seller_amount || 0)
-          : sum,
-      0
-    );
+const pendingPayouts = orders.reduce(
+  (sum: number, order: any) =>
+    order.transfer_status !== "paid" && order.payment_status === "paid"
+      ? sum + Number(order.seller_amount || 0)
+      : sum,
+  0
+);
 
-    const completedPayouts = orders.reduce(
-      (sum, order) =>
-        order.transfer_status === "paid"
-          ? sum + Number(order.seller_amount || 0)
-          : sum,
-      0
-    );
+const completedPayouts = orders.reduce(
+  (sum: number, order: any) =>
+    order.transfer_status === "paid"
+      ? sum + Number(order.seller_amount || 0)
+      : sum,
+  0
+);
 
-    const refunded = orders.reduce(
-      (sum, order) =>
-        order.payment_status === "refunded"
-          ? sum + Number(order.refund_amount || 0)
-          : sum,
-      0
-    );
+const refunded = orders.reduce(
+  (sum: number, order: any) =>
+    order.payment_status === "refunded"
+      ? sum + Number(order.refund_amount || 0)
+      : sum,
+  0
+);
 
-    const ordersSold = orders.filter(
-      (order) => order.payment_status === "paid"
-    ).length;
+   const ordersSold = orders.filter(
+  (order: any) => order.payment_status === "paid"
+).length;
 
-    const averageOrderValue = ordersSold > 0 ? totalSales / ordersSold : 0;
+const activeProducts = products.filter(
+  (p: any) => !p.sold && p.moderation_status === "approved"
+).length;
 
-    const activeProducts = products.filter(
-      (p) => !p.sold && p.moderation_status === "approved"
-    ).length;
+const pendingProducts = products.filter(
+  (p: any) => p.moderation_status === "pending"
+).length;
 
-    const pendingProducts = products.filter(
-      (p) => p.moderation_status === "pending"
-    ).length;
+const rejectedProducts = products.filter(
+  (p: any) => p.moderation_status === "rejected"
+).length;
 
-    const rejectedProducts = products.filter(
-      (p) => p.moderation_status === "rejected"
-    ).length;
+const soldProducts = products.filter((p: any) => p.sold).length;
 
-    const soldProducts = products.filter((p) => p.sold).length;
-
-    const averageRating =
-      reviews.length > 0
-        ? reviews.reduce((acc, item) => acc + Number(item.rating || 0), 0) /
-          reviews.length
-        : 0;
+const averageRating =
+  reviews.length > 0
+    ? reviews.reduce((acc: number, item: any) => acc + Number(item.rating || 0), 0) /
+      reviews.length
+    : 0;
 
     const trustScore = Math.min(
       100,
@@ -141,6 +139,7 @@ export default function SellerDashboardPage() {
     setProducts(products);
     setReviews(reviews);
 
+    const averageOrderValue = ordersSold > 0 ? totalSales / ordersSold : 0;
     setStats({
       totalSales,
       pendingPayouts,
@@ -370,7 +369,7 @@ export default function SellerDashboardPage() {
           <div style={emptyStyle}>No sales yet.</div>
         ) : (
           <div style={ordersListStyle}>
-            {orders.slice(0, 8).map((order) => (
+            {orders.slice(0, 8).map((order: any) => (
               <div key={order.id} style={orderCardStyle}>
                 <div>
                   <p style={orderMetaStyle}>ORDER</p>

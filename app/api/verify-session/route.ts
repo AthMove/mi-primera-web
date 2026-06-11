@@ -1,9 +1,26 @@
 import { NextResponse } from "next/server";
-import { stripe } from "@/lib/stripe";
-import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import Stripe from "stripe";
+import { createClient } from "@supabase/supabase-js";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!stripeSecretKey || !supabaseUrl || !serviceRoleKey) {
+      return NextResponse.json(
+        { success: false, error: "Missing server environment variables" },
+        { status: 500 }
+      );
+    }
+
+    const stripe = new Stripe(stripeSecretKey);
+    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
+
     const body = await req.json();
 
     if (!body.sessionId) {
@@ -91,24 +108,16 @@ export async function POST(req: Request) {
       }
     }
 
-    const { error: soldError } = await supabaseAdmin
+    await supabaseAdmin
       .from("products")
       .update({ sold: true })
       .eq("id", metadata.product_id);
 
-    if (soldError) {
-      console.log("PRODUCT SOLD UPDATE ERROR:", soldError);
-    }
-
     if (metadata.offer_id) {
-      const { error: offerError } = await supabaseAdmin
+      await supabaseAdmin
         .from("conversation_messages")
         .update({ offer_status: "accepted" })
         .eq("id", metadata.offer_id);
-
-      if (offerError) {
-        console.log("OFFER UPDATE ERROR:", offerError);
-      }
     }
 
     let conversationId = "";
@@ -124,71 +133,54 @@ export async function POST(req: Request) {
     if (existingConversation?.id) {
       conversationId = existingConversation.id;
     } else {
-      const { data: newConversation, error: conversationError } =
-        await supabaseAdmin
-          .from("conversations")
-          .insert([
-            {
-              buyer_id: metadata.buyer_id,
-              seller_id: metadata.seller_id,
-              product_id: metadata.product_id,
-            },
-          ])
-          .select("id")
-          .single();
-
-      if (conversationError) {
-        console.log("CONVERSATION ERROR:", conversationError);
-      }
+      const { data: newConversation } = await supabaseAdmin
+        .from("conversations")
+        .insert([
+          {
+            buyer_id: metadata.buyer_id,
+            seller_id: metadata.seller_id,
+            product_id: metadata.product_id,
+          },
+        ])
+        .select("id")
+        .single();
 
       conversationId = newConversation?.id || "";
     }
 
     if (conversationId) {
-      const { error: messageError } = await supabaseAdmin
-        .from("conversation_messages")
-        .insert([
-          {
-            conversation_id: conversationId,
-            sender_id: metadata.buyer_id,
-            content:
-              metadata.checkout_type === "offer"
-                ? "✅ Offer payment completed successfully. The order has started."
-                : "✅ Payment completed successfully. The order has started.",
-            is_image: false,
-            is_offer: false,
-            read_by_buyer: true,
-            read_by_seller: false,
-          },
-        ]);
-
-      if (messageError) {
-        console.log("CONVERSATION MESSAGE ERROR:", messageError);
-      }
-    }
-
-    const { error: notificationError } = await supabaseAdmin
-      .from("notifications")
-      .insert([
+      await supabaseAdmin.from("conversation_messages").insert([
         {
-          user_id: metadata.buyer_id,
-          type: "order",
-          title: "Payment successful",
-          message: "Your order has been created successfully.",
-          link: "/orders",
-        },
-        {
-          user_id: metadata.seller_id,
-          type: "sale",
-          title: "New sale",
-          message: "You received a new paid order.",
-          link: "/orders",
+          conversation_id: conversationId,
+          sender_id: metadata.buyer_id,
+          content:
+            metadata.checkout_type === "offer"
+              ? "✅ Offer payment completed successfully. The order has started."
+              : "✅ Payment completed successfully. The order has started.",
+          is_image: false,
+          is_offer: false,
+          read_by_buyer: true,
+          read_by_seller: false,
         },
       ]);
-
-    if (notificationError) {
-      console.log("NOTIFICATION ERROR:", notificationError);
     }
+
+    await supabaseAdmin.from("notifications").insert([
+      {
+        user_id: metadata.buyer_id,
+        type: "order",
+        title: "Payment successful",
+        message: "Your order has been created successfully.",
+        link: "/orders",
+      },
+      {
+        user_id: metadata.seller_id,
+        type: "sale",
+        title: "New sale",
+        message: "You received a new paid order.",
+        link: "/orders",
+      },
+    ]);
 
     return NextResponse.json({
       success: true,

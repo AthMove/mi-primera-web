@@ -2,7 +2,6 @@
 
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { supabase } from "@/lib/supabase";
 
 export default function CreateDisputePage() {
   return (
@@ -35,6 +34,8 @@ function CreateDisputeContent() {
     setLoading(true);
 
     try {
+      const { supabase } = await import("@/lib/supabase");
+
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -105,14 +106,14 @@ function CreateDisputeContent() {
         return;
       }
 
-    const { error: orderUpdateError } = await supabase
-  .from("orders")
-  .update({
-    dispute_status: "open",
-    dispute_reason: reason.trim(),
-    dispute_opened_at: new Date().toISOString(),
-  })
-  .eq("id", order.id);
+      const { error: orderUpdateError } = await supabase
+        .from("orders")
+        .update({
+          dispute_status: "open",
+          dispute_reason: reason.trim(),
+          dispute_opened_at: new Date().toISOString(),
+        })
+        .eq("id", order.id);
 
       if (orderUpdateError) {
         alert(orderUpdateError.message);
@@ -183,7 +184,9 @@ function CreateDisputeContent() {
 
         <div style={uploadBoxStyle}>
           <strong>Evidence photos</strong>
-          <p style={hintStyle}>Upload up to 5 images to help ATHMOV review the case.</p>
+          <p style={hintStyle}>
+            Upload up to 5 images to help ATHMOV review the case.
+          </p>
 
           <input
             type="file"

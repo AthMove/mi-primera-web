@@ -2,15 +2,25 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!stripeSecretKey || !supabaseUrl || !serviceRoleKey) {
+      return NextResponse.json(
+        { error: "Missing server environment variables" },
+        { status: 500 }
+      );
+    }
+
+    const stripe = new Stripe(stripeSecretKey);
+    const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
+
     const { orderId } = await req.json();
 
     if (!orderId) {
@@ -28,11 +38,17 @@ export async function POST(req: Request) {
     }
 
     if (order.transfer_status === "paid") {
-      return NextResponse.json({ error: "Order already paid out" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Order already paid out" },
+        { status: 400 }
+      );
     }
 
     if (order.status !== "completed") {
-      return NextResponse.json({ error: "Order is not completed yet" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Order is not completed yet" },
+        { status: 400 }
+      );
     }
 
     if (!order.seller_stripe_account_id) {
@@ -45,7 +61,10 @@ export async function POST(req: Request) {
     const sellerAmount = Math.round(Number(order.seller_amount) * 100);
 
     if (!sellerAmount || sellerAmount <= 0) {
-      return NextResponse.json({ error: "Invalid seller amount" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid seller amount" },
+        { status: 400 }
+      );
     }
 
     const transfer = await stripe.transfers.create({

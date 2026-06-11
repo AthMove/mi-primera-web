@@ -2,8 +2,6 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
-import { createNotification } from "@/lib/createNotification";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -26,25 +24,53 @@ export default function OrdersPage() {
   const [savingDispute, setSavingDispute] = useState(false);
   const [disputeFile, setDisputeFile] = useState<File | null>(null);
 
-  useEffect(() => {
-    loadOrders();
+  const getSupabase = async () => {
+    const { supabase } = await import("@/lib/supabase");
+    return supabase;
+  };
 
-    const channel = supabase
-      .channel("orders-realtime")
-      .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, () =>
-        loadOrders()
-      )
-      .on("postgres_changes", { event: "*", schema: "public", table: "reviews" }, () =>
-        loadOrders()
-      )
-      .subscribe();
+  const notify = async (payload: any) => {
+    const { createNotification } = await import("@/lib/createNotification");
+    return createNotification(payload);
+  };
+
+  useEffect(() => {
+    let channel: any = null;
+    let supabaseClient: any = null;
+
+    const start = async () => {
+      const supabase = await getSupabase();
+      supabaseClient = supabase;
+
+      await loadOrders();
+
+      channel = supabase
+        .channel("orders-realtime")
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "orders" },
+          () => loadOrders()
+        )
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "reviews" },
+          () => loadOrders()
+        )
+        .subscribe();
+    };
+
+    start();
 
     return () => {
-      supabase.removeChannel(channel);
+      if (supabaseClient && channel) {
+        supabaseClient.removeChannel(channel);
+      }
     };
   }, []);
 
   const loadOrders = async () => {
+    const supabase = await getSupabase();
+
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -55,16 +81,12 @@ export default function OrdersPage() {
     }
 
     setUserId(user.id);
-    console.log("LOAD ORDERS RUNNING");
-console.log("CURRENT USER ID:", user.id);
+
     const { data, error } = await supabase
       .from("orders")
       .select("*")
       .or(`buyer_id.eq.${user.id},seller_id.eq.${user.id}`)
       .order("created_at", { ascending: false });
-
-      console.log("ORDERS DATA:", data);
-console.log("ORDERS ERROR:", error);
 
     if (error || !data) {
       setOrders([]);
@@ -72,11 +94,8 @@ console.log("ORDERS ERROR:", error);
       return;
     }
 
-    console.log("ORDERS FOUND:", data.length);
-console.log(data);
-
     const enriched = await Promise.all(
-      data.map(async (order) => {
+      data.map(async (order: any) => {
         const { data: product } = await supabase
           .from("products")
           .select("*")
@@ -98,6 +117,8 @@ console.log(data);
   };
 
   const updateOrderStatus = async (order: any, status: string) => {
+    const supabase = await getSupabase();
+
     const confirmUpdate = confirm(`Mark this order as ${status}?`);
     if (!confirmUpdate) return;
 
@@ -111,7 +132,10 @@ console.log(data);
     if (status === "delivered") payload.delivered_at = new Date().toISOString();
     if (status === "completed") payload.completed_at = new Date().toISOString();
 
-    const { error } = await supabase.from("orders").update(payload).eq("id", order.id);
+    const { error } = await supabase
+      .from("orders")
+      .update(payload)
+      .eq("id", order.id);
 
     if (error) {
       alert(error.message);
@@ -119,7 +143,7 @@ console.log(data);
     }
 
     if (status === "delivered") {
-      await createNotification({
+      await notify({
         user_id: order.seller_id,
         title: "Order delivered",
         message: "The buyer marked the order as delivered.",
@@ -142,14 +166,14 @@ console.log(data);
         }),
       });
 
-      await createNotification({
+      await notify({
         user_id: order.buyer_id,
         title: "Order completed",
         message: "Your order has been completed.",
         link: "/orders",
       });
 
-      await createNotification({
+      await notify({
         user_id: order.seller_id,
         title: "Payout released",
         message: "Your payout has been released.",
@@ -168,6 +192,8 @@ console.log(data);
 
   const saveTracking = async () => {
     if (!trackingOrder) return;
+
+    const supabase = await getSupabase();
 
     if (!carrier.trim() || !trackingNumber.trim()) {
       alert("Introduce carrier y tracking number");
@@ -192,7 +218,7 @@ console.log(data);
         return;
       }
 
-      await createNotification({
+      await notify({
         user_id: trackingOrder.buyer_id,
         title: "Order shipped",
         message: `Your order has been shipped with ${carrier.trim()}. Tracking: ${trackingNumber.trim()}`,
@@ -210,6 +236,8 @@ console.log(data);
 
   const openDispute = async () => {
     if (!disputeOrder) return;
+
+    const supabase = await getSupabase();
 
     if (!disputeReason.trim()) {
       alert("Describe the issue");
@@ -234,7 +262,9 @@ console.log(data);
           return;
         }
 
-        const { data } = supabase.storage.from("disputes").getPublicUrl(fileName);
+        const { data } = supabase.storage
+          .from("disputes")
+          .getPublicUrl(fileName);
 
         fileUrl = data.publicUrl;
       }
@@ -262,7 +292,7 @@ console.log(data);
         },
       ]);
 
-      await createNotification({
+      await notify({
         user_id: disputeOrder.seller_id,
         title: "Dispute opened",
         message: "The buyer has reported an issue with the order.",
@@ -279,32 +309,32 @@ console.log(data);
   };
 
   const submitReview = async () => {
-  if (!reviewOrder) return;
+    if (!reviewOrder) return;
 
-  if (!comment.trim()) {
-    alert("Write a short review");
-    return;
-  }
+    const supabase = await getSupabase();
 
-  const { data: existingReview } = await supabase
-    .from("reviews")
-    .select("id")
-    .eq("order_id", reviewOrder.id)
-    .eq("buyer_id", reviewOrder.buyer_id)
-    .maybeSingle();
+    if (!comment.trim()) {
+      alert("Write a short review");
+      return;
+    }
 
-  if (existingReview) {
-    alert("You have already reviewed this order");
-    setReviewOrder(null);
-    return;
-  }
-
-  try {
-    setSavingReview(true);
-
-    const { data, error } = await supabase
+    const { data: existingReview } = await supabase
       .from("reviews")
-      .insert([
+      .select("id")
+      .eq("order_id", reviewOrder.id)
+      .eq("buyer_id", reviewOrder.buyer_id)
+      .maybeSingle();
+
+    if (existingReview) {
+      alert("You have already reviewed this order");
+      setReviewOrder(null);
+      return;
+    }
+
+    try {
+      setSavingReview(true);
+
+      const { error } = await supabase.from("reviews").insert([
         {
           order_id: reviewOrder.id,
           product_id: reviewOrder.product_id,
@@ -313,37 +343,33 @@ console.log(data);
           rating,
           comment: comment.trim(),
         },
-      ])
-      .select()
-      .single();
+      ]);
 
-    if (error) {
-      alert(error.message);
-      return;
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      await supabase.rpc("update_seller_reputation", {
+        target_seller_id: reviewOrder.seller_id,
+      });
+
+      await notify({
+        user_id: reviewOrder.seller_id,
+        title: "New review received",
+        message: `You received a ${rating}-star review.`,
+        link: `/seller/${reviewOrder.seller_id}`,
+      });
+
+      setReviewOrder(null);
+      setRating(5);
+      setComment("");
+
+      await loadOrders();
+    } finally {
+      setSavingReview(false);
     }
-
-    await supabase.rpc("update_seller_reputation", {
-      target_seller_id: reviewOrder.seller_id,
-    });
-
-    await createNotification({
-      user_id: reviewOrder.seller_id,
-      title: "New review received",
-      message: `You received a ${rating}-star review.`,
-      link: `/seller/${reviewOrder.seller_id}`,
-    });
-
-    setReviewOrder(null);
-    setRating(5);
-    setComment("");
-
-    await loadOrders();
-  } catch (err) {
-    console.error("SUBMIT REVIEW ERROR:", err);
-  } finally {
-    setSavingReview(false);
-  }
-};
+  };
 
   const safeImage = (src?: string) => {
     return src?.startsWith("http") || src?.startsWith("/") ? src : "/logo.png";
@@ -410,6 +436,8 @@ console.log(data);
   };
 
   const openOrderChat = async (order: any) => {
+    const supabase = await getSupabase();
+
     const { data: existing } = await supabase
       .from("conversations")
       .select("id")
@@ -444,7 +472,7 @@ console.log(data);
     window.location.href = `/messages/${data.id}`;
   };
 
-  const filteredOrders = orders.filter((order) => {
+  const filteredOrders = orders.filter((order: any) => {
     if (filter === "buying") return order.buyer_id === userId;
     if (filter === "selling") return order.seller_id === userId;
     return true;
@@ -505,7 +533,7 @@ console.log(data);
         </section>
       ) : (
         <section style={listStyle}>
-          {filteredOrders.map((order) => {
+          {filteredOrders.map((order: any) => {
             const isSeller = order.seller_id === userId;
             const isBuyer = order.buyer_id === userId;
             const status = order.status || "paid";
@@ -535,19 +563,22 @@ console.log(data);
                   </h2>
 
                   <p
-  style={{
-    ...buyerStyle,
-    cursor: "pointer",
-    fontWeight: 700,
-    textDecoration: "underline",
-  }}
-  onClick={() => {
-    const profileId = isSeller ? order.buyer_id : order.seller_id;
-    window.location.href = `/seller/${profileId}`;
-  }}
->
-  {isSeller ? "Buyer" : "Seller"} · {formatDate(order.created_at)}
-</p>
+                    style={{
+                      ...buyerStyle,
+                      cursor: "pointer",
+                      fontWeight: 700,
+                      textDecoration: "underline",
+                    }}
+                    onClick={() => {
+                      const profileId = isSeller
+                        ? order.buyer_id
+                        : order.seller_id;
+                      window.location.href = `/seller/${profileId}`;
+                    }}
+                  >
+                    {isSeller ? "Buyer" : "Seller"} ·{" "}
+                    {formatDate(order.created_at)}
+                  </p>
 
                   {(order.carrier || order.tracking_number) && (
                     <div style={trackingBoxStyle}>
@@ -561,17 +592,20 @@ console.log(data);
                         <small>Shipped {formatDate(order.shipped_at)}</small>
                       )}
 
-{status === "shipped" && (
-  <small>Waiting for carrier delivery confirmation</small>
-)}
+                      {status === "shipped" && (
+                        <small>Waiting for carrier delivery confirmation</small>
+                      )}
 
-{status === "delivered" && order.delivered_at && (
-  <small>Delivered {formatDate(order.delivered_at)}</small>
-)}
+                      {status === "delivered" && order.delivered_at && (
+                        <small>Delivered {formatDate(order.delivered_at)}</small>
+                      )}
 
                       {getTrackingUrl(order.carrier, order.tracking_number) && (
                         <a
-                          href={getTrackingUrl(order.carrier, order.tracking_number)}
+                          href={getTrackingUrl(
+                            order.carrier,
+                            order.tracking_number
+                          )}
                           target="_blank"
                           rel="noopener noreferrer"
                           style={trackingLinkStyle}
@@ -582,19 +616,21 @@ console.log(data);
                     </div>
                   )}
 
-                 {hasOpenDispute && (
-  <div style={disputeWarningStyle}>
-    <strong>Issue reported</strong>
-    <span>
-      This order is under ATHMOV review. Reviews, delivery confirmation and payouts are temporarily locked.
-    </span>
-  </div>
-)}
+                  {hasOpenDispute && (
+                    <div style={disputeWarningStyle}>
+                      <strong>Issue reported</strong>
+                      <span>
+                        This order is under ATHMOV review. Reviews, delivery
+                        confirmation and payouts are temporarily locked.
+                      </span>
+                    </div>
+                  )}
 
                   {order.review && (
                     <p style={reviewPreviewStyle}>
                       {"★".repeat(order.review.rating)}
-                      {"☆".repeat(5 - order.review.rating)} · {order.review.comment}
+                      {"☆".repeat(5 - order.review.rating)} ·{" "}
+                      {order.review.comment}
                     </p>
                   )}
 
@@ -641,7 +677,9 @@ console.log(data);
 
                   <div style={protectionGridStyle}>
                     <div style={protectionCardStyle}>
-                      <span style={protectionLabelStyle}>Estimated delivery</span>
+                      <span style={protectionLabelStyle}>
+                        Estimated delivery
+                      </span>
                       <strong>{getEstimatedDelivery(order)}</strong>
                     </div>
 
@@ -657,7 +695,10 @@ console.log(data);
 
                   <span style={statusStyle}>{getStatusLabel(status)}</span>
 
-                  <button onClick={() => openOrderChat(order)} style={reviewButtonStyle}>
+                  <button
+                    onClick={() => openOrderChat(order)}
+                    style={reviewButtonStyle}
+                  >
                     {isSeller ? "Message buyer" : "Message seller"}
                   </button>
 
@@ -671,26 +712,42 @@ console.log(data);
                   )}
 
                   {isSeller && status === "preparing" && (
-                    <button onClick={() => openTrackingModal(order)} style={buttonStyle}>
+                    <button
+                      onClick={() => openTrackingModal(order)}
+                      style={buttonStyle}
+                    >
                       Add tracking
                     </button>
                   )}
 
-
-     {isBuyer &&
-  ["pending", "paid", "preparing", "shipped", "delivered", "completed"].includes(status) &&
-  !hasOpenDispute && (
-    <button
-      onClick={() => setDisputeOrder(order)}
-      style={reviewButtonStyle}
-    >
-      Report issue
-    </button>
-  )}
+                  {isBuyer &&
+                    [
+                      "pending",
+                      "paid",
+                      "preparing",
+                      "shipped",
+                      "delivered",
+                      "completed",
+                    ].includes(status) &&
+                    !hasOpenDispute && (
+                      <button
+                        onClick={() => setDisputeOrder(order)}
+                        style={reviewButtonStyle}
+                      >
+                        Report issue
+                      </button>
+                    )}
 
                   {isSeller &&
-  ["paid", "pending", "preparing", "shipped", "delivered", "completed"].includes(status) &&
-  !hasOpenDispute&& (
+                    [
+                      "paid",
+                      "pending",
+                      "preparing",
+                      "shipped",
+                      "delivered",
+                      "completed",
+                    ].includes(status) &&
+                    !hasOpenDispute && (
                       <button
                         onClick={() => {
                           window.location.href = `/disputes/create?order=${order.id}`;
@@ -701,14 +758,17 @@ console.log(data);
                       </button>
                     )}
 
-                  {isBuyer && status === "completed" && !hasOpenDispute && !order.review && (
-                    <button
-                      onClick={() => setReviewOrder(order)}
-                      style={reviewButtonStyle}
-                    >
-                      Leave review
-                    </button>
-                  )}
+                  {isBuyer &&
+                    status === "completed" &&
+                    !hasOpenDispute &&
+                    !order.review && (
+                      <button
+                        onClick={() => setReviewOrder(order)}
+                        style={reviewButtonStyle}
+                      >
+                        Leave review
+                      </button>
+                    )}
 
                   {order.review && <span style={reviewedStyle}>Reviewed</span>}
                 </div>
@@ -721,13 +781,18 @@ console.log(data);
       {trackingOrder && (
         <div style={modalOverlayStyle}>
           <div style={modalStyle}>
-            <button onClick={() => setTrackingOrder(null)} style={closeButtonStyle}>
+            <button
+              onClick={() => setTrackingOrder(null)}
+              style={closeButtonStyle}
+            >
               ✕
             </button>
 
             <p style={eyebrowStyle}>ATHMOV SHIPPING</p>
             <h2 style={modalTitleStyle}>Add tracking</h2>
-            <p style={modalTextStyle}>{trackingOrder.product?.title || "Product"}</p>
+            <p style={modalTextStyle}>
+              {trackingOrder.product?.title || "Product"}
+            </p>
 
             <select
               value={carrier}
@@ -757,7 +822,10 @@ console.log(data);
       {disputeOrder && (
         <div style={modalOverlayStyle}>
           <div style={modalStyle}>
-            <button onClick={() => setDisputeOrder(null)} style={closeButtonStyle}>
+            <button
+              onClick={() => setDisputeOrder(null)}
+              style={closeButtonStyle}
+            >
               ✕
             </button>
 
@@ -797,14 +865,19 @@ console.log(data);
       {reviewOrder && (
         <div style={modalOverlayStyle}>
           <div style={modalStyle}>
-            <button onClick={() => setReviewOrder(null)} style={closeButtonStyle}>
+            <button
+              onClick={() => setReviewOrder(null)}
+              style={closeButtonStyle}
+            >
               ✕
             </button>
 
             <p style={eyebrowStyle}>ATHMOV REVIEW</p>
             <h2 style={modalTitleStyle}>Review your purchase</h2>
 
-            <p style={modalTextStyle}>{reviewOrder.product?.title || "Product"}</p>
+            <p style={modalTextStyle}>
+              {reviewOrder.product?.title || "Product"}
+            </p>
 
             <div style={starsStyle}>
               {[1, 2, 3, 4, 5].map((star) => (
@@ -1013,15 +1086,6 @@ const trackingBoxStyle = {
   fontSize: "13px",
   color: "#555",
   maxWidth: "420px",
-};
-
-const disputeBadgeStyle = {
-  marginTop: "12px",
-  color: "#b91c1c",
-  fontSize: "12px",
-  fontWeight: 900,
-  textTransform: "uppercase" as const,
-  letterSpacing: "1px",
 };
 
 const reviewPreviewStyle = {

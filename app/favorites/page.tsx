@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { supabase } from "@/lib/supabase";
 
 export default function FavoritesPage() {
   const router = useRouter();
@@ -11,11 +10,18 @@ export default function FavoritesPage() {
   const [favorites, setFavorites] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const getSupabase = async () => {
+    const { supabase } = await import("@/lib/supabase");
+    return supabase;
+  };
+
   useEffect(() => {
     loadFavorites();
   }, []);
 
   const loadFavorites = async () => {
+    const supabase = await getSupabase();
+
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -35,7 +41,7 @@ export default function FavoritesPage() {
       return;
     }
 
-    const productIds = favoriteRows.map((fav) => fav.product_id);
+    const productIds = favoriteRows.map((fav: any) => fav.product_id);
 
     if (productIds.length === 0) {
       setFavorites([]);
@@ -53,6 +59,8 @@ export default function FavoritesPage() {
   };
 
   const removeFavorite = async (productId: string) => {
+    const supabase = await getSupabase();
+
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -63,9 +71,7 @@ export default function FavoritesPage() {
       .eq("user_id", user?.id)
       .eq("product_id", productId);
 
-    setFavorites(
-      favorites.filter((item) => item.id !== productId)
-    );
+    setFavorites(favorites.filter((item: any) => item.id !== productId));
   };
 
   if (loading) {
@@ -76,29 +82,23 @@ export default function FavoritesPage() {
     <main style={pageStyle}>
       <section style={headerStyle}>
         <p style={eyebrowStyle}>ATHMOV FAVORITES</p>
-
         <h1 style={titleStyle}>Wishlist</h1>
       </section>
 
       {favorites.length === 0 ? (
         <section style={emptyStyle}>
           <h2 style={{ margin: 0 }}>No favorites yet</h2>
-
           <p style={{ color: "#666", marginTop: "12px" }}>
             Save premium products to your wishlist.
           </p>
         </section>
       ) : (
         <section style={gridStyle}>
-          {favorites.map((product) => (
+          {favorites.map((product: any) => (
             <article key={product.id} style={cardStyle}>
               <div
-                onClick={() =>
-                  router.push(`/products/${product.id}`)
-                }
-                style={{
-                  cursor: "pointer",
-                }}
+                onClick={() => router.push(`/products/${product.id}`)}
+                style={{ cursor: "pointer" }}
               >
                 <div style={imageWrapperStyle}>
                   <Image
@@ -108,33 +108,23 @@ export default function FavoritesPage() {
                         ? product.image
                         : "/logo.png"
                     }
-                    alt={product.title}
+                    alt={product.title || "Product"}
                     fill
                     sizes="33vw"
-                    style={{
-                      objectFit: "cover",
-                    }}
+                    style={{ objectFit: "cover" }}
                   />
                 </div>
 
                 <div style={{ padding: "24px" }}>
                   <p style={brandStyle}>{product.brand}</p>
-
-                  <h2 style={productTitleStyle}>
-                    {product.title}
-                  </h2>
-
-                  <p style={priceStyle}>
-                    €{product.price}
-                  </p>
+                  <h2 style={productTitleStyle}>{product.title}</h2>
+                  <p style={priceStyle}>€{product.price}</p>
                 </div>
               </div>
 
               <div style={{ padding: "0 24px 24px" }}>
                 <button
-                  onClick={() =>
-                    removeFavorite(product.id)
-                  }
+                  onClick={() => removeFavorite(product.id)}
                   style={removeButtonStyle}
                 >
                   Remove favorite

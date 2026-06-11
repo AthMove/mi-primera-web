@@ -1,10 +1,10 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
 
-export default function EarningsPage() {
+function EarningsPageContent() {
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState<any[]>([]);
 
@@ -21,6 +21,8 @@ export default function EarningsPage() {
   }, []);
 
   const loadEarnings = async () => {
+    const { supabase } = await import("@/lib/supabase");
+
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -39,11 +41,11 @@ export default function EarningsPage() {
     const sellerOrders = data || [];
 
     const completed = sellerOrders.filter(
-      (order) => order.status === "completed"
+      (order: any) => order.status === "completed"
     );
 
     const pending = sellerOrders.filter(
-      (order) =>
+      (order: any) =>
         order.status === "paid" ||
         order.status === "shipped" ||
         order.status === "delivered"
@@ -52,12 +54,12 @@ export default function EarningsPage() {
     const feeRate = 0.1;
 
     const totalRevenue = completed.reduce(
-      (acc, order) => acc + Number(order.amount || 0),
+      (acc: number, order: any) => acc + Number(order.amount || 0),
       0
     );
 
     const pendingRevenue = pending.reduce(
-      (acc, order) => acc + Number(order.amount || 0),
+      (acc: number, order: any) => acc + Number(order.amount || 0),
       0
     );
 
@@ -87,7 +89,9 @@ export default function EarningsPage() {
     <main style={pageStyle} className="earnings-page">
       <section style={heroStyle}>
         <p style={eyebrowStyle}>ATHMOV EARNINGS</p>
-        <h1 style={titleStyle} className="earnings-title">Earnings</h1>
+        <h1 style={titleStyle} className="earnings-title">
+          Earnings
+        </h1>
         <p style={subtitleStyle}>
           Track seller revenue, pending balance and ATHMOV marketplace fees.
         </p>
@@ -149,7 +153,7 @@ export default function EarningsPage() {
           <div style={emptyStyle}>No seller orders yet.</div>
         ) : (
           <div style={listStyle}>
-            {orders.map((order) => {
+            {orders.map((order: any) => {
               const amount = Number(order.amount || 0);
               const fee = amount * 0.1;
               const net = amount - fee;
@@ -390,3 +394,7 @@ const feeStyle = {
   color: "#777",
   fontSize: "13px",
 };
+
+export default dynamic(() => Promise.resolve(EarningsPageContent), {
+  ssr: false,
+});
