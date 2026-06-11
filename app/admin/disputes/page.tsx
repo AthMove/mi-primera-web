@@ -8,44 +8,41 @@ export default function AdminDisputesPage() {
   const [debug, setDebug] = useState("");
   const [resolvingId, setResolvingId] = useState<string | null>(null);
 
-const loadDisputes = async () => {
-  setDebug("Loading disputes...");
+  const loadDisputes = async () => {
+    setDebug("Loading disputes...");
 
-  try {
-    const response = await fetch("/api/admin/disputes", {
-      method: "GET",
-      cache: "no-store",
-    });
+    try {
+      const response = await fetch("/api/admin/disputes", {
+        method: "GET",
+        cache: "no-store",
+      });
 
-    const result = await response.json();
+      const result = await response.json();
 
-   console.log(
-  "ADMIN DISPUTES:",
-  JSON.stringify(result, null, 2)
-);
+      console.log("ADMIN DISPUTES:", JSON.stringify(result, null, 2));
 
-    if (!response.ok) {
-      setDebug("ERROR: " + (result.error || "Could not load disputes"));
-      return;
+      if (!response.ok) {
+        setDebug("ERROR: " + (result.error || "Could not load disputes"));
+        return;
+      }
+
+      setDebug(`Open disputes: ${result.orders?.length || 0}`);
+      setOrders(result.orders || []);
+    } catch (error: any) {
+      setDebug("ERROR: " + (error.message || "Could not load disputes"));
+    } finally {
+      setLoading(false);
     }
-
-    setDebug(`Open disputes: ${result.orders?.length || 0}`);
-    setOrders(result.orders || []);
-  } catch (error: any) {
-    setDebug("ERROR: " + (error.message || "Could not load disputes"));
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   useEffect(() => {
-  loadDisputes();
-}, []);
+    loadDisputes();
+  }, []);
 
   const shortId = (value?: string | null) => {
-  if (!value) return "Unknown";
-  return value.slice(0, 8);
-};
+    if (!value) return "Unknown";
+    return value.slice(0, 8);
+  };
 
   const resolveDispute = async (
     orderId: string,
@@ -82,6 +79,7 @@ const loadDisputes = async () => {
 
       alert("Dispute resolved");
       setOrders((prev) => prev.filter((order) => order.id !== orderId));
+      await loadDisputes();
     } catch (error: any) {
       alert(error.message || "Error resolving dispute");
     } finally {
@@ -89,14 +87,18 @@ const loadDisputes = async () => {
     }
   };
 
+  if (loading) {
+    return <main style={pageStyle}>Loading disputes...</main>;
+  }
+
   return (
     <main style={pageStyle}>
       <p style={eyebrowStyle}>ATHMOV ADMIN</p>
       <h1 style={titleStyle}>Disputes</h1>
 
-     {orders.length === 0 ? (
-  <p>No open disputes found.</p>
-) : (
+      {orders.length === 0 ? (
+        <p>No open disputes found.</p>
+      ) : (
         <div style={listStyle}>
           {orders.map((order) => {
             const product =
@@ -112,6 +114,8 @@ const loadDisputes = async () => {
                 ].filter(Boolean)
               )
             );
+
+            const isResolved = order.dispute_status === "resolved";
 
             return (
               <article key={order.id} style={cardStyle}>
@@ -195,7 +199,10 @@ const loadDisputes = async () => {
 
                       <p>
                         <strong>Buyer:</strong>{" "}
-                       {order.buyer_email || order.user_email || order.buyer_id || "Unknown"}
+                        {order.buyer_email ||
+                          order.user_email ||
+                          order.buyer_id ||
+                          "Unknown"}
                       </p>
 
                       <p>
@@ -222,8 +229,7 @@ const loadDisputes = async () => {
                       </p>
 
                       <p>
-                        <strong>Carrier:</strong>{" "}
-                        {order.carrier || "No carrier"}
+                        <strong>Carrier:</strong> {order.carrier || "No carrier"}
                       </p>
 
                       <p>
@@ -268,63 +274,69 @@ const loadDisputes = async () => {
                     </p>
 
                     <p style={reasonBoxStyle}>
-  {order.dispute_reason || "No reason provided"}
-</p>
+                      {order.dispute_reason || "No reason provided"}
+                    </p>
 
-{order.evidence?.length > 0 && (
-  <div style={evidenceSectionStyle}>
-    <p style={reasonLabelStyle}>
-      <strong>Evidence:</strong>
-    </p>
+                    {order.evidence?.length > 0 && (
+                      <div style={evidenceSectionStyle}>
+                        <p style={reasonLabelStyle}>
+                          <strong>Evidence:</strong>
+                        </p>
 
-    <div style={evidenceGridStyle}>
-      {order.evidence.map((item: any, index: number) => (
-        item.file_url ? (
-          <a
-            key={`${item.file_url}-${index}`}
-            href={item.file_url}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <img
-              src={item.file_url}
-              alt={`Evidence ${index + 1}`}
-              style={evidenceImageStyle}
-            />
-          </a>
-        ) : null
-      ))}
-    </div>
-  </div>
-)}
+                        <div style={evidenceGridStyle}>
+                          {order.evidence.map((item: any, index: number) =>
+                            item.file_url ? (
+                              <a
+                                key={`${item.file_url}-${index}`}
+                                href={item.file_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                <img
+                                  src={item.file_url}
+                                  alt={`Evidence ${index + 1}`}
+                                  style={evidenceImageStyle}
+                                />
+                              </a>
+                            ) : null
+                          )}
+                        </div>
+                      </div>
+                    )}
 
-<div style={actionsStyle}>
-                      <button
-                        onClick={() => resolveDispute(order.id, "seller_wins")}
-                        style={{
-                          ...primaryButtonStyle,
-                          opacity: resolvingId === order.id ? 0.5 : 1,
-                        }}
-                        disabled={resolvingId === order.id}
-                      >
-                        {resolvingId === order.id
-                          ? "Resolving..."
-                          : "Release payout"}
-                      </button>
+                    {!isResolved ? (
+                      <div style={actionsStyle}>
+                        <button
+                          onClick={() => resolveDispute(order.id, "seller_wins")}
+                          style={{
+                            ...primaryButtonStyle,
+                            opacity: resolvingId === order.id ? 0.5 : 1,
+                          }}
+                          disabled={resolvingId === order.id}
+                        >
+                          {resolvingId === order.id
+                            ? "Resolving..."
+                            : "Release payout"}
+                        </button>
 
-                      <button
-                        onClick={() => resolveDispute(order.id, "buyer_refund")}
-                        style={{
-                          ...secondaryButtonStyle,
-                          opacity: resolvingId === order.id ? 0.5 : 1,
-                        }}
-                        disabled={resolvingId === order.id}
-                      >
-                        {resolvingId === order.id
-                          ? "Resolving..."
-                          : "Refund buyer"}
-                      </button>
-                    </div>
+                        <button
+                          onClick={() => resolveDispute(order.id, "buyer_refund")}
+                          style={{
+                            ...secondaryButtonStyle,
+                            opacity: resolvingId === order.id ? 0.5 : 1,
+                          }}
+                          disabled={resolvingId === order.id}
+                        >
+                          {resolvingId === order.id
+                            ? "Resolving..."
+                            : "Refund buyer"}
+                        </button>
+                      </div>
+                    ) : (
+                      <p style={resolvedNoteStyle}>
+                        Dispute resolved · {order.dispute_resolution || "Resolved"}
+                      </p>
+                    )}
                   </div>
                 </div>
               </article>
@@ -486,4 +498,14 @@ const evidenceImageStyle = {
   objectFit: "cover" as const,
   borderRadius: "14px",
   border: "1px solid rgba(0,0,0,0.08)",
+};
+
+const resolvedNoteStyle = {
+  marginTop: "30px",
+  background: "#dcfce7",
+  color: "#166534",
+  padding: "14px 18px",
+  borderRadius: "999px",
+  fontWeight: 800,
+  display: "inline-flex",
 };
