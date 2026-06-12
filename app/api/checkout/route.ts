@@ -45,7 +45,7 @@ const { data: existingOrder } = await supabase
   .eq("product_id", body.productId)
   .eq("buyer_id", body.buyerId)
   .eq("seller_id", body.sellerId)
-  .in("status", ["pending", "paid"])
+  .in("payment_status", ["pending", "paid"])
   .order("created_at", { ascending: false })
   .limit(1)
   .maybeSingle();
@@ -124,17 +124,20 @@ success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/success?session_id={CHECKOUT_S
 cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/cart`,
     });
 
-    return NextResponse.json({
+       return NextResponse.json({
       url: session.url,
       platformFee,
       sellerAmount,
       stripeFeeEstimate,
     });
-  } catch (error) {
-    console.log(error);
+
+  } catch (error: any) {
+    console.error("CHECKOUT ERROR:", error);
 
     return NextResponse.json(
-      { error: "Stripe error" },
+      {
+        error: error?.message || "Stripe error",
+      },
       { status: 500 }
     );
   }

@@ -156,15 +156,6 @@ export default function OrdersPage() {
         target_seller_id: order.seller_id,
       });
 
-      await fetch("/api/stripe/release-payment", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          orderId: order.id,
-        }),
-      });
 
       await notify({
         user_id: order.buyer_id,
@@ -694,6 +685,14 @@ export default function OrdersPage() {
                   <strong style={amountStyle}>€{order.amount}</strong>
 
                   <span style={statusStyle}>{getStatusLabel(status)}</span>
+                  {isSeller && order.transfer_status === "released" && (
+
+  <span style={paidOutStyle}>Paid out ✓</span>
+)}
+
+{isSeller && order.transfer_status !== "released" && (
+  <span style={pendingPayoutStyle}>Payout pending</span>
+)}
 
                   <button
                     onClick={() => openOrderChat(order)}
@@ -719,34 +718,19 @@ export default function OrdersPage() {
                       Add tracking
                     </button>
                   )}
+{isBuyer &&
+  ["paid", "preparing", "shipped", "delivered"].includes(status) &&
+  !hasOpenDispute && (
+    <button
+      onClick={() => setDisputeOrder(order)}
+      style={reviewButtonStyle}
+    >
+      Report issue
+    </button>
+  )}
 
-                  {isBuyer &&
-                    [
-                      "pending",
-                      "paid",
-                      "preparing",
-                      "shipped",
-                      "delivered",
-                      "completed",
-                    ].includes(status) &&
-                    !hasOpenDispute && (
-                      <button
-                        onClick={() => setDisputeOrder(order)}
-                        style={reviewButtonStyle}
-                      >
-                        Report issue
-                      </button>
-                    )}
-
-                  {isSeller &&
-                    [
-                      "paid",
-                      "pending",
-                      "preparing",
-                      "shipped",
-                      "delivered",
-                      "completed",
-                    ].includes(status) &&
+                                    {isSeller &&
+                    ["paid", "preparing", "shipped", "delivered"].includes(status) &&
                     !hasOpenDispute && (
                       <button
                         onClick={() => {
@@ -1343,4 +1327,24 @@ const disputeWarningStyle = {
   fontSize: "13px",
   fontWeight: 700,
   maxWidth: "520px",
+};
+
+const paidOutStyle = {
+  background: "#111",
+  color: "#fff",
+  borderRadius: "999px",
+  padding: "8px 12px",
+  fontSize: "11px",
+  fontWeight: 900,
+  textTransform: "uppercase" as const,
+};
+
+const pendingPayoutStyle = {
+  background: "#f1efe8",
+  color: "#111",
+  borderRadius: "999px",
+  padding: "8px 12px",
+  fontSize: "11px",
+  fontWeight: 900,
+  textTransform: "uppercase" as const,
 };

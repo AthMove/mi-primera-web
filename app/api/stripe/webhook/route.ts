@@ -37,6 +37,7 @@ export async function POST(req: Request) {
 
   try {
     if (event.type === "checkout.session.completed") {
+      console.log("CHECKOUT COMPLETED RECEIVED");
       const session = event.data.object as Stripe.Checkout.Session;
       const metadata = session.metadata || {};
 
@@ -68,6 +69,9 @@ export async function POST(req: Request) {
         console.log("NO ORDER FOUND FOR CHECKOUT:", metadata);
         return NextResponse.json({ received: true });
       }
+
+console.log("UPDATING ORDER", orderId);
+console.log("TIME", new Date().toISOString());
 
       const { data: updatedOrder, error: updateError } = await supabase
         .from("orders")
