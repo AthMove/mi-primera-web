@@ -468,12 +468,13 @@ const drawerStyle = {
   position: "absolute" as const,
   right: 0,
   top: 0,
-  height: "100%",
+  height: "100dvh",
   width: "86%",
   maxWidth: "380px",
   background: "#fff",
-  padding: "26px",
+  padding: "26px 26px 110px",
   boxShadow: "-30px 0 100px rgba(0,0,0,0.18)",
+  overflowY: "auto" as const,
 };
 
 const drawerHeaderStyle = {
@@ -503,6 +504,7 @@ const drawerLinksStyle = {
   display: "flex",
   flexDirection: "column" as const,
   gap: "18px",
+  paddingBottom: "80px",
 };
 
 const drawerLinkStyle = {

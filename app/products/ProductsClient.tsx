@@ -2,11 +2,13 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 export default function ProductsClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const categoryFilter = searchParams.get("category");
 
   const [productos, setProductos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -14,17 +16,24 @@ export default function ProductsClient() {
 
   useEffect(() => {
     loadProducts();
-  }, []);
+  }, [categoryFilter]);
 
   async function loadProducts() {
     try {
       setLoading(true);
 
-const { data, error } = await supabase
-  .from("products")
-  .select("*")
-  .eq("sold", false)
-  .order("created_at", { ascending: false });
+      let query = supabase
+        .from("products")
+        .select("*")
+        .eq("sold", false);
+
+      if (categoryFilter) {
+        query = query.eq("category", categoryFilter);
+      }
+
+      const { data, error } = await query.order("created_at", {
+        ascending: false,
+      });
 
       if (error) {
         console.error(error);
@@ -46,7 +55,9 @@ const { data, error } = await supabase
     <main style={pageStyle}>
       <p style={eyebrowStyle}>MARKETPLACE</p>
 
-      <h1 style={titleStyle}>Products</h1>
+      <h1 style={titleStyle}>
+        {categoryFilter ? categoryFilter : "Products"}
+      </h1>
 
       {debug && (
         <p style={{ color: "red", marginBottom: 20 }}>
@@ -77,9 +88,7 @@ const { data, error } = await supabase
 
               <div style={cardContentStyle}>
                 <h2>{product.title}</h2>
-
                 <p>{product.brand}</p>
-
                 <strong>€{product.price}</strong>
               </div>
             </div>
@@ -89,7 +98,6 @@ const { data, error } = await supabase
     </main>
   );
 }
-
 const pageStyle = {
   minHeight: "100vh",
   background: "#f7f7f3",
