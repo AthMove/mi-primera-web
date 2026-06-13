@@ -2,8 +2,8 @@
   "buildCommand": "next build",
   "crons": [
     {
-      "path": "/api/orders/auto-complete",
-      "schedule": "0 9 * * *"
+      "path": "/api/cron",
+      "schedule": "0 * * * *"
     }
   ]
 }
