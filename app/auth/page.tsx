@@ -47,17 +47,17 @@ export default function AuthPage() {
 
       setDebug(`Logged in as: ${data.user?.email || cleanEmail}`);
 
-     if (cleanEmail === "athmovco@gmail.com") {
-  window.location.href = "/products";
+if (cleanEmail === "athmovco@gmail.com") {
+  window.location.replace("/products");
   return;
 }
 
 if (mode === "register") {
-  window.location.href = "/account";
+  window.location.replace("/account");
   return;
 }
 
-window.location.href = "/orders";
+window.location.replace("/orders");
     } catch (e: any) {
       console.log("AUTH CATCH:", e);
       setDebug(`Catch: ${e.message}`);
