@@ -90,6 +90,31 @@ export default function SellPage() {
       return;
     }
 
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select(
+        "stripe_account_id, stripe_onboarding_complete, stripe_charges_enabled, stripe_payouts_enabled"
+      )
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profileError || !profile) {
+      alert("No se pudo comprobar tu perfil de vendedor");
+      return;
+    }
+
+    const stripeReady =
+      profile.stripe_account_id &&
+      profile.stripe_onboarding_complete &&
+      profile.stripe_charges_enabled &&
+      profile.stripe_payouts_enabled;
+
+    if (!stripeReady) {
+      alert("Debes conectar Stripe payouts antes de vender.");
+      router.push("/account");
+      return;
+    }
+
     try {
       setLoading(true);
 
