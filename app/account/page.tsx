@@ -151,17 +151,21 @@ export default function AccountPage() {
 
     try {
       setSaving(true);
-
-      const { error } = await supabase.from("profiles").upsert({
-        id: user.id,
-        email: profile.email,
-        username: profile.username,
-        full_name: profile.full_name,
-        bio: profile.bio,
-        location: profile.location,
-        avatar_url: profile.avatar_url,
-        stripe_account_id: profile.stripe_account_id,
-      });
+      
+const { error } = await supabase.from("profiles").upsert(
+  {
+    id: user.id,
+    email: user.email,
+    username: profile.username,
+    full_name: profile.full_name,
+    bio: profile.bio,
+    location: profile.location,
+    avatar_url: profile.avatar_url,
+  },
+  {
+    onConflict: "id",
+  }
+);
 
       if (error) {
         alert(error.message);
