@@ -47,8 +47,17 @@ export default function AuthPage() {
 
       setDebug(`Logged in as: ${data.user?.email || cleanEmail}`);
 
-      window.location.href =
-        cleanEmail === "athmovco@gmail.com" ? "/products" : "/orders";
+     if (cleanEmail === "athmovco@gmail.com") {
+  window.location.href = "/products";
+  return;
+}
+
+if (mode === "register") {
+  window.location.href = "/account";
+  return;
+}
+
+window.location.href = "/orders";
     } catch (e: any) {
       console.log("AUTH CATCH:", e);
       setDebug(`Catch: ${e.message}`);
