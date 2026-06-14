@@ -95,6 +95,17 @@ const updateOffer = async (offer: any, status: string) => {
   }
 
   if (status === "accepted") {
+
+    await fetch("/api/email/offer-accepted", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    offerId: offer.id,
+  }),
+});
+
     const { error: orderError } = await supabase.from("orders").insert([
       {
         product_id: offer.product_id,
