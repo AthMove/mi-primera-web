@@ -311,6 +311,16 @@ if (!emailResponse.ok) {
         link: "/orders",
       });
 
+      await fetch("/api/email/dispute-opened", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    orderId: disputeOrder.id,
+  }),
+});
+
       setDisputeOrder(null);
       setDisputeReason("");
       setDisputeFile(null);
