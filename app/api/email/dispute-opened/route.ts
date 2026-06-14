@@ -4,7 +4,6 @@ import { sendEmail } from "@/lib/email";
 
 export async function POST(req: Request) {
   try {
-    console.log("DISPUTE EMAIL API CALLED");
     const { orderId } = await req.json();
 
     const supabase = createClient(
@@ -35,9 +34,6 @@ export async function POST(req: Request) {
       .maybeSingle();
 
     if (seller?.email) {
-
-        console.log("SENDING DISPUTE EMAIL TO:", seller.email);
-
       await sendEmail({
         to: seller.email,
         subject: "A dispute has been opened on ATHMOV",
@@ -53,7 +49,6 @@ export async function POST(req: Request) {
           </div>
         `,
       });
-      console.log("DISPUTE EMAIL SENT");
     }
 
     return NextResponse.json({ success: true });
