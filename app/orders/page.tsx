@@ -149,15 +149,6 @@ export default function OrdersPage() {
         message: "The buyer marked the order as delivered.",
         link: "/orders",
       });
-      await fetch("/api/email/order-shipped", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    orderId: trackingOrder.id,
-  }),
-});
     }
 
     if (status === "completed") {
@@ -224,6 +215,24 @@ export default function OrdersPage() {
         message: `Your order has been shipped with ${carrier.trim()}. Tracking: ${trackingNumber.trim()}`,
         link: "/orders",
       });
+      const emailResponse = await fetch("/api/email/order-shipped", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    orderId: trackingOrder.id,
+  }),
+});
+
+const emailData = await emailResponse.json();
+
+if (!emailResponse.ok) {
+  console.log("SHIPPED EMAIL ERROR:", emailData);
+  alert(emailData.error || "Shipping email failed");
+} else {
+  console.log("SHIPPED EMAIL SENT:", emailData);
+}
 
       setTrackingOrder(null);
       setCarrier("");
