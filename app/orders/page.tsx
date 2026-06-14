@@ -215,7 +215,7 @@ export default function OrdersPage() {
         message: `Your order has been shipped with ${carrier.trim()}. Tracking: ${trackingNumber.trim()}`,
         link: "/orders",
       });
-   const emailResponse = await fetch("/api/email/order-shipped", {
+await fetch("/api/email/order-shipped", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
@@ -224,18 +224,6 @@ export default function OrdersPage() {
     orderId: trackingOrder.id,
   }),
 });
-
-const emailData = await emailResponse.json();
-
-console.log("EMAIL STATUS:", emailResponse.status);
-console.log("EMAIL DATA:", emailData);
-
-if (!emailResponse.ok) {
-  console.log("SHIPPED EMAIL ERROR:", emailData);
-  alert(emailData.error || "Shipping email failed");
-} else {
-  console.log("SHIPPED EMAIL SENT:", emailData);
-}
 
       setTrackingOrder(null);
       setCarrier("");
@@ -311,7 +299,7 @@ if (!emailResponse.ok) {
         link: "/orders",
       });
 
-     const disputeEmailResponse = await fetch("/api/email/dispute-opened", {
+await fetch("/api/email/dispute-opened", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
@@ -320,13 +308,6 @@ if (!emailResponse.ok) {
     orderId: disputeOrder.id,
   }),
 });
-
-const disputeEmailData = await disputeEmailResponse.json();
-
-console.log("DISPUTE EMAIL STATUS:", disputeEmailResponse.status);
-console.log("DISPUTE EMAIL DATA:", disputeEmailData);
-
-alert(JSON.stringify(disputeEmailData));
 
       setDisputeOrder(null);
       setDisputeReason("");
