@@ -102,11 +102,11 @@ const updateOffer = async (offer: any, status: string) => {
     "Content-Type": "application/json",
   },
   body: JSON.stringify({
-    offerId: offer.id,
+    offerId: "",
   }),
 });
 
-    const { data: order, error: orderError } = await supabase
+   const { data: order, error: orderError } = await supabase
   .from("orders")
   .insert([
     {
@@ -118,7 +118,6 @@ const updateOffer = async (offer: any, status: string) => {
       status: "pending",
       payment_status: "pending",
       transfer_status: "pending",
-      offer_id: offer.id,
     },
   ])
   .select()

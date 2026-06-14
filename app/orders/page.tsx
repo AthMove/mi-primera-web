@@ -775,14 +775,16 @@ await fetch("/api/email/dispute-opened", {
                     {isSeller ? "Message buyer" : "Message seller"}
                   </button>
 
-{isBuyer && order.payment_status === "pending" && (
-  <button
-    onClick={() => payAcceptedOffer(order)}
-    style={buttonStyle}
-  >
-    Pay accepted offer
-  </button>
-)}
+{isBuyer &&
+  order.payment_status === "pending" &&
+  order.status === "pending" && (
+    <button
+      onClick={() => payAcceptedOffer(order)}
+      style={buttonStyle}
+    >
+      Pay accepted offer
+    </button>
+  )}
 
                   {isSeller && ["paid", "pending"].includes(status) && (
                     <button
