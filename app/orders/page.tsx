@@ -371,6 +371,16 @@ await fetch("/api/email/dispute-opened", {
         link: `/seller/${reviewOrder.seller_id}`,
       });
 
+      await fetch("/api/email/review-received", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    orderId: reviewOrder.id,
+  }),
+});
+
       setReviewOrder(null);
       setRating(5);
       setComment("");
