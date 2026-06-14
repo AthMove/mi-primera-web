@@ -17,7 +17,7 @@ export async function sendEmail({
   }
 
   return await resend.emails.send({
-    from: "ATHMOV <no-reply@athmov.com>",
+    from: process.env.EMAIL_FROM || "ATHMOV <onboarding@resend.dev>",
     to,
     subject,
     html,

@@ -47,7 +47,6 @@ export async function POST(req: Request) {
         const fullSession = await stripe.checkout.sessions.retrieve(session.id);
         paymentIntentId = fullSession.payment_intent?.toString();
       }
-
       let orderId = metadata.order_id;
 
       if (!orderId) {
