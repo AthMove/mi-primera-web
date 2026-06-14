@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { sendEmail } from "@/lib/email";
 
 export async function POST(req: Request) {
+    console.log("ORDER SHIPPED EMAIL API CALLED");
   try {
     const { orderId } = await req.json();
 

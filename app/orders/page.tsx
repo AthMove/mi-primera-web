@@ -215,7 +215,7 @@ export default function OrdersPage() {
         message: `Your order has been shipped with ${carrier.trim()}. Tracking: ${trackingNumber.trim()}`,
         link: "/orders",
       });
-      const emailResponse = await fetch("/api/email/order-shipped", {
+   const emailResponse = await fetch("/api/email/order-shipped", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
@@ -226,6 +226,9 @@ export default function OrdersPage() {
 });
 
 const emailData = await emailResponse.json();
+
+console.log("EMAIL STATUS:", emailResponse.status);
+console.log("EMAIL DATA:", emailData);
 
 if (!emailResponse.ok) {
   console.log("SHIPPED EMAIL ERROR:", emailData);
