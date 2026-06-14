@@ -106,31 +106,27 @@ const updateOffer = async (offer: any, status: string) => {
   }),
 });
 
-    const { error: orderError } = await supabase.from("orders").insert([
-      {
-        product_id: offer.product_id,
-        seller_id: offer.seller_id,
-        buyer_id: offer.buyer_id,
-        buyer_email: offer.buyer_email,
-        amount: offer.amount,
-        status: "paid",
-      },
-    ]);
+    const { data: order, error: orderError } = await supabase
+  .from("orders")
+  .insert([
+    {
+      product_id: offer.product_id,
+      seller_id: offer.seller_id,
+      buyer_id: offer.buyer_id,
+      buyer_email: offer.buyer_email,
+      amount: offer.amount,
+      status: "pending",
+      payment_status: "pending",
+      transfer_status: "pending",
+      offer_id: offer.id,
+    },
+  ])
+  .select()
+  .single();
 
-    if (orderError) {
+    if (orderError || !order) {
       console.log("ORDER ERROR:", orderError);
       alert(orderError.message);
-      return;
-    }
-
-    const { error: productError } = await supabase
-      .from("products")
-      .update({ sold: true })
-      .eq("id", offer.product_id);
-
-    if (productError) {
-      console.log("PRODUCT ERROR:", productError);
-      alert(productError.message);
       return;
     }
   }

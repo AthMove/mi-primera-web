@@ -492,6 +492,51 @@ await fetch("/api/email/dispute-opened", {
     window.location.href = `/messages/${data.id}`;
   };
 
+  const payAcceptedOffer = async (order: any) => {
+  const supabase = await getSupabase();
+
+  const { data: sellerProfile } = await supabase
+    .from("profiles")
+    .select("stripe_account_id")
+    .eq("id", order.seller_id)
+    .maybeSingle();
+
+  if (!sellerProfile?.stripe_account_id) {
+    alert("Seller has not connected Stripe payouts");
+    return;
+  }
+
+  const response = await fetch("/api/checkout-offer", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      orderId: order.id,
+      offerId: order.offer_id,
+      title: order.product?.title || "ATHMOV offer",
+      image:
+        order.product?.image ||
+        order.product?.image_url ||
+        order.product?.images?.[0],
+      price: order.amount,
+      productId: order.product_id,
+      sellerId: order.seller_id,
+      buyerId: order.buyer_id,
+      stripeAccountId: sellerProfile.stripe_account_id,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (data.url) {
+    window.location.href = data.url;
+    return;
+  }
+
+  alert(data.error || "Could not start offer checkout");
+};
+
   const filteredOrders = orders.filter((order: any) => {
     if (filter === "buying") return order.buyer_id === userId;
     if (filter === "selling") return order.seller_id === userId;
@@ -729,6 +774,15 @@ await fetch("/api/email/dispute-opened", {
                   >
                     {isSeller ? "Message buyer" : "Message seller"}
                   </button>
+
+{isBuyer && order.payment_status === "pending" && (
+  <button
+    onClick={() => payAcceptedOffer(order)}
+    style={buttonStyle}
+  >
+    Pay accepted offer
+  </button>
+)}
 
                   {isSeller && ["paid", "pending"].includes(status) && (
                     <button
