@@ -340,6 +340,19 @@ if (sellerError || !sellerProfile?.stripe_account_id) {
       return;
     }
 
+    await fetch("/api/email/offer-received", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    productId: producto.id,
+    sellerId: producto.seller_id,
+    buyerEmail: user.email,
+    amount: numericAmount,
+  }),
+});
+
     alert("Offer sent");
   };
 
