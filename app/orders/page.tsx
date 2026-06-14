@@ -767,18 +767,16 @@ alert(JSON.stringify(disputeEmailData));
     </button>
   )}
 
-                                    {isSeller &&
-                    ["paid", "preparing", "shipped", "delivered"].includes(status) &&
-                    !hasOpenDispute && (
-                      <button
-                        onClick={() => {
-                          window.location.href = `/disputes/create?order=${order.id}`;
-                        }}
-                        style={reviewButtonStyle}
-                      >
-                        Report issue
-                      </button>
-                    )}
+                     {isSeller &&
+  ["paid", "preparing", "shipped", "delivered"].includes(status) &&
+  !hasOpenDispute && (
+    <button
+      onClick={() => setDisputeOrder(order)}
+      style={reviewButtonStyle}
+    >
+      Report issue
+    </button>
+  )}
 
                   {isBuyer &&
                     status === "completed" &&
