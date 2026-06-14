@@ -311,7 +311,7 @@ if (!emailResponse.ok) {
         link: "/orders",
       });
 
-      await fetch("/api/email/dispute-opened", {
+     const disputeEmailResponse = await fetch("/api/email/dispute-opened", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
@@ -320,6 +320,13 @@ if (!emailResponse.ok) {
     orderId: disputeOrder.id,
   }),
 });
+
+const disputeEmailData = await disputeEmailResponse.json();
+
+console.log("DISPUTE EMAIL STATUS:", disputeEmailResponse.status);
+console.log("DISPUTE EMAIL DATA:", disputeEmailData);
+
+alert(JSON.stringify(disputeEmailData));
 
       setDisputeOrder(null);
       setDisputeReason("");
