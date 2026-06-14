@@ -149,6 +149,15 @@ export default function OrdersPage() {
         message: "The buyer marked the order as delivered.",
         link: "/orders",
       });
+      await fetch("/api/email/order-shipped", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    orderId: trackingOrder.id,
+  }),
+});
     }
 
     if (status === "completed") {
