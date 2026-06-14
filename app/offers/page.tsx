@@ -94,38 +94,59 @@ const updateOffer = async (offer: any, status: string) => {
     return;
   }
 
+  if (status === "rejected") {
+    await fetch("/api/email/offer-rejected", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        offerId: offer.id,
+      }),
+    });
+
+    await loadOffers();
+    return;
+  }
+
   if (status === "accepted") {
-
     await fetch("/api/email/offer-accepted", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    offerId: "",
-  }),
-});
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        offerId: offer.id,
+      }),
+    });
 
-   const { data: order, error: orderError } = await supabase
-  .from("orders")
-  .insert([
-    {
-      product_id: offer.product_id,
-      seller_id: offer.seller_id,
-      buyer_id: offer.buyer_id,
-      buyer_email: offer.buyer_email,
-      amount: offer.amount,
-      status: "pending",
-      payment_status: "pending",
-      transfer_status: "pending",
-    },
-  ])
-  .select()
-  .single();
+    await supabase
+      .from("offers")
+      .update({ status: "rejected" })
+      .eq("product_id", offer.product_id)
+      .neq("id", offer.id)
+      .eq("status", "pending");
+
+    const { data: order, error: orderError } = await supabase
+      .from("orders")
+      .insert([
+        {
+          product_id: offer.product_id,
+          seller_id: offer.seller_id,
+          buyer_id: offer.buyer_id,
+          buyer_email: offer.buyer_email,
+          amount: offer.amount,
+          status: "pending",
+          payment_status: "pending",
+          transfer_status: "pending",
+        },
+      ])
+      .select()
+      .single();
 
     if (orderError || !order) {
       console.log("ORDER ERROR:", orderError);
-      alert(orderError.message);
+      alert(orderError?.message || "Order could not be created");
       return;
     }
   }
