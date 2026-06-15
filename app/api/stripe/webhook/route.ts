@@ -72,6 +72,14 @@ export async function POST(req: Request) {
 console.log("UPDATING ORDER", orderId);
 console.log("TIME", new Date().toISOString());
 
+const { data: currentOrder } = await supabase
+  .from("orders")
+  .select("payment_status")
+  .eq("id", orderId)
+  .maybeSingle();
+
+const wasAlreadyPaid = currentOrder?.payment_status === "paid";
+
       const { data: updatedOrder, error: updateError } = await supabase
         .from("orders")
         .update({
@@ -102,6 +110,11 @@ transfer_status: "pending",
           .from("products")
           .update({ sold: true })
           .eq("id", updatedOrder.product_id);
+          await supabase
+  .from("offers")
+  .update({ status: "rejected" })
+  .eq("product_id", updatedOrder.product_id)
+  .eq("status", "pending");
 
         if (productError) {
           console.log("PRODUCT SOLD UPDATE ERROR:", productError);
@@ -114,7 +127,7 @@ transfer_status: "pending",
         .eq("id", orderId)
         .single();
 
-      if (order) {
+      if (order && !wasAlreadyPaid) {
         const { sendEmail } = await import("@/lib/email");
 
         const { data: product } = await supabase

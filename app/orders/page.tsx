@@ -143,6 +143,15 @@ export default function OrdersPage() {
     }
 
     if (status === "delivered") {
+      await fetch("/api/email/order-delivered", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    orderId: order.id,
+  }),
+});
       await notify({
         user_id: order.seller_id,
         title: "Order delivered",
@@ -163,6 +172,15 @@ export default function OrdersPage() {
         message: "Your order has been completed.",
         link: "/orders",
       });
+      await fetch("/api/email/payout-released", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    orderId: order.id,
+  }),
+});
 
       await notify({
         user_id: order.seller_id,
