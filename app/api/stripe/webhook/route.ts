@@ -105,21 +105,22 @@ transfer_status: "pending",
         );
       }
 
-      if (updatedOrder.product_id) {
-        const { error: productError } = await supabase
-          .from("products")
-          .update({ sold: true })
-          .eq("id", updatedOrder.product_id);
-          await supabase
-  .from("offers")
-  .update({ status: "rejected" })
-  .eq("product_id", updatedOrder.product_id)
-  .eq("status", "pending");
+     if (updatedOrder.product_id) {
+  const { error: productError } = await supabase
+    .from("products")
+    .update({ sold: true })
+    .eq("id", updatedOrder.product_id);
 
-        if (productError) {
-          console.log("PRODUCT SOLD UPDATE ERROR:", productError);
-        }
-      }
+  await supabase
+    .from("offers")
+    .update({ status: "rejected" })
+    .eq("product_id", updatedOrder.product_id)
+    .eq("status", "pending");
+
+  if (productError) {
+    console.log("PRODUCT SOLD UPDATE ERROR:", productError);
+  }
+}
 
       const { data: order } = await supabase
         .from("orders")
