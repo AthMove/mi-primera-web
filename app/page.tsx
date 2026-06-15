@@ -11,6 +11,127 @@ export default function Home() {
   const [newDrops, setNewDrops] = useState<any[]>([]);
   const [soldProducts, setSoldProducts] = useState<any[]>([]);
 
+  const [lang, setLang] = useState<"es" | "en">("es");
+
+useEffect(() => {
+  const savedLang = localStorage.getItem("athmov_lang");
+  if (savedLang === "en" || savedLang === "es") {
+    setLang(savedLang);
+  }
+}, []);
+
+const changeLang = (value: "es" | "en") => {
+  setLang(value);
+  localStorage.setItem("athmov_lang", value);
+};
+
+const t = {
+  es: {
+    eyebrow: "ATHMOV PREMIUM SECOND HAND",
+    title1: "Segunda mano.",
+    title2: "Primera clase.",
+    heroText:
+      "Compra y vende material deportivo premium de segunda mano de atletas, vendedores y coleccionistas de confianza.",
+    shop: "Comprar",
+    drops: "Novedades",
+    sell: "Vender",
+    badge: "Material premium seleccionado",
+    verified: "Vendedores verificados",
+    verifiedText:
+      "ATHMOV revisa manualmente vendedores premium y coleccionistas deportivos.",
+    protection: "Protección al comprador",
+    protectionText:
+      "Pagos seguros y transacciones protegidas dentro del marketplace.",
+    curated: "Marketplace seleccionado",
+    curatedText:
+      "Solo marcas deportivas premium de pádel, golf, tenis y running.",
+    luxury: "Segunda mano premium",
+    luxuryText:
+      "Material deportivo seleccionado de atletas y coleccionistas de confianza.",
+    latest: "ÚLTIMOS",
+    newDrops: "Novedades",
+    viewFeed: "Ver feed →",
+    why: "POR QUÉ ATHMOV",
+    darkTitle: "El material deportivo premium merece una segunda vida.",
+    curatedMarket: "Marketplace seleccionado",
+    curatedMarketText:
+      "Un espacio premium para material deportivo de segunda mano de alta calidad.",
+    reputation: "Reputación del vendedor",
+    reputationText:
+      "Reseñas, pedidos, tracking y perfiles de vendedor construyen confianza.",
+    athletes: "Creado para atletas",
+    athletesText: "Material premium de pádel, golf, tenis y running.",
+    categories: "CATEGORÍAS",
+    explore: "Explorar deportes",
+    sport: "DEPORTE",
+    activity: "ACTIVIDAD DEL MERCADO",
+    recentlySold: "Vendido recientemente",
+    ctaTitle: "¿Listo para vender material premium?",
+    ctaText:
+      "Publica tu equipamiento deportivo y llega a compradores que buscan piezas de calidad.",
+    startSelling: "Empezar a vender",
+    footerText:
+      "Marketplace premium de segunda mano para atletas, coleccionistas y amantes del deporte.",
+    marketplace: "Marketplace",
+    support: "Soporte",
+    how: "Cómo funciona",
+    guide: "Guía del comprador",
+    buyerProtection: "Protección al comprador",
+  },
+  en: {
+    eyebrow: "ATHMOV PREMIUM SECOND HAND",
+    title1: "Second hand.",
+    title2: "First class.",
+    heroText:
+      "Buy and sell premium second-hand sports gear from trusted athletes, sellers and collectors.",
+    shop: "Shop Gear",
+    drops: "New Drops",
+    sell: "Sell Gear",
+    badge: "Curated premium gear",
+    verified: "Verified Sellers",
+    verifiedText:
+      "ATHMOV manually reviews premium sellers and sports collectors.",
+    protection: "Buyer Protection",
+    protectionText:
+      "Secure transactions and protected premium marketplace payments.",
+    curated: "Curated Marketplace",
+    curatedText:
+      "Only premium sports brands across padel, golf, tennis and running.",
+    luxury: "Luxury Second Hand",
+    luxuryText:
+      "Curated performance gear from trusted athletes and collectors.",
+    latest: "LATEST",
+    newDrops: "New Drops",
+    viewFeed: "View feed →",
+    why: "WHY ATHMOV",
+    darkTitle: "Premium sports gear deserves a second life.",
+    curatedMarket: "Curated marketplace",
+    curatedMarketText:
+      "A premium space for high-quality second-hand sports equipment.",
+    reputation: "Seller reputation",
+    reputationText:
+      "Reviews, orders, tracking and seller profiles build trust.",
+    athletes: "Built for athletes",
+    athletesText: "Padel, golf, tennis and running premium gear.",
+    categories: "CATEGORIES",
+    explore: "Explore Sports",
+    sport: "SPORT",
+    activity: "MARKET ACTIVITY",
+    recentlySold: "Recently Sold",
+    ctaTitle: "Ready to sell premium gear?",
+    ctaText:
+      "List your sports equipment and reach buyers looking for quality pieces.",
+    startSelling: "Start selling",
+    footerText:
+      "Premium second-hand marketplace for athletes, collectors and sports enthusiasts.",
+    marketplace: "Marketplace",
+    support: "Support",
+    how: "How it works",
+    guide: "Buyer guide",
+    buyerProtection: "Buyer protection",
+  },
+}[lang];
+
   useEffect(() => {
     loadHome();
   }, []);
@@ -69,36 +190,56 @@ export default function Home() {
   ];
 
   return (
-    <main style={pageStyle} className="home-page">
-      <section style={heroStyle} className="hero-section">
+  <main style={pageStyle} className="home-page">
+
+    <div style={languageSwitcherStyle}>
+      <button
+        onClick={() => changeLang("es")}
+        style={{
+          ...languageButtonStyle,
+          ...(lang === "es" ? activeLanguageButtonStyle : {}),
+        }}
+      >
+        ES
+      </button>
+
+      <button
+        onClick={() => changeLang("en")}
+        style={{
+          ...languageButtonStyle,
+          ...(lang === "en" ? activeLanguageButtonStyle : {}),
+        }}
+      >
+        EN
+      </button>
+    </div>
+
+    <section style={heroStyle} className="hero-section">
         <div>
-          <p style={eyebrowStyle}>ATHMOV PREMIUM SECOND HAND</p>
+          <p style={eyebrowStyle}>{t.eyebrow}</p>
 
-          <h1 style={heroTitleStyle} className="hero-title">
-            Second hand.
-            <br />
-            First class.
-          </h1>
+<h1 style={heroTitleStyle} className="hero-title">
+  {t.title1}
+  <br />
+  {t.title2}
+</h1>
 
-          <p style={heroTextStyle}>
-            Buy and sell premium second-hand sports gear from trusted athletes,
-            sellers and collectors.
-          </p>
+<p style={heroTextStyle}>
+  {t.heroText}
+</p>
 
-          <div style={heroActionsStyle}>
-            <button onClick={() => router.push("/products")} style={primaryButtonStyle}>
-              Shop Gear
-            </button>
+          <button onClick={() => router.push("/products")} style={primaryButtonStyle}>
+  {t.shop}
+</button>
 
-            <button onClick={() => router.push("/feed")} style={secondaryButtonStyle}>
-              New Drops
-            </button>
+<button onClick={() => router.push("/feed")} style={secondaryButtonStyle}>
+  {t.drops}
+</button>
 
-            <button onClick={() => router.push("/sell")} style={secondaryButtonStyle}>
-              Sell Gear
-            </button>
+<button onClick={() => router.push("/sell")} style={secondaryButtonStyle}>
+  {t.sell}
+</button>
           </div>
-        </div>
 
         <div style={heroImageStyle} className="hero-image">
           <Image
@@ -780,4 +921,34 @@ const footerBottomStyle = {
   textAlign: "center" as const,
   color: "#777",
   fontSize: "13px",
+};
+
+const languageSwitcherStyle = {
+  position: "fixed" as const,
+ top: "20px",
+right: "20px",
+ zIndex: 9999,
+  display: "flex",
+  gap: "6px",
+  background: "#fff",
+  border: "1px solid rgba(0,0,0,0.08)",
+  borderRadius: "999px",
+  padding: "5px",
+  boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
+};
+
+const languageButtonStyle = {
+  border: "none",
+  background: "transparent",
+  color: "#111",
+  borderRadius: "999px",
+  padding: "8px 12px",
+  fontSize: "12px",
+  fontWeight: 900,
+  cursor: "pointer",
+};
+
+const activeLanguageButtonStyle = {
+  background: "#111",
+  color: "#fff",
 };

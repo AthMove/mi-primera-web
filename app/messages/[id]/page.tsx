@@ -712,8 +712,8 @@ const sendTyping = () => {
                         Status: {message.offer_status || "pending"}
                       </p>
 
-                      {!mine && message.offer_status === "pending" && (
-                        <div style={offerActionsStyle}>
+                      {false && !mine && message.offer_status === "pending" && (
+  <div style={offerActionsStyle}>
                           <button
                             onClick={() =>
                               updateOfferStatus(message.id, "accepted", message)
