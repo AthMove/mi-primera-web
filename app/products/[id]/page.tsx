@@ -565,7 +565,7 @@ await supabase
   <div style={trustPanelItemStyle}>
     {sellerProfile?.seller_verified ? "✓ Verified Seller" : "Seller Profile Available"}
   </div>
-  <div style={trustPanelItemStyle}>✓ Curated Marketplace</div>
+  <div style={trustPanelItemStyle}>✓ Marketplace seleccionado </div>
 </div>
 
           <section style={buyerGuideStyle}>
