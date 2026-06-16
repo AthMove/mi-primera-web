@@ -192,27 +192,6 @@ const t = {
   return (
   <main style={pageStyle} className="home-page">
 
-    <div style={languageSwitcherStyle}>
-      <button
-        onClick={() => changeLang("es")}
-        style={{
-          ...languageButtonStyle,
-          ...(lang === "es" ? activeLanguageButtonStyle : {}),
-        }}
-      >
-        ES
-      </button>
-
-      <button
-        onClick={() => changeLang("en")}
-        style={{
-          ...languageButtonStyle,
-          ...(lang === "en" ? activeLanguageButtonStyle : {}),
-        }}
-      >
-        EN
-      </button>
-    </div>
 
     <section style={heroStyle} className="hero-section">
         <div>
@@ -252,7 +231,7 @@ const t = {
             style={{ objectFit: "cover" }}
           />
 
-          <div style={heroBadgeStyle}>Curated premium gear</div>
+          <div style={heroBadgeStyle}>{t.badge}</div>
         </div>
       </section>
 
@@ -441,7 +420,7 @@ const t = {
         </button>
       </section>
 
-      <footer style={footerStyle}>
+<footer style={footerStyle}>
   <div style={footerGridStyle}>
     <div>
       <h3 style={footerLogoStyle}>ATHMOV</h3>
@@ -921,34 +900,4 @@ const footerBottomStyle = {
   textAlign: "center" as const,
   color: "#777",
   fontSize: "13px",
-};
-
-const languageSwitcherStyle = {
-  position: "fixed" as const,
- top: "20px",
-right: "20px",
- zIndex: 9999,
-  display: "flex",
-  gap: "6px",
-  background: "#fff",
-  border: "1px solid rgba(0,0,0,0.08)",
-  borderRadius: "999px",
-  padding: "5px",
-  boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
-};
-
-const languageButtonStyle = {
-  border: "none",
-  background: "transparent",
-  color: "#111",
-  borderRadius: "999px",
-  padding: "8px 12px",
-  fontSize: "12px",
-  fontWeight: 900,
-  cursor: "pointer",
-};
-
-const activeLanguageButtonStyle = {
-  background: "#111",
-  color: "#fff",
 };
