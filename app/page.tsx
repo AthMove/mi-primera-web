@@ -11,127 +11,6 @@ export default function Home() {
   const [newDrops, setNewDrops] = useState<any[]>([]);
   const [soldProducts, setSoldProducts] = useState<any[]>([]);
 
-  const [lang, setLang] = useState<"es" | "en">("es");
-
-useEffect(() => {
-  const savedLang = localStorage.getItem("athmov_lang");
-  if (savedLang === "en" || savedLang === "es") {
-    setLang(savedLang);
-  }
-}, []);
-
-const changeLang = (value: "es" | "en") => {
-  setLang(value);
-  localStorage.setItem("athmov_lang", value);
-};
-
-const t = {
-  es: {
-    eyebrow: "ATHMOV PREMIUM SECOND HAND",
-    title1: "Segunda mano.",
-    title2: "Primera clase.",
-    heroText:
-      "Compra y vende material deportivo premium de segunda mano de atletas, vendedores y coleccionistas de confianza.",
-    shop: "Comprar",
-    drops: "Novedades",
-    sell: "Vender",
-    badge: "Material premium seleccionado",
-    verified: "Vendedores verificados",
-    verifiedText:
-      "ATHMOV revisa manualmente vendedores premium y coleccionistas deportivos.",
-    protection: "Protección al comprador",
-    protectionText:
-      "Pagos seguros y transacciones protegidas dentro del marketplace.",
-    curated: "Marketplace seleccionado",
-    curatedText:
-      "Solo marcas deportivas premium de pádel, golf, tenis y running.",
-    luxury: "Segunda mano premium",
-    luxuryText:
-      "Material deportivo seleccionado de atletas y coleccionistas de confianza.",
-    latest: "ÚLTIMOS",
-    newDrops: "Novedades",
-    viewFeed: "Ver feed →",
-    why: "POR QUÉ ATHMOV",
-    darkTitle: "El material deportivo premium merece una segunda vida.",
-    curatedMarket: "Marketplace seleccionado",
-    curatedMarketText:
-      "Un espacio premium para material deportivo de segunda mano de alta calidad.",
-    reputation: "Reputación del vendedor",
-    reputationText:
-      "Reseñas, pedidos, tracking y perfiles de vendedor construyen confianza.",
-    athletes: "Creado para atletas",
-    athletesText: "Material premium de pádel, golf, tenis y running.",
-    categories: "CATEGORÍAS",
-    explore: "Explorar deportes",
-    sport: "DEPORTE",
-    activity: "ACTIVIDAD DEL MERCADO",
-    recentlySold: "Vendido recientemente",
-    ctaTitle: "¿Listo para vender material premium?",
-    ctaText:
-      "Publica tu equipamiento deportivo y llega a compradores que buscan piezas de calidad.",
-    startSelling: "Empezar a vender",
-    footerText:
-      "Marketplace premium de segunda mano para atletas, coleccionistas y amantes del deporte.",
-    marketplace: "Marketplace",
-    support: "Soporte",
-    how: "Cómo funciona",
-    guide: "Guía del comprador",
-    buyerProtection: "Protección al comprador",
-  },
-  en: {
-    eyebrow: "ATHMOV PREMIUM SECOND HAND",
-    title1: "Second hand.",
-    title2: "First class.",
-    heroText:
-      "Buy and sell premium second-hand sports gear from trusted athletes, sellers and collectors.",
-    shop: "Shop Gear",
-    drops: "New Drops",
-    sell: "Sell Gear",
-    badge: "Curated premium gear",
-    verified: "Verified Sellers",
-    verifiedText:
-      "ATHMOV manually reviews premium sellers and sports collectors.",
-    protection: "Buyer Protection",
-    protectionText:
-      "Secure transactions and protected premium marketplace payments.",
-    curated: "Curated Marketplace",
-    curatedText:
-      "Only premium sports brands across padel, golf, tennis and running.",
-    luxury: "Luxury Second Hand",
-    luxuryText:
-      "Curated performance gear from trusted athletes and collectors.",
-    latest: "LATEST",
-    newDrops: "New Drops",
-    viewFeed: "View feed →",
-    why: "WHY ATHMOV",
-    darkTitle: "Premium sports gear deserves a second life.",
-    curatedMarket: "Curated marketplace",
-    curatedMarketText:
-      "A premium space for high-quality second-hand sports equipment.",
-    reputation: "Seller reputation",
-    reputationText:
-      "Reviews, orders, tracking and seller profiles build trust.",
-    athletes: "Built for athletes",
-    athletesText: "Padel, golf, tennis and running premium gear.",
-    categories: "CATEGORIES",
-    explore: "Explore Sports",
-    sport: "SPORT",
-    activity: "MARKET ACTIVITY",
-    recentlySold: "Recently Sold",
-    ctaTitle: "Ready to sell premium gear?",
-    ctaText:
-      "List your sports equipment and reach buyers looking for quality pieces.",
-    startSelling: "Start selling",
-    footerText:
-      "Premium second-hand marketplace for athletes, collectors and sports enthusiasts.",
-    marketplace: "Marketplace",
-    support: "Support",
-    how: "How it works",
-    guide: "Buyer guide",
-    buyerProtection: "Buyer protection",
-  },
-}[lang];
-
   useEffect(() => {
     loadHome();
   }, []);
@@ -164,66 +43,67 @@ const t = {
 
   const categories = [
     {
-      title: "PADEL",
-      text: "Premium rackets & gear",
+      title: "PÁDEL",
+      text: "Palas y material premium",
       href: "/products?category=padel",
       image: "/padel.jpg",
     },
     {
       title: "GOLF",
-      text: "Clubs, bags & essentials",
+      text: "Palos, bolsas y accesorios",
       href: "/products?category=golf",
       image: "/golf.jpg",
     },
     {
-      title: "TENNIS",
-      text: "Rackets & performance pieces",
+      title: "TENIS",
+      text: "Raquetas y piezas de alto rendimiento",
       href: "/products?category=tennis",
       image: "/tennis.jpg",
     },
     {
       title: "RUNNING",
-      text: "Performance footwear & apparel",
+      text: "Calzado técnico y ropa deportiva",
       href: "/products?category=running",
       image: "/running.jpg",
     },
   ];
 
   return (
-  <main style={pageStyle} className="home-page">
-
-
-    <section style={heroStyle} className="hero-section">
+    <main style={pageStyle} className="home-page">
+      <section style={heroStyle} className="hero-section">
         <div>
-          <p style={eyebrowStyle}>{t.eyebrow}</p>
+          <p style={eyebrowStyle}>ATHMOV PREMIUM SECOND HAND</p>
 
-<h1 style={heroTitleStyle} className="hero-title">
-  {t.title1}
-  <br />
-  {t.title2}
-</h1>
+          <h1 style={heroTitleStyle} className="hero-title">
+            Segunda mano.
+            <br />
+            Primera clase.
+          </h1>
 
-<p style={heroTextStyle}>
-  {t.heroText}
-</p>
+          <p style={heroTextStyle}>
+            Compra y vende material deportivo premium de segunda mano de atletas,
+            vendedores y coleccionistas de confianza.
+          </p>
 
-          <button onClick={() => router.push("/products")} style={primaryButtonStyle}>
-  {t.shop}
-</button>
+          <div style={heroActionsStyle}>
+            <button onClick={() => router.push("/products")} style={primaryButtonStyle}>
+              Comprar
+            </button>
 
-<button onClick={() => router.push("/feed")} style={secondaryButtonStyle}>
-  {t.drops}
-</button>
+            <button onClick={() => router.push("/feed")} style={secondaryButtonStyle}>
+              Novedades
+            </button>
 
-<button onClick={() => router.push("/sell")} style={secondaryButtonStyle}>
-  {t.sell}
-</button>
+            <button onClick={() => router.push("/sell")} style={secondaryButtonStyle}>
+              Vender
+            </button>
           </div>
+        </div>
 
         <div style={heroImageStyle} className="hero-image">
           <Image
             src="/hero-sports-new.jpg"
-            alt="ATHMOV premium sports gear"
+            alt="Material deportivo premium ATHMOV"
             fill
             priority
             sizes="(max-width: 1100px) 100vw, 50vw"
@@ -231,36 +111,36 @@ const t = {
             style={{ objectFit: "cover" }}
           />
 
-          <div style={heroBadgeStyle}>{t.badge}</div>
+          <div style={heroBadgeStyle}>Material premium seleccionado</div>
         </div>
       </section>
 
       <section style={trustSectionStyle} className="trust-grid">
         <div style={trustCardStyle}>
-          <p style={trustCardTitleStyle}>Verified Sellers</p>
+          <p style={trustCardTitleStyle}>Vendedores verificados</p>
           <p style={trustCardTextStyle}>
-            ATHMOV manually reviews premium sellers and sports collectors.
+            ATHMOV revisa manualmente vendedores premium y coleccionistas deportivos.
           </p>
         </div>
 
         <div style={trustCardStyle}>
-          <p style={trustCardTitleStyle}>Buyer Protection</p>
+          <p style={trustCardTitleStyle}>Protección al comprador</p>
           <p style={trustCardTextStyle}>
-            Secure transactions and protected premium marketplace payments.
+            Pagos seguros y transacciones protegidas dentro del marketplace.
           </p>
         </div>
 
         <div style={trustCardStyle}>
-          <p style={trustCardTitleStyle}>Curated Marketplace</p>
+          <p style={trustCardTitleStyle}>Marketplace seleccionado</p>
           <p style={trustCardTextStyle}>
-            Only premium sports brands across padel, golf, tennis and running.
+            Solo marcas deportivas premium de pádel, golf, tenis y running.
           </p>
         </div>
 
         <div style={trustCardStyle}>
-          <p style={trustCardTitleStyle}>Luxury Second Hand</p>
+          <p style={trustCardTitleStyle}>Segunda mano premium</p>
           <p style={trustCardTextStyle}>
-            Curated performance gear from trusted athletes and collectors.
+            Material deportivo seleccionado de atletas y coleccionistas de confianza.
           </p>
         </div>
       </section>
@@ -268,12 +148,12 @@ const t = {
       <section style={sectionStyle}>
         <div style={sectionHeaderStyle}>
           <div>
-            <p style={eyebrowStyle}>LATEST</p>
-            <h2 style={sectionTitleStyle}>New Drops</h2>
+            <p style={eyebrowStyle}>ÚLTIMOS</p>
+            <h2 style={sectionTitleStyle}>Novedades</h2>
           </div>
 
           <button onClick={() => router.push("/feed")} style={smallButtonStyle}>
-            View feed →
+            Ver feed →
           </button>
         </div>
 
@@ -288,7 +168,7 @@ const t = {
               <div style={cardImageStyle}>
                 <Image
                   src={safeImage(product.image)}
-                  alt={product.title || "Product"}
+                  alt={product.title || "Producto"}
                   fill
                   sizes="33vw"
                   className="card-img"
@@ -307,31 +187,31 @@ const t = {
       </section>
 
       <section style={darkSectionStyle}>
-        <p style={eyebrowLightStyle}>WHY ATHMOV</p>
+        <p style={eyebrowLightStyle}>POR QUÉ ATHMOV</p>
 
         <h2 style={darkTitleStyle}>
-          Premium sports gear deserves a second life.
+          El material deportivo premium merece una segunda vida.
         </h2>
 
         <div style={trustGridStyle}>
           <div>
-            <h3 style={trustTitleStyle}>Curated marketplace</h3>
+            <h3 style={trustTitleStyle}>Marketplace seleccionado</h3>
             <p style={trustTextStyle}>
-              A premium space for high-quality second-hand sports equipment.
+              Un espacio premium para material deportivo de segunda mano de alta calidad.
             </p>
           </div>
 
           <div>
-            <h3 style={trustTitleStyle}>Seller reputation</h3>
+            <h3 style={trustTitleStyle}>Reputación del vendedor</h3>
             <p style={trustTextStyle}>
-              Reviews, orders, tracking and seller profiles build trust.
+              Reseñas, pedidos, tracking y perfiles de vendedor ayudan a construir confianza.
             </p>
           </div>
 
           <div>
-            <h3 style={trustTitleStyle}>Built for athletes</h3>
+            <h3 style={trustTitleStyle}>Creado para atletas</h3>
             <p style={trustTextStyle}>
-              Padel, golf, tennis and running premium gear.
+              Material premium de pádel, golf, tenis y running.
             </p>
           </div>
         </div>
@@ -340,8 +220,8 @@ const t = {
       <section style={sectionStyle}>
         <div style={sectionHeaderStyle}>
           <div>
-            <p style={eyebrowStyle}>CATEGORIES</p>
-            <h2 style={sectionTitleStyle}>Explore Sports</h2>
+            <p style={eyebrowStyle}>CATEGORÍAS</p>
+            <h2 style={sectionTitleStyle}>Explorar deportes</h2>
           </div>
         </div>
 
@@ -365,7 +245,7 @@ const t = {
               </div>
 
               <div style={cardContentStyle}>
-                <p style={brandStyle}>SPORT</p>
+                <p style={brandStyle}>DEPORTE</p>
                 <h3 style={cardTitleStyle}>{category.title}</h3>
                 <p style={categoryTextStyle}>{category.text}</p>
               </div>
@@ -378,8 +258,8 @@ const t = {
         <section style={sectionStyle}>
           <div style={sectionHeaderStyle}>
             <div>
-              <p style={eyebrowStyle}>MARKET ACTIVITY</p>
-              <h2 style={sectionTitleStyle}>Recently Sold</h2>
+              <p style={eyebrowStyle}>ACTIVIDAD DEL MERCADO</p>
+              <h2 style={sectionTitleStyle}>Vendido recientemente</h2>
             </div>
           </div>
 
@@ -389,13 +269,13 @@ const t = {
                 <div style={soldImageStyle}>
                   <Image
                     src={safeImage(product.image)}
-                    alt={product.title || "Sold product"}
+                    alt={product.title || "Producto vendido"}
                     fill
                     sizes="25vw"
                     style={{ objectFit: "cover" }}
                   />
 
-                  <span style={soldBadgeStyle}>SOLD</span>
+                  <span style={soldBadgeStyle}>VENDIDO</span>
                 </div>
 
                 <div style={soldContentStyle}>
@@ -410,83 +290,79 @@ const t = {
       )}
 
       <section style={sellerCtaStyle}>
-        <h2 style={ctaTitleStyle}>Ready to sell premium gear?</h2>
+        <h2 style={ctaTitleStyle}>¿Listo para vender material premium?</h2>
         <p style={ctaTextStyle}>
-          List your sports equipment and reach buyers looking for quality pieces.
+          Publica tu equipamiento deportivo y llega a compradores que buscan piezas de calidad.
         </p>
 
         <button onClick={() => router.push("/sell")} style={primaryButtonStyle}>
-          Start selling
+          Empezar a vender
         </button>
       </section>
 
-<footer style={footerStyle}>
-  <div style={footerGridStyle}>
-    <div>
-      <h3 style={footerLogoStyle}>ATHMOV</h3>
+      <footer style={footerStyle}>
+        <div style={footerGridStyle}>
+          <div>
+            <h3 style={footerLogoStyle}>ATHMOV</h3>
 
-      <p style={footerTextStyle}>
-        Premium second-hand marketplace for athletes, collectors and sports enthusiasts.
-      </p>
-    </div>
+            <p style={footerTextStyle}>
+              Marketplace premium de segunda mano para atletas, coleccionistas y amantes del deporte.
+            </p>
+          </div>
 
-    <div style={footerColumnStyle}>
-      <p style={footerTitleStyle}>Marketplace</p>
+          <div style={footerColumnStyle}>
+            <p style={footerTitleStyle}>Marketplace</p>
 
-      <button onClick={() => router.push("/products")} style={footerLinkStyle}>
-        Shop
-      </button>
+            <button onClick={() => router.push("/products")} style={footerLinkStyle}>
+              Comprar
+            </button>
 
-      <button onClick={() => router.push("/sell")} style={footerLinkStyle}>
-        Sell
-      </button>
+            <button onClick={() => router.push("/sell")} style={footerLinkStyle}>
+              Vender
+            </button>
 
-      <button onClick={() => router.push("/feed")} style={footerLinkStyle}>
-        Feed
-      </button>
-    </div>
+            <button onClick={() => router.push("/feed")} style={footerLinkStyle}>
+              Feed
+            </button>
+          </div>
 
-    <div style={footerColumnStyle}>
-      <p style={footerTitleStyle}>Support</p>
+          <div style={footerColumnStyle}>
+            <p style={footerTitleStyle}>Soporte</p>
 
-      <button onClick={() => router.push("/how-it-works")} style={footerLinkStyle}>
-        How it works
-      </button>
+            <button onClick={() => router.push("/how-it-works")} style={footerLinkStyle}>
+              Cómo funciona
+            </button>
 
-      <button onClick={() => router.push("/buyer-guide")} style={footerLinkStyle}>
-        Buyer guide
-      </button>
+            <button onClick={() => router.push("/buyer-guide")} style={footerLinkStyle}>
+              Guía del comprador
+            </button>
 
-      <button style={footerLinkStyle}>
-        Buyer protection
-      </button>
-    </div>
+            <button style={footerLinkStyle}>Protección al comprador</button>
+          </div>
 
-    <div style={footerColumnStyle}>
-      <p style={footerTitleStyle}>Categories</p>
+          <div style={footerColumnStyle}>
+            <p style={footerTitleStyle}>Categorías</p>
 
-      <button onClick={() => router.push("/products?category=padel")} style={footerLinkStyle}>
-        Padel
-      </button>
+            <button onClick={() => router.push("/products?category=padel")} style={footerLinkStyle}>
+              Pádel
+            </button>
 
-      <button onClick={() => router.push("/products?category=golf")} style={footerLinkStyle}>
-        Golf
-      </button>
+            <button onClick={() => router.push("/products?category=golf")} style={footerLinkStyle}>
+              Golf
+            </button>
 
-      <button onClick={() => router.push("/products?category=tennis")} style={footerLinkStyle}>
-        Tennis
-      </button>
+            <button onClick={() => router.push("/products?category=tennis")} style={footerLinkStyle}>
+              Tenis
+            </button>
 
-      <button onClick={() => router.push("/products?category=running")} style={footerLinkStyle}>
-        Running
-      </button>
-    </div>
-  </div>
+            <button onClick={() => router.push("/products?category=running")} style={footerLinkStyle}>
+              Running
+            </button>
+          </div>
+        </div>
 
-  <div style={footerBottomStyle}>
-    © 2025 ATHMOV. All rights reserved.
-  </div>
-</footer>
+        <div style={footerBottomStyle}>©️ 2025 ATHMOV. Todos los derechos reservados.</div>
+      </footer>
 
       <style>{`
         .home-card {
