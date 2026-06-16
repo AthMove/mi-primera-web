@@ -168,7 +168,7 @@ export default function SellPage() {
         return;
       }
 
-      alert("Product submitted for review");
+      alert("Producto enviado para revisión");
       router.push(`/products/${data.id}`);
     } finally {
       setLoading(false);
@@ -178,18 +178,18 @@ export default function SellPage() {
   return (
     <main style={pageStyle} className="sell-page">
       <section style={heroStyle}>
-        <p style={heroEyebrowStyle}>ATHMOV CURATED MARKETPLACE</p>
+        <p style={heroEyebrowStyle}>MARKETPLACE SELECCIONADO ATHMOV</p>
 
-        <h1 style={heroTitleStyle} className="sell-title">
-          Sell Premium
-          <br />
-          Sports Gear
-        </h1>
+       <h1 style={heroTitleStyle} className="sell-title">
+  Vende Material
+  <br />
+  Deportivo Premium
+</h1>
 
         <p style={heroTextStyle}>
-          Only selected premium brands in padel, golf, tennis and running are
-          accepted. Every listing is reviewed before going live.
-        </p>
+  Solo se aceptan marcas premium seleccionadas de pádel, golf, tenis y
+  running. Cada anuncio es revisado antes de publicarse.
+</p>
       </section>
 
       <section style={formWrapperStyle} className="sell-form-wrapper">
@@ -197,15 +197,17 @@ export default function SellPage() {
           {preview ? (
             <Image
               src={preview}
-              alt="Product preview"
+              alt="Vista previa del producto"
               fill
               style={{ objectFit: "cover" }}
             />
           ) : (
             <div style={emptyUploadStyle}>
               <div style={uploadIconStyle}>＋</div>
-              <p style={uploadTitleStyle}>Product image</p>
-              <span style={uploadTextStyle}>Upload a clear premium photo</span>
+              <p style={uploadTitleStyle}>Imagen del producto</p>
+              <span style={uploadTextStyle}>
+  Sube una fotografía clara del producto
+</span>
             </div>
           )}
 
@@ -219,7 +221,7 @@ export default function SellPage() {
 
         <div style={formStyle}>
           <input
-            placeholder="Product title"
+            placeholder="Título del producto"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             style={inputStyle}
@@ -257,10 +259,10 @@ export default function SellPage() {
               onChange={(e) => setGender(e.target.value)}
               style={inputStyle}
             >
-              <option value="MEN">MEN</option>
-              <option value="WOMEN">WOMEN</option>
-              <option value="UNISEX">UNISEX</option>
-              <option value="JUNIOR">JUNIOR</option>
+              <option value="MEN">HOMBRE</option>
+<option value="WOMEN">MUJER</option>
+<option value="UNISEX">UNISEX</option>
+<option value="JUNIOR">JUNIOR</option>
             </select>
 
             <select
@@ -268,16 +270,16 @@ export default function SellPage() {
               onChange={(e) => setCondition(e.target.value)}
               style={inputStyle}
             >
-              <option value="New">New</option>
-              <option value="Like new">Like new</option>
-              <option value="Excellent">Excellent</option>
-              <option value="Good">Good</option>
-              <option value="Used">Used</option>
+             <option value="New">Nuevo</option>
+<option value="Like new">Como nuevo</option>
+<option value="Excellent">Excelente</option>
+<option value="Good">Buen estado</option>
+<option value="Used">Usado</option>
             </select>
           </div>
 
           <input
-            placeholder="Price (€)"
+            placeholder="Precio (€)"
             type="number"
             value={price}
             onChange={(e) => setPrice(e.target.value)}
@@ -285,25 +287,25 @@ export default function SellPage() {
           />
 
           <textarea
-            placeholder="Describe condition, usage, serial number, invoice availability..."
+           placeholder="Describe el estado, uso, número de serie y disponibilidad de factura..."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             style={textareaStyle}
           />
 
           <div style={noticeStyle}>
-            <strong>Curated listing:</strong> your product will be reviewed by
-            ATHMOV before appearing publicly.
-          </div>
+  <strong>Anuncio revisado:</strong> tu producto será revisado por ATHMOV
+  antes de publicarse.
+</div>
 
           <div style={trustRowStyle}>
-            <div style={trustBadgeStyle}>✓ PREMIUM BRANDS ONLY</div>
-            <div style={trustBadgeStyle}>✓ BUYER PROTECTION</div>
-            <div style={trustBadgeStyle}>✓ MANUAL REVIEW</div>
+            <div style={trustBadgeStyle}>✓ SOLO MARCAS PREMIUM</div>
+<div style={trustBadgeStyle}>✓ PROTECCIÓN AL COMPRADOR</div>
+<div style={trustBadgeStyle}>✓ REVISIÓN MANUAL</div>
           </div>
 
           <button onClick={publishProduct} style={submitButtonStyle}>
-            {loading ? "Submitting..." : "Submit for review"}
+            {loading ? "Enviando..." : "Enviar para revisión"}
           </button>
         </div>
       </section>
