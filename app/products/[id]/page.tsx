@@ -134,7 +134,7 @@ setSellerProfile(sellerData);
     }
 
     return {
-      sport: "Buyer Guide",
+      sport: "Guía del comprador",
       title: "Qué revisar antes de comprar",
       tips: [
         "Pide fotos reales del producto, serial y detalles de desgaste.",
@@ -148,7 +148,7 @@ setSellerProfile(sellerData);
     if (!producto) return;
 
     if (producto.sold) {
-      alert("This product has already been sold");
+      alert("Este producto ya se ha vendido");
       return;
     }
 
@@ -182,7 +182,7 @@ console.log(
 console.log("SELLER ERROR:", sellerError);
 
 if (sellerError || !sellerProfile?.stripe_account_id) {
-  alert("Seller has not connected Stripe payouts");
+  alert("El vendedor no ha conectado los pagos de Stripe");
   return;
 }
 
@@ -216,7 +216,7 @@ if (sellerError || !sellerProfile?.stripe_account_id) {
         .single();
 
       if (orderError || !order) {
-        alert(orderError?.message || "Could not create order");
+       alert(orderError?.message || "No se pudo crear el pedido");
         return;
       }
 
@@ -248,7 +248,7 @@ if (sellerError || !sellerProfile?.stripe_account_id) {
       alert(data.error || "No se pudo iniciar el checkout");
     } catch (error) {
       console.log(error);
-      alert("Error starting checkout");
+      alert("Error al iniciar el checkout");
     } finally {
       setCheckoutLoading(false);
     }
@@ -291,7 +291,7 @@ if (sellerError || !sellerProfile?.stripe_account_id) {
     if (!producto) return;
 
     if (producto.sold) {
-      alert("This product has already been sold");
+      alert("Este producto ya se ha vendido");
       return;
     }
 
@@ -300,7 +300,7 @@ if (sellerError || !sellerProfile?.stripe_account_id) {
       return;
     }
 
-    const amount = prompt("Enter your offer");
+    const amount = prompt("Introduce tu oferta");
     if (!amount) return;
 
     const numericAmount = Number(amount);
@@ -315,7 +315,7 @@ if (sellerError || !sellerProfile?.stripe_account_id) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      alert("You must sign in");
+      alert("Debes iniciar sesión");
       return;
     }
 
@@ -353,7 +353,7 @@ if (sellerError || !sellerProfile?.stripe_account_id) {
   }),
 });
 
-    alert("Offer sent");
+   alert("Oferta enviada");
   };
 
   const messageSeller = async () => {
@@ -407,7 +407,7 @@ if (sellerError || !sellerProfile?.stripe_account_id) {
       conversationId = newConversation.id;
     }
 
-    const firstMessage = `Hi! Could you send me a verification video of "${producto.title}" showing serial numbers, condition and branding?`;
+   const firstMessage = `Hola, ¿podrías enviarme un vídeo de verificación de "${producto.title}" mostrando números de serie, estado y detalles de la marca?`;
 
 const { error: messageError } = await supabase
   .from("conversation_messages")
@@ -451,22 +451,21 @@ await supabase
   }
 
   if (notFound || !producto) {
-    return <div style={{ padding: "60px" }}>Product not found</div>;
+   return <div style={{ padding: "60px" }}>Producto no encontrado</div>;
   }
 
   if (producto.sold) {
     return (
       <main style={pageStyle}>
         <button onClick={() => window.history.back()} style={backButtonStyle}>
-          ← Back
+          ← Volver
         </button>
 
         <section style={soldCardStyle}>
           <p style={soldEyebrowStyle}>ATHMOV MARKETPLACE</p>
-          <h1 style={soldTitleStyle}>This product has been sold</h1>
+          <h1 style={soldTitleStyle}>Este producto se ha vendido</h1>
           <p style={soldTextStyle}>
-            This item is no longer available. You can continue browsing similar
-            premium sports gear.
+           Este artículo ya no está disponible. Puedes seguir explorando material deportivo premium similar.
           </p>
 
           <button
@@ -475,7 +474,7 @@ await supabase
             }}
             style={buyButtonStyle}
           >
-            Back to marketplace
+            Volver al marketplace
           </button>
         </section>
       </main>
@@ -492,7 +491,7 @@ await supabase
   return (
     <main className="product-detail-page" style={pageStyle}>
       <button onClick={() => window.history.back()} style={backButtonStyle}>
-        ← Back
+        ← Volver
       </button>
 
       <div style={layoutStyle} className="product-detail-layout">
@@ -500,7 +499,7 @@ await supabase
           <div style={mainImageStyle} className="product-detail-image">
             <Image
               src={safeImage(selectedImage)}
-              alt={producto.title || "Product"}
+              alt={producto.title || "Producto"}
               fill
               sizes="(max-width: 900px) 100vw, 50vw"
               className="main-product-image"
@@ -523,7 +522,7 @@ await supabase
               >
                 <Image
                   src={safeImage(img)}
-                  alt={`Product ${index + 1}`}
+                  alt={`Producto ${index + 1}`}
                   fill
                   sizes="180px"
                   style={{ objectFit: "cover" }}
@@ -548,9 +547,22 @@ await supabase
 
           <div style={metaGridStyle} className="product-detail-meta">
             {[
-              ["CONDITION", producto.condition || "Excellent"],
-              ["SELLER", "Verified"],
-              ["LOCATION", "Spain"],
+             [
+  "ESTADO",
+  producto.condition === "New"
+    ? "Nuevo"
+    : producto.condition === "Like new"
+      ? "Como nuevo"
+      : producto.condition === "Excellent"
+        ? "Excelente"
+        : producto.condition === "Good"
+          ? "Buen estado"
+          : producto.condition === "Used"
+            ? "Usado"
+            : producto.condition || "Excelente",
+],
+["VENDEDOR", "Verificado"],
+["UBICACIÓN", "España"],
             ].map(([label, value]) => (
               <div key={label} style={metaCardStyle}>
                 <p style={metaLabelStyle}>{label}</p>
@@ -560,10 +572,10 @@ await supabase
           </div>
 
         <div style={trustPanelStyle}>
-  <div style={trustPanelItemStyle}>✓ Buyer Protection</div>
-  <div style={trustPanelItemStyle}>✓ Secure Checkout</div>
+  <div style={trustPanelItemStyle}>✓ Protección al comprador</div>
+  <div style={trustPanelItemStyle}>✓ Pago seguro</div>
   <div style={trustPanelItemStyle}>
-    {sellerProfile?.seller_verified ? "✓ Verified Seller" : "Seller Profile Available"}
+    {sellerProfile?.seller_verified ? "✓ Vendedor verificado" : "Perfil del vendedor disponible"}
   </div>
   <div style={trustPanelItemStyle}>✓ Marketplace seleccionado </div>
 </div>
@@ -571,7 +583,7 @@ await supabase
           <section style={buyerGuideStyle}>
             <div style={buyerGuideHeaderStyle}>
               <div>
-                <p style={buyerGuideEyebrowStyle}>BUYER GUIDE · BETA</p>
+                <p style={buyerGuideEyebrowStyle}>GUÍA DEL COMPRADOR · BETA</p>
                 <h2 style={buyerGuideTitleStyle}>{buyerGuide.title}</h2>
               </div>
 
@@ -579,9 +591,9 @@ await supabase
             </div>
 
             <p style={buyerGuideTextStyle}>
-              Learn how to verify this product before purchasing. We recommend
-              checking serials, asking for videos and comparing details with the
-              official brand catalog.
+              Aprende cómo verificar este producto antes de comprarlo. Recomendamos
+comprobar números de serie, pedir vídeos y comparar detalles con el
+catálogo oficial de la marca.
             </p>
 
             <div style={buyerGuideCardsStyle}>
@@ -595,10 +607,10 @@ await supabase
                     <div>
                       <h4 style={buyerGuideCardTitleStyle}>
                         {index === 0
-                          ? "Check authenticity marks"
+                          ? "Revisa marcas de autenticidad"
                           : index === 1
-                            ? "Request extra proof"
-                            : "Compare condition"}
+                            ? "Pide pruebas adicionales"
+                            : "Compara el estado"}
                       </h4>
 
                       <p style={buyerGuideCardTextStyle}>{tip}</p>
@@ -609,14 +621,14 @@ await supabase
             </div>
 
             <div style={buyerGuideFooterStyle}>
-              ATHMOV is currently in beta. Verification tools are educational
-              and designed to help buyers make safer decisions independently.
+              ATHMOV está actualmente en beta. Las herramientas de verificación son educativas
+y están diseñadas para ayudar a los compradores a tomar decisiones más seguras.
             </div>
           </section>
 
 {sellerProfile?.seller_verified && (
   <div style={verifiedSellerBadgeStyle}>
-    ✓ Verified seller
+   ✓ Vendedor verificado
   </div>
 )}
           {producto.seller_id && (
@@ -626,17 +638,17 @@ await supabase
               }}
               style={sellerButtonStyle}
             >
-              View seller profile
+             Ver perfil del vendedor
             </button>
           )}
 
           <div style={actionsStyle} className="product-detail-actions">
             <button onClick={messageSeller} style={secondaryButtonStyle}>
-              Request verification video
+              Solicitar vídeo de verificación
             </button>
 
             <button onClick={buyNow} style={buyButtonStyle}>
-              {checkoutLoading ? "Redirecting..." : "Buy now"}
+              {checkoutLoading ? "Redirigiendo..." : "Comprar ahora"}
             </button>
 
             <button
@@ -658,31 +670,31 @@ await supabase
                   localStorage.setItem("athmov_cart", JSON.stringify(cart));
                 }
 
-                alert("Added to cart");
+                alert("Añadido al carrito");
               }}
               style={primaryButtonStyle}
             >
-              Add to cart
+              Añadir al carrito
             </button>
 
             <button onClick={toggleFavorite} style={secondaryButtonStyle}>
-              {isFavorite ? "❤️ Favorited" : "🤍 Add to favorites"}
+              {isFavorite ? "❤️ En favoritos" : "🤍 Añadir a favoritos"}
             </button>
 
             <button onClick={messageSeller} style={secondaryButtonStyle}>
-              Message seller
+              Escribir al vendedor
             </button>
 
             <button onClick={makeOffer} style={secondaryButtonStyle}>
-              Make offer
+              Hacer oferta
             </button>
           </div>
         </div>
       </div>
 
       <section style={relatedSectionStyle}>
-        <p style={relatedEyebrowStyle}>ATHMOV SELECTION</p>
-        <h2 style={relatedTitleStyle}>You may also like</h2>
+        <p style={relatedEyebrowStyle}>SELECCIÓN ATHMOV</p>
+        <h2 style={relatedTitleStyle}>También te puede gustar</h2>
 
         <div style={relatedGridStyle} className="product-detail-related">
           {related.map((item) => (
@@ -694,7 +706,7 @@ await supabase
               <div style={relatedImageStyle}>
                 <Image
                   src={safeImage(item.image)}
-                  alt={item.title || "Product"}
+                  alt={item.title || "Producto"}
                   fill
                   sizes="33vw"
                   style={{ objectFit: "cover" }}

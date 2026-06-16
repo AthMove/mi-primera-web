@@ -179,7 +179,7 @@ const { data: orders } = await supabase
     </Link>
 
     <Link href="/products?category=PADEL" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-      PADEL
+      PÁDEL
     </Link>
 
     <Link href="/products?category=GOLF" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
@@ -187,7 +187,7 @@ const { data: orders } = await supabase
     </Link>
 
     <Link href="/products?category=TENNIS" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-      TENNIS
+      TENIS
     </Link>
 
     <Link href="/products?category=RUNNING" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
@@ -197,25 +197,25 @@ const { data: orders } = await supabase
     <p style={drawerSectionTitleStyle}>SELLER</p>
 
     <Link href="/sell" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-      SELL
+      VENDER
     </Link>
 
     {userEmail && (
       <>
         <Link href="/seller-dashboard" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-          DASHBOARD
+          PANEL
         </Link>
 
         <Link href="/orders" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-          ORDERS{badge(ordersCount)}
+          PEDIDOS{badge(ordersCount)}
         </Link>
 
         <Link href="/notifications" style={signInStyle}>
-  NOTIFICATIONS{badge(notificationsCount)}
+  NOTIFICACIONES{badge(notificationsCount)}
 </Link>
 
         <Link href="/offers" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-          OFFERS{badge(offersCount)}
+          OFERTAS{badge(offersCount)}
         </Link>
       </>
     )}
@@ -223,39 +223,39 @@ const { data: orders } = await supabase
     <p style={drawerSectionTitleStyle}>ACCOUNT</p>
 
     <Link href="/cart" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-      CART ({cartCount})
+      CARRITO ({cartCount})
     </Link>
 
     {userEmail ? (
       <>
         <Link href="/favorites" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-          FAVORITES
+          FAVORITOS
         </Link>
 
         <Link href="/messages" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-          MESSAGES{badge(messagesCount)}
+          MENSAJES{badge(messagesCount)}
         </Link>
 
         <Link href="/notifications" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-          NOTIFICATIONS{badge(notificationsCount)}
+          NOTIFICACIONES{badge(notificationsCount)}
         </Link>
 
         <Link href="/account" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-          ACCOUNT
+          CUENTA
         </Link>
 
         <button onClick={handleLogout} style={drawerButtonStyle}>
-          LOG OUT
+          CERRAR SESIÓN
         </button>
       </>
     ) : (
       <>
         <Link href="/auth" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-          SIGN IN
+          INICIAR SESIÓN
         </Link>
 
         <Link href="/auth" style={drawerButtonStyle} onClick={() => setMenuOpen(false)}>
-          REGISTER
+         REGISTRARSE
         </Link>
       </>
     )}
@@ -281,35 +281,35 @@ const { data: orders } = await supabase
 
         <div style={rightLinksStyle} className="desktop-only">
           <Link href="/cart" style={cartLinkStyle}>
-            CART ({cartCount})
+            CARRITO ({cartCount})
           </Link>
 
           {userEmail ? (
             <>
               <Link href="/favorites" style={signInStyle}>
-                FAVORITES
+                FAVORITOS
               </Link>
 
               <Link href="/messages" style={signInStyle}>
-                MESSAGES{badge(messagesCount)}
+                MENSAJES{badge(messagesCount)}
               </Link>
 
               <Link href="/offers" style={signInStyle}>
-                OFFERS{badge(offersCount)}
+                OFERTAS{badge(offersCount)}
               </Link>
 
               <Link href="/orders" style={signInStyle}>
-                ORDERS{badge(ordersCount)}
+                PEDIDOS{badge(ordersCount)}
               </Link>
             </>
           ) : (
             <>
               <Link href="/auth" style={signInStyle}>
-                SIGN IN
+                INICIAR SESIÓN
               </Link>
 
               <Link href="/auth" style={registerStyle}>
-                REGISTER
+                REGISTRARSE
               </Link>
             </>
           )}
@@ -318,7 +318,7 @@ const { data: orders } = await supabase
             onClick={() => setMenuOpen(true)}
             style={menuButtonStyle}
           >
-            MENU
+            MENÚ
           </button>
         </div>
 
@@ -327,7 +327,7 @@ const { data: orders } = await supabase
           style={menuButtonStyle}
           className="mobile-only"
         >
-          MENU
+          MENÚ
         </button>
       </nav>
 
