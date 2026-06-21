@@ -37,12 +37,10 @@ export default function VerifyPage() {
     }
   };
 
-  const uploadDocument = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const uploadDocument = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
 
-    if (!file || !userId) return;
+    if (!file || !userId || uploading) return;
 
     try {
       setUploading(true);
@@ -83,30 +81,32 @@ export default function VerifyPage() {
       setStatus("pending");
       setDocumentUrl(publicUrl);
 
-      alert("Verification submitted");
+      alert("Verificación enviada");
     } finally {
       setUploading(false);
+      e.target.value = "";
     }
   };
 
   return (
     <main style={pageStyle}>
       <section style={cardStyle}>
-        <p style={eyebrowStyle}>ATHMOV VERIFY</p>
+        <p style={eyebrowStyle}>ATHMOV VERIFICACIÓN</p>
 
-        <h1 style={titleStyle}>Seller verification</h1>
+        <h1 style={titleStyle}>Verificación de vendedor</h1>
 
         <p style={textStyle}>
-          Upload your ID or passport to become a verified ATHMOV seller.
+          Sube tu DNI, pasaporte o permiso de conducir para convertirte en
+          vendedor verificado de ATHMOV.
         </p>
 
         <div style={statusBoxStyle}>
-          <strong>Status:</strong>{" "}
+          <strong>Estado:</strong>{" "}
           {status === "verified"
-            ? "Verified ✓"
+            ? "Verificado ✓"
             : status === "pending"
-            ? "Pending review"
-            : "Unverified"}
+              ? "Pendiente de revisión"
+              : "No verificado"}
         </div>
 
         {documentUrl && (
@@ -116,27 +116,32 @@ export default function VerifyPage() {
             rel="noopener noreferrer"
             style={linkStyle}
           >
-            View uploaded document →
+            Ver documento subido →
           </a>
         )}
 
         {status !== "verified" && (
           <>
-            <label style={uploadBoxStyle}>
+            <label
+              style={{
+                ...uploadBoxStyle,
+                opacity: uploading ? 0.6 : 1,
+                cursor: uploading ? "not-allowed" : "pointer",
+              }}
+            >
               <input
                 type="file"
                 accept="image/*,.pdf"
                 onChange={uploadDocument}
+                disabled={uploading}
                 style={{ display: "none" }}
               />
 
-              {uploading
-                ? "Uploading..."
-                : "Upload passport or ID"}
+              {uploading ? "Subiendo..." : "Subir DNI o pasaporte"}
             </label>
 
             <p style={smallTextStyle}>
-              Accepted: passport, national ID, driving license.
+              Aceptado: DNI, pasaporte o permiso de conducir.
             </p>
           </>
         )}
@@ -201,7 +206,6 @@ const uploadBoxStyle = {
   background: "#111",
   color: "#fff",
   borderRadius: "999px",
-  cursor: "pointer",
   fontWeight: 800,
 };
 

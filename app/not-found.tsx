@@ -14,10 +14,12 @@ export default function NotFound() {
       <div
         style={{
           background: "#fff",
-          borderRadius: "28px",
-          padding: "44px",
-          maxWidth: "520px",
+          borderRadius: "32px",
+          padding: "54px",
+          maxWidth: "560px",
           textAlign: "center",
+          boxShadow: "0 30px 100px rgba(0,0,0,0.06)",
+          border: "1px solid rgba(0,0,0,0.05)",
         }}
       >
         <p
@@ -25,33 +27,59 @@ export default function NotFound() {
             fontSize: "12px",
             letterSpacing: "3px",
             opacity: 0.5,
-            marginBottom: "12px",
+            marginBottom: "14px",
           }}
         >
           ATHMOV
         </p>
 
-        <h1 style={{ fontSize: "54px", margin: "0 0 16px" }}>
-          Page not found
+        <h1
+          style={{
+            fontSize: "64px",
+            letterSpacing: "-3px",
+            margin: "0 0 18px",
+            lineHeight: 1,
+          }}
+        >
+          404
         </h1>
 
-        <p style={{ color: "#666", marginBottom: "28px" }}>
-          The page you are looking for does not exist.
+        <h2
+          style={{
+            fontSize: "34px",
+            margin: "0 0 16px",
+            letterSpacing: "-1px",
+          }}
+        >
+          Página no encontrada
+        </h2>
+
+        <p
+          style={{
+            color: "#666",
+            lineHeight: 1.7,
+            marginBottom: "34px",
+          }}
+        >
+          La página que buscas no existe o ha sido movida. Puedes volver al
+          marketplace y seguir explorando material deportivo premium.
         </p>
 
         <a
           href="/"
           style={{
             display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
             background: "#111",
             color: "#fff",
-            padding: "14px 22px",
+            padding: "16px 24px",
             borderRadius: "999px",
             textDecoration: "none",
             fontWeight: 800,
           }}
         >
-          Go home
+          Volver al inicio
         </a>
       </div>
     </main>

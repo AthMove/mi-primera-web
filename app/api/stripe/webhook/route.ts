@@ -19,7 +19,10 @@ export async function POST(req: Request) {
   const signature = headersList.get("stripe-signature");
 
   if (!signature) {
-    return NextResponse.json({ error: "Missing signature" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Falta la firma de Stripe" },
+      { status: 400 }
+    );
   }
 
   let event: Stripe.Event;
@@ -31,13 +34,18 @@ export async function POST(req: Request) {
       process.env.STRIPE_WEBHOOK_SECRET!
     );
   } catch (error: any) {
-    console.log("WEBHOOK SIGNATURE ERROR:", error.message);
-    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+    console.log("ERROR DE FIRMA DEL WEBHOOK:", error.message);
+
+    return NextResponse.json(
+      { error: "Firma no válida" },
+      { status: 400 }
+    );
   }
 
   try {
     if (event.type === "checkout.session.completed") {
-      console.log("CHECKOUT COMPLETED RECEIVED");
+      console.log("CHECKOUT COMPLETADO RECIBIDO");
+
       const session = event.data.object as Stripe.Checkout.Session;
       const metadata = session.metadata || {};
 
@@ -47,6 +55,7 @@ export async function POST(req: Request) {
         const fullSession = await stripe.checkout.sessions.retrieve(session.id);
         paymentIntentId = fullSession.payment_intent?.toString();
       }
+
       let orderId = metadata.order_id;
 
       if (!orderId) {
@@ -65,27 +74,27 @@ export async function POST(req: Request) {
       }
 
       if (!orderId) {
-        console.log("NO ORDER FOUND FOR CHECKOUT:", metadata);
+        console.log("NO SE ENCONTRÓ PEDIDO PARA CHECKOUT:", metadata);
         return NextResponse.json({ received: true });
       }
 
-console.log("UPDATING ORDER", orderId);
-console.log("TIME", new Date().toISOString());
+      console.log("ACTUALIZANDO PEDIDO", orderId);
+      console.log("FECHA", new Date().toISOString());
 
-const { data: currentOrder } = await supabase
-  .from("orders")
-  .select("payment_status")
-  .eq("id", orderId)
-  .maybeSingle();
+      const { data: currentOrder } = await supabase
+        .from("orders")
+        .select("payment_status")
+        .eq("id", orderId)
+        .maybeSingle();
 
-const wasAlreadyPaid = currentOrder?.payment_status === "paid";
+      const wasAlreadyPaid = currentOrder?.payment_status === "paid";
 
       const { data: updatedOrder, error: updateError } = await supabase
         .from("orders")
         .update({
-         status: "paid",
-payment_status: "paid",
-transfer_status: "pending",
+          status: "paid",
+          payment_status: "paid",
+          transfer_status: "pending",
           stripe_payment_intent: paymentIntentId,
           paid_at: new Date().toISOString(),
           platform_fee: Number(metadata.platform_fee || 0),
@@ -98,29 +107,30 @@ transfer_status: "pending",
         .single();
 
       if (updateError || !updatedOrder) {
-        console.log("ORDER UPDATE ERROR:", updateError);
+        console.log("ERROR AL ACTUALIZAR PEDIDO:", updateError);
+
         return NextResponse.json(
-          { error: updateError?.message || "Order update failed" },
+          { error: updateError?.message || "No se pudo actualizar el pedido" },
           { status: 500 }
         );
       }
 
-     if (updatedOrder.product_id) {
-  const { error: productError } = await supabase
-    .from("products")
-    .update({ sold: true })
-    .eq("id", updatedOrder.product_id);
+      if (updatedOrder.product_id) {
+        const { error: productError } = await supabase
+          .from("products")
+          .update({ sold: true })
+          .eq("id", updatedOrder.product_id);
 
-  await supabase
-    .from("offers")
-    .update({ status: "rejected" })
-    .eq("product_id", updatedOrder.product_id)
-    .eq("status", "pending");
+        await supabase
+          .from("offers")
+          .update({ status: "rejected" })
+          .eq("product_id", updatedOrder.product_id)
+          .eq("status", "pending");
 
-  if (productError) {
-    console.log("PRODUCT SOLD UPDATE ERROR:", productError);
-  }
-}
+        if (productError) {
+          console.log("ERROR AL MARCAR PRODUCTO COMO VENDIDO:", productError);
+        }
+      }
 
       const { data: order } = await supabase
         .from("orders")
@@ -149,21 +159,35 @@ transfer_status: "pending",
           .eq("id", order.seller_id)
           .maybeSingle();
 
-        const productTitle = product?.title || "your item";
+        const productTitle = product?.title || "tu artículo";
         const amount = Number(order.amount || metadata.amount || 0).toFixed(2);
 
         if (buyer?.email) {
           await sendEmail({
             to: buyer.email,
-            subject: "Your ATHMOV order is confirmed",
+            subject: "Tu pedido de ATHMOV está confirmado",
             html: `
               <div style="font-family: Arial, sans-serif; color: #111; line-height: 1.6;">
-                <h1>Order confirmed</h1>
-                <p>Hi ${buyer.full_name || "there"},</p>
-                <p>Your order for <strong>${productTitle}</strong> has been confirmed.</p>
-                <p>The seller will prepare the shipment and add tracking soon.</p>
+                <h1>Pedido confirmado</h1>
+
+                <p>Hola ${buyer.full_name || "usuario"},</p>
+
+                <p>
+                  Tu pedido de
+                  <strong>${productTitle}</strong>
+                  ha sido confirmado.
+                </p>
+
+                <p>
+                  El vendedor preparará el envío y añadirá el seguimiento próximamente.
+                </p>
+
                 <p><strong>Total:</strong> €${amount}</p>
-                <p>You can track your order from your ATHMOV account.</p>
+
+                <p>
+                  Puedes seguir tu pedido desde tu cuenta de ATHMOV.
+                </p>
+
                 <p>ATHMOV</p>
               </div>
             `,
@@ -173,14 +197,27 @@ transfer_status: "pending",
         if (seller?.email) {
           await sendEmail({
             to: seller.email,
-            subject: "You sold an item on ATHMOV",
+            subject: "Has vendido un artículo en ATHMOV",
             html: `
               <div style="font-family: Arial, sans-serif; color: #111; line-height: 1.6;">
-                <h1>New sale</h1>
-                <p>Hi ${seller.full_name || "there"},</p>
-                <p>Your item <strong>${productTitle}</strong> has been sold.</p>
-                <p>Please prepare the shipment and add tracking from your Orders page.</p>
-                <p>Your payout will be released after the order is completed.</p>
+                <h1>Nueva venta</h1>
+
+                <p>Hola ${seller.full_name || "usuario"},</p>
+
+                <p>
+                  Tu artículo
+                  <strong>${productTitle}</strong>
+                  se ha vendido.
+                </p>
+
+                <p>
+                  Prepara el envío y añade el seguimiento desde tu página de pedidos.
+                </p>
+
+                <p>
+                  Tu pago se liberará cuando el pedido se complete correctamente.
+                </p>
+
                 <p>ATHMOV</p>
               </div>
             `,
@@ -216,7 +253,11 @@ transfer_status: "pending",
 
     return NextResponse.json({ received: true });
   } catch (error: any) {
-    console.log("WEBHOOK HANDLER ERROR:", error.message);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.log("ERROR EN EL WEBHOOK:", error.message);
+
+    return NextResponse.json(
+      { error: error.message || "Error en el webhook" },
+      { status: 500 }
+    );
   }
 }

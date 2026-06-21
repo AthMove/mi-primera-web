@@ -13,7 +13,7 @@ export async function POST(req: Request) {
 
     if (!stripeSecretKey || !supabaseUrl || !serviceRoleKey) {
       return NextResponse.json(
-        { error: "Missing server environment variables" },
+        { error: "Faltan variables de entorno del servidor" },
         { status: 500 }
       );
     }
@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     const { orderId, reason } = await req.json();
 
     if (!orderId) {
-      return NextResponse.json({ error: "Missing orderId" }, { status: 400 });
+      return NextResponse.json({ error: "Falta orderId" }, { status: 400 });
     }
 
     const { data: order, error: orderError } = await supabase
@@ -34,26 +34,32 @@ export async function POST(req: Request) {
       .single();
 
     if (orderError || !order) {
-      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Pedido no encontrado" },
+        { status: 404 }
+      );
     }
 
     if (!order.stripe_payment_intent) {
       return NextResponse.json(
-        { error: "Order has no payment intent" },
+        { error: "El pedido no tiene payment intent" },
         { status: 400 }
       );
     }
 
-    if (order.payment_status === "refunded") {
+    if (order.payment_status === "refunded" || order.stripe_refund_id) {
       return NextResponse.json(
-        { error: "Order already refunded" },
+        { error: "El pedido ya ha sido reembolsado" },
         { status: 400 }
       );
     }
 
-    if (order.transfer_status === "paid") {
+    if (order.transfer_status === "released" || order.stripe_transfer_id) {
       return NextResponse.json(
-        { error: "Seller has already been paid. Manual dispute required." },
+        {
+          error:
+            "El pago al vendedor ya ha sido liberado. Requiere revisión manual.",
+        },
         { status: 400 }
       );
     }
@@ -63,21 +69,24 @@ export async function POST(req: Request) {
       reason: "requested_by_customer",
       metadata: {
         order_id: order.id,
-        buyer_id: order.buyer_id,
-        seller_id: order.seller_id,
+        buyer_id: order.buyer_id || "",
+        seller_id: order.seller_id || "",
         reason: reason || "ATHMOV refund",
       },
     });
+
+    const refundAmount = Number((refund.amount / 100).toFixed(2));
 
     const { error: updateError } = await supabase
       .from("orders")
       .update({
         status: "refunded",
         payment_status: "refunded",
-        refund_status: refund.status,
+        transfer_status: "cancelled",
+        refund_status: refund.status || "refunded",
         stripe_refund_id: refund.id,
         refunded_at: new Date().toISOString(),
-        refund_amount: refund.amount / 100,
+        refund_amount: refundAmount,
       })
       .eq("id", order.id);
 
@@ -85,16 +94,37 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: updateError.message }, { status: 500 });
     }
 
+    await supabase.from("notifications").insert([
+      {
+        user_id: order.buyer_id,
+        type: "refund",
+        title: "Reembolso aprobado",
+        message: "Tu pedido ha sido reembolsado correctamente.",
+        link: "/orders",
+        is_read: false,
+      },
+      {
+        user_id: order.seller_id,
+        type: "refund",
+        title: "Pedido reembolsado",
+        message:
+          "El pedido ha sido reembolsado y el pago al vendedor ha sido cancelado.",
+        link: "/orders",
+        is_read: false,
+      },
+    ]);
+
     return NextResponse.json({
       success: true,
       refundId: refund.id,
       status: refund.status,
+      amount: refundAmount,
     });
   } catch (error: any) {
     console.log("REFUND ERROR:", error?.message || error);
 
     return NextResponse.json(
-      { error: error?.message || "Refund failed" },
+      { error: error?.message || "Error al realizar el reembolso" },
       { status: 500 }
     );
   }

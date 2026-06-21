@@ -39,7 +39,7 @@ export default function AdminLayout({
 
       setAuthorized(true);
     } catch (error) {
-      console.log("ADMIN CHECK ERROR:", error);
+      console.log("ERROR AL COMPROBAR ADMIN:", error);
       window.location.href = "/";
     } finally {
       setLoading(false);
@@ -48,16 +48,8 @@ export default function AdminLayout({
 
   if (loading) {
     return (
-      <main
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontFamily: "Inter, sans-serif",
-        }}
-      >
-        Checking admin access...
+      <main style={loadingStyle}>
+        Comprobando acceso de administrador...
       </main>
     );
   }
@@ -68,3 +60,11 @@ export default function AdminLayout({
 
   return <>{children}</>;
 }
+
+const loadingStyle = {
+  minHeight: "100vh",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontFamily: "Inter, sans-serif",
+};

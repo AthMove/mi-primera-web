@@ -9,6 +9,7 @@ export async function GET(req: Request) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     const cronSecret = process.env.CRON_SECRET;
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
     if (!supabaseUrl || !serviceRoleKey) {
       return NextResponse.json(
@@ -17,13 +18,13 @@ export async function GET(req: Request) {
       );
     }
 
-    const supabase = createClient(supabaseUrl, serviceRoleKey);
-
     const authHeader = req.headers.get("authorization");
 
     if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const supabase = createClient(supabaseUrl, serviceRoleKey);
 
     const limitDate = new Date();
     limitDate.setHours(limitDate.getHours() - 72);
@@ -32,8 +33,8 @@ export async function GET(req: Request) {
       .from("orders")
       .select("*")
       .eq("status", "delivered")
-      .neq("dispute_status", "open")
-      .neq("transfer_status", "paid")
+      .or("dispute_status.is.null,dispute_status.neq.open")
+      .neq("transfer_status", "released")
       .not("delivered_at", "is", null)
       .lte("delivered_at", limitDate.toISOString());
 
@@ -46,9 +47,6 @@ export async function GET(req: Request) {
 
     for (const order of orders || []) {
       try {
-        const siteUrl =
-          process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-
         const releaseResponse = await fetch(
           `${siteUrl}/api/stripe/release-payment`,
           {
@@ -63,45 +61,49 @@ export async function GET(req: Request) {
           }
         );
 
-        const releaseData = await releaseResponse.json();
+        const releaseData = await releaseResponse.json().catch(() => null);
 
         if (!releaseResponse.ok) {
           failed.push({
             orderId: order.id,
-            error: releaseData.error || "Release failed",
+            error: releaseData?.error || "Release failed",
           });
           continue;
         }
 
-        await supabase
+        const { error: updateError } = await supabase
           .from("orders")
           .update({
             status: "completed",
-            transfer_status: "paid",
             completed_at: new Date().toISOString(),
-            payout_released_at: new Date().toISOString(),
-            stripe_transfer_id:
-              releaseData.transferId ||
-              releaseData.stripe_transfer_id ||
-              order.stripe_transfer_id ||
-              null,
           })
           .eq("id", order.id);
+
+        if (updateError) {
+          failed.push({
+            orderId: order.id,
+            error: updateError.message,
+          });
+          continue;
+        }
 
         await supabase.from("notifications").insert([
           {
             user_id: order.buyer_id,
             type: "order",
-            title: "Order completed",
-            message: "Your order was automatically completed after 72 hours.",
+            title: "Pedido completado",
+            message:
+              "Tu pedido se ha completado automáticamente tras 72 horas desde la entrega.",
             link: "/orders",
+            is_read: false,
           },
           {
             user_id: order.seller_id,
             type: "sale",
-            title: "Payout released",
-            message: "Your payout has been automatically released.",
+            title: "Pago liberado",
+            message: "Tu pago se ha liberado automáticamente.",
             link: "/orders",
+            is_read: false,
           },
         ]);
 

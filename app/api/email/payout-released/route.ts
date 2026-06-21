@@ -19,7 +19,7 @@ export async function POST(req: Request) {
 
     if (!order) {
       return NextResponse.json(
-        { error: "Order not found" },
+        { error: "Pedido no encontrado" },
         { status: 404 }
       );
     }
@@ -38,34 +38,36 @@ export async function POST(req: Request) {
 
     if (!seller?.email) {
       return NextResponse.json(
-        { error: "Seller email not found" },
+        { error: "Email del vendedor no encontrado" },
         { status: 404 }
       );
     }
 
     await sendEmail({
       to: seller.email,
-      subject: "Your ATHMOV payout has been released",
+     subject: "Tu pago de ATHMOV ha sido liberado",
       html: `
         <div style="font-family: Arial,sans-serif;color:#111;line-height:1.6;">
-          <h1>Payout released</h1>
+          <h1>Pago liberado</h1>
 
-          <p>Hi ${seller.full_name || "there"},</p>
+<p>Hola ${seller.full_name || "usuario"},</p>
 
-          <p>
-            The payout for
-            <strong>${product?.title || "your item"}</strong>
-            has been released.
-          </p>
+<p>
+  El pago correspondiente a
+  <strong>${product?.title || "tu artículo"}</strong>
+  ha sido liberado.
+</p>
 
-          <p>
-            Funds will arrive in your connected Stripe account
-            according to Stripe processing times.
-          </p>
+<p>
+  Los fondos llegarán a tu cuenta de Stripe conectada
+  según los tiempos de procesamiento de Stripe.
+</p>
 
-          <p>Thank you for selling on ATHMOV.</p>
+<p>
+  Gracias por vender en ATHMOV.
+</p>
 
-          <p>ATHMOV</p>
+<p>ATHMOV</p>
         </div>
       `,
     });
@@ -73,7 +75,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json(
-      { error: error.message || "Payout email failed" },
+      { error: error.message || "Error al enviar el email de pago" },
       { status: 500 }
     );
   }

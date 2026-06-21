@@ -45,25 +45,25 @@ export default function Home() {
     {
       title: "PÁDEL",
       text: "Palas y material premium",
-      href: "/products?category=padel",
+     href: "/products?category=PADEL",
       image: "/padel.jpg",
     },
     {
       title: "GOLF",
       text: "Palos, bolsas y accesorios",
-      href: "/products?category=golf",
+      href: "/products?category=GOLF",
       image: "/golf.jpg",
     },
     {
       title: "TENIS",
       text: "Raquetas y piezas de alto rendimiento",
-      href: "/products?category=tennis",
+      href: "/products?category=TENIS",
       image: "/tennis.jpg",
     },
     {
       title: "RUNNING",
       text: "Calzado técnico y ropa deportiva",
-      href: "/products?category=running",
+      href: "/products?category=RUNNING",
       image: "/running.jpg",
     },
   ];
@@ -344,19 +344,19 @@ export default function Home() {
             <p style={footerTitleStyle}>Categorías</p>
 
             <button onClick={() => router.push("/products?category=padel")} style={footerLinkStyle}>
-              Pádel
+              PADEL
             </button>
 
             <button onClick={() => router.push("/products?category=golf")} style={footerLinkStyle}>
-              Golf
+              GOLF
             </button>
 
             <button onClick={() => router.push("/products?category=tennis")} style={footerLinkStyle}>
-              Tenis
+              TENIS
             </button>
 
             <button onClick={() => router.push("/products?category=running")} style={footerLinkStyle}>
-              Running
+              RUNNING
             </button>
           </div>
         </div>

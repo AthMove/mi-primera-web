@@ -22,9 +22,21 @@ export default function FeedPage() {
 
     const channel = supabase
       .channel("feed-realtime")
-      .on("postgres_changes", { event: "*", schema: "public", table: "feed_posts" }, loadFeed)
-      .on("postgres_changes", { event: "*", schema: "public", table: "feed_comments" }, loadFeed)
-      .on("postgres_changes", { event: "*", schema: "public", table: "products" }, loadFeed)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "feed_posts" },
+        loadFeed
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "feed_comments" },
+        loadFeed
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "products" },
+        loadFeed
+      )
       .subscribe();
 
     return () => {
@@ -80,7 +92,7 @@ export default function FeedPage() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      alert("Sign in first");
+      alert("Debes iniciar sesión");
       return;
     }
 
@@ -152,7 +164,7 @@ export default function FeedPage() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      alert("Sign in first");
+      alert("Debes iniciar sesión");
       return;
     }
 
@@ -179,7 +191,7 @@ export default function FeedPage() {
   };
 
   const deleteComment = async (commentId: string) => {
-    const confirmDelete = confirm("Delete this comment?");
+    const confirmDelete = confirm("¿Eliminar este comentario?");
     if (!confirmDelete) return;
 
     await supabase.from("feed_comments").delete().eq("id", commentId);
@@ -193,14 +205,15 @@ export default function FeedPage() {
   return (
     <main style={pageStyle} className="feed-page">
       <section style={heroStyle}>
-        <p style={eyebrowStyle}>ATHMOV FEED</p>
+        <p style={eyebrowStyle}>FEED ATHMOV</p>
 
         <h1 style={titleStyle} className="feed-title">
-          Drops & Community
+          Drops y comunidad
         </h1>
 
         <p style={subtitleStyle}>
-          Premium sports gear, curated drops and community updates.
+          Material deportivo premium, drops seleccionados y novedades de la
+          comunidad.
         </p>
       </section>
 
@@ -208,16 +221,19 @@ export default function FeedPage() {
         <section style={featuredSectionStyle}>
           <div style={sectionHeaderStyle}>
             <div>
-              <p style={eyebrowStyle}>CURATED</p>
-              <h2 style={sectionTitleStyle}>Featured Drops</h2>
+              <p style={eyebrowStyle}>SELECCIÓN ATHMOV</p>
+              <h2 style={sectionTitleStyle}>Drops destacados</h2>
             </div>
 
-            <button onClick={() => router.push("/products")} style={smallButtonStyle}>
-              Shop all →
+            <button
+              onClick={() => router.push("/products")}
+              style={smallButtonStyle}
+            >
+              Ver todo →
             </button>
           </div>
 
-          <div style={featuredGridStyle}>
+          <div style={featuredGridStyle} className="feed-featured-grid">
             {featuredDrops.map((product) => (
               <article
                 key={product.id}
@@ -226,7 +242,7 @@ export default function FeedPage() {
               >
                 <Image
                   src={safeImage(product.image)}
-                  alt={product.title || "Product"}
+                  alt={product.title || "Producto"}
                   fill
                   sizes="33vw"
                   style={{ objectFit: "cover" }}
@@ -246,8 +262,8 @@ export default function FeedPage() {
       <section style={recentSectionStyle}>
         <div style={sectionHeaderStyle}>
           <div>
-            <p style={eyebrowStyle}>LATEST LISTINGS</p>
-            <h2 style={sectionTitleStyle}>New Gear</h2>
+            <p style={eyebrowStyle}>ÚLTIMOS PRODUCTOS</p>
+            <h2 style={sectionTitleStyle}>Nuevo material</h2>
           </div>
         </div>
 
@@ -261,7 +277,7 @@ export default function FeedPage() {
               <div style={dropImageStyle}>
                 <Image
                   src={safeImage(product.image)}
-                  alt={product.title || "Product"}
+                  alt={product.title || "Producto"}
                   fill
                   sizes="220px"
                   style={{ objectFit: "cover" }}
@@ -279,10 +295,10 @@ export default function FeedPage() {
       </section>
 
       <section style={createStyle}>
-        <p style={createEyebrowStyle}>COMMUNITY POST</p>
+        <p style={createEyebrowStyle}>PUBLICACIÓN DE LA COMUNIDAD</p>
 
         <textarea
-          placeholder="Share a drop, fit, match day moment or gear insight..."
+          placeholder="Comparte un drop, un outfit, un momento de partido o una opinión sobre material deportivo..."
           value={content}
           onChange={(e) => setContent(e.target.value)}
           style={textareaStyle}
@@ -290,7 +306,7 @@ export default function FeedPage() {
 
         <div style={actionsStyle}>
           <label style={uploadButtonStyle}>
-            {uploading ? "Uploading..." : "Add image"}
+            {uploading ? "Subiendo..." : "Añadir imagen"}
 
             <input
               type="file"
@@ -301,13 +317,13 @@ export default function FeedPage() {
           </label>
 
           <button onClick={() => createPost()} style={buttonStyle}>
-            Publish
+            Publicar
           </button>
         </div>
       </section>
 
       {loading ? (
-        <p style={loadingStyle}>Loading feed...</p>
+        <p style={loadingStyle}>Cargando feed...</p>
       ) : (
         <section style={feedStyle}>
           {posts.map((post) => (
@@ -331,8 +347,8 @@ export default function FeedPage() {
               {post.image && (
                 <div style={imageWrapperStyle}>
                   <Image
-                    src={post.image}
-                    alt="Feed image"
+                    src={safeImage(post.image)}
+                    alt="Imagen del feed"
                     fill
                     sizes="800px"
                     style={{ objectFit: "cover" }}
@@ -342,13 +358,13 @@ export default function FeedPage() {
 
               <div style={footerStyle}>
                 <button onClick={() => likePost(post)} style={likeButtonStyle}>
-                  ♥ {post.likes || 0}
+                  ♥️ {post.likes || 0}
                 </button>
               </div>
 
               <div style={commentsStyle}>
                 <p style={commentsTitleStyle}>
-                  Comments ({comments[post.id]?.length || 0})
+                  Comentarios ({comments[post.id]?.length || 0})
                 </p>
 
                 <div style={commentsListStyle}>
@@ -384,7 +400,7 @@ export default function FeedPage() {
                         addComment(post.id);
                       }
                     }}
-                    placeholder="Write a comment..."
+                    placeholder="Escribe un comentario..."
                     style={commentInputStyle}
                   />
 
@@ -392,7 +408,7 @@ export default function FeedPage() {
                     onClick={() => addComment(post.id)}
                     style={commentButtonStyle}
                   >
-                    Send
+                    Enviar
                   </button>
                 </div>
               </div>
@@ -605,6 +621,7 @@ const textareaStyle = {
   resize: "none" as const,
   outline: "none",
   fontSize: "15px",
+  boxSizing: "border-box" as const,
 };
 
 const actionsStyle = {

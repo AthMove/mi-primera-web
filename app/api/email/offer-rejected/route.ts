@@ -21,7 +21,7 @@ export async function POST(req: Request) {
 
     if (!offer) {
       return NextResponse.json(
-        { error: "Offer not found" },
+        { error: "Oferta no encontrada" },
         { status: 404 }
       );
     }
@@ -35,21 +35,21 @@ export async function POST(req: Request) {
     await resend.emails.send({
       from: "ATHMOV <orders@athmov.com>",
       to: offer.buyer_email,
-      subject: "Your offer was not accepted",
+      subject: "Tu oferta no ha sido aceptada",
       html: `
         <div style="font-family:Arial,sans-serif;padding:40px;max-width:600px;margin:auto">
-          <h2>Your offer was not accepted</h2>
+          <h2>Tu oferta no ha sido aceptada</h2>
 
-          <p>Hi ${offer.buyer_email.split("@")[0]},</p>
+          <p>Hola ${offer.buyer_email.split("@")[0]},</p>
 
           <p>
-            Unfortunately your offer for
-            <strong>${product?.title || "this product"}</strong>
-            was not accepted by the seller.
+            Lamentablemente, tu oferta por
+            <strong>${product?.title || "este producto"}</strong>
+            no ha sido aceptada por el vendedor.
           </p>
 
           <p>
-            You can still contact the seller or make another offer.
+            Aún puedes contactar con el vendedor o realizar una nueva oferta.
           </p>
 
           <p>ATHMOV</p>
@@ -62,7 +62,7 @@ export async function POST(req: Request) {
     console.log(error);
 
     return NextResponse.json(
-      { error: "Email failed" },
+      { error: "Error al enviar el correo" },
       { status: 500 }
     );
   }

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
@@ -10,7 +11,7 @@ export async function GET() {
 
     if (!supabaseUrl || !serviceKey) {
       return NextResponse.json(
-        { error: "Missing Supabase env vars" },
+        { error: "Faltan variables de entorno de Supabase" },
         { status: 500 }
       );
     }
@@ -39,7 +40,7 @@ export async function GET() {
         product_id,
         carrier,
         tracking_number,
-        products!orders_product_id_fkey (
+        products (
           id,
           title,
           image,
@@ -67,32 +68,53 @@ export async function GET() {
     const ordersWithDetails = await Promise.all(
       (data || []).map(async (order: any) => {
         let buyerEmail = order.buyer_email || null;
+        let sellerEmail = order.products?.seller_email || null;
 
         if (!buyerEmail && order.buyer_id) {
-          const { data: userData } =
+          const { data: buyerUser } =
             await supabaseAdmin.auth.admin.getUserById(order.buyer_id);
 
-          buyerEmail = userData?.user?.email || null;
+          buyerEmail = buyerUser?.user?.email || null;
         }
 
-        const { data: evidence } = await supabaseAdmin
+        if (!sellerEmail && order.seller_id) {
+          const { data: sellerProfile } = await supabaseAdmin
+            .from("profiles")
+            .select("email")
+            .eq("id", order.seller_id)
+            .maybeSingle();
+
+          sellerEmail = sellerProfile?.email || null;
+        }
+
+        const { data: evidence, error: evidenceError } = await supabaseAdmin
           .from("dispute_evidence")
           .select("*")
           .eq("order_id", order.id)
           .order("created_at", { ascending: true });
 
+        if (evidenceError) {
+          console.log("DISPUTE EVIDENCE ERROR:", evidenceError.message);
+        }
+
         return {
           ...order,
           buyer_email: buyerEmail,
+          seller_email: sellerEmail,
           evidence: evidence || [],
         };
       })
     );
 
-    return NextResponse.json({ orders: ordersWithDetails });
+    return NextResponse.json({
+      success: true,
+      orders: ordersWithDetails,
+    });
   } catch (error: any) {
+    console.log("ADMIN DISPUTES API ERROR:", error);
+
     return NextResponse.json(
-      { error: error.message || "Unknown server error" },
+      { error: error.message || "Error del servidor" },
       { status: 500 }
     );
   }

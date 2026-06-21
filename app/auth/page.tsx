@@ -13,10 +13,10 @@ export default function AuthPage() {
   const handleAuth = async () => {
     try {
       setLoading(true);
-      setDebug("Starting...");
+      setDebug("Iniciando...");
 
       if (!email || !password) {
-        setDebug("Missing email or password");
+        setDebug("Falta email o contraseña");
         alert("Introduce email y contraseña");
         return;
       }
@@ -40,28 +40,28 @@ export default function AuthPage() {
       console.log("AUTH ERROR:", error);
 
       if (error) {
-        setDebug(`Auth error: ${error.message}`);
+        setDebug(`Error de acceso: ${error.message}`);
         alert(error.message);
         return;
       }
 
-      setDebug(`Logged in as: ${data.user?.email || cleanEmail}`);
+      setDebug(`Sesión iniciada como: ${data.user?.email || cleanEmail}`);
 
-if (cleanEmail === "athmovco@gmail.com") {
-  window.location.replace("/products");
-  return;
-}
+      if (cleanEmail === "athmovco@gmail.com") {
+        window.location.replace("/products");
+        return;
+      }
 
-if (mode === "register") {
-  window.location.replace("/account");
-  return;
-}
+      if (mode === "register") {
+        window.location.replace("/account");
+        return;
+      }
 
-window.location.replace("/orders");
+      window.location.replace("/orders");
     } catch (e: any) {
       console.log("AUTH CATCH:", e);
-      setDebug(`Catch: ${e.message}`);
-      alert(e.message || "Auth error");
+      setDebug(`Error: ${e.message}`);
+      alert(e.message || "Error de autenticación");
     } finally {
       setLoading(false);
     }
@@ -70,10 +70,10 @@ window.location.replace("/orders");
   return (
     <main style={pageStyle}>
       <section style={cardStyle}>
-        <p style={eyebrowStyle}>ATHMOV ACCOUNT</p>
+        <p style={eyebrowStyle}>CUENTA ATHMOV</p>
 
         <h1 style={titleStyle}>
-          {mode === "login" ? "Welcome back" : "Create account"}
+          {mode === "login" ? "Bienvenido de nuevo" : "Crear cuenta"}
         </h1>
 
         <div style={switchStyle}>
@@ -85,7 +85,7 @@ window.location.replace("/orders");
               color: mode === "login" ? "#fff" : "#111",
             }}
           >
-            Sign in
+            Iniciar sesión
           </button>
 
           <button
@@ -96,7 +96,7 @@ window.location.replace("/orders");
               color: mode === "register" ? "#fff" : "#111",
             }}
           >
-            Register
+            Registrarse
           </button>
         </div>
 
@@ -110,14 +110,18 @@ window.location.replace("/orders");
 
         <input
           type="password"
-          placeholder="Password"
+          placeholder="Contraseña"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           style={inputStyle}
         />
 
         <button onClick={handleAuth} disabled={loading} style={buttonStyle}>
-          {loading ? "Loading..." : mode === "login" ? "Sign in" : "Register"}
+          {loading
+            ? "Cargando..."
+            : mode === "login"
+              ? "Iniciar sesión"
+              : "Registrarse"}
         </button>
 
         <p style={{ marginTop: 16, fontSize: 13 }}>{debug}</p>

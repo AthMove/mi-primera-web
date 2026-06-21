@@ -10,7 +10,7 @@ export async function POST(req: Request) {
 
     if (!stripeSecretKey) {
       return NextResponse.json(
-        { success: false, error: "Missing STRIPE_SECRET_KEY" },
+        { success: false, error: "Falta STRIPE_SECRET_KEY" },
         { status: 500 }
       );
     }
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
 
     if (!body.sessionId) {
       return NextResponse.json(
-        { success: false, error: "Missing sessionId" },
+        { success: false, error: "Falta sessionId" },
         { status: 400 }
       );
     }
@@ -33,12 +33,12 @@ export async function POST(req: Request) {
       order_id: session.metadata?.order_id || null,
     });
   } catch (error) {
-    console.log("VERIFY SESSION ERROR:", error);
+    console.log("ERROR AL VERIFICAR LA SESIÓN:", error);
 
     return NextResponse.json(
       {
         success: false,
-        error: "Internal server error",
+        error: "Error interno del servidor",
       },
       { status: 500 }
     );

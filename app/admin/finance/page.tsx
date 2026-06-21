@@ -18,7 +18,7 @@ export default function AdminFinancePage() {
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.log("ADMIN FINANCE ERROR:", error);
+      console.log("ERROR ADMIN FINANZAS:", error);
       setOrders([]);
     } else {
       setOrders(data || []);
@@ -29,29 +29,26 @@ export default function AdminFinancePage() {
 
   const stats = useMemo(() => {
     const paidOrders = orders.filter((o) =>
-      ["paid", "preparing", "shipped", "delivered", "completed"].includes(o.status)
+      ["paid", "preparing", "shipped", "delivered", "completed"].includes(
+        o.status
+      )
     );
 
     const gmv = paidOrders.reduce((sum, o) => sum + Number(o.amount || 0), 0);
-
     const fees = paidOrders.reduce(
       (sum, o) => sum + Number(o.platform_fee || 0),
       0
     );
-
     const sellerEarnings = paidOrders.reduce(
       (sum, o) => sum + Number(o.seller_amount || 0),
       0
     );
-
     const released = orders
       .filter((o) => o.transfer_status === "released")
       .reduce((sum, o) => sum + Number(o.seller_amount || 0), 0);
-
     const pendingRelease = paidOrders
       .filter((o) => o.transfer_status !== "released")
       .reduce((sum, o) => sum + Number(o.seller_amount || 0), 0);
-
     const disputes = orders.filter((o) => o.dispute_status === "open").length;
 
     return {
@@ -70,6 +67,7 @@ export default function AdminFinancePage() {
 
   const formatDate = (date?: string) => {
     if (!date) return "-";
+
     return new Date(date).toLocaleDateString([], {
       day: "2-digit",
       month: "short",
@@ -77,68 +75,98 @@ export default function AdminFinancePage() {
     });
   };
 
+  const getStatusLabel = (status?: string) => {
+    if (status === "paid") return "Pagado";
+    if (status === "preparing") return "Preparando";
+    if (status === "shipped") return "Enviado";
+    if (status === "delivered") return "Entregado";
+    if (status === "completed") return "Completado";
+    if (status === "refunded") return "Reembolsado";
+    if (status === "pending") return "Pendiente";
+    return status || "Pendiente";
+  };
+
+  const getTransferLabel = (status?: string) => {
+    if (status === "released") return "Liberado";
+    if (status === "pending") return "Pendiente";
+    if (status === "cancelled") return "Cancelado";
+    if (status === "refunded") return "Reembolsado";
+    return status || "Pendiente";
+  };
+
+  const getDisputeLabel = (status?: string) => {
+    if (status === "open") return "Abierta";
+    if (status === "resolved") return "Resuelta";
+    if (status === "none") return "Sin disputa";
+    return status || "Sin disputa";
+  };
+
   if (loading) {
-    return <main style={pageStyle}>Loading finance...</main>;
+    return <main style={pageStyle}>Cargando finanzas...</main>;
   }
 
   return (
-    <main style={pageStyle}>
+    <main style={pageStyle} className="admin-finance-page">
       <section style={headerStyle}>
-        <p style={eyebrowStyle}>ATHMOV ADMIN</p>
-        <h1 style={titleStyle}>Finance</h1>
+        <p style={eyebrowStyle}>ADMIN ATHMOV</p>
+
+        <h1 style={titleStyle} className="admin-finance-title">
+          Finanzas
+        </h1>
+
         <p style={subtitleStyle}>
-          Monitor marketplace volume, commissions, payouts and open risk.
+          Controla el volumen del marketplace, comisiones, pagos y riesgo abierto.
         </p>
       </section>
 
-      <section style={statsGridStyle}>
+      <section style={statsGridStyle} className="stats-grid">
         <Card label="GMV" value={formatMoney(stats.gmv)} />
-        <Card label="ATHMOV fees" value={formatMoney(stats.fees)} />
-        <Card label="Seller earnings" value={formatMoney(stats.sellerEarnings)} />
-        <Card label="Pending payouts" value={formatMoney(stats.pendingRelease)} />
-        <Card label="Released payouts" value={formatMoney(stats.released)} />
-        <Card label="Paid orders" value={String(stats.paidOrders)} />
-        <Card label="Total orders" value={String(stats.totalOrders)} />
-        <Card label="Open disputes" value={String(stats.disputes)} />
+        <Card label="Comisiones ATHMOV" value={formatMoney(stats.fees)} />
+        <Card label="Ganancias vendedores" value={formatMoney(stats.sellerEarnings)} />
+        <Card label="Pagos pendientes" value={formatMoney(stats.pendingRelease)} />
+        <Card label="Pagos liberados" value={formatMoney(stats.released)} />
+        <Card label="Pedidos pagados" value={String(stats.paidOrders)} />
+        <Card label="Pedidos totales" value={String(stats.totalOrders)} />
+        <Card label="Disputas abiertas" value={String(stats.disputes)} />
       </section>
 
       <section style={tableSectionStyle}>
-        <p style={eyebrowStyle}>ORDER FINANCE</p>
-        <h2 style={sectionTitleStyle}>Orders</h2>
+        <p style={eyebrowStyle}>FINANZAS DE PEDIDOS</p>
+        <h2 style={sectionTitleStyle}>Pedidos</h2>
 
         {orders.length === 0 ? (
-          <div style={emptyStyle}>No orders yet.</div>
+          <div style={emptyStyle}>Todavía no hay pedidos.</div>
         ) : (
           <div style={tableStyle}>
             {orders.map((order) => (
-              <div key={order.id} style={rowStyle}>
+              <div key={order.id} style={rowStyle} className="finance-row">
                 <div>
                   <p style={rowTitleStyle}>#{String(order.id).slice(0, 8)}</p>
                   <p style={rowMetaStyle}>{formatDate(order.created_at)}</p>
                 </div>
 
                 <div>
-                  <p style={rowLabelStyle}>Amount</p>
+                  <p style={rowLabelStyle}>Importe</p>
                   <strong>{formatMoney(Number(order.amount || 0))}</strong>
                 </div>
 
                 <div>
-                  <p style={rowLabelStyle}>Fee</p>
+                  <p style={rowLabelStyle}>Comisión</p>
                   <strong>{formatMoney(Number(order.platform_fee || 0))}</strong>
                 </div>
 
                 <div>
-                  <p style={rowLabelStyle}>Seller</p>
+                  <p style={rowLabelStyle}>Vendedor</p>
                   <strong>{formatMoney(Number(order.seller_amount || 0))}</strong>
                 </div>
 
                 <div>
-                  <p style={rowLabelStyle}>Status</p>
-                  <span style={badgeStyle}>{order.status || "pending"}</span>
+                  <p style={rowLabelStyle}>Estado</p>
+                  <span style={badgeStyle}>{getStatusLabel(order.status)}</span>
                 </div>
 
                 <div>
-                  <p style={rowLabelStyle}>Transfer</p>
+                  <p style={rowLabelStyle}>Transferencia</p>
                   <span
                     style={{
                       ...badgeStyle,
@@ -147,12 +175,12 @@ export default function AdminFinancePage() {
                         : pendingBadgeStyle),
                     }}
                   >
-                    {order.transfer_status || "pending"}
+                    {getTransferLabel(order.transfer_status)}
                   </span>
                 </div>
 
                 <div>
-                  <p style={rowLabelStyle}>Dispute</p>
+                  <p style={rowLabelStyle}>Disputa</p>
                   <span
                     style={{
                       ...badgeStyle,
@@ -161,7 +189,7 @@ export default function AdminFinancePage() {
                         : pendingBadgeStyle),
                     }}
                   >
-                    {order.dispute_status || "none"}
+                    {getDisputeLabel(order.dispute_status)}
                   </span>
                 </div>
               </div>
@@ -169,6 +197,37 @@ export default function AdminFinancePage() {
           </div>
         )}
       </section>
+
+      <style>{`
+        @media (max-width: 1100px) {
+          .stats-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+
+          .finance-row {
+            grid-template-columns: 1fr 1fr !important;
+          }
+        }
+
+        @media (max-width: 700px) {
+          .admin-finance-page {
+            padding: 120px 18px 40px !important;
+          }
+
+          .admin-finance-title {
+            font-size: 48px !important;
+            letter-spacing: -2px !important;
+          }
+
+          .stats-grid {
+            grid-template-columns: 1fr !important;
+          }
+
+          .finance-row {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </main>
   );
 }

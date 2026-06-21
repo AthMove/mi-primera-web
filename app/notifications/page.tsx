@@ -95,7 +95,7 @@ export default function NotificationsPage() {
   ) => {
     e.stopPropagation();
 
-    const confirmDelete = confirm("Delete this notification?");
+    const confirmDelete = confirm("¿Eliminar esta notificación?");
     if (!confirmDelete) return;
 
     await supabase
@@ -130,28 +130,28 @@ export default function NotificationsPage() {
   };
 
   if (loading) {
-    return <main style={pageStyle}>Loading notifications...</main>;
+    return <main style={pageStyle}>Cargando notificaciones...</main>;
   }
 
   return (
     <main style={pageStyle} className="notifications-page">
       <section style={headerStyle}>
-        <p style={eyebrowStyle}>ATHMOV ALERTS</p>
+        <p style={eyebrowStyle}>ALERTAS ATHMOV</p>
 
         <div style={headerRowStyle}>
           <div>
             <h1 style={titleStyle} className="notifications-title">
-              Notifications
+              Notificaciones
             </h1>
 
             <p style={subtitleStyle}>
-              Messages, offers, orders and reviews.
+              Mensajes, ofertas, pedidos y reseñas.
             </p>
           </div>
 
           {unreadCount > 0 && (
             <button onClick={markAllAsRead} style={markButtonStyle}>
-              Mark all as read
+              Marcar todo como leído
             </button>
           )}
         </div>
@@ -159,17 +159,17 @@ export default function NotificationsPage() {
         {unreadCount > 0 && (
           <div style={summaryPillStyle}>
             <span style={pulseDotStyle} />
-            {unreadCount} unread notification{unreadCount === 1 ? "" : "s"}
+            {unreadCount} notificación{unreadCount === 1 ? "" : "es"} sin leer
           </div>
         )}
       </section>
 
       {notifications.length === 0 ? (
         <section style={emptyStyle}>
-          <h2 style={emptyTitleStyle}>No notifications yet</h2>
+          <h2 style={emptyTitleStyle}>Todavía no tienes notificaciones</h2>
 
           <p style={emptyTextStyle}>
-            Your marketplace activity will appear here.
+            Tu actividad del marketplace aparecerá aquí.
           </p>
         </section>
       ) : (
@@ -206,7 +206,7 @@ export default function NotificationsPage() {
                       {notification.title}
                     </h2>
 
-                    {!notification.is_read && <span style={newBadgeStyle}>NEW</span>}
+                    {!notification.is_read && <span style={newBadgeStyle}>NUEVA</span>}
                   </div>
 
                   <p style={messageStyle}>{notification.message}</p>
@@ -218,13 +218,13 @@ export default function NotificationsPage() {
               </div>
 
               <div style={rightStyle}>
-                <span style={openStyle}>Open →</span>
+                <span style={openStyle}>Abrir →</span>
 
                 <button
                   onClick={(e) => deleteNotification(e, notification.id)}
                   style={deleteButtonStyle}
                 >
-                  Delete
+                  Eliminar
                 </button>
               </div>
             </article>

@@ -30,17 +30,15 @@ export default function AccountPage() {
     try {
       setCheckingStripe(true);
 
-       await fetch("/api/stripe/connect/status", {
+      await fetch("/api/stripe/connect/status", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          userId,
-        }),
+        body: JSON.stringify({ userId }),
       });
     } catch (error) {
-      console.log("Stripe status sync error:", error);
+      console.log("ERROR AL SINCRONIZAR STRIPE:", error);
     } finally {
       setCheckingStripe(false);
     }
@@ -95,7 +93,7 @@ export default function AccountPage() {
       bio: data.bio || "",
       location: data.location || "",
       avatar_url: data.avatar_url || "",
-      email: data.email || "",
+      email: data.email || user.email || "",
       stripe_account_id: data.stripe_account_id || "",
       stripe_onboarding_complete: data.stripe_onboarding_complete || false,
       stripe_charges_enabled: data.stripe_charges_enabled || false,
@@ -135,10 +133,10 @@ export default function AccountPage() {
         return;
       }
 
-      alert(data.error || "Could not start Stripe onboarding");
+      alert(data.error || "No se pudo iniciar la conexión con Stripe");
     } catch (error) {
       console.log(error);
-      alert("Stripe connection failed");
+      alert("No se pudo conectar Stripe");
     }
   };
 
@@ -151,28 +149,28 @@ export default function AccountPage() {
 
     try {
       setSaving(true);
-      
-const { error } = await supabase.from("profiles").upsert(
-  {
-    id: user.id,
-    email: user.email,
-    username: profile.username,
-    full_name: profile.full_name,
-    bio: profile.bio,
-    location: profile.location,
-    avatar_url: profile.avatar_url,
-  },
-  {
-    onConflict: "id",
-  }
-);
+
+      const { error } = await supabase.from("profiles").upsert(
+        {
+          id: user.id,
+          email: user.email,
+          username: profile.username.trim(),
+          full_name: profile.full_name.trim(),
+          bio: profile.bio.trim(),
+          location: profile.location.trim(),
+          avatar_url: profile.avatar_url.trim(),
+        },
+        {
+          onConflict: "id",
+        }
+      );
 
       if (error) {
         alert(error.message);
         return;
       }
 
-      alert("Profile updated");
+      alert("Perfil actualizado correctamente");
       await loadProfile();
     } finally {
       setSaving(false);
@@ -180,7 +178,7 @@ const { error } = await supabase.from("profiles").upsert(
   };
 
   const safeAvatar = (src: string) => {
-    return src?.startsWith("http") ? src : "/logo.png";
+    return src?.startsWith("http") || src?.startsWith("/") ? src : "/logo.png";
   };
 
   const stripeReady =
@@ -190,29 +188,31 @@ const { error } = await supabase.from("profiles").upsert(
     profile.stripe_payouts_enabled;
 
   if (loading) {
-    return <main style={loadingStyle}>Loading profile...</main>;
+    return <main style={loadingStyle}>Cargando perfil...</main>;
   }
 
   return (
     <main style={pageStyle} className="account-page">
       <section style={heroStyle}>
-        <p style={eyebrowStyle}>ATHMOV PROFILE</p>
+        <p style={eyebrowStyle}>PERFIL ATHMOV</p>
 
         <h1 style={titleStyle} className="account-title">
-          Your Account
+          Tu cuenta
         </h1>
 
-        <p style={subtitleStyle}>Manage your public seller profile.</p>
+        <p style={subtitleStyle}>
+          Gestiona tu perfil público de vendedor.
+        </p>
       </section>
 
-      <section style={layoutStyle}>
+      <section style={layoutStyle} className="account-layout">
         <div style={avatarCardStyle}>
           <div style={avatarWrapperStyle}>
             <Image
               src={safeAvatar(profile.avatar_url)}
               alt="Avatar"
               fill
-              sizes="200px"
+              sizes="220px"
               style={{ objectFit: "cover" }}
             />
           </div>
@@ -225,16 +225,30 @@ const { error } = await supabase.from("profiles").upsert(
                 avatar_url: e.target.value,
               })
             }
-            placeholder="Avatar image URL"
+            placeholder="URL de imagen de perfil"
             style={inputStyle}
           />
 
-          <p style={helperStyle}>Paste an image URL for your profile photo.</p>
+          <p style={helperStyle}>
+            Pega una URL de imagen para tu foto de perfil.
+          </p>
+
+          <div style={stripeBoxStyle}>
+            <p style={stripeTitleStyle}>Estado de Stripe</p>
+
+            {stripeReady ? (
+              <p style={stripeOkStyle}>Pagos activos ✓</p>
+            ) : profile.stripe_account_id ? (
+              <p style={stripePendingStyle}>Configuración pendiente</p>
+            ) : (
+              <p style={stripePendingStyle}>Stripe no conectado</p>
+            )}
+          </div>
         </div>
 
         <div style={formCardStyle}>
           <div style={fieldStyle}>
-            <label style={labelStyle}>Username</label>
+            <label style={labelStyle}>Usuario</label>
 
             <input
               value={profile.username}
@@ -244,13 +258,13 @@ const { error } = await supabase.from("profiles").upsert(
                   username: e.target.value,
                 })
               }
-              placeholder="@username"
+              placeholder="@usuario"
               style={inputStyle}
             />
           </div>
 
           <div style={fieldStyle}>
-            <label style={labelStyle}>Full Name</label>
+            <label style={labelStyle}>Nombre completo</label>
 
             <input
               value={profile.full_name}
@@ -260,13 +274,13 @@ const { error } = await supabase.from("profiles").upsert(
                   full_name: e.target.value,
                 })
               }
-              placeholder="Your full name"
+              placeholder="Tu nombre completo"
               style={inputStyle}
             />
           </div>
 
           <div style={fieldStyle}>
-            <label style={labelStyle}>Location</label>
+            <label style={labelStyle}>Ubicación</label>
 
             <input
               value={profile.location}
@@ -276,13 +290,13 @@ const { error } = await supabase.from("profiles").upsert(
                   location: e.target.value,
                 })
               }
-              placeholder="Madrid, Spain"
+              placeholder="Madrid, España"
               style={inputStyle}
             />
           </div>
 
           <div style={fieldStyle}>
-            <label style={labelStyle}>Bio</label>
+            <label style={labelStyle}>Biografía</label>
 
             <textarea
               value={profile.bio}
@@ -292,32 +306,32 @@ const { error } = await supabase.from("profiles").upsert(
                   bio: e.target.value,
                 })
               }
-              placeholder="Tell buyers about yourself..."
+              placeholder="Cuéntale a los compradores quién eres..."
               style={textareaStyle}
             />
           </div>
 
           <div style={buttonsRowStyle}>
             <button onClick={saveProfile} style={buttonStyle}>
-              {saving ? "Saving..." : "Save profile"}
+              {saving ? "Guardando..." : "Guardar perfil"}
             </button>
 
             {!profile.stripe_account_id ? (
               <button onClick={startStripeOnboarding} style={connectButtonStyle}>
-                Connect Stripe payouts
+                Conectar pagos de Stripe
               </button>
             ) : stripeReady ? (
               <div style={stripeConnectedStyle}>
-                Stripe payouts active ✓
+                Pagos de Stripe activos ✓
               </div>
             ) : (
               <button onClick={startStripeOnboarding} style={connectButtonStyle}>
-                Complete Stripe onboarding
+                Completar configuración de Stripe
               </button>
             )}
 
             <button onClick={loadProfile} style={refreshButtonStyle}>
-              {checkingStripe ? "Checking..." : "Refresh Stripe status"}
+              {checkingStripe ? "Comprobando..." : "Actualizar estado de Stripe"}
             </button>
           </div>
         </div>
@@ -332,6 +346,10 @@ const { error } = await supabase.from("profiles").upsert(
           .account-title {
             font-size: 52px !important;
             letter-spacing: -2px !important;
+          }
+
+          .account-layout {
+            grid-template-columns: 1fr !important;
           }
         }
       `}</style>
@@ -408,6 +426,35 @@ const helperStyle = {
   fontSize: "13px",
   lineHeight: 1.6,
   marginTop: "12px",
+};
+
+const stripeBoxStyle = {
+  marginTop: "20px",
+  background: "#f7f7f3",
+  border: "1px solid rgba(0,0,0,0.06)",
+  borderRadius: "22px",
+  padding: "16px",
+};
+
+const stripeTitleStyle = {
+  margin: 0,
+  fontSize: "11px",
+  fontWeight: 900,
+  letterSpacing: "1.5px",
+  textTransform: "uppercase" as const,
+  opacity: 0.5,
+};
+
+const stripeOkStyle = {
+  marginBottom: 0,
+  color: "#16a34a",
+  fontWeight: 900,
+};
+
+const stripePendingStyle = {
+  marginBottom: 0,
+  color: "#92400e",
+  fontWeight: 900,
 };
 
 const formCardStyle = {

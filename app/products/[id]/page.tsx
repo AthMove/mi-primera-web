@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
@@ -46,12 +45,14 @@ export default function ProductDetail() {
         setProducto(data);
 
         const { data: sellerData } = await supabase
-  .from("profiles")
-  .select("seller_verified, seller_level, seller_badge")
-  .eq("id", data.seller_id)
-  .maybeSingle();
+          .from("profiles")
+          .select(
+            "seller_verified, seller_level, seller_badge, stripe_account_id, stripe_charges_enabled, stripe_payouts_enabled"
+          )
+          .eq("id", data.seller_id)
+          .maybeSingle();
 
-setSellerProfile(sellerData);
+        setSellerProfile(sellerData);
 
         const images =
           data.images && Array.isArray(data.images) ? data.images : [data.image];
@@ -74,12 +75,12 @@ setSellerProfile(sellerData);
         }
 
         const { data: relatedProducts } = await supabase
-  .from("products")
-  .select("*")
-  .neq("id", data.id)
-  .eq("sold", false)
-  .eq("moderation_status", "approved")
-  .limit(3);
+          .from("products")
+          .select("*")
+          .neq("id", data.id)
+          .eq("sold", false)
+          .eq("moderation_status", "approved")
+          .limit(3);
 
         setRelated(relatedProducts || []);
       } catch {
@@ -91,6 +92,19 @@ setSellerProfile(sellerData);
 
     getProduct();
   }, [id]);
+
+  const safeImage = (src?: string) => {
+    return src?.startsWith("http") || src?.startsWith("/") ? src : "/logo.png";
+  };
+
+  const getConditionLabel = (condition?: string) => {
+    if (condition === "New") return "Nuevo";
+    if (condition === "Like new") return "Como nuevo";
+    if (condition === "Excellent") return "Excelente";
+    if (condition === "Good") return "Buen estado";
+    if (condition === "Used") return "Usado";
+    return condition || "Excelente";
+  };
 
   const getBuyerGuide = () => {
     const category = String(producto?.category || producto?.brand || "")
@@ -166,25 +180,23 @@ setSellerProfile(sellerData);
       return;
     }
 
-const { data: sellerProfile, error: sellerError } = await supabase
-  .from("profiles")
-  .select(
-    "seller_verified, seller_level, seller_badge, stripe_account_id, stripe_charges_enabled, stripe_payouts_enabled"
-  )
-  .eq("id", producto.seller_id)
-  .maybeSingle();
+    const { data: sellerProfile, error: sellerError } = await supabase
+      .from("profiles")
+      .select(
+        "seller_verified, seller_level, seller_badge, stripe_account_id, stripe_charges_enabled, stripe_payouts_enabled"
+      )
+      .eq("id", producto.seller_id)
+      .maybeSingle();
 
-console.log("PRODUCT SELLER ID:", producto.seller_id);
-console.log(
-  "SELLER PROFILE JSON:",
-  JSON.stringify(sellerProfile, null, 2)
-);
-console.log("SELLER ERROR:", sellerError);
-
-if (sellerError || !sellerProfile?.stripe_account_id) {
-  alert("El vendedor no ha conectado los pagos de Stripe");
-  return;
-}
+    if (
+      sellerError ||
+      !sellerProfile?.stripe_account_id ||
+      !sellerProfile?.stripe_charges_enabled ||
+      !sellerProfile?.stripe_payouts_enabled
+    ) {
+      alert("El vendedor todavía no tiene los pagos de Stripe activos");
+      return;
+    }
 
     try {
       setCheckoutLoading(true);
@@ -216,7 +228,7 @@ if (sellerError || !sellerProfile?.stripe_account_id) {
         .single();
 
       if (orderError || !order) {
-       alert(orderError?.message || "No se pudo crear el pedido");
+        alert(orderError?.message || "No se pudo crear el pedido");
         return;
       }
 
@@ -341,22 +353,21 @@ if (sellerError || !sellerProfile?.stripe_account_id) {
     }
 
     await fetch("/api/email/offer-received", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    productId: producto.id,
-    sellerId: producto.seller_id,
-    buyerEmail: user.email,
-    amount: numericAmount,
-  }),
-});
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        productId: producto.id,
+        sellerId: producto.seller_id,
+        buyerEmail: user.email,
+        amount: numericAmount,
+      }),
+    });
 
-   alert("Oferta enviada");
+    alert("Oferta enviada");
   };
-
-  const messageSeller = async () => {
+    const messageSeller = async () => {
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -407,43 +418,62 @@ if (sellerError || !sellerProfile?.stripe_account_id) {
       conversationId = newConversation.id;
     }
 
-   const firstMessage = `Hola, ¿podrías enviarme un vídeo de verificación de "${producto.title}" mostrando números de serie, estado y detalles de la marca?`;
+    const firstMessage = `Hola, ¿podrías enviarme un vídeo de verificación de "${producto.title}" mostrando números de serie, estado y detalles de la marca?`;
 
-const { error: messageError } = await supabase
-  .from("conversation_messages")
-  .insert([
-    {
-      conversation_id: conversationId,
-      sender_id: user.id,
-      content: firstMessage,
-      is_image: false,
-      is_offer: false,
-      read_by_buyer: false,
-      read_by_seller: false,
-    },
-  ]);
+    const { error: messageError } = await supabase
+      .from("conversation_messages")
+      .insert([
+        {
+          conversation_id: conversationId,
+          sender_id: user.id,
+          content: firstMessage,
+          is_image: false,
+          is_offer: false,
+          read_by_buyer: false,
+          read_by_seller: false,
+        },
+      ]);
 
-if (messageError) {
-  alert(messageError.message);
-  return;
-}
+    if (messageError) {
+      alert(messageError.message);
+      return;
+    }
 
-await supabase
-  .from("conversations")
-  .update({
-    last_message: firstMessage,
-    last_message_at: new Date().toISOString(),
-    unread_seller: 1,
-    archived_by_buyer: false,
-    archived_by_seller: false,
-  })
-  .eq("id", conversationId);
+    await supabase
+      .from("conversations")
+      .update({
+        last_message: firstMessage,
+        last_message_at: new Date().toISOString(),
+        unread_seller: 1,
+        archived_by_buyer: false,
+        archived_by_seller: false,
+      })
+      .eq("id", conversationId);
 
     window.location.href = `/messages/${conversationId}`;
   };
 
-  const safeImage = (src: string) => {
-    return src?.startsWith("http") || src?.startsWith("/") ? src : "/logo.png";
+  const addToCart = () => {
+    if (!producto) return;
+
+    const cart = JSON.parse(localStorage.getItem("athmov_cart") || "[]");
+    const exists = cart.some((item: any) => item.id === producto.id);
+
+    if (!exists) {
+      cart.push({
+        id: producto.id,
+        nombre: producto.title,
+        precio: `€${producto.price}`,
+        imagen: producto.image,
+        deporte: producto.brand,
+        seller_id: producto.seller_id,
+        stripe_account_id: sellerProfile?.stripe_account_id || "",
+      });
+
+      localStorage.setItem("athmov_cart", JSON.stringify(cart));
+    }
+
+    alert("Añadido al carrito");
   };
 
   if (loading) {
@@ -451,7 +481,7 @@ await supabase
   }
 
   if (notFound || !producto) {
-   return <div style={{ padding: "60px" }}>Producto no encontrado</div>;
+    return <div style={{ padding: "60px" }}>Producto no encontrado</div>;
   }
 
   if (producto.sold) {
@@ -465,7 +495,8 @@ await supabase
           <p style={soldEyebrowStyle}>ATHMOV MARKETPLACE</p>
           <h1 style={soldTitleStyle}>Este producto se ha vendido</h1>
           <p style={soldTextStyle}>
-           Este artículo ya no está disponible. Puedes seguir explorando material deportivo premium similar.
+            Este artículo ya no está disponible. Puedes seguir explorando
+            material deportivo premium similar.
           </p>
 
           <button
@@ -547,22 +578,12 @@ await supabase
 
           <div style={metaGridStyle} className="product-detail-meta">
             {[
-             [
-  "ESTADO",
-  producto.condition === "New"
-    ? "Nuevo"
-    : producto.condition === "Like new"
-      ? "Como nuevo"
-      : producto.condition === "Excellent"
-        ? "Excelente"
-        : producto.condition === "Good"
-          ? "Buen estado"
-          : producto.condition === "Used"
-            ? "Usado"
-            : producto.condition || "Excelente",
-],
-["VENDEDOR", "Verificado"],
-["UBICACIÓN", "España"],
+              ["ESTADO", getConditionLabel(producto.condition)],
+              [
+                "VENDEDOR",
+                sellerProfile?.seller_verified ? "Verificado" : "Disponible",
+              ],
+              ["UBICACIÓN", producto.location || "España"],
             ].map(([label, value]) => (
               <div key={label} style={metaCardStyle}>
                 <p style={metaLabelStyle}>{label}</p>
@@ -571,14 +592,16 @@ await supabase
             ))}
           </div>
 
-        <div style={trustPanelStyle}>
-  <div style={trustPanelItemStyle}>✓ Protección al comprador</div>
-  <div style={trustPanelItemStyle}>✓ Pago seguro</div>
-  <div style={trustPanelItemStyle}>
-    {sellerProfile?.seller_verified ? "✓ Vendedor verificado" : "Perfil del vendedor disponible"}
-  </div>
-  <div style={trustPanelItemStyle}>✓ Marketplace seleccionado </div>
-</div>
+          <div style={trustPanelStyle}>
+            <div style={trustPanelItemStyle}>✓ Protección al comprador</div>
+            <div style={trustPanelItemStyle}>✓ Pago seguro</div>
+            <div style={trustPanelItemStyle}>
+              {sellerProfile?.seller_verified
+                ? "✓ Vendedor verificado"
+                : "Perfil del vendedor disponible"}
+            </div>
+            <div style={trustPanelItemStyle}>✓ Marketplace seleccionado</div>
+          </div>
 
           <section style={buyerGuideStyle}>
             <div style={buyerGuideHeaderStyle}>
@@ -591,9 +614,9 @@ await supabase
             </div>
 
             <p style={buyerGuideTextStyle}>
-              Aprende cómo verificar este producto antes de comprarlo. Recomendamos
-comprobar números de serie, pedir vídeos y comparar detalles con el
-catálogo oficial de la marca.
+              Aprende cómo verificar este producto antes de comprarlo.
+              Recomendamos comprobar números de serie, pedir vídeos y comparar
+              detalles con el catálogo oficial de la marca.
             </p>
 
             <div style={buyerGuideCardsStyle}>
@@ -621,16 +644,16 @@ catálogo oficial de la marca.
             </div>
 
             <div style={buyerGuideFooterStyle}>
-              ATHMOV está actualmente en beta. Las herramientas de verificación son educativas
-y están diseñadas para ayudar a los compradores a tomar decisiones más seguras.
+              ATHMOV está actualmente en beta. Las herramientas de verificación
+              son educativas y están diseñadas para ayudar a los compradores a
+              tomar decisiones más seguras.
             </div>
           </section>
 
-{sellerProfile?.seller_verified && (
-  <div style={verifiedSellerBadgeStyle}>
-   ✓ Vendedor verificado
-  </div>
-)}
+          {sellerProfile?.seller_verified && (
+            <div style={verifiedSellerBadgeStyle}>✓ Vendedor verificado</div>
+          )}
+
           {producto.seller_id && (
             <button
               onClick={() => {
@@ -638,7 +661,7 @@ y están diseñadas para ayudar a los compradores a tomar decisiones más segura
               }}
               style={sellerButtonStyle}
             >
-             Ver perfil del vendedor
+              Ver perfil del vendedor
             </button>
           )}
 
@@ -651,29 +674,7 @@ y están diseñadas para ayudar a los compradores a tomar decisiones más segura
               {checkoutLoading ? "Redirigiendo..." : "Comprar ahora"}
             </button>
 
-            <button
-              onClick={() => {
-                const cart = JSON.parse(
-                  localStorage.getItem("athmov_cart") || "[]"
-                );
-                const exists = cart.some((item: any) => item.id === producto.id);
-
-                if (!exists) {
-                  cart.push({
-                    id: producto.id,
-                    nombre: producto.title,
-                    precio: `€${producto.price}`,
-                    imagen: producto.image,
-                    deporte: producto.brand,
-                  });
-
-                  localStorage.setItem("athmov_cart", JSON.stringify(cart));
-                }
-
-                alert("Añadido al carrito");
-              }}
-              style={primaryButtonStyle}
-            >
+            <button onClick={addToCart} style={primaryButtonStyle}>
               Añadir al carrito
             </button>
 
@@ -1085,25 +1086,6 @@ const buyerGuideHeaderStyle = {
   alignItems: "flex-start",
   gap: "18px",
   marginBottom: "18px",
-};
-
-const trustBadgesStyle = {
-  display: "flex",
-  flexWrap: "wrap" as const,
-  gap: "10px",
-  marginTop: "22px",
-  marginBottom: "10px",
-};
-
-const trustBadgeStyle = {
-  background: "#fff",
-  border: "1px solid rgba(0,0,0,0.08)",
-  borderRadius: "999px",
-  padding: "10px 14px",
-  fontSize: "10px",
-  fontWeight: 800,
-  letterSpacing: "1.5px",
-  color: "#111",
 };
 
 const buyerGuideCardsStyle = {

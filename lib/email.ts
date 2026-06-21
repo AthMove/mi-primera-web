@@ -11,15 +11,27 @@ export async function sendEmail({
   subject: string;
   html: string;
 }) {
-  if (!process.env.RESEND_API_KEY) {
-    console.log("Missing RESEND_API_KEY");
-    return;
-  }
+  try {
+    if (!process.env.RESEND_API_KEY) {
+      console.error("Missing RESEND_API_KEY");
+      return null;
+    }
 
-  return await resend.emails.send({
-    from: process.env.EMAIL_FROM || "ATHMOV <orders@athmov.com>",
-    to,
-    subject,
-    html,
-  });
+    const { data, error } = await resend.emails.send({
+      from: process.env.EMAIL_FROM || "ATHMOV <orders@athmov.com>",
+      to,
+      subject,
+      html,
+    });
+
+    if (error) {
+      console.error("RESEND ERROR:", error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("SEND EMAIL ERROR:", error);
+    return null;
+  }
 }

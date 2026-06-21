@@ -59,7 +59,7 @@ export default function SellerDashboardPage() {
       .order("created_at", { ascending: false });
 
     const { data: reviewsData } = await supabase
-      .from("reviews")
+      .from("seller_reviews")
       .select("*")
       .eq("seller_id", user.id)
       .order("created_at", { ascending: false });
@@ -68,61 +68,63 @@ export default function SellerDashboardPage() {
     const products = productsData || [];
     const reviews = reviewsData || [];
 
-    const totalSales = orders.reduce(
-  (sum: number, order: any) =>
-    order.payment_status === "paid"
-      ? sum + Number(order.seller_amount || 0)
-      : sum,
-  0
-);
+    const paidOrders = orders.filter(
+      (order: any) => order.payment_status === "paid"
+    );
 
-const pendingPayouts = orders.reduce(
-  (sum: number, order: any) =>
-    order.transfer_status !== "paid" && order.payment_status === "paid"
-      ? sum + Number(order.seller_amount || 0)
-      : sum,
-  0
-);
+    const totalSales = paidOrders.reduce(
+      (sum: number, order: any) => sum + Number(order.seller_amount || 0),
+      0
+    );
 
-const completedPayouts = orders.reduce(
-  (sum: number, order: any) =>
-    order.transfer_status === "paid"
-      ? sum + Number(order.seller_amount || 0)
-      : sum,
-  0
-);
+    const pendingPayouts = paidOrders
+      .filter(
+        (order: any) =>
+          order.transfer_status !== "released" &&
+          order.dispute_status !== "open"
+      )
+      .reduce(
+        (sum: number, order: any) => sum + Number(order.seller_amount || 0),
+        0
+      );
 
-const refunded = orders.reduce(
-  (sum: number, order: any) =>
-    order.payment_status === "refunded"
-      ? sum + Number(order.refund_amount || 0)
-      : sum,
-  0
-);
+    const completedPayouts = orders
+      .filter((order: any) => order.transfer_status === "released")
+      .reduce(
+        (sum: number, order: any) => sum + Number(order.seller_amount || 0),
+        0
+      );
 
-   const ordersSold = orders.filter(
-  (order: any) => order.payment_status === "paid"
-).length;
+    const refunded = orders
+      .filter((order: any) => order.payment_status === "refunded")
+      .reduce(
+        (sum: number, order: any) => sum + Number(order.refund_amount || 0),
+        0
+      );
 
-const activeProducts = products.filter(
-  (p: any) => !p.sold && p.moderation_status === "approved"
-).length;
+    const ordersSold = paidOrders.length;
 
-const pendingProducts = products.filter(
-  (p: any) => p.moderation_status === "pending"
-).length;
+    const activeProducts = products.filter(
+      (p: any) => !p.sold && p.moderation_status === "approved"
+    ).length;
 
-const rejectedProducts = products.filter(
-  (p: any) => p.moderation_status === "rejected"
-).length;
+    const pendingProducts = products.filter(
+      (p: any) => p.moderation_status === "pending"
+    ).length;
 
-const soldProducts = products.filter((p: any) => p.sold).length;
+    const rejectedProducts = products.filter(
+      (p: any) => p.moderation_status === "rejected"
+    ).length;
 
-const averageRating =
-  reviews.length > 0
-    ? reviews.reduce((acc: number, item: any) => acc + Number(item.rating || 0), 0) /
-      reviews.length
-    : 0;
+    const soldProducts = products.filter((p: any) => p.sold).length;
+
+    const averageRating =
+      reviews.length > 0
+        ? reviews.reduce(
+            (acc: number, item: any) => acc + Number(item.rating || 0),
+            0
+          ) / reviews.length
+        : 0;
 
     const trustScore = Math.min(
       100,
@@ -134,12 +136,13 @@ const averageRating =
       )
     );
 
+    const averageOrderValue = ordersSold > 0 ? totalSales / ordersSold : 0;
+
     setProfile(profileData);
     setOrders(orders);
     setProducts(products);
     setReviews(reviews);
 
-    const averageOrderValue = ordersSold > 0 ? totalSales / ordersSold : 0;
     setStats({
       totalSales,
       pendingPayouts,
@@ -159,43 +162,62 @@ const averageRating =
     setLoading(false);
   };
 
-  const sellerLevel =
-    profile?.seller_badge || profile?.seller_level || "new";
+  const sellerLevel = profile?.seller_badge || profile?.seller_level || "nuevo";
+
+  const getOrderStatusLabel = (status?: string) => {
+    if (status === "pending") return "Pendiente";
+    if (status === "paid") return "Pagado";
+    if (status === "preparing") return "En preparación";
+    if (status === "shipped") return "Enviado";
+    if (status === "delivered") return "Entregado";
+    if (status === "completed") return "Completado";
+    if (status === "refunded") return "Reembolsado";
+    return status || "Pendiente";
+  };
+
+  const getTransferStatusLabel = (status?: string) => {
+    if (status === "pending") return "Pendiente";
+    if (status === "released") return "Liberado";
+    if (status === "cancelled") return "Cancelado";
+    if (status === "refunded") return "Reembolsado";
+    return status || "Pendiente";
+  };
 
   if (loading) {
-    return <main style={loadingStyle}>Loading seller dashboard...</main>;
+    return <main style={loadingStyle}>Cargando panel de vendedor...</main>;
   }
 
   return (
     <main style={pageStyle} className="seller-dashboard-page">
       <section style={heroStyle}>
         <div>
-          <p style={eyebrowStyle}>ATHMOV SELLER</p>
+          <p style={eyebrowStyle}>ATHMOV VENDEDOR</p>
 
           <h1 style={titleStyle} className="seller-dashboard-title">
-            Seller Dashboard
+            Panel de vendedor
           </h1>
 
           <p style={subtitleStyle}>
-            Track your wallet, seller level, payouts and marketplace performance.
+            Controla tus ventas, pagos, nivel de vendedor y rendimiento dentro
+            del marketplace.
           </p>
 
           <div style={heroBadgesStyle}>
             {profile?.seller_verified && (
-              <span style={verifiedBadgeStyle}>VERIFIED SELLER ✓</span>
+              <span style={verifiedBadgeStyle}>VENDEDOR VERIFICADO ✓</span>
             )}
 
             <span style={levelBadgeStyle}>
-              {String(sellerLevel).toUpperCase()} SELLER
+              VENDEDOR {String(sellerLevel).toUpperCase()}
             </span>
           </div>
         </div>
 
         <div style={trustScoreCardStyle}>
-          <p style={trustLabelStyle}>Trust Score</p>
+          <p style={trustLabelStyle}>Puntuación de confianza</p>
           <h2 style={trustValueStyle}>{stats.trustScore}</h2>
           <p style={trustTextStyle}>
-            Based on verification, sales, reviews and active listings.
+            Basada en verificación, ventas, valoraciones y productos activos.
           </p>
         </div>
       </section>
@@ -204,17 +226,17 @@ const averageRating =
         <div>
           <p style={eyebrowStyle}>ATHMOV WALLET</p>
           <h2 style={walletTitleStyle}>€{stats.pendingPayouts.toFixed(2)}</h2>
-          <p style={walletTextStyle}>Pending payout balance</p>
+          <p style={walletTextStyle}>Saldo pendiente de liberar</p>
         </div>
 
         <div style={walletMiniGridStyle}>
           <div style={walletMiniCardStyle}>
-            <span>Completed payouts</span>
+            <span>Pagos liberados</span>
             <strong>€{stats.completedPayouts.toFixed(2)}</strong>
           </div>
 
           <div style={walletMiniCardStyle}>
-            <span>Total seller sales</span>
+            <span>Ventas totales</span>
             <strong>€{stats.totalSales.toFixed(2)}</strong>
           </div>
         </div>
@@ -222,58 +244,60 @@ const averageRating =
 
       <section style={statsGridStyle}>
         <div style={cardStyle}>
-          <span style={labelStyle}>Orders sold</span>
+          <span style={labelStyle}>Pedidos vendidos</span>
           <strong style={valueStyle}>{stats.ordersSold}</strong>
         </div>
 
         <div style={cardStyle}>
-          <span style={labelStyle}>Average order</span>
+          <span style={labelStyle}>Pedido medio</span>
           <strong style={valueStyle}>
             €{stats.averageOrderValue.toFixed(2)}
           </strong>
         </div>
 
         <div style={cardStyle}>
-          <span style={labelStyle}>Rating</span>
+          <span style={labelStyle}>Valoración</span>
           <strong style={valueStyle}>★ {stats.averageRating}</strong>
         </div>
 
         <div style={cardStyle}>
-          <span style={labelStyle}>Reviews</span>
+          <span style={labelStyle}>Valoraciones</span>
           <strong style={valueStyle}>{stats.totalReviews}</strong>
         </div>
 
         <div style={cardStyle}>
-          <span style={labelStyle}>Active products</span>
+          <span style={labelStyle}>Productos activos</span>
           <strong style={valueStyle}>{stats.activeProducts}</strong>
         </div>
 
         <div style={cardStyle}>
-          <span style={labelStyle}>Pending approval</span>
+          <span style={labelStyle}>Pendientes de aprobar</span>
           <strong style={valueStyle}>{stats.pendingProducts}</strong>
         </div>
 
         <div style={cardStyle}>
-          <span style={labelStyle}>Rejected products</span>
+          <span style={labelStyle}>Productos rechazados</span>
           <strong style={valueStyle}>{stats.rejectedProducts}</strong>
         </div>
 
         <div style={cardStyle}>
-          <span style={labelStyle}>Sold products</span>
+          <span style={labelStyle}>Productos vendidos</span>
           <strong style={valueStyle}>{stats.soldProducts}</strong>
         </div>
       </section>
 
       <section style={insightsGridStyle}>
         <div style={panelStyle}>
-          <p style={sectionEyebrowStyle}>SELLER TRUST</p>
-          <h2 style={sectionTitleStyle}>Performance</h2>
+          <p style={sectionEyebrowStyle}>CONFIANZA DEL VENDEDOR</p>
+          <h2 style={sectionTitleStyle}>Rendimiento</h2>
 
           <div style={trustBarsStyle}>
             <div>
               <div style={barHeaderStyle}>
-                <span>Verification</span>
-                <strong>{profile?.seller_verified ? "Complete" : "Pending"}</strong>
+                <span>Verificación</span>
+                <strong>
+                  {profile?.seller_verified ? "Completa" : "Pendiente"}
+                </strong>
               </div>
               <div style={barTrackStyle}>
                 <div
@@ -287,8 +311,8 @@ const averageRating =
 
             <div>
               <div style={barHeaderStyle}>
-                <span>Seller activity</span>
-                <strong>{stats.activeProducts} active</strong>
+                <span>Actividad del vendedor</span>
+                <strong>{stats.activeProducts} activos</strong>
               </div>
               <div style={barTrackStyle}>
                 <div
@@ -302,7 +326,7 @@ const averageRating =
 
             <div>
               <div style={barHeaderStyle}>
-                <span>Buyer feedback</span>
+                <span>Opiniones de compradores</span>
                 <strong>★ {stats.averageRating}</strong>
               </div>
               <div style={barTrackStyle}>
@@ -318,33 +342,36 @@ const averageRating =
         </div>
 
         <div style={panelStyle}>
-          <p style={sectionEyebrowStyle}>SELLER ACTIONS</p>
-          <h2 style={sectionTitleStyle}>Quick links</h2>
+          <p style={sectionEyebrowStyle}>ACCIONES DEL VENDEDOR</p>
+          <h2 style={sectionTitleStyle}>Accesos rápidos</h2>
 
           <div style={quickActionsStyle}>
-            <button onClick={() => (window.location.href = "/sell")} style={buttonStyle}>
-              Add product
+            <button
+              onClick={() => (window.location.href = "/sell")}
+              style={buttonStyle}
+            >
+              Añadir producto
             </button>
 
             <button
               onClick={() => (window.location.href = "/orders?filter=selling")}
               style={secondaryButtonStyle}
             >
-              View orders
+              Ver pedidos
             </button>
 
             <button
               onClick={() => (window.location.href = "/verify")}
               style={secondaryButtonStyle}
             >
-              Verification
+              Verificación
             </button>
 
             <button
               onClick={() => (window.location.href = "/account")}
               style={secondaryButtonStyle}
             >
-              Account
+              Cuenta
             </button>
           </div>
         </div>
@@ -353,39 +380,47 @@ const averageRating =
       <section style={ordersSectionStyle}>
         <div style={sectionHeaderStyle}>
           <div>
-            <p style={sectionEyebrowStyle}>RECENT SALES</p>
-            <h2 style={sectionTitleStyle}>Latest orders</h2>
+            <p style={sectionEyebrowStyle}>VENTAS RECIENTES</p>
+            <h2 style={sectionTitleStyle}>Últimos pedidos</h2>
           </div>
 
           <button
             onClick={() => (window.location.href = "/orders")}
             style={smallButtonStyle}
           >
-            View all →
+            Ver todo →
           </button>
         </div>
 
         {orders.length === 0 ? (
-          <div style={emptyStyle}>No sales yet.</div>
+          <div style={emptyStyle}>Todavía no hay ventas.</div>
         ) : (
           <div style={ordersListStyle}>
             {orders.slice(0, 8).map((order: any) => (
               <div key={order.id} style={orderCardStyle}>
                 <div>
-                  <p style={orderMetaStyle}>ORDER</p>
+                  <p style={orderMetaStyle}>PEDIDO</p>
 
                   <p style={orderAmountStyle}>
                     €{Number(order.seller_amount || 0).toFixed(2)}
                   </p>
 
                   <p style={orderTextStyle}>
-                    Status: {order.status || "paid"} · Transfer:{" "}
-                    {order.transfer_status || "pending"}
+                    Estado: {getOrderStatusLabel(order.status)} ·
+                    Transferencia:{" "}
+                    {getTransferStatusLabel(order.transfer_status)}
                   </p>
                 </div>
 
-                <div style={badgeStyle}>
-                  {order.transfer_status || "pending"}
+                <div
+                  style={{
+                    ...badgeStyle,
+                    ...(order.transfer_status === "released"
+                      ? releasedBadgeStyle
+                      : {}),
+                  }}
+                >
+                  {getTransferStatusLabel(order.transfer_status)}
                 </div>
               </div>
             ))}
@@ -732,9 +767,15 @@ const orderTextStyle = {
 const badgeStyle = {
   padding: "10px 16px",
   borderRadius: "999px",
-  background: "#111",
-  color: "#fff",
+  background: "#fff",
+  color: "#111",
+  border: "1px solid rgba(0,0,0,0.12)",
   fontSize: "12px",
   fontWeight: 800,
   textTransform: "uppercase" as const,
+};
+
+const releasedBadgeStyle = {
+  background: "#111",
+  color: "#fff",
 };

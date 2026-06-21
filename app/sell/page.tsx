@@ -304,9 +304,17 @@ export default function SellPage() {
 <div style={trustBadgeStyle}>✓ REVISIÓN MANUAL</div>
           </div>
 
-          <button onClick={publishProduct} style={submitButtonStyle}>
-            {loading ? "Enviando..." : "Enviar para revisión"}
-          </button>
+          <button
+  onClick={publishProduct}
+  disabled={loading}
+  style={{
+    ...submitButtonStyle,
+    opacity: loading ? 0.6 : 1,
+    cursor: loading ? "not-allowed" : "pointer",
+  }}
+>
+  {loading ? "Enviando..." : "Enviar para revisión"}
+</button>
         </div>
       </section>
 

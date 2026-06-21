@@ -13,7 +13,7 @@ export default function FavoriteButton({ productId }: Props) {
 
   useEffect(() => {
     checkFavorite();
-  }, []);
+  }, [productId]);
 
   const checkFavorite = async () => {
     const {
@@ -24,14 +24,12 @@ export default function FavoriteButton({ productId }: Props) {
 
     const { data } = await supabase
       .from("favorites")
-      .select("*")
+      .select("id")
       .eq("user_id", user.id)
       .eq("product_id", productId)
-      .single();
+      .maybeSingle();
 
-    if (data) {
-      setIsFavorite(true);
-    }
+    setIsFavorite(!!data);
   };
 
   const toggleFavorite = async () => {
@@ -40,47 +38,53 @@ export default function FavoriteButton({ productId }: Props) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      alert("Inicia sesión");
+      alert("Debes iniciar sesión");
       return;
     }
 
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    if (isFavorite) {
-      await supabase
-        .from("favorites")
-        .delete()
-        .eq("user_id", user.id)
-        .eq("product_id", productId);
+      if (isFavorite) {
+        await supabase
+          .from("favorites")
+          .delete()
+          .eq("user_id", user.id)
+          .eq("product_id", productId);
 
-      setIsFavorite(false);
-    } else {
-      await supabase.from("favorites").insert({
-        user_id: user.id,
-        product_id: productId,
-      });
+        setIsFavorite(false);
+      } else {
+        await supabase.from("favorites").insert({
+          user_id: user.id,
+          product_id: productId,
+          user_email: user.email,
+        });
 
-      setIsFavorite(true);
+        setIsFavorite(true);
+      }
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
     <button
       onClick={toggleFavorite}
       disabled={loading}
+      aria-label={isFavorite ? "Quitar de favoritos" : "Añadir a favoritos"}
+      title={isFavorite ? "Quitar de favoritos" : "Añadir a favoritos"}
       style={{
         width: "52px",
         height: "52px",
         borderRadius: "999px",
         border: "1px solid #ddd",
         background: "#fff",
-        cursor: "pointer",
+        cursor: loading ? "not-allowed" : "pointer",
         fontSize: "22px",
+        opacity: loading ? 0.6 : 1,
       }}
     >
-      {isFavorite ? "♥" : "♡"}
+      {isFavorite ? "♥️" : "♡"}
     </button>
   );
 }

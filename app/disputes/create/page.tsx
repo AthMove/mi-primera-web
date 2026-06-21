@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 
 export default function CreateDisputePage() {
   return (
-    <Suspense fallback={<main style={{ padding: 140 }}>Loading...</main>}>
+    <Suspense fallback={<main style={{ padding: 140 }}>Cargando...</main>}>
       <CreateDisputeContent />
     </Suspense>
   );
@@ -21,13 +21,18 @@ function CreateDisputeContent() {
   const [loading, setLoading] = useState(false);
 
   const submitDispute = async () => {
-    if (!reason.trim() || !description.trim() || !orderId) {
-      alert("Complete all fields");
+    if (!orderId) {
+      alert("Pedido no encontrado");
+      return;
+    }
+
+    if (!reason.trim() || !description.trim()) {
+      alert("Completa todos los campos");
       return;
     }
 
     if (files.length > 5) {
-      alert("You can upload up to 5 files");
+      alert("Puedes subir un máximo de 5 archivos");
       return;
     }
 
@@ -52,17 +57,17 @@ function CreateDisputeContent() {
         .maybeSingle();
 
       if (orderError || !order) {
-        alert(orderError?.message || "Order not found");
+        alert(orderError?.message || "Pedido no encontrado");
         return;
       }
 
       if (user.id !== order.buyer_id && user.id !== order.seller_id) {
-        alert("You are not allowed to open a dispute for this order");
+        alert("No tienes permiso para abrir una disputa en este pedido");
         return;
       }
 
       if (order.dispute_status === "open") {
-        alert("This order already has an open dispute");
+        alert("Este pedido ya tiene una disputa abierta");
         return;
       }
 
@@ -89,7 +94,9 @@ function CreateDisputeContent() {
           .from("dispute-evidence")
           .getPublicUrl(fileName);
 
-        if (data.publicUrl) evidenceUrls.push(data.publicUrl);
+        if (data.publicUrl) {
+          evidenceUrls.push(data.publicUrl);
+        }
       }
 
       const { error: disputeError } = await supabase.from("disputes").insert({
@@ -120,43 +127,47 @@ function CreateDisputeContent() {
         return;
       }
 
-      if (evidenceUrls.length > 0) {
-        const rows = evidenceUrls.map((url) => ({
-          order_id: order.id,
-          user_id: user.id,
-          message: description.trim(),
-          file_url: url,
-        }));
+      const evidenceRows =
+        evidenceUrls.length > 0
+          ? evidenceUrls.map((url) => ({
+              order_id: order.id,
+              user_id: user.id,
+              message: description.trim(),
+              file_url: url,
+            }))
+          : [
+              {
+                order_id: order.id,
+                user_id: user.id,
+                message: description.trim(),
+                file_url: null,
+              },
+            ];
 
-        const { error: evidenceError } = await supabase
-          .from("dispute_evidence")
-          .insert(rows);
+      const { error: evidenceError } = await supabase
+        .from("dispute_evidence")
+        .insert(evidenceRows);
 
-        if (evidenceError) {
-          alert(evidenceError.message);
-          return;
-        }
-      } else {
-        const { error: evidenceError } = await supabase
-          .from("dispute_evidence")
-          .insert({
-            order_id: order.id,
-            user_id: user.id,
-            message: description.trim(),
-            file_url: null,
-          });
-
-        if (evidenceError) {
-          alert(evidenceError.message);
-          return;
-        }
+      if (evidenceError) {
+        alert(evidenceError.message);
+        return;
       }
 
-      alert("Dispute opened");
+      await fetch("/api/email/dispute-opened", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderId: order.id,
+        }),
+      });
+
+      alert("Disputa abierta");
       window.location.href = "/orders";
     } catch (err) {
-      console.error("CREATE DISPUTE ERROR:", err);
-      alert("Unexpected error opening dispute");
+      console.error("ERROR AL CREAR DISPUTA:", err);
+      alert("Error inesperado al abrir la disputa");
     } finally {
       setLoading(false);
     }
@@ -165,27 +176,28 @@ function CreateDisputeContent() {
   return (
     <main style={pageStyle}>
       <div style={cardStyle}>
-        <p style={eyebrowStyle}>ATHMOV PROTECTION</p>
-        <h1 style={titleStyle}>Open dispute</h1>
+        <p style={eyebrowStyle}>PROTECCIÓN ATHMOV</p>
+        <h1 style={titleStyle}>Abrir disputa</h1>
 
         <input
-          placeholder="Reason"
+          placeholder="Motivo"
           value={reason}
           onChange={(e) => setReason(e.target.value)}
           style={inputStyle}
         />
 
         <textarea
-          placeholder="Describe the issue"
+          placeholder="Describe el problema"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           style={textareaStyle}
         />
 
         <div style={uploadBoxStyle}>
-          <strong>Evidence photos</strong>
+          <strong>Fotos como prueba</strong>
+
           <p style={hintStyle}>
-            Upload up to 5 images to help ATHMOV review the case.
+            Sube hasta 5 imágenes para ayudar a ATHMOV a revisar el caso.
           </p>
 
           <input
@@ -210,7 +222,7 @@ function CreateDisputeContent() {
         </div>
 
         <button onClick={submitDispute} disabled={loading} style={buttonStyle}>
-          {loading ? "Opening..." : "Submit dispute"}
+          {loading ? "Abriendo..." : "Enviar disputa"}
         </button>
       </div>
     </main>
@@ -221,6 +233,7 @@ const pageStyle = {
   minHeight: "100vh",
   padding: "140px 20px",
   background: "#f6f6f3",
+  fontFamily: "Inter, sans-serif",
 };
 
 const cardStyle = {
@@ -259,6 +272,7 @@ const textareaStyle = {
   border: "1px solid #ddd",
   marginBottom: "24px",
   boxSizing: "border-box" as const,
+  resize: "none" as const,
 };
 
 const uploadBoxStyle = {

@@ -10,12 +10,25 @@ export default function BuyerGuidePage() {
       intro: "4 cosas que debes comprobar antes de comprar.",
       theme: "light",
       tips: [
-        ["Holograma o QR oficial", "Bullpadel, Nox y Head suelen incluir holograma o QR verificable. Pide foto clara y compruébalo antes de pagar."],
-        ["Peso entre 350 y 390 g", "Pide pesar la pala. Las réplicas suelen tener peso o balance extraño."],
-        ["Serigrafía y acabados", "Compara logos, colores y bordes con fotos oficiales del modelo."],
-        ["Número de serie", "Busca el número en el marco y pide una foto cercana."],
+        [
+          "Holograma o QR oficial",
+          "Bullpadel, Nox y Head suelen incluir holograma o QR verificable. Pide una foto clara y compruébalo antes de pagar.",
+        ],
+        [
+          "Peso entre 350 y 390 g",
+          "Pide pesar la pala. Las réplicas suelen tener un peso o balance extraño.",
+        ],
+        [
+          "Serigrafía y acabados",
+          "Compara logos, colores y bordes con fotos oficiales del modelo.",
+        ],
+        [
+          "Número de serie",
+          "Busca el número en el marco y pide una foto cercana.",
+        ],
       ],
-      buyerTip: "Pídele siempre al vendedor fotos del QR, del marco y del recibo original de compra.",
+      buyerTip:
+        "Pídele siempre al vendedor fotos del QR, del marco y del recibo original de compra.",
     },
     {
       name: "Tenis",
@@ -23,12 +36,25 @@ export default function BuyerGuidePage() {
       intro: "4 cosas que debes comprobar antes de comprar.",
       theme: "light",
       tips: [
-        ["Código en el mástil", "Wilson, Babolat y Head suelen incluir códigos o referencias visibles en el mástil."],
-        ["Sonido del marco", "Si puedes probarla, el grafito de calidad suele sonar seco y definido."],
-        ["Medidas oficiales", "Longitud, marco y cabeza deben coincidir con la ficha técnica de la marca."],
-        ["Grip y encordado", "Revisa marcas, tensión y estado general del grip y las cuerdas."],
+        [
+          "Código en el mástil",
+          "Wilson, Babolat y Head suelen incluir códigos o referencias visibles en el mástil.",
+        ],
+        [
+          "Sonido del marco",
+          "Si puedes probarla, el grafito de calidad suele sonar seco y definido.",
+        ],
+        [
+          "Medidas oficiales",
+          "Longitud, marco y cabeza deben coincidir con la ficha técnica de la marca.",
+        ],
+        [
+          "Grip y encordado",
+          "Revisa marcas, tensión y estado general del grip y las cuerdas.",
+        ],
       ],
-      buyerTip: "Antes de cerrar el trato, solicita un vídeo mostrando el código del mástil en cámara.",
+      buyerTip:
+        "Antes de cerrar el trato, solicita un vídeo mostrando el código del mástil en cámara.",
     },
     {
       name: "Golf",
@@ -36,24 +62,37 @@ export default function BuyerGuidePage() {
       intro: "4 cosas que debes comprobar antes de comprar.",
       theme: "dark",
       tips: [
-        ["Serial en el hosel", "Callaway, TaylorMade y Titleist suelen grabar números de serie en el hosel."],
-        ["Soldaduras y cromado", "Acabados irregulares, cromado desigual o textura rara pueden ser señal de réplica."],
-        ["Loft y lie", "Una tienda de golf puede ayudarte a medirlos y compararlos con especificaciones oficiales."],
-        ["Shaft con marcaje", "Marca, flex y características deben estar claramente impresas."],
+        [
+          "Serial en el hosel",
+          "Callaway, TaylorMade y Titleist suelen grabar números de serie en el hosel.",
+        ],
+        [
+          "Soldaduras y cromado",
+          "Acabados irregulares, cromado desigual o textura rara pueden ser señal de réplica.",
+        ],
+        [
+          "Loft y lie",
+          "Una tienda de golf puede ayudarte a medirlos y compararlos con especificaciones oficiales.",
+        ],
+        [
+          "Shaft con marcaje",
+          "Marca, flex y características deben estar claramente impresas.",
+        ],
       ],
-      buyerTip: "Ante la duda, paga en mano y llévalo a revisar antes de aceptar la compra.",
+      buyerTip:
+        "Ante la duda, paga en mano y llévalo a revisar antes de aceptar la compra.",
     },
   ];
 
   return (
     <main style={pageStyle} className="buyer-guide-page">
       <section style={heroStyle}>
-        <p style={eyebrowStyle}>ATHMOV BUYER GUIDE · BETA</p>
+        <p style={eyebrowStyle}>GUÍA DEL COMPRADOR ATHMOV · BETA</p>
 
         <h1 style={titleStyle} className="buyer-guide-title">
-          Know before
+          Infórmate antes
           <br />
-          you <em style={mutedItalicStyle}>buy.</em>
+          de <em style={mutedItalicStyle}>comprar.</em>
         </h1>
 
         <p style={heroTextStyle}>
@@ -66,7 +105,7 @@ export default function BuyerGuidePage() {
           <span style={chipStyle}>Pádel</span>
           <span style={chipStyle}>Tenis</span>
           <span style={chipStyle}>Golf</span>
-          <span style={betaChipStyle}>Beta guide</span>
+          <span style={betaChipStyle}>Guía beta</span>
         </div>
       </section>
 
@@ -158,11 +197,9 @@ export default function BuyerGuidePage() {
       })}
 
       <section style={checklistStyle}>
-        <p style={eyebrowLightStyle}>BETA CHECKLIST</p>
+        <p style={eyebrowLightStyle}>CHECKLIST BETA</p>
 
-        <h2 style={checklistTitleStyle}>
-          Compra con criterio.
-        </h2>
+        <h2 style={checklistTitleStyle}>Compra con criterio.</h2>
 
         <p style={checklistTextStyle}>
           Antes de comprar cualquier pieza premium de segunda mano, sigue estos

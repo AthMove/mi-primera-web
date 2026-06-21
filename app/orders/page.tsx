@@ -119,11 +119,14 @@ export default function OrdersPage() {
   const updateOrderStatus = async (order: any, status: string) => {
     const supabase = await getSupabase();
 
-    const confirmUpdate = confirm(`Mark this order as ${status}?`);
+    const confirmUpdate = confirm(
+      `¿Marcar este pedido como "${getStatusLabel(status)}"?`
+    );
+
     if (!confirmUpdate) return;
 
     if (status === "completed" && order.dispute_status === "open") {
-      alert("This order has an open dispute. Payout cannot be released yet.");
+      alert("Este pedido tiene una disputa abierta. El pago no puede liberarse todavía.");
       return;
     }
 
@@ -144,35 +147,25 @@ export default function OrdersPage() {
 
     if (status === "delivered") {
       await fetch("/api/email/order-delivered", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    orderId: order.id,
-  }),
-});
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderId: order.id,
+        }),
+      });
+
       await notify({
         user_id: order.seller_id,
-        title: "Order delivered",
-        message: "The buyer marked the order as delivered.",
+        title: "Pedido entregado",
+        message: "El comprador ha marcado el pedido como entregado.",
         link: "/orders",
       });
     }
 
     if (status === "completed") {
-      await supabase.rpc("update_seller_reputation", {
-        target_seller_id: order.seller_id,
-      });
-
-
-      await notify({
-        user_id: order.buyer_id,
-        title: "Order completed",
-        message: "Your order has been completed.",
-        link: "/orders",
-      });
-      await fetch("/api/email/payout-released", {
+      const releaseResponse = await fetch("/api/stripe/release-payment", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
@@ -182,10 +175,37 @@ export default function OrdersPage() {
   }),
 });
 
+const releaseData = await releaseResponse.json();
+
+if (!releaseResponse.ok) {
+  alert(releaseData.error || "No se pudo liberar el pago");
+  return;
+}
+      await supabase.rpc("update_seller_reputation", {
+        target_seller_id: order.seller_id,
+      });
+
+      await notify({
+        user_id: order.buyer_id,
+        title: "Pedido completado",
+        message: "Tu pedido se ha completado correctamente.",
+        link: "/orders",
+      });
+
+      await fetch("/api/email/payout-released", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderId: order.id,
+        }),
+      });
+
       await notify({
         user_id: order.seller_id,
-        title: "Payout released",
-        message: "Your payout has been released.",
+        title: "Pago liberado",
+        message: "Tu pago ha sido liberado.",
         link: "/orders",
       });
     }
@@ -205,7 +225,7 @@ export default function OrdersPage() {
     const supabase = await getSupabase();
 
     if (!carrier.trim() || !trackingNumber.trim()) {
-      alert("Introduce carrier y tracking number");
+      alert("Introduce la empresa de transporte y el número de seguimiento");
       return;
     }
 
@@ -229,19 +249,20 @@ export default function OrdersPage() {
 
       await notify({
         user_id: trackingOrder.buyer_id,
-        title: "Order shipped",
-        message: `Your order has been shipped with ${carrier.trim()}. Tracking: ${trackingNumber.trim()}`,
+        title: "Pedido enviado",
+        message: `Tu pedido ha sido enviado con ${carrier.trim()}. Seguimiento: ${trackingNumber.trim()}`,
         link: "/orders",
       });
-await fetch("/api/email/order-shipped", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    orderId: trackingOrder.id,
-  }),
-});
+
+      await fetch("/api/email/order-shipped", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderId: trackingOrder.id,
+        }),
+      });
 
       setTrackingOrder(null);
       setCarrier("");
@@ -258,7 +279,7 @@ await fetch("/api/email/order-shipped", {
     const supabase = await getSupabase();
 
     if (!disputeReason.trim()) {
-      alert("Describe the issue");
+      alert("Describe el problema");
       return;
     }
 
@@ -272,7 +293,7 @@ await fetch("/api/email/order-shipped", {
         const fileName = `${disputeOrder.id}-${Date.now()}.${fileExt}`;
 
         const { error: uploadError } = await supabase.storage
-          .from("disputes")
+          .from("dispute-evidence")
           .upload(fileName, disputeFile);
 
         if (uploadError) {
@@ -281,7 +302,7 @@ await fetch("/api/email/order-shipped", {
         }
 
         const { data } = supabase.storage
-          .from("disputes")
+          .from("dispute-evidence")
           .getPublicUrl(fileName);
 
         fileUrl = data.publicUrl;
@@ -300,6 +321,16 @@ await fetch("/api/email/order-shipped", {
         alert(error.message);
         return;
       }
+      await supabase.from("disputes").insert([
+  {
+    order_id: disputeOrder.id,
+    buyer_id: disputeOrder.buyer_id,
+    seller_id: disputeOrder.seller_id,
+    reason: disputeReason.trim(),
+    description: disputeReason.trim(),
+    status: "open",
+  },
+]);
 
       await supabase.from("dispute_evidence").insert([
         {
@@ -312,20 +343,20 @@ await fetch("/api/email/order-shipped", {
 
       await notify({
         user_id: disputeOrder.seller_id,
-        title: "Dispute opened",
-        message: "The buyer has reported an issue with the order.",
+        title: "Disputa abierta",
+        message: "El comprador ha reportado un problema con el pedido.",
         link: "/orders",
       });
 
-await fetch("/api/email/dispute-opened", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    orderId: disputeOrder.id,
-  }),
-});
+      await fetch("/api/email/dispute-opened", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderId: disputeOrder.id,
+        }),
+      });
 
       setDisputeOrder(null);
       setDisputeReason("");
@@ -342,7 +373,7 @@ await fetch("/api/email/dispute-opened", {
     const supabase = await getSupabase();
 
     if (!comment.trim()) {
-      alert("Write a short review");
+      alert("Escribe una reseña breve");
       return;
     }
 
@@ -354,7 +385,7 @@ await fetch("/api/email/dispute-opened", {
       .maybeSingle();
 
     if (existingReview) {
-      alert("You have already reviewed this order");
+      alert("Ya has valorado este pedido");
       setReviewOrder(null);
       return;
     }
@@ -384,20 +415,20 @@ await fetch("/api/email/dispute-opened", {
 
       await notify({
         user_id: reviewOrder.seller_id,
-        title: "New review received",
-        message: `You received a ${rating}-star review.`,
+        title: "Nueva reseña recibida",
+        message: `Has recibido una valoración de ${rating} estrellas.`,
         link: `/seller/${reviewOrder.seller_id}`,
       });
 
       await fetch("/api/email/review-received", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    orderId: reviewOrder.id,
-  }),
-});
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderId: reviewOrder.id,
+        }),
+      });
 
       setReviewOrder(null);
       setRating(5);
@@ -416,7 +447,7 @@ await fetch("/api/email/dispute-opened", {
   const formatDate = (date?: string) => {
     if (!date) return "";
 
-    return new Date(date).toLocaleDateString([], {
+    return new Date(date).toLocaleDateString("es-ES", {
       day: "2-digit",
       month: "short",
       year: "numeric",
@@ -424,13 +455,14 @@ await fetch("/api/email/dispute-opened", {
   };
 
   const getStatusLabel = (status: string) => {
-    if (status === "paid") return "Paid";
-    if (status === "preparing") return "Preparing";
-    if (status === "shipped") return "Shipped";
-    if (status === "delivered") return "Delivered";
-    if (status === "completed") return "Completed";
-    if (status === "refunded") return "Refunded";
-    return status || "Paid";
+    if (status === "pending") return "Pendiente";
+    if (status === "paid") return "Pagado";
+    if (status === "preparing") return "Preparando";
+    if (status === "shipped") return "Enviado";
+    if (status === "delivered") return "Entregado";
+    if (status === "completed") return "Completado";
+    if (status === "refunded") return "Reembolsado";
+    return status || "Pagado";
   };
 
   const getStepIndex = (status: string) => {
@@ -441,7 +473,7 @@ await fetch("/api/email/dispute-opened", {
 
   const getEstimatedDelivery = (order: any) => {
     const baseDate = order.shipped_at || order.created_at;
-    if (!baseDate) return "Estimated after shipment";
+    if (!baseDate) return "Estimado tras el envío";
 
     const start = new Date(baseDate);
     const end = new Date(baseDate);
@@ -495,7 +527,7 @@ await fetch("/api/email/dispute-opened", {
           seller_id: order.seller_id,
           product_id: order.product_id,
           order_id: order.id,
-          last_message: "Conversation started",
+          last_message: "Conversación iniciada",
           last_message_at: new Date().toISOString(),
         },
       ])
@@ -511,49 +543,49 @@ await fetch("/api/email/dispute-opened", {
   };
 
   const payAcceptedOffer = async (order: any) => {
-  const supabase = await getSupabase();
+    const supabase = await getSupabase();
 
-  const { data: sellerProfile } = await supabase
-    .from("profiles")
-    .select("stripe_account_id")
-    .eq("id", order.seller_id)
-    .maybeSingle();
+    const { data: sellerProfile } = await supabase
+      .from("profiles")
+      .select("stripe_account_id")
+      .eq("id", order.seller_id)
+      .maybeSingle();
 
-  if (!sellerProfile?.stripe_account_id) {
-    alert("Seller has not connected Stripe payouts");
-    return;
-  }
+    if (!sellerProfile?.stripe_account_id) {
+      alert("El vendedor no ha conectado los pagos de Stripe");
+      return;
+    }
 
-  const response = await fetch("/api/checkout-offer", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      orderId: order.id,
-      offerId: order.offer_id,
-      title: order.product?.title || "ATHMOV offer",
-      image:
-        order.product?.image ||
-        order.product?.image_url ||
-        order.product?.images?.[0],
-      price: order.amount,
-      productId: order.product_id,
-      sellerId: order.seller_id,
-      buyerId: order.buyer_id,
-      stripeAccountId: sellerProfile.stripe_account_id,
-    }),
-  });
+    const response = await fetch("/api/checkout-offer", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        orderId: order.id,
+        offerId: order.offer_id,
+        title: order.product?.title || "Oferta ATHMOV",
+        image:
+          order.product?.image ||
+          order.product?.image_url ||
+          order.product?.images?.[0],
+        price: order.amount,
+        productId: order.product_id,
+        sellerId: order.seller_id,
+        buyerId: order.buyer_id,
+        stripeAccountId: sellerProfile.stripe_account_id,
+      }),
+    });
 
-  const data = await response.json();
+    const data = await response.json();
 
-  if (data.url) {
-    window.location.href = data.url;
-    return;
-  }
+    if (data.url) {
+      window.location.href = data.url;
+      return;
+    }
 
-  alert(data.error || "Could not start offer checkout");
-};
+    alert(data.error || "No se pudo iniciar el pago de la oferta");
+  };
 
   const filteredOrders = orders.filter((order: any) => {
     if (filter === "buying") return order.buyer_id === userId;
@@ -562,17 +594,17 @@ await fetch("/api/email/dispute-opened", {
   });
 
   if (loading) {
-    return <main style={pageStyle}>Loading orders...</main>;
+    return <main style={pageStyle}>Cargando pedidos...</main>;
   }
 
   return (
     <main style={pageStyle} className="orders-page">
       <section style={headerStyle}>
         <h1 style={titleStyle} className="orders-title">
-          Orders
+          Pedidos
         </h1>
 
-        <p style={subtitleStyle}>Track your purchases and sales.</p>
+        <p style={subtitleStyle}>Sigue tus compras y ventas.</p>
 
         <div style={tabsStyle} className="orders-tabs">
           <button
@@ -582,7 +614,7 @@ await fetch("/api/email/dispute-opened", {
               ...(filter === "all" ? activeTabStyle : {}),
             }}
           >
-            All
+            Todos
           </button>
 
           <button
@@ -592,7 +624,7 @@ await fetch("/api/email/dispute-opened", {
               ...(filter === "buying" ? activeTabStyle : {}),
             }}
           >
-            Buying
+            Compras
           </button>
 
           <button
@@ -602,16 +634,16 @@ await fetch("/api/email/dispute-opened", {
               ...(filter === "selling" ? activeTabStyle : {}),
             }}
           >
-            Selling
+            Ventas
           </button>
         </div>
       </section>
 
       {filteredOrders.length === 0 ? (
         <section style={emptyStyle}>
-          <h2 style={{ fontSize: "32px", margin: 0 }}>No orders yet</h2>
+          <h2 style={{ fontSize: "32px", margin: 0 }}>Todavía no hay pedidos</h2>
           <p style={{ color: "#666", marginTop: "12px" }}>
-            Your purchases and sales will appear here.
+            Tus compras y ventas aparecerán aquí.
           </p>
         </section>
       ) : (
@@ -631,7 +663,7 @@ await fetch("/api/email/dispute-opened", {
                         order.product?.image_url ||
                         order.product?.images?.[0]
                     )}
-                    alt={order.product?.title || "Product"}
+                    alt={order.product?.title || "Producto"}
                     fill
                     sizes="120px"
                     style={{ objectFit: "cover" }}
@@ -639,10 +671,10 @@ await fetch("/api/email/dispute-opened", {
                 </div>
 
                 <div style={{ flex: 1 }}>
-                  <p style={metaStyle}>{isSeller ? "Sale" : "Purchase"}</p>
+                  <p style={metaStyle}>{isSeller ? "Venta" : "Compra"}</p>
 
                   <h2 style={orderTitleStyle}>
-                    {order.product?.title || "Product"}
+                    {order.product?.title || "Producto"}
                   </h2>
 
                   <p
@@ -659,28 +691,31 @@ await fetch("/api/email/dispute-opened", {
                       window.location.href = `/seller/${profileId}`;
                     }}
                   >
-                    {isSeller ? "Buyer" : "Seller"} ·{" "}
+                    {isSeller ? "Comprador" : "Vendedor"} ·{" "}
                     {formatDate(order.created_at)}
                   </p>
 
                   {(order.carrier || order.tracking_number) && (
                     <div style={trackingBoxStyle}>
-                      <strong>Tracking</strong>
+                      <strong>Seguimiento</strong>
 
                       <span>
-                        {order.carrier || "Carrier"} · {order.tracking_number}
+                        {order.carrier || "Transportista"} ·{" "}
+                        {order.tracking_number}
                       </span>
 
                       {order.shipped_at && (
-                        <small>Shipped {formatDate(order.shipped_at)}</small>
+                        <small>Enviado el {formatDate(order.shipped_at)}</small>
                       )}
 
                       {status === "shipped" && (
-                        <small>Waiting for carrier delivery confirmation</small>
+                        <small>
+                          Esperando confirmación de entrega del transportista
+                        </small>
                       )}
 
                       {status === "delivered" && order.delivered_at && (
-                        <small>Delivered {formatDate(order.delivered_at)}</small>
+                        <small>Entregado el {formatDate(order.delivered_at)}</small>
                       )}
 
                       {getTrackingUrl(order.carrier, order.tracking_number) && (
@@ -693,7 +728,7 @@ await fetch("/api/email/dispute-opened", {
                           rel="noopener noreferrer"
                           style={trackingLinkStyle}
                         >
-                          Track shipment →
+                          Ver seguimiento →
                         </a>
                       )}
                     </div>
@@ -701,10 +736,11 @@ await fetch("/api/email/dispute-opened", {
 
                   {hasOpenDispute && (
                     <div style={disputeWarningStyle}>
-                      <strong>Issue reported</strong>
+                      <strong>Incidencia reportada</strong>
                       <span>
-                        This order is under ATHMOV review. Reviews, delivery
-                        confirmation and payouts are temporarily locked.
+                        Este pedido está en revisión por ATHMOV. Las reseñas,
+                        la confirmación de entrega y los pagos quedan bloqueados
+                        temporalmente.
                       </span>
                     </div>
                   )}
@@ -761,14 +797,14 @@ await fetch("/api/email/dispute-opened", {
                   <div style={protectionGridStyle}>
                     <div style={protectionCardStyle}>
                       <span style={protectionLabelStyle}>
-                        Estimated delivery
+                        Entrega estimada
                       </span>
                       <strong>{getEstimatedDelivery(order)}</strong>
                     </div>
 
                     <div style={protectionCardStyle}>
-                      <span style={protectionLabelStyle}>ATHMOV Protection</span>
-                      <strong>Secure payment & dispute support</strong>
+                      <span style={protectionLabelStyle}>Protección ATHMOV</span>
+                      <strong>Pago seguro y soporte en incidencias</strong>
                     </div>
                   </div>
                 </div>
@@ -777,39 +813,39 @@ await fetch("/api/email/dispute-opened", {
                   <strong style={amountStyle}>€{order.amount}</strong>
 
                   <span style={statusStyle}>{getStatusLabel(status)}</span>
+
                   {isSeller && order.transfer_status === "released" && (
+                    <span style={paidOutStyle}>Pagado ✓</span>
+                  )}
 
-  <span style={paidOutStyle}>Paid out ✓</span>
-)}
-
-{isSeller && order.transfer_status !== "released" && (
-  <span style={pendingPayoutStyle}>Payout pending</span>
-)}
+                  {isSeller && order.transfer_status !== "released" && (
+                    <span style={pendingPayoutStyle}>Pago pendiente</span>
+                  )}
 
                   <button
                     onClick={() => openOrderChat(order)}
                     style={reviewButtonStyle}
                   >
-                    {isSeller ? "Message buyer" : "Message seller"}
+                    {isSeller ? "Escribir al comprador" : "Escribir al vendedor"}
                   </button>
 
-{isBuyer &&
-  order.payment_status === "pending" &&
-  order.status === "pending" && (
-    <button
-      onClick={() => payAcceptedOffer(order)}
-      style={buttonStyle}
-    >
-      Pay accepted offer
-    </button>
-  )}
+                  {isBuyer &&
+                    order.payment_status === "pending" &&
+                    order.status === "pending" && (
+                      <button
+                        onClick={() => payAcceptedOffer(order)}
+                        style={buttonStyle}
+                      >
+                        Pagar oferta aceptada
+                      </button>
+                    )}
 
                   {isSeller && ["paid", "pending"].includes(status) && (
                     <button
                       onClick={() => updateOrderStatus(order, "preparing")}
                       style={buttonStyle}
                     >
-                      Start preparing
+                      Empezar preparación
                     </button>
                   )}
 
@@ -818,30 +854,31 @@ await fetch("/api/email/dispute-opened", {
                       onClick={() => openTrackingModal(order)}
                       style={buttonStyle}
                     >
-                      Add tracking
+                      Añadir seguimiento
                     </button>
                   )}
-{isBuyer &&
-  ["paid", "preparing", "shipped", "delivered"].includes(status) &&
-  !hasOpenDispute && (
-    <button
-      onClick={() => setDisputeOrder(order)}
-      style={reviewButtonStyle}
-    >
-      Report issue
-    </button>
-  )}
 
-                     {isSeller &&
-  ["paid", "preparing", "shipped", "delivered"].includes(status) &&
-  !hasOpenDispute && (
-    <button
-      onClick={() => setDisputeOrder(order)}
-      style={reviewButtonStyle}
-    >
-      Report issue
-    </button>
-  )}
+                  {isBuyer &&
+                    ["paid", "preparing", "shipped", "delivered"].includes(status) &&
+                    !hasOpenDispute && (
+                      <button
+                        onClick={() => setDisputeOrder(order)}
+                        style={reviewButtonStyle}
+                      >
+                        Reportar incidencia
+                      </button>
+                    )}
+
+                  {isSeller &&
+                    ["paid", "preparing", "shipped", "delivered"].includes(status) &&
+                    !hasOpenDispute && (
+                      <button
+                        onClick={() => setDisputeOrder(order)}
+                        style={reviewButtonStyle}
+                      >
+                        Reportar incidencia
+                      </button>
+                    )}
 
                   {isBuyer &&
                     status === "completed" &&
@@ -851,11 +888,11 @@ await fetch("/api/email/dispute-opened", {
                         onClick={() => setReviewOrder(order)}
                         style={reviewButtonStyle}
                       >
-                        Leave review
+                        Dejar reseña
                       </button>
                     )}
 
-                  {order.review && <span style={reviewedStyle}>Reviewed</span>}
+                  {order.review && <span style={reviewedStyle}>Valorado</span>}
                 </div>
               </article>
             );
@@ -873,10 +910,10 @@ await fetch("/api/email/dispute-opened", {
               ✕
             </button>
 
-            <p style={eyebrowStyle}>ATHMOV SHIPPING</p>
-            <h2 style={modalTitleStyle}>Add tracking</h2>
+            <p style={eyebrowStyle}>ENVÍO ATHMOV</p>
+            <h2 style={modalTitleStyle}>Añadir seguimiento</h2>
             <p style={modalTextStyle}>
-              {trackingOrder.product?.title || "Product"}
+              {trackingOrder.product?.title || "Producto"}
             </p>
 
             <select
@@ -884,7 +921,7 @@ await fetch("/api/email/dispute-opened", {
               onChange={(e) => setCarrier(e.target.value)}
               style={modalInputStyle}
             >
-              <option value="">Select carrier</option>
+              <option value="">Selecciona transportista</option>
               <option value="SEUR">SEUR</option>
               <option value="MRW">MRW</option>
               <option value="DHL Express">DHL Express</option>
@@ -893,12 +930,12 @@ await fetch("/api/email/dispute-opened", {
             <input
               value={trackingNumber}
               onChange={(e) => setTrackingNumber(e.target.value)}
-              placeholder="Tracking number"
+              placeholder="Número de seguimiento"
               style={modalInputStyle}
             />
 
             <button onClick={saveTracking} style={buttonStyle}>
-              {savingTracking ? "Saving..." : "Save tracking"}
+              {savingTracking ? "Guardando..." : "Guardar seguimiento"}
             </button>
           </div>
         </div>
@@ -914,18 +951,18 @@ await fetch("/api/email/dispute-opened", {
               ✕
             </button>
 
-            <p style={eyebrowStyle}>ATHMOV PROTECTION</p>
-            <h2 style={modalTitleStyle}>Report issue</h2>
+            <p style={eyebrowStyle}>PROTECCIÓN ATHMOV</p>
+            <h2 style={modalTitleStyle}>Reportar incidencia</h2>
 
             <p style={modalTextStyle}>
-              Tell us what happened with this order. ATHMOV will review the case
-              before the payout is released.
+              Cuéntanos qué ha ocurrido con este pedido. ATHMOV revisará el caso
+              antes de liberar el pago.
             </p>
 
             <textarea
               value={disputeReason}
               onChange={(e) => setDisputeReason(e.target.value)}
-              placeholder="Example: item arrived damaged, tracking does not work, item is not authentic..."
+              placeholder="Ejemplo: el artículo llegó dañado, el seguimiento no funciona, el producto no parece auténtico..."
               style={textareaStyle}
             />
 
@@ -941,7 +978,7 @@ await fetch("/api/email/dispute-opened", {
             />
 
             <button onClick={openDispute} style={buttonStyle}>
-              {savingDispute ? "Submitting..." : "Submit issue"}
+              {savingDispute ? "Enviando..." : "Enviar incidencia"}
             </button>
           </div>
         </div>
@@ -957,11 +994,11 @@ await fetch("/api/email/dispute-opened", {
               ✕
             </button>
 
-            <p style={eyebrowStyle}>ATHMOV REVIEW</p>
-            <h2 style={modalTitleStyle}>Review your purchase</h2>
+            <p style={eyebrowStyle}>RESEÑA ATHMOV</p>
+            <h2 style={modalTitleStyle}>Valora tu compra</h2>
 
             <p style={modalTextStyle}>
-              {reviewOrder.product?.title || "Product"}
+              {reviewOrder.product?.title || "Producto"}
             </p>
 
             <div style={starsStyle}>
@@ -982,12 +1019,12 @@ await fetch("/api/email/dispute-opened", {
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Write your experience with this seller..."
+              placeholder="Escribe tu experiencia con este vendedor..."
               style={textareaStyle}
             />
 
             <button onClick={submitReview} style={buttonStyle}>
-              {savingReview ? "Saving..." : "Submit review"}
+              {savingReview ? "Guardando..." : "Enviar reseña"}
             </button>
           </div>
         </div>

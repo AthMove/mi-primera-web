@@ -5,7 +5,7 @@ export const createNotification = async ({
   title,
   message,
   link,
-  type = "order",
+  type = "general",
 }: {
   user_id: string;
   title: string;
@@ -13,6 +13,11 @@ export const createNotification = async ({
   link?: string;
   type?: string;
 }) => {
+  if (!user_id || !title || !message) {
+    console.error("CREATE NOTIFICATION ERROR: missing required fields");
+    return;
+  }
+
   const { error } = await supabase.from("notifications").insert([
     {
       user_id,
@@ -20,11 +25,11 @@ export const createNotification = async ({
       title,
       message,
       link: link || null,
-      read: false,
+      is_read: false,
     },
   ]);
 
   if (error) {
-    console.log("CREATE NOTIFICATION ERROR:", error);
+    console.error("CREATE NOTIFICATION ERROR:", error.message);
   }
 };

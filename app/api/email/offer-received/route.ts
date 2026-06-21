@@ -24,20 +24,38 @@ export async function POST(req: Request) {
       .maybeSingle();
 
     if (!seller?.email) {
-      return NextResponse.json({ error: "Seller email not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Email del vendedor no encontrado" },
+        { status: 404 }
+      );
     }
 
     await sendEmail({
       to: seller.email,
-      subject: "You received a new offer on ATHMOV",
+      subject: "Has recibido una nueva oferta en ATHMOV",
       html: `
         <div style="font-family: Arial, sans-serif; color: #111; line-height: 1.6;">
-          <h1>New offer received</h1>
-          <p>Hi ${seller.full_name || "there"},</p>
-          <p>You received a new offer for <strong>${product?.title || "your item"}</strong>.</p>
-          <p><strong>Offer:</strong> €${Number(amount).toFixed(2)}</p>
-          <p><strong>Buyer:</strong> ${buyerEmail || "ATHMOV buyer"}</p>
-          <p>You can review the offer from your ATHMOV account.</p>
+          <h1>Nueva oferta recibida</h1>
+
+          <p>Hola ${seller.full_name || "usuario"},</p>
+
+          <p>
+            Has recibido una nueva oferta por
+            <strong>${product?.title || "tu artículo"}</strong>.
+          </p>
+
+          <p>
+            <strong>Oferta:</strong> €${Number(amount).toFixed(2)}
+          </p>
+
+          <p>
+            <strong>Comprador:</strong> ${buyerEmail || "Comprador de ATHMOV"}
+          </p>
+
+          <p>
+            Puedes revisar la oferta desde tu cuenta de ATHMOV.
+          </p>
+
           <p>ATHMOV</p>
         </div>
       `,
@@ -46,7 +64,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json(
-      { error: error.message || "Offer email failed" },
+      { error: error.message || "Error al enviar el email de oferta" },
       { status: 500 }
     );
   }

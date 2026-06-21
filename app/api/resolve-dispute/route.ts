@@ -13,7 +13,7 @@ export async function POST(req: Request) {
 
     if (!stripeSecretKey || !supabaseUrl || !serviceRoleKey) {
       return NextResponse.json(
-        { error: "Missing server environment variables" },
+        { error: "Faltan variables de entorno del servidor" },
         { status: 500 }
       );
     }
@@ -24,11 +24,17 @@ export async function POST(req: Request) {
     const { orderId, resolution } = await req.json();
 
     if (!orderId || !resolution) {
-      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Faltan campos obligatorios" },
+        { status: 400 }
+      );
     }
 
     if (!["seller_wins", "buyer_refund"].includes(resolution)) {
-      return NextResponse.json({ error: "Invalid resolution" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Resolución no válida" },
+        { status: 400 }
+      );
     }
 
     const { data: order, error: orderError } = await supabase
@@ -38,19 +44,22 @@ export async function POST(req: Request) {
       .single();
 
     if (orderError || !order) {
-      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Pedido no encontrado" },
+        { status: 404 }
+      );
     }
 
     if (order.dispute_resolution || order.dispute_resolved_at) {
       return NextResponse.json(
-        { error: "Dispute has already been resolved" },
+        { error: "La disputa ya ha sido resuelta" },
         { status: 400 }
       );
     }
 
     if (order.stripe_refund_id || order.refund_status === "refunded") {
       return NextResponse.json(
-        { error: "Order has already been refunded" },
+        { error: "El pedido ya ha sido reembolsado" },
         { status: 400 }
       );
     }
@@ -60,7 +69,7 @@ export async function POST(req: Request) {
       (order.transfer_status === "released" || order.stripe_transfer_id)
     ) {
       return NextResponse.json(
-        { error: "Seller payout has already been released" },
+        { error: "El pago al vendedor ya ha sido liberado" },
         { status: 400 }
       );
     }
@@ -81,14 +90,14 @@ export async function POST(req: Request) {
 
         if (!sellerAmount || sellerAmount <= 0) {
           return NextResponse.json(
-            { error: "Invalid seller amount" },
+            { error: "Importe del vendedor no válido" },
             { status: 400 }
           );
         }
 
         if (!order.seller_stripe_account_id) {
           return NextResponse.json(
-            { error: "Missing seller Stripe account" },
+            { error: "Falta la cuenta de Stripe del vendedor" },
             { status: 400 }
           );
         }
@@ -123,7 +132,7 @@ export async function POST(req: Request) {
     if (resolution === "buyer_refund") {
       if (!order.stripe_payment_intent) {
         return NextResponse.json(
-          { error: "Payment intent missing" },
+          { error: "Falta el Payment Intent" },
           { status: 400 }
         );
       }
@@ -163,21 +172,21 @@ export async function POST(req: Request) {
       {
         user_id: order.buyer_id,
         type: "dispute",
-        title: "Dispute resolved",
+        title: "Disputa resuelta",
         message:
           resolution === "buyer_refund"
-            ? "Your refund has been approved."
-            : "The payout was released to the seller.",
+            ? "Tu reembolso ha sido aprobado."
+            : "El pago ha sido liberado al vendedor.",
         link: "/orders",
       },
       {
         user_id: order.seller_id,
         type: "dispute",
-        title: "Dispute resolved",
+        title: "Disputa resuelta",
         message:
           resolution === "seller_wins"
-            ? "Your payout has been released."
-            : "The buyer refund was approved.",
+            ? "Tu pago ha sido liberado."
+            : "El reembolso al comprador ha sido aprobado.",
         link: "/orders",
       },
     ]);
@@ -193,7 +202,7 @@ export async function POST(req: Request) {
     if (!finalOrder || finalOrder.dispute_status !== "resolved") {
       return NextResponse.json(
         {
-          error: "Dispute update verification failed",
+          error: "No se pudo verificar la actualización de la disputa",
           order: finalOrder,
         },
         { status: 500 }
@@ -205,9 +214,10 @@ export async function POST(req: Request) {
       order: finalOrder,
     });
   } catch (error: any) {
-    console.log("RESOLVE DISPUTE ERROR:", error);
+    console.log("ERROR AL RESOLVER DISPUTA:", error);
+
     return NextResponse.json(
-      { error: error.message || "Resolve failed" },
+      { error: error.message || "No se pudo resolver la disputa" },
       { status: 500 }
     );
   }

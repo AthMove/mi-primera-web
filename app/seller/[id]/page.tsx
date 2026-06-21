@@ -25,8 +25,6 @@ export default function SellerPage() {
       .select("*")
       .eq("id", sellerId)
       .maybeSingle();
-      console.log("SELLER PROFILE:", sellerProfile);
-console.log("SELLER ID PAGE:", sellerId);
 
     const { data: sellerProducts } = await supabase
       .from("products")
@@ -35,11 +33,11 @@ console.log("SELLER ID PAGE:", sellerId);
       .eq("moderation_status", "approved")
       .order("created_at", { ascending: false });
 
-    const { data: sellerReviews } = await supabase
-      .from("reviews")
-      .select("*")
-      .eq("seller_id", sellerId)
-      .order("created_at", { ascending: false });
+  const { data: sellerReviews } = await supabase
+  .from("seller_reviews")
+  .select("*")
+  .eq("seller_id", sellerId)
+  .order("created_at", { ascending: false });
 
     setSeller(sellerProfile);
     setProducts(sellerProducts || []);
@@ -55,22 +53,26 @@ console.log("SELLER ID PAGE:", sellerId);
     seller?.full_name ||
     seller?.username ||
     seller?.email ||
-    "ATHMOV Seller";
+    "Vendedor ATHMOV";
 
-  const soldCount = Number(seller?.total_sales || products.filter((p) => p.sold).length || 0);
-const activeCount = products.filter((p) => !p.sold).length;
+const soldCount =
+  seller?.total_sales ??
+  products.filter((p) => p.sold).length;
 
-const totalReviews = Number(seller?.total_reviews || reviews.length || 0);
+const activeCount =
+  products.filter((p) => !p.sold).length;
+
+const totalReviews = reviews.length;
 
 const averageRating =
-  seller?.average_rating && Number(seller.average_rating) > 0
-    ? Number(seller.average_rating).toFixed(1)
-    : reviews.length > 0
+  reviews.length > 0
     ? (
-        reviews.reduce((acc, item) => acc + Number(item.rating || 0), 0) /
-        reviews.length
+        reviews.reduce(
+          (acc, review) => acc + Number(review.rating || 0),
+          0
+        ) / reviews.length
       ).toFixed(1)
-    : "0";
+    : "0.0";
 
   if (loading) {
     return <main style={pageStyle}>Loading seller...</main>;
@@ -98,15 +100,30 @@ const averageRating =
         </div>
 
         <div style={{ flex: 1 }}>
-          <p style={eyebrowStyle}>ATHMOV VERIFIED SELLER</p>
+          <p style={eyebrowStyle}>VENDEDOR ATHMOV VERIFICADO</p>
 
           <h1 style={titleStyle} className="seller-title">
             {sellerName}
           </h1>
 
           <div style={badgesStyle}>
+            <button
+  onClick={() => router.push(`/seller/${sellerId}/review`)}
+  style={{
+    marginTop: "20px",
+    background: "#fff",
+    color: "#111",
+    border: "none",
+    borderRadius: "999px",
+    padding: "14px 22px",
+    fontWeight: 800,
+    cursor: "pointer",
+  }}
+>
+  Dejar valoración
+</button>
             {seller?.seller_verified && (
-              <span style={verifiedBadgeStyle}>VERIFIED</span>
+             <span style={verifiedBadgeStyle}>VERIFICADO</span>
             )}
 
             <span style={levelBadgeStyle}>
@@ -117,10 +134,10 @@ const averageRating =
               )
                 .toString()
                 .toUpperCase()}{" "}
-              SELLER
+             VENDEDOR
             </span>
 
-            <span style={trustBadgeStyle}>TRUSTED MARKETPLACE</span>
+            <span style={trustBadgeStyle}>MARKETPLACE DE CONFIANZA</span>
           </div>
 
           <p style={bioStyle}>
@@ -130,21 +147,21 @@ const averageRating =
 
           <div style={infoRowStyle}>
             <div style={infoCardStyle}>
-              <p style={infoLabelStyle}>Location</p>
+              <p style={infoLabelStyle}>Ubicación</p>
               <p style={infoValueStyle}>
-                {seller?.location || "Spain"}
+               {seller?.location || "España"}
               </p>
             </div>
 
             <div style={infoCardStyle}>
-              <p style={infoLabelStyle}>Response time</p>
+              <p style={infoLabelStyle}>Tiempo de respuesta</p>
               <p style={infoValueStyle}>
-                {seller?.response_time || "< 1 hour"}
+               {seller?.response_time || "< 1 hora"}
               </p>
             </div>
 
             <div style={infoCardStyle}>
-              <p style={infoLabelStyle}>Member since</p>
+              <p style={infoLabelStyle}>Miembro desde</p>
               <p style={infoValueStyle}>
                 {seller?.created_at
                   ? new Date(seller.created_at).getFullYear()
@@ -156,30 +173,30 @@ const averageRating =
       </section>
 
       <section style={trustSectionStyle}>
-        <div style={trustCardStyle}>✓ Verified identity</div>
-        <div style={trustCardStyle}>✓ Secure payments</div>
-        <div style={trustCardStyle}>✓ Premium marketplace</div>
-        <div style={trustCardStyle}>✓ Trusted seller</div>
+        <div style={trustCardStyle}>✓ Identidad verificada</div>
+        <div style={trustCardStyle}>✓ Pagos seguros</div>
+        <div style={trustCardStyle}>✓ Marketplace premium</div>
+        <div style={trustCardStyle}>✓ Vendedor confiable</div>
       </section>
 
     <section style={statsGridStyle}>
   <div style={statCardStyle}>
-    <p style={statLabelStyle}>Reviews</p>
+    <p style={statLabelStyle}>Valoraciones</p>
     <h2 style={statValueStyle}>{totalReviews}</h2>
   </div>
 
   <div style={statCardStyle}>
-    <p style={statLabelStyle}>Rating</p>
+    <p style={statLabelStyle}>Valoración</p>
     <h2 style={statValueStyle}>★ {averageRating}</h2>
   </div>
 
   <div style={statCardStyle}>
-    <p style={statLabelStyle}>Active products</p>
+    <p style={statLabelStyle}>Productos activos</p>
     <h2 style={statValueStyle}>{activeCount}</h2>
   </div>
 
   <div style={statCardStyle}>
-    <p style={statLabelStyle}>Sold products</p>
+    <p style={statLabelStyle}>Productos vendidos</p>
     <h2 style={statValueStyle}>{soldCount}</h2>
   </div>
 </section>
@@ -187,14 +204,14 @@ const averageRating =
       <section style={sectionStyle}>
         <div style={sectionHeaderStyle}>
           <div>
-            <p style={sectionEyebrowStyle}>SELLER INVENTORY</p>
-            <h2 style={sectionTitleStyle}>Active Products</h2>
+            <p style={sectionEyebrowStyle}>INVENTARIO DEL VENDEDOR</p>
+            <h2 style={sectionTitleStyle}>Productos activos</h2>
           </div>
         </div>
 
         {products.filter((p) => !p.sold).length === 0 ? (
           <div style={emptyStyle}>
-            No active products from this seller.
+           Este vendedor no tiene productos activos.
           </div>
         ) : (
           <div style={gridStyle}>
@@ -239,13 +256,13 @@ const averageRating =
       <section style={sectionStyle}>
         <div style={sectionHeaderStyle}>
           <div>
-            <p style={sectionEyebrowStyle}>BUYER FEEDBACK</p>
-            <h2 style={sectionTitleStyle}>Reviews</h2>
+            <p style={sectionEyebrowStyle}>FEEDBACK DEL COMPRADOR</p>
+            <h2 style={sectionTitleStyle}>Valoraciones</h2>
           </div>
         </div>
 
         {reviews.length === 0 ? (
-          <div style={emptyStyle}>No reviews yet.</div>
+       <div style={emptyStyle}>Todavía no hay valoraciones.</div>
         ) : (
           <div style={reviewsGridStyle}>
             {reviews.map((review) => (
@@ -261,7 +278,7 @@ const averageRating =
                 </p>
 
                 <p style={reviewTextStyle}>
-  {review.comment || "No comment provided."}
+  {review.comment || "Sin comentario."}
 </p>
 
 <p style={reviewDateStyle}>

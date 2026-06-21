@@ -17,24 +17,29 @@ type Props = {
   setShowSold: (value: boolean) => void;
 };
 
-const categories = [
-  "ALL",
-  "PADEL",
-  "GOLF",
-  "TENNIS",
-  "CYCLING",
-  "RUNNING",
-];
+const categories = ["ALL", "PADEL", "GOLF", "TENNIS", "RUNNING"];
 
 const brands = [
   "ALL",
-  "Nike",
-  "Adidas",
-  "Wilson",
-  "Babolat",
-  "Head",
-  "Yonex",
+  "NOX",
   "Bullpadel",
+  "Siux",
+  "Babolat",
+  "Wilson",
+  "Head",
+  "Titleist",
+  "TaylorMade",
+  "Callaway",
+  "PXG",
+  "Scotty Cameron",
+  "Ping",
+  "Yonex",
+  "Nike",
+  "Hoka",
+  "On",
+  "ASICS",
+  "New Balance",
+  "Salomon",
 ];
 
 export default function Filters({
@@ -53,39 +58,47 @@ export default function Filters({
     <section style={wrapperStyle}>
       <div style={filtersGridStyle}>
         <div>
-          <p style={labelStyle}>CATEGORY</p>
+          <p style={labelStyle}>DEPORTE</p>
 
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
             style={selectStyle}
           >
-            {categories.map((category) => (
-              <option key={category}>
-                {category}
-              </option>
-            ))}
+            <option value="ALL">Todos</option>
+
+            {categories
+              .filter((category) => category !== "ALL")
+              .map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
           </select>
         </div>
 
         <div>
-          <p style={labelStyle}>BRAND</p>
+          <p style={labelStyle}>MARCA</p>
 
           <select
             value={selectedBrand}
             onChange={(e) => setSelectedBrand(e.target.value)}
             style={selectStyle}
           >
-            {brands.map((brand) => (
-              <option key={brand}>
-                {brand}
-              </option>
-            ))}
+            <option value="ALL">Todas</option>
+
+            {brands
+              .filter((brand) => brand !== "ALL")
+              .map((brand) => (
+                <option key={brand} value={brand}>
+                  {brand}
+                </option>
+              ))}
           </select>
         </div>
 
         <div>
-          <p style={labelStyle}>MIN PRICE</p>
+          <p style={labelStyle}>PRECIO MÍN.</p>
 
           <input
             value={minPrice}
@@ -97,12 +110,12 @@ export default function Filters({
         </div>
 
         <div>
-          <p style={labelStyle}>MAX PRICE</p>
+          <p style={labelStyle}>PRECIO MÁX.</p>
 
           <input
             value={maxPrice}
             onChange={(e) => setMaxPrice(e.target.value)}
-            placeholder="1000"
+            placeholder="5000"
             type="number"
             style={inputStyle}
           />
@@ -114,12 +127,10 @@ export default function Filters({
           <input
             type="checkbox"
             checked={showSold}
-            onChange={(e) =>
-              setShowSold(e.target.checked)
-            }
+            onChange={(e) => setShowSold(e.target.checked)}
           />
 
-          <span>Show sold items</span>
+          <span>Mostrar productos vendidos</span>
         </label>
       </div>
     </section>

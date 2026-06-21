@@ -4,60 +4,79 @@ import { sendEmail } from "@/lib/email";
 
 export async function POST(req: Request) {
   try {
-    const { offerId } = await req.json();
+    const { orderId } = await req.json();
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    const { data: offer } = await supabase
-      .from("offers")
+    const { data: order } = await supabase
+      .from("orders")
       .select("*")
-      .eq("id", offerId)
+      .eq("id", orderId)
       .single();
 
-    if (!offer) {
-      return NextResponse.json({ error: "Offer not found" }, { status: 404 });
+    if (!order) {
+      return NextResponse.json(
+        { error: "Pedido no encontrado" },
+        { status: 404 }
+      );
     }
 
     const { data: product } = await supabase
       .from("products")
       .select("title")
-      .eq("id", offer.product_id)
+      .eq("id", order.product_id)
       .maybeSingle();
 
-    const { data: buyer } = await supabase
+    const { data: seller } = await supabase
       .from("profiles")
       .select("email, full_name")
-      .eq("id", offer.buyer_id)
+      .eq("id", order.seller_id)
       .maybeSingle();
 
-    const buyerEmail = buyer?.email || offer.buyer_email;
+    if (seller?.email) {
+      await sendEmail({
+        to: seller.email,
+        subject: "Se ha abierto una disputa en ATHMOV",
+        html: `
+          <div style="font-family: Arial, sans-serif; color: #111; line-height: 1.6;">
+            <h1>Disputa abierta</h1>
 
-    if (!buyerEmail) {
-      return NextResponse.json({ error: "Buyer email not found" }, { status: 404 });
+            <p>Hola ${seller.full_name || "usuario"},</p>
+
+            <p>
+              Se ha abierto una disputa relacionada con
+              <strong>${product?.title || "tu artículo"}</strong>.
+            </p>
+
+            <p>
+              <strong>Motivo:</strong>
+              ${order.dispute_reason || "No se ha indicado ningún motivo"}
+            </p>
+
+            <p>
+              El pago ha quedado temporalmente retenido mientras ATHMOV revisa el caso.
+            </p>
+
+            <p>
+              Consulta tu página de Pedidos para obtener más información.
+            </p>
+
+            <p>ATHMOV</p>
+          </div>
+        `,
+      });
     }
-
-    await sendEmail({
-      to: buyerEmail,
-      subject: "Your offer has been accepted on ATHMOV",
-      html: `
-        <div style="font-family: Arial, sans-serif; color: #111; line-height: 1.6;">
-          <h1>Offer accepted</h1>
-          <p>Hi ${buyer?.full_name || "there"},</p>
-          <p>Your offer for <strong>${product?.title || "this item"}</strong> has been accepted.</p>
-          <p><strong>Offer amount:</strong> €${Number(offer.amount).toFixed(2)}</p>
-          <p>Please go to ATHMOV to complete your purchase securely.</p>
-          <p>ATHMOV</p>
-        </div>
-      `,
-    });
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json(
-      { error: error.message || "Offer accepted email failed" },
+      {
+        error:
+          error.message || "Error al enviar el correo de disputa",
+      },
       { status: 500 }
     );
   }

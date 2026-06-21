@@ -128,7 +128,7 @@ export default function MessagesPage() {
   ) => {
     e.stopPropagation();
 
-    const confirmArchive = confirm("Archive this conversation?");
+    const confirmArchive = confirm("¿Archivar esta conversación?");
     if (!confirmArchive) return;
 
     const isSeller = conversation.seller_id === userId;
@@ -158,27 +158,27 @@ export default function MessagesPage() {
 };
 
   if (loading) {
-    return <main style={loadingStyle}>Loading messages...</main>;
+    return <main style={loadingStyle}>Cargando mensajes...</main>;
   }
 
   return (
     <main style={pageStyle} className="messages-page">
       <section style={headerStyle}>
-        <p style={eyebrowStyle}>ATHMOV INBOX</p>
-        <h1 style={titleStyle} className="messages-title">Messages</h1>
-        <p style={subtitleStyle}>Conversations with buyers and sellers.</p>
+        <p style={eyebrowStyle}>MENSAJES ATHMOV</p>
+        <h1 style={titleStyle} className="messages-title">Mensajes</h1>
+        <p style={subtitleStyle}>Conversaciones con compradores y vendedores.</p>
       </section>
 
       {conversations.length === 0 ? (
         <section style={emptyStyle}>
-          <h2 style={emptyTitleStyle}>No conversations yet</h2>
+          <h2 style={emptyTitleStyle}>Todavía no tienes conversaciones</h2>
 
           <p style={emptyTextStyle}>
-            When you contact a seller, your conversations will appear here.
+            Cuando contactes con un vendedor, tus conversaciones aparecerán aquí.
           </p>
 
           <button onClick={() => router.push("/products")} style={buttonStyle}>
-            Go to marketplace
+            Ir al marketplace
           </button>
         </section>
       ) : (
@@ -207,7 +207,7 @@ export default function MessagesPage() {
                 <div style={imageWrapperStyle}>
                   <Image
                     src={safeImage(product?.image)}
-                    alt={product?.title || "Product"}
+                    alt={product?.title || "Producto"}
                     fill
                     sizes="120px"
                     style={{ objectFit: "cover" }}
@@ -218,11 +218,11 @@ export default function MessagesPage() {
 
                 <div style={{ flex: 1 }}>
                   <p style={metaStyle}>
-                    {isSeller ? "Buyer conversation" : "Seller conversation"}
+                    {isSeller ? "Conversación con comprador" : "Conversación con vendedor"}
                   </p>
 
                   <h2 style={conversationTitleStyle}>
-                    {product?.title || "Product"}
+                    {product?.title || "Producto"}
                   </h2>
 
                   <p
@@ -232,11 +232,11 @@ export default function MessagesPage() {
                       color: hasUnread ? "#111" : "#666",
                     }}
                   >
-                    {lastMessage?.is_image
-                      ? "Image sent"
-                      : lastMessage?.is_offer
-                        ? `Offer: €${lastMessage?.offer_price}`
-                        : lastMessage?.content || "No messages yet"}
+                  {lastMessage?.is_image
+  ? "Imagen enviada"
+  : lastMessage?.is_offer
+    ? `Oferta: €${lastMessage?.offer_price}`
+    : lastMessage?.content || "Sin mensajes todavía"}
                   </p>
 
                   <p style={timeStyle}>
@@ -260,13 +260,13 @@ export default function MessagesPage() {
                     {product?.price ? `€${product.price}` : ""}
                   </strong>
 
-                  <span style={openStyle}>Open →</span>
+                  <span style={openStyle}>Abrir →</span>
 
                   <button
                     onClick={(e) => archiveConversation(e, conversation)}
                     style={archiveButtonStyle}
                   >
-                    Archive
+                    Archivar
                   </button>
                 </div>
               </article>

@@ -32,7 +32,7 @@ function EarningsPageContent() {
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.log("EARNINGS ERROR:", error);
+      console.log("ERROR DE GANANCIAS:", error);
       setOrders([]);
     } else {
       setOrders(data || []);
@@ -43,32 +43,39 @@ function EarningsPageContent() {
 
   const stats = useMemo(() => {
     const totalSales = orders.reduce(
-  (sum: number, order: any) => sum + Number(order.amount || 0),
-  0
-);
+      (sum: number, order: any) => sum + Number(order.amount || 0),
+      0
+    );
 
-const totalSellerEarnings = orders.reduce(
-  (sum: number, order: any) => sum + Number(order.seller_amount || 0),
-  0
-);
+    const totalSellerEarnings = orders.reduce(
+      (sum: number, order: any) => sum + Number(order.seller_amount || 0),
+      0
+    );
 
-const pendingRelease = orders
-  .filter(
-    (order: any) =>
-      ["paid", "preparing", "shipped", "delivered", "completed"].includes(
-        order.status
-      ) && order.transfer_status !== "released"
-  )
-  .reduce((sum: number, order: any) => sum + Number(order.seller_amount || 0), 0);
+    const pendingRelease = orders
+      .filter(
+        (order: any) =>
+          ["paid", "preparing", "shipped", "delivered", "completed"].includes(
+            order.status
+          ) && order.transfer_status !== "released"
+      )
+      .reduce(
+        (sum: number, order: any) => sum + Number(order.seller_amount || 0),
+        0
+      );
 
-const released = orders
-  .filter((order: any) => order.transfer_status === "released")
-  .reduce((sum: number, order: any) => sum + Number(order.seller_amount || 0), 0);
+    const released = orders
+      .filter((order: any) => order.transfer_status === "released")
+      .reduce(
+        (sum: number, order: any) => sum + Number(order.seller_amount || 0),
+        0
+      );
 
-const platformFees = orders.reduce(
-  (sum: number, order: any) => sum + Number(order.platform_fee || 0),
-  0
-);
+    const platformFees = orders.reduce(
+      (sum: number, order: any) => sum + Number(order.platform_fee || 0),
+      0
+    );
+
     return {
       totalSales,
       totalSellerEarnings,
@@ -93,50 +100,71 @@ const platformFees = orders.reduce(
     });
   };
 
+  const getStatusLabel = (status?: string) => {
+    if (status === "paid") return "Pagado";
+    if (status === "preparing") return "Preparando";
+    if (status === "shipped") return "Enviado";
+    if (status === "delivered") return "Entregado";
+    if (status === "completed") return "Completado";
+    if (status === "refunded") return "Reembolsado";
+    if (status === "pending") return "Pendiente";
+    return status || "Pendiente";
+  };
+
+  const getTransferStatusLabel = (status?: string) => {
+    if (status === "released") return "Liberado";
+    if (status === "pending") return "Pendiente";
+    if (status === "cancelled") return "Cancelado";
+    if (status === "refunded") return "Reembolsado";
+    return status || "Pendiente";
+  };
+
   if (loading) {
-    return <main style={pageStyle}>Loading earnings...</main>;
+    return <main style={pageStyle}>Cargando ganancias...</main>;
   }
 
   return (
     <main style={pageStyle}>
       <section style={headerStyle}>
-        <p style={eyebrowStyle}>ATHMOV SELLER</p>
-        <h1 style={titleStyle}>Earnings</h1>
+        <p style={eyebrowStyle}>VENDEDOR ATHMOV</p>
+        <h1 style={titleStyle}>Ganancias</h1>
         <p style={subtitleStyle}>
-          Track your sales, pending payouts and released payments.
+          Consulta tus ventas, pagos pendientes y pagos liberados.
         </p>
       </section>
 
       <section style={statsGridStyle}>
         <div style={statCardStyle}>
-          <p style={statLabelStyle}>Total sales</p>
+          <p style={statLabelStyle}>Ventas totales</p>
           <h2 style={statValueStyle}>{formatMoney(stats.totalSales)}</h2>
         </div>
 
         <div style={statCardStyle}>
-          <p style={statLabelStyle}>Seller earnings</p>
-          <h2 style={statValueStyle}>{formatMoney(stats.totalSellerEarnings)}</h2>
+          <p style={statLabelStyle}>Ganancias del vendedor</p>
+          <h2 style={statValueStyle}>
+            {formatMoney(stats.totalSellerEarnings)}
+          </h2>
         </div>
 
         <div style={statCardStyle}>
-          <p style={statLabelStyle}>Pending release</p>
+          <p style={statLabelStyle}>Pendiente de liberar</p>
           <h2 style={statValueStyle}>{formatMoney(stats.pendingRelease)}</h2>
         </div>
 
         <div style={statCardStyle}>
-          <p style={statLabelStyle}>Released</p>
+          <p style={statLabelStyle}>Liberado</p>
           <h2 style={statValueStyle}>{formatMoney(stats.released)}</h2>
         </div>
       </section>
 
       <section style={summaryStyle}>
         <div>
-          <p style={summaryLabelStyle}>Sales completed</p>
+          <p style={summaryLabelStyle}>Ventas completadas</p>
           <strong>{stats.salesCount}</strong>
         </div>
 
         <div>
-          <p style={summaryLabelStyle}>ATHMOV fees generated</p>
+          <p style={summaryLabelStyle}>Comisiones generadas para ATHMOV</p>
           <strong>{formatMoney(stats.platformFees)}</strong>
         </div>
       </section>
@@ -144,42 +172,46 @@ const platformFees = orders.reduce(
       <section style={tableSectionStyle}>
         <div style={tableHeaderStyle}>
           <div>
-            <p style={eyebrowStyle}>PAYOUT HISTORY</p>
-            <h2 style={sectionTitleStyle}>Orders & payouts</h2>
+            <p style={eyebrowStyle}>HISTORIAL DE PAGOS</p>
+            <h2 style={sectionTitleStyle}>Pedidos y pagos</h2>
           </div>
         </div>
 
         {orders.length === 0 ? (
           <div style={emptyStyle}>
-            <h3>No earnings yet</h3>
-            <p>Your sales and payouts will appear here.</p>
+            <h3>Todavía no tienes ganancias</h3>
+            <p>Tus ventas y pagos aparecerán aquí.</p>
           </div>
         ) : (
           <div style={tableStyle}>
             {orders.map((order: any) => (
               <div key={order.id} style={rowStyle}>
                 <div>
-                  <p style={rowTitleStyle}>Order #{String(order.id).slice(0, 8)}</p>
+                  <p style={rowTitleStyle}>
+                    Pedido #{String(order.id).slice(0, 8)}
+                  </p>
                   <p style={rowMetaStyle}>{formatDate(order.created_at)}</p>
                 </div>
 
                 <div>
-                  <p style={rowLabelStyle}>Sale</p>
+                  <p style={rowLabelStyle}>Venta</p>
                   <strong>{formatMoney(Number(order.amount || 0))}</strong>
                 </div>
 
                 <div>
-                  <p style={rowLabelStyle}>You receive</p>
-                  <strong>{formatMoney(Number(order.seller_amount || 0))}</strong>
+                  <p style={rowLabelStyle}>Recibes</p>
+                  <strong>
+                    {formatMoney(Number(order.seller_amount || 0))}
+                  </strong>
                 </div>
 
                 <div>
-                  <p style={rowLabelStyle}>Status</p>
-                  <span style={badgeStyle}>{order.status || "pending"}</span>
+                  <p style={rowLabelStyle}>Estado</p>
+                  <span style={badgeStyle}>{getStatusLabel(order.status)}</span>
                 </div>
 
                 <div>
-                  <p style={rowLabelStyle}>Payout</p>
+                  <p style={rowLabelStyle}>Pago</p>
                   <span
                     style={{
                       ...badgeStyle,
@@ -188,12 +220,12 @@ const platformFees = orders.reduce(
                         : pendingBadgeStyle),
                     }}
                   >
-                    {order.transfer_status || "pending"}
+                    {getTransferStatusLabel(order.transfer_status)}
                   </span>
                 </div>
 
                 <div>
-                  <p style={rowLabelStyle}>Released at</p>
+                  <p style={rowLabelStyle}>Liberado el</p>
                   <strong>{formatDate(order.payout_released_at)}</strong>
                 </div>
               </div>
@@ -201,6 +233,24 @@ const platformFees = orders.reduce(
           </div>
         )}
       </section>
+
+      <style>{`
+        @media (max-width: 900px) {
+          main {
+            padding: 120px 18px 40px !important;
+          }
+
+          section {
+            max-width: 100% !important;
+          }
+        }
+
+        @media (max-width: 1100px) {
+          .earnings-row {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </main>
   );
 }
@@ -241,7 +291,7 @@ const statsGridStyle = {
   maxWidth: "1100px",
   margin: "0 auto",
   display: "grid",
-  gridTemplateColumns: "repeat(4, 1fr)",
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
   gap: "18px",
 };
 
@@ -273,6 +323,7 @@ const summaryStyle = {
   padding: "26px",
   display: "flex",
   gap: "50px",
+  flexWrap: "wrap" as const,
 };
 
 const summaryLabelStyle = {

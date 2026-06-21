@@ -79,17 +79,17 @@ export default function CartPage() {
   return (
     <main style={pageStyle}>
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
-        <p style={eyebrowStyle}>ATHMOV CHECKOUT</p>
-        <h1 style={titleStyle}>Your Cart</h1>
+        <p style={eyebrowStyle}>ATHMOV CARRITO</p>
+        <h1 style={titleStyle}>Tu carrito</h1>
 
         {cart.length === 0 ? (
           <section style={emptyStyle}>
-            <h2 style={{ fontSize: "42px", margin: 0 }}>Your cart is empty</h2>
+            <h2 style={{ fontSize: "42px", margin: 0 }}>Tu carrito está vacío</h2>
             <p style={{ color: "#666", marginTop: "14px" }}>
-              Discover premium sports equipment from athletes and sellers.
+              Descubre material deportivo premium de atletas y vendedores.
             </p>
             <Link href="/products" style={shopButtonStyle}>
-              Continue shopping
+              Seguir comprando
             </Link>
           </section>
         ) : (
@@ -116,14 +116,14 @@ export default function CartPage() {
                     onClick={() => removeItem(item.id)}
                     style={removeButtonStyle}
                   >
-                    Remove
+                    Eliminar
                   </button>
                 </article>
               ))}
             </section>
 
             <aside style={summaryStyle}>
-              <p style={eyebrowStyle}>ORDER SUMMARY</p>
+              <p style={eyebrowStyle}>RESUMEN DEL PEDIDO</p>
 
               <div style={summaryRowStyle}>
                 <span>Subtotal</span>
@@ -131,8 +131,8 @@ export default function CartPage() {
               </div>
 
               <div style={summaryRowStyle}>
-                <span>Service</span>
-                <strong>Included</strong>
+                <span>Servicio</span>
+                <strong>Incluido</strong>
               </div>
 
               <div style={dividerStyle} />
@@ -143,11 +143,11 @@ export default function CartPage() {
               </div>
 
               <button onClick={handleCheckout} style={checkoutButtonStyle}>
-                Checkout
+                Finalizar compra
               </button>
 
               <p style={secureTextStyle}>
-                Secure checkout. Buyer protection included.
+                Pago seguro. Protección al comprador incluida.
               </p>
             </aside>
           </div>

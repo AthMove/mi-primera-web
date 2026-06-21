@@ -20,6 +20,8 @@ export default function DashboardPage() {
     rejectedProducts: 0,
     soldProducts: 0,
     averageRating: 0,
+    openDisputes: 0,
+    heldAmount: 0,
   });
 
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
@@ -96,15 +98,23 @@ export default function DashboardPage() {
           0
         ) || 0;
 
+    const openDisputes =
+      orders?.filter((o: any) => o.dispute_status === "open").length || 0;
+
+    const heldAmount =
+      orders
+        ?.filter((o: any) => o.dispute_status === "open")
+        .reduce(
+          (acc: number, item: any) => acc + Number(item.seller_amount || 0),
+          0
+        ) || 0;
+
     const sales =
       orders?.filter((o: any) => o.status === "completed").length || 0;
 
     const activeOrders =
-      orders?.filter(
-        (o: any) =>
-          o.status === "paid" ||
-          o.status === "shipped" ||
-          o.status === "delivered"
+      orders?.filter((o: any) =>
+        ["paid", "preparing", "shipped", "delivered"].includes(o.status)
       ).length || 0;
 
     const activeProducts =
@@ -146,6 +156,8 @@ export default function DashboardPage() {
       rejectedProducts,
       soldProducts,
       averageRating: Number(averageRating),
+      openDisputes,
+      heldAmount,
     });
 
     setRecentOrders(
@@ -161,99 +173,136 @@ export default function DashboardPage() {
     setLoading(false);
   };
 
+  const translateStatus = (status: string) => {
+    switch (status) {
+      case "paid":
+        return "Pagado";
+      case "preparing":
+        return "Preparando";
+      case "shipped":
+        return "Enviado";
+      case "delivered":
+        return "Entregado";
+      case "completed":
+        return "Completado";
+      case "refunded":
+        return "Reembolsado";
+      case "pending":
+        return "Pendiente";
+      default:
+        return status || "Pendiente";
+    }
+  };
+
+  const formatMoney = (value: number) => {
+    return `€${Number(value || 0).toFixed(2)}`;
+  };
+
   if (loading) {
-    return <main style={loadingStyle}>Loading dashboard...</main>;
+    return <main style={loadingStyle}>Cargando panel...</main>;
   }
 
   return (
     <main style={pageStyle} className="dashboard-page">
       <section style={heroStyle}>
-        <p style={eyebrowStyle}>ATHMOV WALLET</p>
+        <p style={eyebrowStyle}>ATHMOV SELLER</p>
 
         <h1 style={titleStyle} className="dashboard-title">
-          Seller Earnings
+          Panel de vendedor
         </h1>
 
         <p style={subtitleStyle}>
-          Track your sales, pending balance, available balance and marketplace
-          fees.
+          Gestiona tus ventas, saldo pendiente, pagos liberados y rendimiento
+          como vendedor.
         </p>
       </section>
 
       <section style={statsGridStyle}>
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Available Balance</p>
-          <h2 style={cardValueStyle}>€{stats.availableEarnings}</h2>
+          <p style={cardLabelStyle}>Saldo disponible</p>
+          <h2 style={cardValueStyle}>
+            {formatMoney(stats.availableEarnings)}
+          </h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Pending Balance</p>
-          <h2 style={cardValueStyle}>€{stats.pendingEarnings}</h2>
+          <p style={cardLabelStyle}>Saldo pendiente</p>
+          <h2 style={cardValueStyle}>{formatMoney(stats.pendingEarnings)}</h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Total Earnings</p>
-          <h2 style={cardValueStyle}>€{stats.sellerEarnings}</h2>
+          <p style={cardLabelStyle}>Ganancias totales</p>
+          <h2 style={cardValueStyle}>{formatMoney(stats.sellerEarnings)}</h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Gross Sales</p>
-          <h2 style={cardValueStyle}>€{stats.grossRevenue}</h2>
+          <p style={cardLabelStyle}>Ventas brutas</p>
+          <h2 style={cardValueStyle}>{formatMoney(stats.grossRevenue)}</h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>ATHMOV Fees</p>
-          <h2 style={cardValueStyle}>€{stats.platformFees}</h2>
+          <p style={cardLabelStyle}>Comisiones ATHMOV</p>
+          <h2 style={cardValueStyle}>{formatMoney(stats.platformFees)}</h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Stripe Estimate</p>
-          <h2 style={cardValueStyle}>€{stats.stripeFees}</h2>
+          <p style={cardLabelStyle}>Comisión Stripe estimada</p>
+          <h2 style={cardValueStyle}>{formatMoney(stats.stripeFees)}</h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Completed Sales</p>
+          <p style={cardLabelStyle}>Ventas completadas</p>
           <h2 style={cardValueStyle}>{stats.sales}</h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Active Orders</p>
+          <p style={cardLabelStyle}>Pedidos activos</p>
           <h2 style={cardValueStyle}>{stats.activeOrders}</h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Active Products</p>
+          <p style={cardLabelStyle}>Productos activos</p>
           <h2 style={cardValueStyle}>{stats.activeProducts}</h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Pending Approval</p>
+          <p style={cardLabelStyle}>Pendientes de aprobación</p>
           <h2 style={cardValueStyle}>{stats.pendingProducts}</h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Rejected Products</p>
+          <p style={cardLabelStyle}>Productos rechazados</p>
           <h2 style={cardValueStyle}>{stats.rejectedProducts}</h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Sold Products</p>
+          <p style={cardLabelStyle}>Productos vendidos</p>
           <h2 style={cardValueStyle}>{stats.soldProducts}</h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Rating</p>
+          <p style={cardLabelStyle}>Valoración media</p>
           <h2 style={cardValueStyle}>★ {stats.averageRating}</h2>
+        </div>
+
+        <div style={cardStyle}>
+          <p style={cardLabelStyle}>Disputas abiertas</p>
+          <h2 style={cardValueStyle}>{stats.openDisputes}</h2>
+        </div>
+
+        <div style={cardStyle}>
+          <p style={cardLabelStyle}>Importe retenido</p>
+          <h2 style={cardValueStyle}>{formatMoney(stats.heldAmount)}</h2>
         </div>
       </section>
 
       <section style={quickActionsStyle}>
         <Link href="/sell" style={actionButtonStyle}>
-          Add Product
+          Añadir producto
         </Link>
 
         <Link href="/orders" style={actionButtonStyle}>
-          Orders
+          Pedidos
         </Link>
 
         <Link href="/products" style={actionButtonStyle}>
@@ -261,32 +310,35 @@ export default function DashboardPage() {
         </Link>
 
         <Link href="/account" style={actionButtonStyle}>
-          Account
+          Mi cuenta
         </Link>
       </section>
 
       <section style={recentSectionStyle}>
         <div style={recentHeaderStyle}>
-          <h2 style={recentTitleStyle}>Recent Orders</h2>
+          <h2 style={recentTitleStyle}>Pedidos recientes</h2>
 
           <Link href="/orders" style={viewAllStyle}>
-            View all →
+            Ver todos →
           </Link>
         </div>
 
         {recentOrders.length === 0 ? (
-          <div style={emptyStyle}>No recent sales.</div>
+          <div style={emptyStyle}>Todavía no tienes ventas recientes.</div>
         ) : (
           <div style={ordersListStyle}>
             {recentOrders.map((order: any) => (
               <div key={order.id} style={orderCardStyle}>
                 <div>
-                  <p style={orderMetaStyle}>ORDER</p>
+                  <p style={orderMetaStyle}>PEDIDO</p>
 
-                  <h3 style={orderPriceStyle}>€{order.amount}</h3>
+                  <h3 style={orderPriceStyle}>
+                    {formatMoney(Number(order.amount || 0))}
+                  </h3>
 
                   <p style={orderDateStyle}>
-                    Seller payout: €{order.seller_amount || 0}
+                    Pago al vendedor:{" "}
+                    {formatMoney(Number(order.seller_amount || 0))}
                   </p>
 
                   <p style={orderDateStyle}>
@@ -294,7 +346,9 @@ export default function DashboardPage() {
                   </p>
                 </div>
 
-                <span style={statusStyle}>{order.status}</span>
+                <span style={statusStyle}>
+                  {translateStatus(order.status)}
+                </span>
               </div>
             ))}
           </div>

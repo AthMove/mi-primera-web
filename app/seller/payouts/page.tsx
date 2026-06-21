@@ -37,72 +37,87 @@ export default function SellerPayoutsPage() {
     setLoading(false);
   };
 
-  const pending = orders.filter((o) => o.transfer_status === "pending");
-  const paid = orders.filter((o) => o.transfer_status === "paid");
+  const pending = orders.filter(
+    (o) => o.transfer_status === "pending" && o.dispute_status !== "open"
+  );
+
+  const paid = orders.filter((o) => o.transfer_status === "released");
+
   const disputed = orders.filter((o) => o.dispute_status === "open");
 
   const sum = (items: any[]) =>
-    items.reduce((acc, item) => acc + Number(item.seller_amount || item.amount || 0), 0);
+    items.reduce(
+      (acc, item) => acc + Number(item.seller_amount || item.amount || 0),
+      0
+    );
 
-  if (loading) return <main style={pageStyle}>Loading payouts...</main>;
+  if (loading) {
+    return <main style={pageStyle}>Cargando pagos...</main>;
+  }
 
   return (
     <main style={pageStyle}>
-      <p style={eyebrowStyle}>SELLER CENTER</p>
-      <h1 style={titleStyle}>Payouts</h1>
+      <p style={eyebrowStyle}>CENTRO DE VENDEDOR</p>
+      <h1 style={titleStyle}>Pagos</h1>
 
       <section style={statsGridStyle}>
         <div style={statCardStyle}>
-          <span style={statLabelStyle}>Pending release</span>
+          <span style={statLabelStyle}>Pendiente de liberar</span>
           <strong style={statValueStyle}>€{sum(pending).toFixed(2)}</strong>
         </div>
 
         <div style={statCardStyle}>
-          <span style={statLabelStyle}>Released</span>
+          <span style={statLabelStyle}>Liberado</span>
           <strong style={statValueStyle}>€{sum(paid).toFixed(2)}</strong>
         </div>
 
         <div style={statCardStyle}>
-          <span style={statLabelStyle}>Disputed</span>
+          <span style={statLabelStyle}>En disputa</span>
           <strong style={statValueStyle}>€{sum(disputed).toFixed(2)}</strong>
         </div>
 
         <div style={statCardDarkStyle}>
-          <span style={statLabelLightStyle}>Total revenue</span>
+          <span style={statLabelLightStyle}>Ingresos totales</span>
           <strong style={statValueLightStyle}>€{sum(orders).toFixed(2)}</strong>
         </div>
       </section>
 
       <section style={listStyle}>
         {orders.length === 0 ? (
-          <div style={emptyStyle}>No payouts yet.</div>
+          <div style={emptyStyle}>Todavía no hay pagos.</div>
         ) : (
           orders.map((order) => (
             <article key={order.id} style={rowStyle}>
               <div>
-                <p style={rowEyebrowStyle}>ORDER #{order.id.slice(0, 8)}</p>
-                <h2 style={rowTitleStyle}>€{Number(order.seller_amount || order.amount || 0).toFixed(2)}</h2>
+                <p style={rowEyebrowStyle}>PEDIDO #{order.id.slice(0, 8)}</p>
+
+                <h2 style={rowTitleStyle}>
+                  €{Number(order.seller_amount || order.amount || 0).toFixed(2)}
+                </h2>
+
                 <p style={rowTextStyle}>
-                  Status: {order.status || "pending"} · Transfer:{" "}
-                  {order.transfer_status || "pending"}
+                  Estado: {getOrderStatusLabel(order.status)} · Transferencia:{" "}
+                  {getTransferStatusLabel(order.transfer_status)}
                 </p>
 
                 {order.dispute_status === "open" && (
-                  <p style={warningStyle}>Dispute open — payout blocked</p>
+                  <p style={warningStyle}>Disputa abierta — pago bloqueado</p>
                 )}
               </div>
 
               <div style={rightStyle}>
                 <span style={badgeStyle(order.transfer_status)}>
-                  {order.transfer_status === "paid" ? "Released" : "Pending"}
+                  {order.transfer_status === "released"
+                    ? "Liberado"
+                    : "Pendiente"}
                 </span>
 
                 <small style={dateStyle}>
                   {order.payout_released_at
-                    ? `Released ${formatDate(order.payout_released_at)}`
+                    ? `Liberado ${formatDate(order.payout_released_at)}`
                     : order.delivered_at
-                      ? `Delivered ${formatDate(order.delivered_at)}`
-                      : `Created ${formatDate(order.created_at)}`}
+                      ? `Entregado ${formatDate(order.delivered_at)}`
+                      : `Creado ${formatDate(order.created_at)}`}
                 </small>
               </div>
             </article>
@@ -113,8 +128,28 @@ export default function SellerPayoutsPage() {
   );
 }
 
+function getOrderStatusLabel(status?: string) {
+  if (status === "pending") return "Pendiente";
+  if (status === "paid") return "Pagado";
+  if (status === "preparing") return "En preparación";
+  if (status === "shipped") return "Enviado";
+  if (status === "delivered") return "Entregado";
+  if (status === "completed") return "Completado";
+  if (status === "refunded") return "Reembolsado";
+  return status || "Pendiente";
+}
+
+function getTransferStatusLabel(status?: string) {
+  if (status === "pending") return "Pendiente";
+  if (status === "released") return "Liberado";
+  if (status === "cancelled") return "Cancelado";
+  if (status === "refunded") return "Reembolsado";
+  return status || "Pendiente";
+}
+
 function formatDate(date?: string) {
   if (!date) return "";
+
   return new Date(date).toLocaleDateString([], {
     day: "2-digit",
     month: "short",
@@ -240,8 +275,8 @@ const rightStyle = {
 };
 
 const badgeStyle = (status?: string) => ({
-  background: status === "paid" ? "#111" : "#fff",
-  color: status === "paid" ? "#fff" : "#111",
+  background: status === "released" ? "#111" : "#fff",
+  color: status === "released" ? "#fff" : "#111",
   border: "1px solid rgba(0,0,0,0.12)",
   borderRadius: "999px",
   padding: "10px 14px",

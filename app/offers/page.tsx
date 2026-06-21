@@ -74,132 +74,130 @@ export default function OffersPage() {
     setLoading(false);
   };
 
-const updateOffer = async (offer: any, status: string) => {
-  const confirmed = confirm(
-    status === "accepted" ? "Accept this offer?" : "Reject this offer?"
-  );
+  const updateOffer = async (offer: any, status: string) => {
+    const confirmed = confirm(
+      status === "accepted"
+        ? "¿Aceptar esta oferta?"
+        : "¿Rechazar esta oferta?"
+    );
 
-  if (!confirmed) return;
+    if (!confirmed) return;
 
-  const { data: updatedOffer, error: updateError } = await supabase
-    .from("offers")
-    .update({ status })
-    .eq("id", offer.id)
-    .select("*")
-    .single();
-
-  if (updateError || !updatedOffer) {
-    console.log("OFFER UPDATE ERROR:", updateError);
-    alert(updateError?.message || "Offer could not be updated");
-    return;
-  }
-
-  if (status === "rejected") {
-    await fetch("/api/email/offer-rejected", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        offerId: offer.id,
-      }),
-    });
-
-    await loadOffers();
-    return;
-  }
-
-  if (status === "accepted") {
-    await fetch("/api/email/offer-accepted", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        offerId: offer.id,
-      }),
-    });
-
-    await supabase
+    const { data: updatedOffer, error: updateError } = await supabase
       .from("offers")
-      .update({ status: "rejected" })
-      .eq("product_id", offer.product_id)
-      .neq("id", offer.id)
-      .eq("status", "pending");
-
-    const { data: order, error: orderError } = await supabase
-      .from("orders")
-      .insert([
-        {
-          product_id: offer.product_id,
-          seller_id: offer.seller_id,
-          buyer_id: offer.buyer_id,
-          buyer_email: offer.buyer_email,
-          amount: offer.amount,
-          status: "pending",
-          payment_status: "pending",
-          transfer_status: "pending",
-        },
-      ])
-      .select()
+      .update({ status })
+      .eq("id", offer.id)
+      .select("*")
       .single();
 
-    if (orderError || !order) {
-      console.log("ORDER ERROR:", orderError);
-      alert(orderError?.message || "Order could not be created");
+    if (updateError || !updatedOffer) {
+      console.log("OFFER UPDATE ERROR:", updateError);
+      alert(updateError?.message || "No se pudo actualizar la oferta");
       return;
     }
-  }
 
-  await loadOffers();
-};
+    if (status === "rejected") {
+      await fetch("/api/email/offer-rejected", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          offerId: offer.id,
+        }),
+      });
 
-  const safeImage = (src: string) => {
+      await loadOffers();
+      return;
+    }
+
+    if (status === "accepted") {
+      await fetch("/api/email/offer-accepted", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          offerId: offer.id,
+        }),
+      });
+
+      await supabase
+        .from("offers")
+        .update({ status: "rejected" })
+        .eq("product_id", offer.product_id)
+        .neq("id", offer.id)
+        .eq("status", "pending");
+
+      const { data: order, error: orderError } = await supabase
+        .from("orders")
+        .insert([
+          {
+            product_id: offer.product_id,
+            seller_id: offer.seller_id,
+            buyer_id: offer.buyer_id,
+            buyer_email: offer.buyer_email,
+            amount: offer.amount,
+            status: "pending",
+            payment_status: "pending",
+            transfer_status: "pending",
+          },
+        ])
+        .select()
+        .single();
+
+      if (orderError || !order) {
+        console.log("ORDER ERROR:", orderError);
+        alert(orderError?.message || "No se pudo crear el pedido");
+        return;
+      }
+    }
+
+    await loadOffers();
+  };
+
+  const safeImage = (src?: string) => {
     return src?.startsWith("http") || src?.startsWith("/")
       ? src
       : "/logo.png";
   };
 
   if (loading) {
-    return <main style={pageStyle}>Loading offers...</main>;
+    return <main style={pageStyle}>Cargando ofertas...</main>;
   }
 
   return (
     <main style={pageStyle} className="offers-page">
       <section style={headerStyle}>
-        <p style={eyebrowStyle}>ATHMOV OFFERS</p>
+        <p style={eyebrowStyle}>OFERTAS ATHMOV</p>
 
         <h1 style={titleStyle} className="offers-title">
-          Received offers
+          Ofertas recibidas
         </h1>
 
         <p style={subtitleStyle}>
-          Manage buyer offers for your products.
+          Gestiona las ofertas de compradores para tus productos.
         </p>
       </section>
 
       {offers.length === 0 ? (
         <section style={emptyStyle}>
           <h2 style={{ fontSize: "32px", margin: 0 }}>
-            No pending offers
+            No tienes ofertas pendientes
           </h2>
 
           <p style={{ color: "#666", marginTop: "12px" }}>
-            Buyer offers will appear here.
+            Las ofertas de compradores aparecerán aquí.
           </p>
         </section>
       ) : (
         <section style={listStyle}>
           {offers.map((offer: any) => (
-            <article
-              key={offer.id}
-              style={offerStyle}
-              className="offer-card"
-            >
+            <article key={offer.id} style={offerStyle} className="offer-card">
               <div style={imageWrapperStyle}>
                 <Image
                   src={safeImage(offer.product?.image)}
-                  alt={offer.product?.title || "Product"}
+                  alt={offer.product?.title || "Producto"}
                   fill
                   sizes="120px"
                   style={{ objectFit: "cover" }}
@@ -207,39 +205,31 @@ const updateOffer = async (offer: any, status: string) => {
               </div>
 
               <div style={{ flex: 1 }}>
-                <p style={metaStyle}>Pending offer</p>
+                <p style={metaStyle}>Oferta pendiente</p>
 
                 <h2 style={offerTitleStyle}>
-                  {offer.product?.title || "Product"}
+                  {offer.product?.title || "Producto"}
                 </h2>
 
-                <p style={buyerStyle}>
-                  {offer.buyer_email}
-                </p>
+                <p style={buyerStyle}>{offer.buyer_email}</p>
               </div>
 
               <div style={rightStyle}>
-                <strong style={amountStyle}>
-                  €{offer.amount}
-                </strong>
+                <strong style={amountStyle}>€{offer.amount}</strong>
 
                 <div style={actionsStyle}>
                   <button
-                    onClick={() =>
-                      updateOffer(offer, "accepted")
-                    }
+                    onClick={() => updateOffer(offer, "accepted")}
                     style={acceptButtonStyle}
                   >
-                    Accept
+                    Aceptar
                   </button>
 
                   <button
-                    onClick={() =>
-                      updateOffer(offer, "rejected")
-                    }
+                    onClick={() => updateOffer(offer, "rejected")}
                     style={rejectButtonStyle}
                   >
-                    Reject
+                    Rechazar
                   </button>
                 </div>
               </div>

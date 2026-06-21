@@ -4,7 +4,7 @@ export default function HowItWorksPage() {
   return (
     <main style={pageStyle} className="how-page">
       <section style={heroStyle}>
-        <p style={eyebrowStyle}>ATHMOV HOW IT WORKS</p>
+        <p style={eyebrowStyle}>CÓMO FUNCIONA ATHMOV</p>
 
         <h1 style={titleStyle}>
           Directo.
@@ -33,7 +33,7 @@ export default function HowItWorksPage() {
       </section>
 
       <section style={sectionStyle}>
-        <p style={eyebrowStyle}>SELLER FLOW</p>
+        <p style={eyebrowStyle}>PROCESO DEL VENDEDOR</p>
         <h2 style={sectionTitleStyle}>Si vendes</h2>
 
         <div style={cardsStyle}>
@@ -51,8 +51,8 @@ export default function HowItWorksPage() {
               "Solo tras validar el vídeo se activa el envío.",
             ],
             [
-              "Envía con tracking",
-              "SEUR, MRW o Correos Express. El comprador sigue el pedido.",
+              "Envía con seguimiento",
+              "SEUR, MRW o DHL Express. El comprador sigue el pedido.",
             ],
           ].map(([title, text], index) => (
             <article key={title} style={cardStyle}>
@@ -65,7 +65,7 @@ export default function HowItWorksPage() {
       </section>
 
       <section style={darkSectionStyle}>
-        <p style={eyebrowLightStyle}>ATHMOV VERIFICATION</p>
+        <p style={eyebrowLightStyle}>VERIFICACIÓN ATHMOV</p>
         <h2 style={darkTitleStyle}>
           Tres niveles
           <br />
@@ -109,7 +109,7 @@ export default function HowItWorksPage() {
       </section>
 
       <section style={sectionStyle}>
-        <p style={eyebrowStyle}>BUYER FLOW</p>
+        <p style={eyebrowStyle}>PROCESO DEL COMPRADOR</p>
         <h2 style={sectionTitleStyle}>Si compras</h2>
 
         <div style={cardsStyle}>
@@ -120,15 +120,15 @@ export default function HowItWorksPage() {
             ],
             [
               "Graba tu unboxing",
-              "Si hay daño de transporte, ese vídeo activa la incidencia.",
+              "Si hay daño de transporte, ese vídeo ayuda a abrir una incidencia.",
             ],
             [
-              "48 h para confirmar",
-              "Tienes tiempo para revisar el producto recibido.",
+              "48 h para revisar",
+              "Tienes tiempo para comprobar el producto recibido.",
             ],
             [
               "El pago se libera después",
-              "El vendedor cobra cuando confirmas que todo está correcto.",
+              "El vendedor cobra cuando el pedido se completa correctamente.",
             ],
           ].map(([title, text], index) => (
             <article key={title} style={cardStyle}>
@@ -141,7 +141,7 @@ export default function HowItWorksPage() {
       </section>
 
       <section style={ctaStyle}>
-        <p style={eyebrowLightStyle}>SECOND HAND. FIRST CLASS.</p>
+        <p style={eyebrowLightStyle}>SEGUNDA MANO. PRIMERA CLASE.</p>
 
         <h2 style={ctaTitleStyle}>
           Compra y vende material deportivo premium con confianza real.
@@ -149,11 +149,11 @@ export default function HowItWorksPage() {
 
         <div style={ctaButtonsStyle}>
           <a href="/products" style={primaryButtonStyle}>
-            Shop gear
+            Comprar material
           </a>
 
           <a href="/sell" style={secondaryDarkButtonStyle}>
-            Sell gear
+            Vender material
           </a>
         </div>
       </section>

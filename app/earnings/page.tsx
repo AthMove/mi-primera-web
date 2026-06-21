@@ -41,31 +41,36 @@ function EarningsPageContent() {
     const sellerOrders = data || [];
 
     const completed = sellerOrders.filter(
-      (order: any) => order.status === "completed"
+      (order: any) =>
+        order.status === "completed" ||
+        order.transfer_status === "released"
     );
 
     const pending = sellerOrders.filter(
       (order: any) =>
-        order.status === "paid" ||
-        order.status === "shipped" ||
-        order.status === "delivered"
+        ["paid", "preparing", "shipped", "delivered"].includes(order.status) &&
+        order.transfer_status !== "released"
     );
-
-    const feeRate = 0.1;
 
     const totalRevenue = completed.reduce(
       (acc: number, order: any) => acc + Number(order.amount || 0),
       0
     );
 
-    const pendingRevenue = pending.reduce(
-      (acc: number, order: any) => acc + Number(order.amount || 0),
+    const availableBalance = completed.reduce(
+      (acc: number, order: any) => acc + Number(order.seller_amount || 0),
       0
     );
 
-    const athmovFees = totalRevenue * feeRate;
-    const availableBalance = totalRevenue - athmovFees;
-    const pendingBalance = pendingRevenue * (1 - feeRate);
+    const pendingBalance = pending.reduce(
+      (acc: number, order: any) => acc + Number(order.seller_amount || 0),
+      0
+    );
+
+    const athmovFees = sellerOrders.reduce(
+      (acc: number, order: any) => acc + Number(order.platform_fee || 0),
+      0
+    );
 
     setStats({
       totalRevenue,
@@ -79,99 +84,131 @@ function EarningsPageContent() {
     setLoading(false);
   };
 
-  const money = (value: number) => `€${value.toFixed(2)}`;
+  const money = (value: number) => `€${Number(value || 0).toFixed(2)}`;
+
+  const translateStatus = (status: string) => {
+    switch (status) {
+      case "pending":
+        return "Pendiente";
+      case "paid":
+        return "Pagado";
+      case "preparing":
+        return "Preparando";
+      case "shipped":
+        return "Enviado";
+      case "delivered":
+        return "Entregado";
+      case "completed":
+        return "Completado";
+      case "refunded":
+        return "Reembolsado";
+      default:
+        return status || "Pendiente";
+    }
+  };
 
   if (loading) {
-    return <main style={pageStyle}>Loading earnings...</main>;
+    return <main style={pageStyle}>Cargando ganancias...</main>;
   }
 
   return (
     <main style={pageStyle} className="earnings-page">
       <section style={heroStyle}>
-        <p style={eyebrowStyle}>ATHMOV EARNINGS</p>
+        <p style={eyebrowStyle}>GANANCIAS ATHMOV</p>
+
         <h1 style={titleStyle} className="earnings-title">
-          Earnings
+          Ganancias
         </h1>
+
         <p style={subtitleStyle}>
-          Track seller revenue, pending balance and ATHMOV marketplace fees.
+          Consulta tus ingresos como vendedor, saldo pendiente, pagos liberados y
+          comisiones del marketplace.
         </p>
       </section>
 
       <section style={balanceCardStyle}>
-        <p style={balanceLabelStyle}>Available balance</p>
+        <p style={balanceLabelStyle}>Saldo disponible</p>
+
         <h2 style={balanceValueStyle}>{money(stats.availableBalance)}</h2>
+
         <p style={balanceTextStyle}>
-          Available after completed orders. Stripe Connect payouts will be added
-          here next.
+          Saldo correspondiente a pedidos completados o pagos ya liberados. Los
+          pagos se gestionan mediante Stripe Connect.
         </p>
 
         <button style={withdrawButtonStyle} disabled>
-          Withdraw coming soon
+          Retirada automática mediante Stripe
         </button>
       </section>
 
       <section style={statsGridStyle}>
         <div style={statCardStyle}>
-          <p style={statLabelStyle}>Total completed revenue</p>
+          <p style={statLabelStyle}>Ingresos completados</p>
           <h2 style={statValueStyle}>{money(stats.totalRevenue)}</h2>
         </div>
 
         <div style={statCardStyle}>
-          <p style={statLabelStyle}>Pending balance</p>
+          <p style={statLabelStyle}>Saldo pendiente</p>
           <h2 style={statValueStyle}>{money(stats.pendingBalance)}</h2>
         </div>
 
         <div style={statCardStyle}>
-          <p style={statLabelStyle}>ATHMOV fees</p>
+          <p style={statLabelStyle}>Comisiones ATHMOV</p>
           <h2 style={statValueStyle}>{money(stats.athmovFees)}</h2>
         </div>
 
         <div style={statCardStyle}>
-          <p style={statLabelStyle}>Completed sales</p>
+          <p style={statLabelStyle}>Ventas completadas</p>
           <h2 style={statValueStyle}>{stats.completedSales}</h2>
         </div>
       </section>
 
       <section style={actionsStyle}>
         <Link href="/dashboard" style={actionButtonStyle}>
-          Seller dashboard
+          Panel de vendedor
         </Link>
 
         <Link href="/orders" style={actionButtonStyle}>
-          Orders
+          Pedidos
         </Link>
 
         <Link href="/sell" style={actionButtonStyle}>
-          Add product
+          Añadir producto
         </Link>
       </section>
 
       <section style={historySectionStyle}>
-        <h2 style={sectionTitleStyle}>Earnings history</h2>
+        <h2 style={sectionTitleStyle}>Historial de ganancias</h2>
 
         {orders.length === 0 ? (
-          <div style={emptyStyle}>No seller orders yet.</div>
+          <div style={emptyStyle}>Todavía no tienes pedidos como vendedor.</div>
         ) : (
           <div style={listStyle}>
             {orders.map((order: any) => {
               const amount = Number(order.amount || 0);
-              const fee = amount * 0.1;
-              const net = amount - fee;
+              const fee = Number(order.platform_fee || 0);
+              const net = Number(order.seller_amount || 0);
 
               return (
                 <article key={order.id} style={orderCardStyle}>
                   <div>
-                    <p style={orderMetaStyle}>ORDER</p>
+                    <p style={orderMetaStyle}>PEDIDO</p>
+
                     <h3 style={orderAmountStyle}>{money(amount)}</h3>
+
                     <p style={orderDateStyle}>
                       {new Date(order.created_at).toLocaleDateString()}
                     </p>
                   </div>
 
                   <div style={rightStyle}>
-                    <span style={statusStyle}>{order.status}</span>
-                    <p style={netStyle}>Net: {money(net)}</p>
-                    <p style={feeStyle}>Fee: {money(fee)}</p>
+                    <span style={statusStyle}>
+                      {translateStatus(order.status)}
+                    </span>
+
+                    <p style={netStyle}>Neto: {money(net)}</p>
+
+                    <p style={feeStyle}>Comisión: {money(fee)}</p>
                   </div>
                 </article>
               );

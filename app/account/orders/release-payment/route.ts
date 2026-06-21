@@ -37,19 +37,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
-    if (order.transfer_status === "paid") {
+    if (order.transfer_status === "released") {
       return NextResponse.json(
         { error: "Order already paid out" },
         { status: 400 }
       );
     }
 
-    if (order.status !== "completed") {
-      return NextResponse.json(
-        { error: "Order is not completed yet" },
-        { status: 400 }
-      );
-    }
+    if (order.dispute_status === "open") {
+  return NextResponse.json(
+    { error: "Order has an active dispute" },
+    { status: 400 }
+  );
+}
 
     if (!order.seller_stripe_account_id) {
       return NextResponse.json(
@@ -80,13 +80,13 @@ export async function POST(req: Request) {
     });
 
     const { error: updateError } = await supabaseAdmin
-      .from("orders")
-      .update({
-        transfer_status: "paid",
-        stripe_transfer_id: transfer.id,
-        paid_out_at: new Date().toISOString(),
-      })
-      .eq("id", order.id);
+  .from("orders")
+  .update({
+    transfer_status: "released",
+    stripe_transfer_id: transfer.id,
+    payout_released_at: new Date().toISOString(),
+  })
+  .eq("id", order.id);
 
     if (updateError) {
       return NextResponse.json({ error: updateError.message }, { status: 500 });

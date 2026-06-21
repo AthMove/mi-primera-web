@@ -37,6 +37,7 @@ export default function FavoritesPage() {
       .eq("user_id", user.id);
 
     if (error || !favoriteRows) {
+      setFavorites([]);
       setLoading(false);
       return;
     }
@@ -52,7 +53,9 @@ export default function FavoritesPage() {
     const { data: products } = await supabase
       .from("products")
       .select("*")
-      .in("id", productIds);
+      .in("id", productIds)
+      .eq("sold", false)
+      .eq("moderation_status", "approved");
 
     setFavorites(products || []);
     setLoading(false);
@@ -65,35 +68,59 @@ export default function FavoritesPage() {
       data: { user },
     } = await supabase.auth.getUser();
 
+    if (!user) {
+      router.push("/auth");
+      return;
+    }
+
     await supabase
       .from("favorites")
       .delete()
-      .eq("user_id", user?.id)
+      .eq("user_id", user.id)
       .eq("product_id", productId);
 
-    setFavorites(favorites.filter((item: any) => item.id !== productId));
+    setFavorites((current) =>
+      current.filter((item: any) => item.id !== productId)
+    );
+  };
+
+  const safeImage = (product: any) => {
+    const src = product.image || product.image_url || product.images?.[0];
+
+    return src?.startsWith("http") || src?.startsWith("/") ? src : "/logo.png";
   };
 
   if (loading) {
-    return <main style={pageStyle}>Loading...</main>;
+    return <main style={pageStyle}>Cargando favoritos...</main>;
   }
 
   return (
-    <main style={pageStyle}>
+    <main style={pageStyle} className="favorites-page">
       <section style={headerStyle}>
-        <p style={eyebrowStyle}>ATHMOV FAVORITES</p>
-        <h1 style={titleStyle}>Wishlist</h1>
+        <p style={eyebrowStyle}>FAVORITOS ATHMOV</p>
+
+        <h1 style={titleStyle} className="favorites-title">
+          Favoritos
+        </h1>
       </section>
 
       {favorites.length === 0 ? (
         <section style={emptyStyle}>
-          <h2 style={{ margin: 0 }}>No favorites yet</h2>
+          <h2 style={{ margin: 0 }}>Todavía no tienes favoritos</h2>
+
           <p style={{ color: "#666", marginTop: "12px" }}>
-            Save premium products to your wishlist.
+            Guarda productos premium para verlos más tarde.
           </p>
+
+          <button
+            onClick={() => router.push("/products")}
+            style={shopButtonStyle}
+          >
+            Explorar marketplace
+          </button>
         </section>
       ) : (
-        <section style={gridStyle}>
+        <section style={gridStyle} className="favorites-grid">
           {favorites.map((product: any) => (
             <article key={product.id} style={cardStyle}>
               <div
@@ -102,22 +129,21 @@ export default function FavoritesPage() {
               >
                 <div style={imageWrapperStyle}>
                   <Image
-                    src={
-                      product.image?.startsWith("http") ||
-                      product.image?.startsWith("/")
-                        ? product.image
-                        : "/logo.png"
-                    }
-                    alt={product.title || "Product"}
+                    src={safeImage(product)}
+                    alt={product.title || "Producto"}
                     fill
-                    sizes="33vw"
+                    sizes="(max-width: 900px) 100vw, 33vw"
                     style={{ objectFit: "cover" }}
                   />
                 </div>
 
                 <div style={{ padding: "24px" }}>
-                  <p style={brandStyle}>{product.brand}</p>
-                  <h2 style={productTitleStyle}>{product.title}</h2>
+                  <p style={brandStyle}>{product.brand || "ATHMOV"}</p>
+
+                  <h2 style={productTitleStyle}>
+                    {product.title || "Producto"}
+                  </h2>
+
                   <p style={priceStyle}>€{product.price}</p>
                 </div>
               </div>
@@ -127,13 +153,30 @@ export default function FavoritesPage() {
                   onClick={() => removeFavorite(product.id)}
                   style={removeButtonStyle}
                 >
-                  Remove favorite
+                  Quitar de favoritos
                 </button>
               </div>
             </article>
           ))}
         </section>
       )}
+
+      <style>{`
+        @media (max-width: 900px) {
+          .favorites-page {
+            padding: 120px 18px 34px !important;
+          }
+
+          .favorites-title {
+            font-size: 52px !important;
+            letter-spacing: -2px !important;
+          }
+
+          .favorites-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </main>
   );
 }
@@ -170,6 +213,18 @@ const emptyStyle = {
   background: "#fff",
   borderRadius: "34px",
   padding: "50px",
+};
+
+const shopButtonStyle = {
+  marginTop: "24px",
+  background: "#111",
+  color: "#fff",
+  border: "none",
+  borderRadius: "999px",
+  padding: "15px 22px",
+  fontSize: "14px",
+  fontWeight: 800,
+  cursor: "pointer",
 };
 
 const gridStyle = {

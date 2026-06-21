@@ -16,22 +16,56 @@ export default function SellerReviewPage() {
   const submitReview = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!comment.trim()) {
+      alert("Escribe una valoración");
+      return;
+    }
+
+    setLoading(true);
+
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
     if (!user) {
+      setLoading(false);
       alert("Debes iniciar sesión");
       router.push("/auth");
       return;
     }
 
     if (user.id === sellerId) {
+      setLoading(false);
       alert("No puedes valorarte a ti mismo");
       return;
     }
 
-    setLoading(true);
+    const { data: order } = await supabase
+      .from("orders")
+      .select("id")
+      .eq("buyer_id", user.id)
+      .eq("seller_id", sellerId)
+      .eq("status", "completed")
+      .maybeSingle();
+
+    if (!order) {
+      setLoading(false);
+      alert("Solo compradores con pedidos completados pueden valorar vendedores");
+      return;
+    }
+
+    const { data: existingReview } = await supabase
+      .from("seller_reviews")
+      .select("id")
+      .eq("seller_id", sellerId)
+      .eq("buyer_id", user.id)
+      .maybeSingle();
+
+    if (existingReview) {
+      setLoading(false);
+      alert("Ya has valorado a este vendedor");
+      return;
+    }
 
     const { error } = await supabase.from("seller_reviews").insert([
       {
@@ -39,7 +73,7 @@ export default function SellerReviewPage() {
         buyer_id: user.id,
         buyer_email: user.email,
         rating: Number(rating),
-        comment,
+        comment: comment.trim(),
       },
     ]);
 
@@ -50,7 +84,7 @@ export default function SellerReviewPage() {
       return;
     }
 
-    alert("Review enviada");
+    alert("Valoración enviada");
     router.push(`/seller/${sellerId}`);
   };
 
@@ -58,7 +92,7 @@ export default function SellerReviewPage() {
     <main style={pageStyle}>
       <section style={cardStyle}>
         <p style={eyebrowStyle}>ATHMOV REVIEW</p>
-        <h1 style={titleStyle}>Rate seller</h1>
+        <h1 style={titleStyle}>Valorar vendedor</h1>
 
         <form onSubmit={submitReview} style={formStyle}>
           <select
@@ -81,8 +115,16 @@ export default function SellerReviewPage() {
             style={textareaStyle}
           />
 
-          <button type="submit" disabled={loading} style={buttonStyle}>
-            {loading ? "Sending..." : "Submit review"}
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              ...buttonStyle,
+              opacity: loading ? 0.6 : 1,
+              cursor: loading ? "not-allowed" : "pointer",
+            }}
+          >
+            {loading ? "Enviando..." : "Enviar valoración"}
           </button>
         </form>
       </section>
@@ -151,5 +193,4 @@ const buttonStyle = {
   padding: "18px",
   fontSize: "16px",
   fontWeight: 800,
-  cursor: "pointer",
 };

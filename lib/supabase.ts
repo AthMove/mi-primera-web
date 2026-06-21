@@ -9,10 +9,6 @@ function getSupabaseClient() {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    if (typeof window === "undefined") {
-      return {};
-    }
-
     throw new Error("Missing Supabase browser environment variables");
   }
 
@@ -32,7 +28,8 @@ export const supabase: any = new Proxy(
   {},
   {
     get(_target, prop) {
-      return getSupabaseClient()[prop as keyof ReturnType<typeof createClient>];
+      const client = getSupabaseClient();
+      return client[prop as keyof typeof client];
     },
   }
 );

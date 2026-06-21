@@ -13,24 +13,20 @@ export async function POST(req: Request) {
 
     if (!stripeSecretKey || !supabaseUrl || !serviceRoleKey) {
       return NextResponse.json(
-        { error: "Missing server environment variables" },
+        { error: "Faltan variables de entorno del servidor" },
         { status: 500 }
       );
     }
 
     const stripe = new Stripe(stripeSecretKey);
-
-    const supabase = createClient(
-      supabaseUrl,
-      serviceRoleKey
-    );
+    const supabase = createClient(supabaseUrl, serviceRoleKey);
 
     const body = await req.json();
     const orderId = body.orderId;
 
     if (!orderId) {
       return NextResponse.json(
-        { error: "Missing orderId" },
+        { error: "Falta el orderId" },
         { status: 400 }
       );
     }
@@ -43,14 +39,14 @@ export async function POST(req: Request) {
 
     if (error || !order) {
       return NextResponse.json(
-        { error: "Order not found" },
+        { error: "Pedido no encontrado" },
         { status: 404 }
       );
     }
 
     if (!order.stripe_payment_intent) {
       return NextResponse.json(
-        { error: "Missing payment intent" },
+        { error: "Falta el Payment Intent" },
         { status: 400 }
       );
     }
@@ -83,10 +79,10 @@ export async function POST(req: Request) {
       refundId: refund.id,
     });
   } catch (error: any) {
-    console.log("REFUND ERROR:", error?.message || error);
+    console.log("ERROR DE REEMBOLSO:", error?.message || error);
 
     return NextResponse.json(
-      { error: error?.message || "Refund failed" },
+      { error: error?.message || "No se pudo realizar el reembolso" },
       { status: 500 }
     );
   }

@@ -9,7 +9,7 @@ import { createNotification } from "@/lib/createNotification";
 const PROFILE_TABLE = "profiles";
 
 const isValidUuid = (value: string) =>
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{12}$/i.test(
     value
   );
 
@@ -61,20 +61,26 @@ export default function ConversationPage() {
   };
 
   const formatLastSeen = (dateString: string | null) => {
-    if (!dateString) return "Last seen recently";
+    if (!dateString) return "Visto recientemente";
 
     const diff = Date.now() - new Date(dateString).getTime();
     const minutes = Math.floor(diff / 60000);
 
-    if (minutes < 1) return "Last seen just now";
-    if (minutes === 1) return "Last seen 1 min ago";
-    if (minutes < 60) return `Last seen ${minutes} min ago`;
+    if (minutes < 1) return "Visto ahora";
+    if (minutes === 1) return "Visto hace 1 min";
+    if (minutes < 60) return `Visto hace ${minutes} min`;
 
     const hours = Math.floor(minutes / 60);
-    if (hours === 1) return "Last seen 1 hour ago";
-    if (hours < 24) return `Last seen ${hours} hours ago`;
+    if (hours === 1) return "Visto hace 1 hora";
+    if (hours < 24) return `Visto hace ${hours} horas`;
 
-    return "Last seen yesterday";
+    return "Visto ayer";
+  };
+
+  const getOfferStatusLabel = (status?: string) => {
+    if (status === "accepted") return "Aceptada";
+    if (status === "rejected") return "Rechazada";
+    return "Pendiente";
   };
 
   const updateMyPresence = async (online: boolean, currentUserId?: string) => {
@@ -154,7 +160,7 @@ export default function ConversationPage() {
       ? message.read_by_buyer
       : message.read_by_seller;
 
-    return otherHasRead ? "Seen" : "Delivered";
+    return otherHasRead ? "Visto" : "Entregado";
   };
 
   const loadMessages = async () => {
@@ -254,15 +260,15 @@ export default function ConversationPage() {
 
         setOtherTyping(true);
 
-  if (typingTimeoutRef.current) {
-    clearTimeout(typingTimeoutRef.current);
-  }
+        if (typingTimeoutRef.current) {
+          clearTimeout(typingTimeoutRef.current);
+        }
 
-  typingTimeoutRef.current = setTimeout(() => {
-    setOtherTyping(false);
-  }, 1800);
-})
-.subscribe();
+        typingTimeoutRef.current = setTimeout(() => {
+          setOtherTyping(false);
+        }, 1800);
+      })
+      .subscribe();
 
     typingChannelRef.current = channel;
 
@@ -287,17 +293,17 @@ export default function ConversationPage() {
     scrollToBottom();
   }, [messages, otherTyping]);
 
-const sendTyping = () => {
-  if (!typingChannelRef.current || !userIdRef.current) return;
+  const sendTyping = () => {
+    if (!typingChannelRef.current || !userIdRef.current) return;
 
-  typingChannelRef.current.send({
-    type: "broadcast",
-    event: "typing",
-    payload: {
-      user_id: userIdRef.current,
-    },
-  });
-};
+    typingChannelRef.current.send({
+      type: "broadcast",
+      event: "typing",
+      payload: {
+        user_id: userIdRef.current,
+      },
+    });
+  };
 
   const updateConversationUnread = async (
     text: string,
@@ -366,13 +372,13 @@ const sendTyping = () => {
       return;
     }
 
-    await updateConversationUnread(imageUrl ? "Image" : text, user.id);
+    await updateConversationUnread(imageUrl ? "Imagen" : text, user.id);
 
     if (otherUserId) {
       await createNotification({
         user_id: otherUserId,
-        title: "New message",
-        message: imageUrl ? "You received an image" : text,
+        title: "Nuevo mensaje",
+        message: imageUrl ? "Has recibido una imagen" : text,
         link: `/messages/${conversationId}`,
       });
     }
@@ -412,7 +418,7 @@ const sendTyping = () => {
       .insert({
         conversation_id: conversationId,
         sender_id: user.id,
-        content: `Offer: €${numericAmount}`,
+        content: `Oferta: €${numericAmount}`,
         is_offer: true,
         offer_price: numericAmount,
         offer_status: "pending",
@@ -429,13 +435,13 @@ const sendTyping = () => {
       return;
     }
 
-    await updateConversationUnread(`Offer: €${numericAmount}`, user.id);
+    await updateConversationUnread(`Oferta: €${numericAmount}`, user.id);
 
     if (otherUserId) {
       await createNotification({
         user_id: otherUserId,
-        title: "New offer received",
-        message: `You received an offer of €${numericAmount}`,
+        title: "Nueva oferta recibida",
+        message: `Has recibido una oferta de €${numericAmount}`,
         link: `/messages/${conversationId}`,
       });
     }
@@ -492,7 +498,7 @@ const sendTyping = () => {
     if (!product) return;
 
     if (product.sold) {
-      alert("This product has already been sold");
+      alert("Este producto ya se ha vendido");
       return;
     }
 
@@ -507,7 +513,7 @@ const sendTyping = () => {
       !sellerProfile?.stripe_charges_enabled ||
       !sellerProfile?.stripe_payouts_enabled
     ) {
-      alert("Seller has not connected Stripe payouts");
+      alert("El vendedor no ha conectado los pagos de Stripe");
       return;
     }
 
@@ -537,7 +543,7 @@ const sendTyping = () => {
 
     if (orderError || !order) {
       console.log(orderError);
-      alert("No se pudo crear la orden");
+      alert("No se pudo crear el pedido");
       return;
     }
 
@@ -564,7 +570,7 @@ const sendTyping = () => {
     const checkoutData = await response.json();
 
     if (!response.ok || !checkoutData.url) {
-      alert(checkoutData.error || "Checkout error");
+      alert(checkoutData.error || "Error al iniciar el checkout");
       return;
     }
 
@@ -613,8 +619,7 @@ const sendTyping = () => {
       <main style={pageStyle}>
         <div style={chatStyle}>
           <div style={emptyStateStyle}>
-            Invalid conversation. Open the chat from Messages, not from
-            /messages/[id].
+            Conversación no válida. Abre el chat desde Mensajes.
           </div>
         </div>
       </main>
@@ -626,13 +631,13 @@ const sendTyping = () => {
       <div style={chatStyle} className="chat-shell">
         <div style={headerStyle} className="chat-header">
           <button onClick={() => window.history.back()} style={backButtonStyle}>
-            ← Back
+            ← Volver
           </button>
 
           <div>
-            <p style={headerEyebrowStyle}>ATHMOV CHAT</p>
+            <p style={headerEyebrowStyle}>CHAT ATHMOV</p>
 
-            <h1 style={headerTitleStyle}>Conversation</h1>
+            <h1 style={headerTitleStyle}>Conversación</h1>
 
             <p style={statusTextStyle}>
               <span
@@ -641,7 +646,7 @@ const sendTyping = () => {
                   background: otherOnline ? "#20c95a" : "#999",
                 }}
               />
-              {otherOnline ? "Online now" : formatLastSeen(otherLastSeen)}
+              {otherOnline ? "En línea ahora" : formatLastSeen(otherLastSeen)}
             </p>
           </div>
         </div>
@@ -656,7 +661,7 @@ const sendTyping = () => {
                   productData.images?.[0] ||
                   "/logo.png"
                 }
-                alt={productData.title || "Product"}
+                alt={productData.title || "Producto"}
                 fill
                 sizes="64px"
                 style={{ objectFit: "cover" }}
@@ -664,10 +669,10 @@ const sendTyping = () => {
             </div>
 
             <div>
-              <strong>{productData.title || productData.nombre || "Product"}</strong>
+              <strong>{productData.title || productData.nombre || "Producto"}</strong>
               {conversationData?.order_id && (
                 <p style={orderPreviewTextStyle}>
-                  Order #{conversationData.order_id.slice(0, 8)}
+                  Pedido #{conversationData.order_id.slice(0, 8)}
                 </p>
               )}
             </div>
@@ -676,10 +681,10 @@ const sendTyping = () => {
 
         <div style={messagesStyle} className="chat-messages">
           {loading ? (
-            <div style={emptyStateStyle}>Loading conversation...</div>
+            <div style={emptyStateStyle}>Cargando conversación...</div>
           ) : messages.length === 0 ? (
             <div style={emptyStateStyle}>
-              No messages yet. Start the conversation.
+              Todavía no hay mensajes. Empieza la conversación.
             </div>
           ) : (
             messages.map((message) => {
@@ -704,23 +709,23 @@ const sendTyping = () => {
                         borderBottomLeftRadius: mine ? "26px" : "8px",
                       }}
                     >
-                      <p style={offerEyebrowStyle}>OFFER</p>
+                      <p style={offerEyebrowStyle}>OFERTA</p>
 
                       <h2 style={offerPriceStyle}>€{message.offer_price}</h2>
 
                       <p style={offerStatusStyle}>
-                        Status: {message.offer_status || "pending"}
+                        Estado: {getOfferStatusLabel(message.offer_status)}
                       </p>
 
-                      {false && !mine && message.offer_status === "pending" && (
-  <div style={offerActionsStyle}>
+                      {!mine && message.offer_status === "pending" && (
+                        <div style={offerActionsStyle}>
                           <button
                             onClick={() =>
                               updateOfferStatus(message.id, "accepted", message)
                             }
                             style={acceptButtonStyle}
                           >
-                            Accept
+                            Aceptar
                           </button>
 
                           <button
@@ -729,7 +734,7 @@ const sendTyping = () => {
                             }
                             style={rejectButtonStyle}
                           >
-                            Reject
+                            Rechazar
                           </button>
                         </div>
                       )}
@@ -759,7 +764,7 @@ const sendTyping = () => {
                         <div style={chatImageWrapperStyle}>
                           <Image
                             src={message.content}
-                            alt="Chat image"
+                            alt="Imagen del chat"
                             fill
                             sizes="280px"
                             style={{ objectFit: "cover" }}
@@ -785,7 +790,7 @@ const sendTyping = () => {
 
           {otherTyping && (
             <div style={typingStyle}>
-              Typing<span className="typing-dots">...</span>
+              Escribiendo<span className="typing-dots">...</span>
             </div>
           )}
 
@@ -806,7 +811,7 @@ const sendTyping = () => {
                 sendMessage();
               }
             }}
-            placeholder="Write a message..."
+            placeholder="Escribe un mensaje..."
             style={inputStyle}
           />
 
@@ -822,11 +827,11 @@ const sendTyping = () => {
           </label>
 
           <button onClick={sendOffer} style={offerButtonStyle}>
-            Offer
+            Oferta
           </button>
 
           <button onClick={() => sendMessage()} style={buttonStyle}>
-            Send
+            Enviar
           </button>
         </div>
       </div>

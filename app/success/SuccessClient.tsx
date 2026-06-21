@@ -28,10 +28,15 @@ export default function SuccessClient() {
         body: JSON.stringify({ sessionId }),
       });
 
-      await response.json();
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        console.log("VERIFY SESSION ERROR:", data.error || data);
+      }
+
       setLoading(false);
     } catch (error) {
-      console.log(error);
+      console.log("SUCCESS PAGE ERROR:", error);
       setLoading(false);
     }
   };
@@ -44,52 +49,55 @@ export default function SuccessClient() {
         <p style={eyebrowStyle}>ATHMOV CHECKOUT</p>
 
         <h1 style={titleStyle}>
-          {loading ? "Processing order..." : "Order confirmed"}
+          {loading ? "Procesando pedido..." : "Pedido confirmado"}
         </h1>
 
         <p style={textStyle}>
-          Your payment was successful. ATHMOV Buyer Protection is now active and
-          the seller will prepare tracked shipping.
+          Tu pago se ha completado correctamente. La Protección al Comprador de
+          ATHMOV ya está activa y el vendedor preparará el envío con seguimiento.
         </p>
 
         <div style={timelineStyle}>
           <div style={stepStyle}>
             <span style={dotActiveStyle}>✓</span>
-            <p>Paid</p>
+            <p>Pagado</p>
           </div>
 
           <div style={lineStyle} />
 
           <div style={stepStyle}>
             <span style={dotStyle}>2</span>
-            <p>Seller ships</p>
+            <p>El vendedor envía</p>
           </div>
 
           <div style={lineStyle} />
 
           <div style={stepStyle}>
             <span style={dotStyle}>3</span>
-            <p>Delivered</p>
+            <p>Entregado</p>
           </div>
         </div>
 
         <div style={trustGridStyle}>
-          <div style={trustCardStyle}>✓ Secure checkout</div>
-          <div style={trustCardStyle}>✓ Buyer protection</div>
-          <div style={trustCardStyle}>✓ Tracked shipping</div>
-          <div style={trustCardStyle}>✓ Premium marketplace</div>
+          <div style={trustCardStyle}>✓ Pago seguro</div>
+          <div style={trustCardStyle}>✓ Protección al comprador</div>
+          <div style={trustCardStyle}>✓ Envío con seguimiento</div>
+          <div style={trustCardStyle}>✓ Marketplace premium</div>
         </div>
 
         <div style={actionsStyle}>
-          <button onClick={() => (window.location.href = "/orders")} style={buttonStyle}>
-            View order
+          <button
+            onClick={() => (window.location.href = "/orders")}
+            style={buttonStyle}
+          >
+            Ver pedido
           </button>
 
           <button
             onClick={() => (window.location.href = "/products")}
             style={secondaryButtonStyle}
           >
-            Continue shopping
+            Seguir comprando
           </button>
         </div>
       </section>

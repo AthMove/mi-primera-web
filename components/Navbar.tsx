@@ -87,10 +87,10 @@ const { data: orders } = await supabase
   .in("status", ["paid", "preparing", "shipped", "delivered"]);
 
     const { data: notifications } = await supabase
-      .from("notifications")
-      .select("id")
-      .eq("user_id", user.id)
-      .eq("is_read", false);
+  .from("notifications")
+  .select("id")
+  .eq("user_id", user.id)
+  .eq("is_read", false);
 
     setMessagesCount(unreadTotal);
     setOffersCount(offers?.length || 0);
@@ -174,9 +174,9 @@ const { data: orders } = await supabase
   <>
     <p style={drawerSectionTitleStyle}>MARKETPLACE</p>
 
-    <Link href="/products" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-      SHOP
-    </Link>
+    <Link href="/products" style={drawerLinkStyle}>
+  COMPRAR
+</Link>
 
     <Link href="/products?category=PADEL" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
       PÁDEL
@@ -210,7 +210,11 @@ const { data: orders } = await supabase
           PEDIDOS{badge(ordersCount)}
         </Link>
 
-        <Link href="/notifications" style={signInStyle}>
+<Link
+  href="/notifications"
+  style={drawerLinkStyle}
+  onClick={() => setMenuOpen(false)}
+>
   NOTIFICACIONES{badge(notificationsCount)}
 </Link>
 

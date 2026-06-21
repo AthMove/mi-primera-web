@@ -18,7 +18,7 @@ export default function AdminUsersPage() {
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.log(error);
+      console.log("ERROR ADMIN USUARIOS:", error);
       setUsers([]);
     } else {
       setUsers(data || []);
@@ -28,79 +28,98 @@ export default function AdminUsersPage() {
   }
 
   if (loading) {
-    return <main style={pageStyle}>Loading users...</main>;
+    return <main style={pageStyle}>Cargando usuarios...</main>;
   }
 
   return (
-    <main style={pageStyle}>
+    <main style={pageStyle} className="admin-users-page">
       <section style={headerStyle}>
-        <p style={eyebrowStyle}>ATHMOV ADMIN</p>
-        <h1 style={titleStyle}>Users</h1>
+        <p style={eyebrowStyle}>ADMIN ATHMOV</p>
+
+        <h1 style={titleStyle} className="admin-users-title">
+          Usuarios
+        </h1>
+
         <p style={subtitleStyle}>
-          Monitor marketplace members and Stripe status.
+          Controla los miembros del marketplace y el estado de Stripe.
         </p>
       </section>
 
       <section style={listStyle}>
-        {users.map((user) => (
-          <div key={user.id} style={cardStyle}>
-            <div>
-              <p style={idStyle}>#{user.id?.slice(0, 8)}</p>
+        {users.length === 0 ? (
+          <div style={emptyStyle}>No se han encontrado usuarios.</div>
+        ) : (
+          users.map((user) => (
+            <div key={user.id} style={cardStyle} className="user-card">
+              <div>
+                <p style={idStyle}>#{user.id?.slice(0, 8)}</p>
 
-              <h2 style={nameStyle}>
-                {user.username || user.full_name || "Unnamed User"}
-              </h2>
+                <h2 style={nameStyle}>
+                  {user.username || user.full_name || "Usuario sin nombre"}
+                </h2>
 
-              <p style={emailStyle}>
-                {user.email || "No email"}
-              </p>
+                <p style={emailStyle}>{user.email || "Sin email"}</p>
+              </div>
+
+              <div>
+                <p style={labelStyle}>Stripe</p>
+
+                <span
+                  style={{
+                    ...badgeStyle,
+                    background: user.stripe_payouts_enabled
+                      ? "#dcfce7"
+                      : "#fee2e2",
+                    color: user.stripe_payouts_enabled ? "#166534" : "#991b1b",
+                  }}
+                >
+                  {user.stripe_payouts_enabled ? "Conectado" : "No conectado"}
+                </span>
+              </div>
+
+              <div>
+                <p style={labelStyle}>Cuenta</p>
+
+                <span
+                  style={{
+                    ...badgeStyle,
+                    background: "#f3f4f6",
+                  }}
+                >
+                  Activa
+                </span>
+              </div>
+
+              <div>
+                <p style={labelStyle}>Registro</p>
+
+                <strong>
+                  {user.created_at
+                    ? new Date(user.created_at).toLocaleDateString()
+                    : "-"}
+                </strong>
+              </div>
             </div>
-
-            <div>
-              <p style={labelStyle}>Stripe</p>
-
-              <span
-                style={{
-                  ...badgeStyle,
-                  background: user.stripe_payouts_enabled
-                    ? "#dcfce7"
-                    : "#fee2e2",
-                  color: user.stripe_payouts_enabled
-                    ? "#166534"
-                    : "#991b1b",
-                }}
-              >
-                {user.stripe_payouts_enabled
-                  ? "Connected"
-                  : "Not Connected"}
-              </span>
-            </div>
-
-            <div>
-              <p style={labelStyle}>Account</p>
-
-              <span
-                style={{
-                  ...badgeStyle,
-                  background: "#f3f4f6",
-                }}
-              >
-                Active
-              </span>
-            </div>
-
-            <div>
-              <p style={labelStyle}>Registered</p>
-
-              <strong>
-                {user.created_at
-                  ? new Date(user.created_at).toLocaleDateString()
-                  : "-"}
-              </strong>
-            </div>
-          </div>
-        ))}
+          ))
+        )}
       </section>
+
+      <style>{`
+        @media (max-width: 900px) {
+          .admin-users-page {
+            padding: 120px 18px 40px !important;
+          }
+
+          .admin-users-title {
+            font-size: 48px !important;
+            letter-spacing: -2px !important;
+          }
+
+          .user-card {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </main>
   );
 }
@@ -126,6 +145,7 @@ const eyebrowStyle = {
 const titleStyle = {
   fontSize: "72px",
   margin: 0,
+  letterSpacing: "-5px",
 };
 
 const subtitleStyle = {
@@ -137,6 +157,12 @@ const listStyle = {
   margin: "0 auto",
   display: "grid",
   gap: "16px",
+};
+
+const emptyStyle = {
+  background: "#fff",
+  borderRadius: "24px",
+  padding: "34px",
 };
 
 const cardStyle = {

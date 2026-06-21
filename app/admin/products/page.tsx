@@ -43,7 +43,7 @@ export default function AdminProductsPage() {
   }
 
   async function deleteProduct(productId: string) {
-    const ok = confirm("Delete this product permanently?");
+    const ok = confirm("¿Eliminar este producto permanentemente?");
     if (!ok) return;
 
     const { error } = await supabase
@@ -65,27 +65,31 @@ export default function AdminProductsPage() {
   };
 
   if (loading) {
-    return <main style={pageStyle}>Loading products...</main>;
+    return <main style={pageStyle}>Cargando productos...</main>;
   }
 
   return (
-    <main style={pageStyle}>
+    <main style={pageStyle} className="admin-products-page">
       <section style={headerStyle}>
-        <p style={eyebrowStyle}>ATHMOV ADMIN</p>
-        <h1 style={titleStyle}>Products</h1>
-        <p style={subtitleStyle}>Review, manage and remove marketplace listings.</p>
+        <p style={eyebrowStyle}>ADMIN ATHMOV</p>
+        <h1 style={titleStyle} className="admin-products-title">
+          Productos
+        </h1>
+        <p style={subtitleStyle}>
+          Revisa, gestiona y elimina productos del marketplace.
+        </p>
       </section>
 
       <section style={listStyle}>
         {products.length === 0 ? (
-          <div style={emptyStyle}>No products found.</div>
+          <div style={emptyStyle}>No se han encontrado productos.</div>
         ) : (
           products.map((product) => (
-            <article key={product.id} style={cardStyle}>
+            <article key={product.id} style={cardStyle} className="product-card">
               <div style={imageWrapperStyle}>
                 <Image
                   src={safeImage(product)}
-                  alt={product.title || "Product"}
+                  alt={product.title || "Producto"}
                   fill
                   sizes="120px"
                   style={{ objectFit: "cover" }}
@@ -94,17 +98,27 @@ export default function AdminProductsPage() {
 
               <div style={{ flex: 1 }}>
                 <p style={metaStyle}>#{String(product.id).slice(0, 8)}</p>
-                <h2 style={productTitleStyle}>{product.title || "Untitled"}</h2>
+
+                <h2 style={productTitleStyle}>
+                  {product.title || "Sin título"}
+                </h2>
 
                 <div style={detailsStyle}>
-                  <span>{product.brand || "No brand"}</span>
-                  <span>{product.category || product.sport || "No category"}</span>
+                  <span>{product.brand || "Sin marca"}</span>
+                  <span>{product.category || product.sport || "Sin categoría"}</span>
                   <span>€{product.price || 0}</span>
-                  <span>{product.created_at ? new Date(product.created_at).toLocaleDateString() : "-"}</span>
+                  <span>
+                    {product.created_at
+                      ? new Date(product.created_at).toLocaleDateString()
+                      : "-"}
+                  </span>
                 </div>
 
                 <p style={sellerStyle}>
-                  Seller: {product.seller_id ? String(product.seller_id).slice(0, 8) : "Unknown"}
+                  Vendedor:{" "}
+                  {product.seller_id
+                    ? String(product.seller_id).slice(0, 8)
+                    : "Desconocido"}
                 </p>
               </div>
 
@@ -115,24 +129,42 @@ export default function AdminProductsPage() {
                     ...(product.sold ? soldBadgeStyle : activeBadgeStyle),
                   }}
                 >
-                  {product.sold ? "Sold / Hidden" : "Active"}
+                  {product.sold ? "Vendido / Oculto" : "Activo"}
                 </span>
 
                 <button onClick={() => toggleSold(product)} style={buttonStyle}>
-                  {product.sold ? "Restore" : "Hide"}
+                  {product.sold ? "Restaurar" : "Ocultar"}
                 </button>
 
                 <button
                   onClick={() => deleteProduct(product.id)}
                   style={dangerButtonStyle}
                 >
-                  Delete
+                  Eliminar
                 </button>
               </div>
             </article>
           ))
         )}
       </section>
+
+      <style>{`
+        @media (max-width: 800px) {
+          .admin-products-page {
+            padding: 120px 18px 40px !important;
+          }
+
+          .admin-products-title {
+            font-size: 48px !important;
+            letter-spacing: -2px !important;
+          }
+
+          .product-card {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+          }
+        }
+      `}</style>
     </main>
   );
 }
