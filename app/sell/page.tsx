@@ -140,35 +140,36 @@ export default function SellPage() {
         imageUrl = data.publicUrl;
       }
 
-      const { data, error } = await supabase
-        .from("products")
-        .insert([
-          {
-            title: title.trim(),
-            brand,
-            category,
-            sport: category,
-            gender,
-            condition,
-            price: numericPrice,
-            description: description.trim(),
-            image: imageUrl,
-            images: [imageUrl],
-            seller_id: user.id,
-            seller_email: user.email,
-            sold: false,
-            moderation_status: "pending",
-          },
-        ])
-        .select()
-        .single();
+     const { data, error } = await supabase
+  .from("products")
+  .insert([
+    {
+      title: title.trim(),
+      brand,
+      category,
+      sport: category,
+      gender,
+      condition,
+      price: numericPrice,
+      description: description.trim(),
+      image: imageUrl,
+      images: [imageUrl],
+      seller_id: user.id,
+      seller_email: user.email,
+      sold: false,
+      moderation_status: "approved",
+approved_at: new Date().toISOString(),
+    },
+  ])
+  .select()
+  .single();
 
       if (error) {
         alert(error.message);
         return;
       }
 
-      alert("Producto enviado para revisión");
+     alert("Producto publicado correctamente");
       router.push(`/products/${data.id}`);
     } finally {
       setLoading(false);
@@ -186,9 +187,9 @@ export default function SellPage() {
   Deportivo Premium
 </h1>
 
-        <p style={heroTextStyle}>
+<p style={heroTextStyle}>
   Solo se aceptan marcas premium seleccionadas de pádel, golf, tenis y
-  running. Cada anuncio es revisado antes de publicarse.
+  running.
 </p>
       </section>
 
@@ -293,15 +294,15 @@ export default function SellPage() {
             style={textareaStyle}
           />
 
-          <div style={noticeStyle}>
-  <strong>Anuncio revisado:</strong> tu producto será revisado por ATHMOV
-  antes de publicarse.
+ <div style={noticeStyle}>
+  <strong>Publicación inmediata:</strong> tu se publicará directamente
+  en ATHMOV.
 </div>
 
           <div style={trustRowStyle}>
-            <div style={trustBadgeStyle}>✓ SOLO MARCAS PREMIUM</div>
+<div style={trustBadgeStyle}>✓ SOLO MARCAS PREMIUM</div>
 <div style={trustBadgeStyle}>✓ PROTECCIÓN AL COMPRADOR</div>
-<div style={trustBadgeStyle}>✓ REVISIÓN MANUAL</div>
+<div style={trustBadgeStyle}>✓ PUBLICACIÓN INMEDIATA</div>
           </div>
 
           <button
@@ -313,7 +314,7 @@ export default function SellPage() {
     cursor: loading ? "not-allowed" : "pointer",
   }}
 >
-  {loading ? "Enviando..." : "Enviar para revisión"}
+  {loading ? "Publicando..." : "Publicar producto"}
 </button>
         </div>
       </section>
