@@ -91,12 +91,16 @@ export default function Home() {
             </button>
 
             <button onClick={() => router.push("/feed")} style={secondaryButtonStyle}>
-              Novedades
-            </button>
+  Novedades
+</button>
 
-            <button onClick={() => router.push("/sell")} style={secondaryButtonStyle}>
-              Vender
-            </button>
+<button onClick={() => router.push("/blog")} style={secondaryButtonStyle}>
+  Blog
+</button>
+
+<button onClick={() => router.push("/sell")} style={secondaryButtonStyle}>
+  Vender
+</button>
           </div>
         </div>
 
@@ -254,7 +258,7 @@ export default function Home() {
         </div>
       </section>
 
-      {soldProducts.length > 0 && (
+          {soldProducts.length > 0 && (
         <section style={sectionStyle}>
           <div style={sectionHeaderStyle}>
             <div>
@@ -289,7 +293,50 @@ export default function Home() {
         </section>
       )}
 
-      <section style={sellerCtaStyle}>
+      {/* BLOG ATHMOV */}
+      <section style={sectionStyle}>
+  <div style={sectionHeaderStyle}>
+    <div>
+      <p style={eyebrowStyle}>ATHMOV JOURNAL</p>
+      <h2 style={sectionTitleStyle}>
+        Guías para comprar y vender mejor
+      </h2>
+    </div>
+
+    <button
+      onClick={() => router.push("/blog")}
+      style={smallButtonStyle}
+    >
+      Ver blog →
+    </button>
+  </div>
+
+  <div style={gridStyle}>
+    <article
+      onClick={() =>
+        router.push(
+          "/blog/cuando-comprar-vender-palos-golf-segunda-mano"
+        )
+      }
+      style={cardStyle}
+      className="home-card"
+    >
+      <div style={cardContentStyle}>
+        <p style={brandStyle}>GOLF · MERCADO</p>
+
+        <h3 style={cardTitleStyle}>
+          Cuándo comprar y vender palos de golf de segunda mano
+        </h3>
+
+        <p style={categoryTextStyle}>
+          El calendario clave para compradores y vendedores de golf premium.
+        </p>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section style={sellerCtaStyle}>
         <h2 style={ctaTitleStyle}>¿Listo para vender material premium?</h2>
         <p style={ctaTextStyle}>
           Publica tu equipamiento deportivo y llega a compradores que buscan piezas de calidad.
@@ -325,9 +372,9 @@ export default function Home() {
               Vender
             </button>
 
-            <button onClick={() => router.push("/feed")} style={footerLinkStyle}>
-              Feed
-            </button>
+            <button onClick={() => router.push("/blog")} style={footerLinkStyle}>
+  Blog
+</button>
           </div>
 
           <div style={footerColumnStyle}>
