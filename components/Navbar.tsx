@@ -178,6 +178,10 @@ const { data: orders } = await supabase
   COMPRAR
 </Link>
 
+<Link href="/blog" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
+  BLOG
+</Link>
+
     <Link href="/products?category=PADEL" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
       PÁDEL
     </Link>
@@ -317,7 +321,9 @@ const { data: orders } = await supabase
               </Link>
             </>
           )}
-
+<Link href="/blog" style={signInStyle}>
+  BLOG
+</Link>
           <button
             onClick={() => setMenuOpen(true)}
             style={menuButtonStyle}
