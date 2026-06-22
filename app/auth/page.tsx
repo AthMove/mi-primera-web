@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 
 export default function AuthPage() {
   const [mode, setMode] = useState<"login" | "register">("login");
-  const [email, setEmail] = useState("athmovco@gmail.com");
+  const [email, setEmail] = useState("contact@athmov.com");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [debug, setDebug] = useState("");
@@ -47,7 +47,7 @@ export default function AuthPage() {
 
       setDebug(`Sesión iniciada como: ${data.user?.email || cleanEmail}`);
 
-      if (cleanEmail === "athmovco@gmail.com") {
+      if (cleanEmail === "contact@athmov.com") {
         window.location.replace("/products");
         return;
       }

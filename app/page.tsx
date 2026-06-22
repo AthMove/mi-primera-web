@@ -306,8 +306,12 @@ export default function Home() {
             <h3 style={footerLogoStyle}>ATHMOV</h3>
 
             <p style={footerTextStyle}>
-              Marketplace premium de segunda mano para atletas, coleccionistas y amantes del deporte.
-            </p>
+  Marketplace premium de segunda mano para atletas, coleccionistas y amantes del deporte.
+</p>
+
+<a href="mailto:contact@athmov.com" style={footerEmailStyle}>
+  contact@athmov.com
+</a>
           </div>
 
           <div style={footerColumnStyle}>
@@ -361,7 +365,9 @@ export default function Home() {
           </div>
         </div>
 
-        <div style={footerBottomStyle}>©️ 2025 ATHMOV. Todos los derechos reservados.</div>
+       <div style={footerBottomStyle}>
+  © 2025 ATHMOV. Todos los derechos reservados. · Contacto: contact@athmov.com
+</div>
       </footer>
 
       <style>{`
@@ -776,4 +782,12 @@ const footerBottomStyle = {
   textAlign: "center" as const,
   color: "#777",
   fontSize: "13px",
+};
+
+const footerEmailStyle = {
+  display: "inline-block",
+  marginTop: "14px",
+  color: "#111",
+  fontWeight: 900,
+  textDecoration: "none",
 };
