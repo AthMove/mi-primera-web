@@ -6,7 +6,9 @@ export const metadata = {
   title: "ATHMOV",
   description: "Marketplace deportivo premium",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
   },
 };
 
