@@ -176,26 +176,31 @@ export default function GolfVerificationArticlePage() {
       Ver material de golf →
     </a>
   </section>
+<section style={relatedStyle}>
+  <p style={relatedEyebrowStyle}>Más guías ATHMOV</p>
 
-  <section style={relatedStyle}>
-    <p style={relatedEyebrowStyle}>Más guías ATHMOV</p>
+  <div style={relatedGridStyle}>
+    <a
+      href="/blog/como-calcular-precio-palos-golf-segunda-mano"
+      style={relatedCardStyle}
+    >
+      <span style={relatedCategoryStyle}>GOLF · MERCADO</span>
+      <strong style={relatedTitleStyle}>
+        Cómo calcular el precio de palos de golf de segunda mano
+      </strong>
+    </a>
 
-    <div style={relatedGridStyle}>
-      <a href="/blog/como-calcular-precio-palos-golf-segunda-mano" style={relatedCardStyle}>
-        <span style={relatedCategoryStyle}>GOLF · MERCADO</span>
-        <strong style={relatedTitleStyle}>
-          Cómo calcular el precio de palos de golf de segunda mano
-        </strong>
-      </a>
-
-      <a href="/blog/cuando-comprar-vender-palos-golf-segunda-mano" style={relatedCardStyle}>
-        <span style={relatedCategoryStyle}>GOLF · MERCADO</span>
-        <strong style={relatedTitleStyle}>
-          Cuándo comprar y vender palos de golf de segunda mano
-        </strong>
-      </a>
-    </div>
-  </section>
+    <a
+      href="/blog/cuando-comprar-vender-palos-golf-segunda-mano"
+      style={relatedCardStyle}
+    >
+      <span style={relatedCategoryStyle}>GOLF · MERCADO</span>
+      <strong style={relatedTitleStyle}>
+        Cuándo comprar y vender palos de golf de segunda mano
+      </strong>
+    </a>
+  </div>
+</section>
 </article>
     </main>
   );
