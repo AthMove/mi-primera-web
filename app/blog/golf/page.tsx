@@ -12,7 +12,7 @@ const articles = [
     title: "Cómo verificar unos palos de golf originales",
     description:
       "Seriales, acabados, ferrules y detalles para detectar material auténtico.",
-    href: "/blog/como-verificar-palos-golf-originales",
+    href: "/blog/verificar-palos-golf",
     reading: "6 min",
   },
   {
