@@ -2,53 +2,44 @@
 
 import { useRouter } from "next/navigation";
 
-const featuredArticles = [
-  {
-    category: "GOLF · MERCADO",
-    title: "Cuándo comprar y vender palos de golf de segunda mano",
-    text: "El calendario que utilizan los compradores inteligentes para pagar menos y los vendedores para vender más rápido.",
-    href: "/blog/cuando-comprar-vender-palos-golf-segunda-mano",
-    reading: "6 min",
-  },
-  {
-    category: "RUNNING · GUÍA",
-    title: "Qué revisar antes de comprar unas zapatillas de running de segunda mano",
-    text: "Suela, mediasuela, talón y kilómetros: lo que debes comprobar antes de comprar.",
-    href: "/blog/que-revisar-zapatillas-running-segunda-mano",
-    reading: "6 min",
-  },
-  {
-    category: "TENIS · COMPRA",
-    title: "Qué revisar antes de comprar una raqueta de tenis de segunda mano",
-    text: "Marco, grietas, cordaje, grip y señales que deberías revisar antes de comprar.",
-    href: "/blog/que-revisar-raqueta-tenis-segunda-mano",
-    reading: "6 min",
-  },
+const heroTags = [
+  { label: "Golf", href: "/blog/golf" },
+  { label: "Pádel", href: "/blog/padel" },
+  { label: "Tenis", href: "/blog/tenis" },
+  { label: "Running", href: "/blog/running" },
 ];
+
+const featuredArticle = {
+  category: "RUNNING · GUÍA",
+  title: "Qué revisar antes de comprar unas zapatillas de running de segunda mano",
+  text: "Suela, mediasuela, talón y kilómetros: lo que debes comprobar antes de comprar.",
+  href: "/blog/que-revisar-zapatillas-running-segunda-mano",
+  reading: "6 min",
+};
 
 const sports = [
   {
     label: "⛳ GOLF",
-    title: "Guías de Golf",
-    text: "Compra, venta, verificación y valoración de palos de golf.",
+    title: "Golf",
+    text: "Compra, venta y valoración de palos.",
     href: "/blog/golf",
   },
   {
     label: "🏓 PÁDEL",
-    title: "Guías de Pádel",
-    text: "Autenticidad, precios y consejos para palas usadas.",
+    title: "Pádel",
+    text: "Autenticidad, precios y palas usadas.",
     href: "/blog/padel",
   },
   {
     label: "🎾 TENIS",
-    title: "Guías de Tenis",
-    text: "Raquetas originales, compra segura y valoración de segunda mano.",
+    title: "Tenis",
+    text: "Raquetas, verificación y segunda mano.",
     href: "/blog/tenis",
   },
   {
     label: "🏃 RUNNING",
-    title: "Guías de Running",
-    text: "Zapatillas usadas, kilómetros, desgaste y compra inteligente.",
+    title: "Running",
+    text: "Zapatillas, kilómetros y desgaste.",
     href: "/blog/running",
   },
 ];
@@ -57,77 +48,66 @@ const allArticles = [
   {
     category: "GOLF · AUTENTICIDAD",
     title: "Cómo verificar unos palos de golf originales",
-    text: "Seriales, grabados, varillas, grips y señales para detectar falsificaciones.",
     href: "/blog/como-verificar-palos-golf-originales",
     reading: "6 min",
   },
   {
     category: "GOLF · MERCADO",
     title: "Cómo calcular el precio de palos de golf de segunda mano",
-    text: "Guía para valorar drivers, hierros, wedges y sets completos según estado y demanda.",
     href: "/blog/como-calcular-precio-palos-golf-segunda-mano",
     reading: "6 min",
   },
   {
     category: "GOLF · MERCADO",
     title: "Cuándo comprar y vender palos de golf de segunda mano",
-    text: "El calendario que utilizan compradores y vendedores para elegir mejor el momento.",
     href: "/blog/cuando-comprar-vender-palos-golf-segunda-mano",
     reading: "6 min",
   },
   {
     category: "PÁDEL · AUTENTICIDAD",
     title: "Cómo detectar una pala de pádel falsa",
-    text: "Las señales que debes revisar antes de comprar una pala premium usada.",
     href: "/blog/como-detectar-pala-padel-falsa",
     reading: "7 min",
   },
   {
     category: "PÁDEL · MERCADO",
     title: "Cómo valorar una pala de pádel de segunda mano",
-    text: "Marca, modelo, estado, antigüedad y demanda para poner un precio correcto.",
     href: "/blog/como-valorar-pala-padel-segunda-mano",
     reading: "6 min",
   },
   {
     category: "TENIS · AUTENTICIDAD",
     title: "Cómo verificar una raqueta de tenis original",
-    text: "Seriales, peso, balance, pintura y acabados antes de comprar.",
     href: "/blog/como-verificar-raqueta-tenis-original",
     reading: "6 min",
   },
   {
     category: "TENIS · COMPRA",
     title: "Qué revisar antes de comprar una raqueta de tenis de segunda mano",
-    text: "Marco, grietas, cordaje, grip y señales que deberías revisar antes de comprar.",
     href: "/blog/que-revisar-raqueta-tenis-segunda-mano",
     reading: "6 min",
   },
   {
     category: "TENIS · VALORACIÓN",
     title: "Cómo valorar una raqueta de tenis de segunda mano",
-    text: "Calcula el valor real según marca, estado, antigüedad y demanda.",
     href: "/blog/como-valorar-raqueta-tenis-segunda-mano",
     reading: "5 min",
   },
   {
     category: "RUNNING · COMPRA",
     title: "Qué revisar antes de comprar unas zapatillas de running de segunda mano",
-    text: "Suela, mediasuela, talón y kilómetros: lo que debes comprobar antes de comprar.",
     href: "/blog/que-revisar-zapatillas-running-segunda-mano",
     reading: "6 min",
   },
   {
     category: "RUNNING · ESTADO",
     title: "Cómo saber si unas zapatillas de running están agotadas",
-    text: "Detecta pérdida de amortiguación, estabilidad y vida útil.",
     href: "/blog/como-saber-si-zapatillas-running-estan-agotadas",
     reading: "5 min",
   },
   {
     category: "RUNNING · VALORACIÓN",
     title: "Cuántos kilómetros puede tener una zapatilla de running usada",
-    text: "Cómo interpretar los kilómetros y valorar la vida útil restante.",
     href: "/blog/cuantos-kilometros-puede-tener-zapatilla-running-usada",
     reading: "5 min",
   },
@@ -144,42 +124,46 @@ export default function BlogPage() {
         <h1 style={titleStyle}>
           Guías para comprar,
           <br />
-          vender y elegir mejor.
+          vender y valorar mejor.
         </h1>
 
         <p style={textStyle}>
-          Artículos creados por ATHMOV para ayudar a compradores y vendedores de
-          material deportivo premium de segunda mano.
+          Una biblioteca editorial para entender el valor real del material
+          deportivo premium de segunda mano.
         </p>
-      </section>
 
-      <section style={sectionStyle}>
-        <div style={sectionHeaderStyle}>
-          <p style={sectionEyebrowStyle}>Destacados</p>
-          <h2 style={sectionTitleStyle}>Empieza por estas guías</h2>
-        </div>
-
-        <div style={featuredGridStyle}>
-          {featuredArticles.map((article) => (
-            <article
-              key={article.href}
-              onClick={() => router.push(article.href)}
-              style={featuredCardStyle}
-              className="blog-card"
+        <div style={tagRowStyle}>
+          {heroTags.map((tag) => (
+            <button
+              key={tag.href}
+              onClick={() => router.push(tag.href)}
+              style={tagStyle}
             >
-              <div>
-                <p style={cardCategoryStyle}>{article.category}</p>
-                <h3 style={cardTitleStyle}>{article.title}</h3>
-                <p style={cardTextStyle}>{article.text}</p>
-              </div>
-
-              <div style={cardFooterStyle}>
-                <span>{article.reading}</span>
-                <span>Leer guía →</span>
-              </div>
-            </article>
+              {tag.label}
+            </button>
           ))}
         </div>
+      </section>
+
+      <section style={featuredSectionStyle}>
+        <article
+          onClick={() => router.push(featuredArticle.href)}
+          style={heroArticleStyle}
+          className="lift-card"
+        >
+          <div style={heroArticleContentStyle}>
+            <p style={darkCategoryStyle}>{featuredArticle.category}</p>
+
+            <h2 style={heroArticleTitleStyle}>{featuredArticle.title}</h2>
+
+            <p style={heroArticleTextStyle}>{featuredArticle.text}</p>
+          </div>
+
+          <div style={heroArticleFooterStyle}>
+            <span>{featuredArticle.reading}</span>
+            <span>Leer guía →</span>
+          </div>
+        </article>
       </section>
 
       <section style={sectionStyle}>
@@ -199,47 +183,56 @@ export default function BlogPage() {
         </div>
       </section>
 
-      <section style={sectionStyle}>
+      <section style={libraryStyle}>
         <div style={sectionHeaderStyle}>
-          <p style={sectionEyebrowStyle}>Todas las guías</p>
-          <h2 style={sectionTitleStyle}>Biblioteca ATHMOV</h2>
+          <p style={sectionEyebrowStyle}>Biblioteca ATHMOV</p>
+          <h2 style={sectionTitleStyle}>Todas las guías</h2>
         </div>
 
-        <div style={articleGridStyle}>
+        <div style={listStyle}>
           {allArticles.map((article) => (
-            <article
+            <button
               key={article.href}
               onClick={() => router.push(article.href)}
-              style={articleCardStyle}
-              className="blog-card"
+              style={listItemStyle}
+              className="list-item"
             >
               <div>
-                <p style={cardCategoryStyle}>{article.category}</p>
-                <h3 style={smallCardTitleStyle}>{article.title}</h3>
-                <p style={smallCardTextStyle}>{article.text}</p>
+                <p style={listCategoryStyle}>{article.category}</p>
+                <h3 style={listTitleStyle}>{article.title}</h3>
               </div>
 
-              <div style={smallCardFooterStyle}>
-                <span>{article.reading}</span>
-                <span>Leer →</span>
-              </div>
-            </article>
+              <span style={listReadingStyle}>{article.reading} →</span>
+            </button>
           ))}
         </div>
       </section>
 
       <style>{`
-        .blog-card {
+        .lift-card {
           transition: transform 0.25s ease, box-shadow 0.25s ease;
         }
 
-        .blog-card:hover {
-          transform: translateY(-6px);
-          box-shadow: 0 34px 100px rgba(0,0,0,0.10) !important;
+        .lift-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 34px 100px rgba(0,0,0,0.16) !important;
         }
 
-        @media (max-width: 700px) {
-          .blog-title {
+        .list-item {
+          transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .list-item:hover {
+          background: #fff !important;
+          transform: translateX(4px);
+        }
+
+        @media (max-width: 800px) {
+          main {
+            padding: 110px 22px 70px !important;
+          }
+
+          .athmov-blog-title {
             font-size: 46px !important;
             letter-spacing: -2px !important;
           }
@@ -259,7 +252,7 @@ const pageStyle = {
 
 const heroStyle = {
   maxWidth: "1200px",
-  margin: "0 auto 70px",
+  margin: "0 auto 68px",
 };
 
 const eyebrowStyle = {
@@ -271,24 +264,109 @@ const eyebrowStyle = {
 };
 
 const titleStyle = {
-  fontSize: "72px",
-  lineHeight: 1,
+  fontSize: "76px",
+  lineHeight: 0.98,
   letterSpacing: "-4px",
   margin: 0,
   fontWeight: 600,
 };
 
 const textStyle = {
-  maxWidth: "700px",
+  maxWidth: "680px",
   color: "#666",
   fontSize: "18px",
   lineHeight: 1.8,
+  marginTop: "26px",
+};
+
+const tagRowStyle = {
+  display: "flex",
+  flexWrap: "wrap" as const,
+  gap: "10px",
+  marginTop: "30px",
+};
+
+const tagStyle = {
+  border: "1px solid rgba(0,0,0,0.10)",
+  background: "#fff",
+  borderRadius: "999px",
+  padding: "12px 18px",
+  fontSize: "12px",
+  fontWeight: 900,
+  letterSpacing: "1px",
+  cursor: "pointer",
+};
+
+const featuredSectionStyle = {
+  maxWidth: "1200px",
+  margin: "0 auto 74px",
+};
+
+const heroArticleStyle = {
+  minHeight: "430px",
+  background: "#0f0e0c",
+  color: "#fff",
+  borderRadius: "38px",
+  padding: "42px",
+  cursor: "pointer",
+  boxShadow: "0 28px 90px rgba(0,0,0,0.14)",
+  display: "flex",
+  flexDirection: "column" as const,
+  justifyContent: "space-between",
+  position: "relative" as const,
+  overflow: "hidden",
+};
+
+const heroArticleContentStyle = {
+  maxWidth: "780px",
+  position: "relative" as const,
+  zIndex: 2,
+};
+
+const darkCategoryStyle = {
+  fontSize: "11px",
+  letterSpacing: "3px",
+  color: "#c9b896",
+  fontWeight: 900,
+  marginBottom: "20px",
+};
+
+const heroArticleTitleStyle = {
+  fontSize: "52px",
+  lineHeight: 1.02,
+  letterSpacing: "-3px",
+  margin: 0,
+};
+
+const heroArticleTextStyle = {
+  maxWidth: "620px",
+  color: "rgba(255,255,255,0.62)",
+  fontSize: "17px",
+  lineHeight: 1.75,
   marginTop: "24px",
+};
+
+const heroArticleFooterStyle = {
+  position: "relative" as const,
+  zIndex: 2,
+  paddingTop: "24px",
+  borderTop: "1px solid rgba(255,255,255,0.12)",
+  display: "flex",
+  justifyContent: "space-between",
+  gap: "20px",
+  fontSize: "12px",
+  fontWeight: 900,
+  letterSpacing: "1px",
 };
 
 const sectionStyle = {
   maxWidth: "1200px",
-  margin: "0 auto 74px",
+  margin: "0 auto 76px",
+};
+
+const libraryStyle = {
+  maxWidth: "980px",
+  margin: "0 auto",
 };
 
 const sectionHeaderStyle = {
@@ -311,103 +389,6 @@ const sectionTitleStyle = {
   margin: 0,
 };
 
-const featuredGridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))",
-  gap: "24px",
-};
-
-const featuredCardStyle = {
-  minHeight: "360px",
-  background: "#fff",
-  borderRadius: "34px",
-  padding: "34px",
-  cursor: "pointer",
-  border: "1px solid rgba(0,0,0,0.06)",
-  boxShadow: "0 20px 70px rgba(0,0,0,0.04)",
-  display: "flex",
-  flexDirection: "column" as const,
-  justifyContent: "space-between",
-};
-
-const articleGridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))",
-  gap: "18px",
-};
-
-const articleCardStyle = {
-  minHeight: "270px",
-  background: "#fff",
-  borderRadius: "28px",
-  padding: "28px",
-  cursor: "pointer",
-  border: "1px solid rgba(0,0,0,0.06)",
-  boxShadow: "0 16px 50px rgba(0,0,0,0.035)",
-  display: "flex",
-  flexDirection: "column" as const,
-  justifyContent: "space-between",
-};
-
-const cardCategoryStyle = {
-  fontSize: "11px",
-  letterSpacing: "2px",
-  opacity: 0.45,
-  fontWeight: 900,
-  marginBottom: "18px",
-};
-
-const cardTitleStyle = {
-  fontSize: "34px",
-  lineHeight: 1.08,
-  letterSpacing: "-2px",
-  margin: 0,
-};
-
-const smallCardTitleStyle = {
-  fontSize: "25px",
-  lineHeight: 1.12,
-  letterSpacing: "-1px",
-  margin: 0,
-};
-
-const cardTextStyle = {
-  color: "#666",
-  lineHeight: 1.75,
-  marginTop: "18px",
-};
-
-const smallCardTextStyle = {
-  color: "#666",
-  lineHeight: 1.65,
-  marginTop: "14px",
-  fontSize: "14px",
-};
-
-const cardFooterStyle = {
-  marginTop: "34px",
-  paddingTop: "20px",
-  borderTop: "1px solid rgba(0,0,0,0.08)",
-  display: "flex",
-  justifyContent: "space-between",
-  gap: "20px",
-  fontSize: "12px",
-  fontWeight: 900,
-  letterSpacing: "1px",
-};
-
-const smallCardFooterStyle = {
-  marginTop: "26px",
-  paddingTop: "18px",
-  borderTop: "1px solid rgba(0,0,0,0.08)",
-  display: "flex",
-  justifyContent: "space-between",
-  gap: "20px",
-  fontSize: "12px",
-  fontWeight: 900,
-  letterSpacing: "1px",
-};
-
 const sportsGridStyle = {
   display: "grid",
   gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
@@ -417,9 +398,10 @@ const sportsGridStyle = {
 const sportCardStyle = {
   background: "#fff",
   border: "1px solid rgba(0,0,0,0.08)",
-  borderRadius: "24px",
-  padding: "24px",
+  borderRadius: "28px",
+  padding: "26px",
   textDecoration: "none",
+  minHeight: "180px",
 };
 
 const sportLabelStyle = {
@@ -431,32 +413,34 @@ const sportLabelStyle = {
 
 const sportTitleStyle = {
   color: "#111",
-  fontSize: "24px",
-  marginTop: "10px",
-  marginBottom: "8px",
+  fontSize: "28px",
+  marginTop: "14px",
+  marginBottom: "10px",
 };
 
 const sportTextStyle = {
   color: "#666",
-  lineHeight: 1.7,
+  lineHeight: 1.65,
+  margin: 0,
 };
 
 const listStyle = {
-  display: "grid",
-  gap: "12px",
+  borderTop: "1px solid rgba(0,0,0,0.10)",
 };
 
 const listItemStyle = {
-  background: "#fff",
-  border: "1px solid rgba(0,0,0,0.08)",
-  borderRadius: "22px",
-  padding: "22px 24px",
-  textDecoration: "none",
+  width: "100%",
+  background: "transparent",
+  border: "none",
+  borderBottom: "1px solid rgba(0,0,0,0.10)",
+  padding: "24px 0",
+  textAlign: "left" as const,
+  cursor: "pointer",
   color: "#111",
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  gap: "20px",
+  gap: "24px",
 };
 
 const listCategoryStyle = {
@@ -468,8 +452,9 @@ const listCategoryStyle = {
 };
 
 const listTitleStyle = {
-  fontSize: "22px",
-  lineHeight: 1.3,
+  fontSize: "24px",
+  lineHeight: 1.25,
+  letterSpacing: "-0.5px",
   margin: 0,
 };
 
