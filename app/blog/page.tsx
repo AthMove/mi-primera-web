@@ -48,7 +48,7 @@ const allArticles = [
   {
     category: "GOLF · AUTENTICIDAD",
     title: "Cómo verificar unos palos de golf originales",
-    href: "/blog/como-verificar-palos-golf-originales",
+    href: "/blog/verificar-palos-golf",
     reading: "6 min",
   },
   {
