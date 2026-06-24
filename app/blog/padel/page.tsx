@@ -8,40 +8,84 @@ export const metadata = {
 
 const articles = [
   {
+    category: "PÁDEL · AUTENTICIDAD",
     title: "Cómo detectar una pala de pádel falsa",
     description:
-      "Aprende a identificar seriales, acabados y señales de falsificación.",
+      "Seriales, acabados, peso y señales de falsificación antes de comprar.",
     href: "/blog/como-detectar-pala-padel-falsa",
+    reading: "7 min",
   },
   {
-    title: "Cómo calcular el precio de una pala de pádel usada",
+    category: "PÁDEL · VALORACIÓN",
+    title: "Cómo valorar una pala de pádel de segunda mano",
     description:
-      "Guía para valorar una pala según marca, modelo, estado y antigüedad.",
+      "Marca, modelo, estado, antigüedad y demanda para calcular un precio correcto.",
     href: "/blog/como-valorar-pala-padel-segunda-mano",
+    reading: "6 min",
   },
 ];
 
 export default function PadelBlogPage() {
+  const featured = articles[0];
+  const rest = articles.slice(1);
+
   return (
     <main style={pageStyle}>
-      <div style={containerStyle}>
+      <section style={heroStyle}>
+        <Link href="/blog" style={backLinkStyle}>
+          ← Volver al blog
+        </Link>
+
         <p style={eyebrowStyle}>ATHMOV · PÁDEL</p>
 
-        <h1 style={titleStyle}>Blog de Pádel</h1>
+        <h1 style={titleStyle}>
+          Guías de
+          <br />
+          Pádel
+        </h1>
 
         <p style={subtitleStyle}>
-          Consejos para comprar, vender y verificar material de pádel de segunda mano.
+          Autenticidad, precios y consejos para comprar y vender palas de pádel
+          de segunda mano.
         </p>
+      </section>
+
+      <section style={featuredSectionStyle}>
+        <Link href={featured.href} style={featuredCardStyle}>
+          <div>
+            <p style={cardCategoryStyle}>{featured.category}</p>
+            <h2 style={featuredTitleStyle}>{featured.title}</h2>
+            <p style={cardTextStyle}>{featured.description}</p>
+          </div>
+
+          <div style={cardFooterStyle}>
+            <span>{featured.reading}</span>
+            <span>Leer guía →</span>
+          </div>
+        </Link>
+      </section>
+
+      <section style={sectionStyle}>
+        <p style={sectionEyebrowStyle}>Más guías</p>
+        <h2 style={sectionTitleStyle}>Todo sobre Pádel</h2>
 
         <div style={gridStyle}>
-          {articles.map((article) => (
+          {rest.map((article) => (
             <Link key={article.href} href={article.href} style={cardStyle}>
-              <h2 style={cardTitleStyle}>{article.title}</h2>
-              <p style={cardTextStyle}>{article.description}</p>
+              <div>
+                <p style={cardCategoryStyle}>{article.category}</p>
+                <h3 style={cardTitleStyle}>{article.title}</h3>
+                <p style={cardTextStyle}>{article.description}</p>
+              </div>
+
+              <div style={cardFooterStyle}>
+                <span>{article.reading}</span>
+                <span>Leer →</span>
+              </div>
             </Link>
           ))}
         </div>
-      </div>
+      </section>
     </main>
   );
 }
@@ -49,54 +93,145 @@ export default function PadelBlogPage() {
 const pageStyle = {
   minHeight: "100vh",
   background: "#f7f5f0",
+  padding: "130px 40px 90px",
+  fontFamily: "Inter, sans-serif",
+  color: "#111",
 };
 
-const containerStyle = {
-  maxWidth: "900px",
-  margin: "0 auto",
-  padding: "80px 28px",
+const heroStyle = {
+  maxWidth: "1100px",
+  margin: "0 auto 54px",
+};
+
+const backLinkStyle = {
+  display: "inline-block",
+  marginBottom: "34px",
+  color: "#777",
+  textDecoration: "none",
+  fontSize: "13px",
+  fontWeight: 800,
 };
 
 const eyebrowStyle = {
-  fontSize: "11px",
+  fontSize: "12px",
   letterSpacing: "3px",
   textTransform: "uppercase" as const,
   color: "#c9b896",
   fontWeight: 900,
+  marginBottom: "18px",
 };
 
 const titleStyle = {
-  fontSize: "56px",
-  marginTop: "10px",
-  marginBottom: "16px",
+  fontSize: "76px",
+  lineHeight: 1,
+  letterSpacing: "-4px",
+  margin: 0,
+  fontWeight: 600,
 };
 
 const subtitleStyle = {
   color: "#666",
   fontSize: "18px",
-  marginBottom: "40px",
+  lineHeight: 1.8,
+  maxWidth: "680px",
+  marginTop: "24px",
+};
+
+const featuredSectionStyle = {
+  maxWidth: "1100px",
+  margin: "0 auto 70px",
+};
+
+const featuredCardStyle = {
+  minHeight: "360px",
+  background: "#0f0e0c",
+  color: "#fff",
+  borderRadius: "34px",
+  padding: "38px",
+  textDecoration: "none",
+  display: "flex",
+  flexDirection: "column" as const,
+  justifyContent: "space-between",
+};
+
+const featuredTitleStyle = {
+  fontSize: "46px",
+  lineHeight: 1.05,
+  letterSpacing: "-2px",
+  margin: 0,
+  maxWidth: "760px",
+};
+
+const sectionStyle = {
+  maxWidth: "1100px",
+  margin: "0 auto",
+};
+
+const sectionEyebrowStyle = {
+  fontSize: "11px",
+  letterSpacing: "3px",
+  textTransform: "uppercase" as const,
+  color: "#c9b896",
+  fontWeight: 900,
+  marginBottom: "8px",
+};
+
+const sectionTitleStyle = {
+  fontSize: "38px",
+  lineHeight: 1.1,
+  letterSpacing: "-2px",
+  margin: "0 0 22px",
 };
 
 const gridStyle = {
   display: "grid",
-  gap: "16px",
+  gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))",
+  gap: "18px",
 };
 
 const cardStyle = {
+  minHeight: "270px",
   background: "#fff",
   border: "1px solid rgba(0,0,0,0.08)",
-  borderRadius: "24px",
-  padding: "24px",
+  borderRadius: "28px",
+  padding: "28px",
   textDecoration: "none",
+  color: "#111",
+  display: "flex",
+  flexDirection: "column" as const,
+  justifyContent: "space-between",
+};
+
+const cardCategoryStyle = {
+  fontSize: "11px",
+  letterSpacing: "2px",
+  opacity: 0.5,
+  fontWeight: 900,
+  marginBottom: "18px",
 };
 
 const cardTitleStyle = {
-  color: "#111",
-  fontSize: "24px",
-  marginBottom: "8px",
+  fontSize: "28px",
+  lineHeight: 1.12,
+  letterSpacing: "-1px",
+  margin: 0,
 };
 
 const cardTextStyle = {
-  color: "#666",
+  color: "inherit",
+  opacity: 0.65,
   lineHeight: 1.7,
+  marginTop: "16px",
+};
+
+const cardFooterStyle = {
+  marginTop: "30px",
+  paddingTop: "18px",
+  borderTop: "1px solid rgba(255,255,255,0.12)",
+  display: "flex",
+  justifyContent: "space-between",
+  gap: "20px",
+  fontSize: "12px",
+  fontWeight: 900,
+  letterSpacing: "1px",
 };
