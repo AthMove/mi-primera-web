@@ -38,6 +38,13 @@ const articles = [
   href: "/blog/como-valorar-pala-padel-segunda-mano",
   reading: "6 min",
 },
+{
+  category: "RUNNING · GUÍA",
+  title: "Qué revisar antes de comprar unas zapatillas de running de segunda mano",
+  text: "Suela, mediasuela, talón y kilómetros: lo que debes comprobar antes de comprar.",
+  href: "/blog/que-revisar-zapatillas-running-segunda-mano",
+  reading: "6 min",
+},
 ];
 
 export default function BlogPage() {
@@ -107,6 +114,13 @@ export default function BlogPage() {
       Autenticidad, compra y material de segunda mano.
     </p>
   </a>
+  <a href="/blog/running" style={sportCardStyle}>
+  <span style={sportLabelStyle}>🏃 RUNNING</span>
+  <h3 style={sportTitleStyle}>Guías de Running</h3>
+  <p style={sportTextStyle}>
+    Compra inteligente de zapatillas y material de running de segunda mano.
+  </p>
+</a>
 </div>
 
   <div style={relatedGridStyle}>
