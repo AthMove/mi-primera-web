@@ -1,3 +1,4 @@
+import ArticleSEO from "@/components/ArticleSEO";
 export const metadata = {
   title: "Cómo verificar unos palos de golf originales | ATHMOV",
   description: "Guía para comprobar si unos palos de golf son originales.",
@@ -16,35 +17,14 @@ export const metadata = {
   },
 };
 
-const articleSchema = {
-  "@context": "https://schema.org",
-  "@type": "Article",
-  headline: "Cómo verificar unos palos de golf originales",
-  description:
-    "Guía para comprobar si unos palos de golf son originales antes de comprarlos.",
-  image: "https://athmov.com/golf.jpg",
-  author: {
-    "@type": "Organization",
-    name: "ATHMOV",
-  },
-  publisher: {
-    "@type": "Organization",
-    name: "ATHMOV",
-    logo: {
-      "@type": "ImageObject",
-      url: "https://athmov.com/favicon.png",
-    },
-  },
-};
-
 export default function VerificarPalosGolfPage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(articleSchema),
-        }}
+      <ArticleSEO
+        title="Cómo verificar unos palos de golf originales | ATHMOV"
+        description="Guía para comprobar si unos palos de golf son originales."
+        image="/golf.jpg"
+        url="/blog/verificar-palos-golf"
       />
 
       <main style={pageStyle}>
