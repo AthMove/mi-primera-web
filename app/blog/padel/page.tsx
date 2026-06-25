@@ -1,9 +1,25 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Blog de Pádel | ATHMOV",
+  title: "Blog de Pádel | Guías de segunda mano | ATHMOV",
   description:
-    "Guías para comprar, vender, verificar y valorar palas de pádel de segunda mano.",
+    "Guías ATHMOV para comprar, vender, verificar y valorar palas de pádel de segunda mano: autenticidad, precios, estado y consejos de compra.",
+
+  openGraph: {
+    title: "Blog de Pádel | ATHMOV",
+    description:
+      "Guías de compra, venta, autenticidad y valoración de palas de pádel de segunda mano.",
+    type: "website",
+    images: ["/padel.jpg"],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Blog de Pádel | ATHMOV",
+    description:
+      "Guías de pádel de segunda mano: compra, venta, autenticidad y valoración.",
+    images: ["/padel.jpg"],
+  },
 };
 
 const articles = [

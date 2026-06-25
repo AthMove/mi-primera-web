@@ -1,9 +1,25 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Blog de Golf | ATHMOV",
+  title: "Blog de Golf | Guías de segunda mano | ATHMOV",
   description:
-    "Guías de compra, venta, autenticidad y valoración de material de golf de segunda mano.",
+    "Guías ATHMOV para comprar, vender, verificar y valorar material de golf de segunda mano: palos, drivers, hierros, wedges y sets completos.",
+
+  openGraph: {
+    title: "Blog de Golf | ATHMOV",
+    description:
+      "Compra, venta, autenticidad y valoración de material de golf de segunda mano.",
+    type: "website",
+    images: ["/golf.jpg"],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Blog de Golf | ATHMOV",
+    description:
+      "Guías de golf de segunda mano: compra, venta, autenticidad y valoración.",
+    images: ["/golf.jpg"],
+  },
 };
 
 const articles = [
@@ -12,7 +28,7 @@ const articles = [
     title: "Cómo verificar unos palos de golf originales",
     description:
       "Seriales, acabados, ferrules y detalles para detectar material auténtico.",
-    href: "/blog/verificar-palos-golf",
+   href: "/blog/como-verificar-palos-golf-originales",
     reading: "6 min",
   },
   {
