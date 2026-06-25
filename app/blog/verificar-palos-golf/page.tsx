@@ -1,4 +1,5 @@
 import ArticleSEO from "@/components/ArticleSEO";
+import RelatedArticles from "@/components/RelatedArticles";
 export const metadata = {
   title: "Cómo verificar unos palos de golf originales | ATHMOV",
   description: "Guía para comprobar si unos palos de golf son originales.",
@@ -101,6 +102,10 @@ export default function VerificarPalosGolfPage() {
               Ver material de golf →
             </a>
           </section>
+          <RelatedArticles
+  category="golf"
+  currentHref="/blog/verificar-palos-golf"
+/>
         </article>
       </main>
     </>
