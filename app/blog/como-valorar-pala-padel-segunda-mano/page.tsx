@@ -1,11 +1,38 @@
-export const metadata = {
+import type { Metadata } from "next";
+import ArticleSEO from "@/components/ArticleSEO";
+import RelatedArticles from "@/components/RelatedArticles";
+
+export const metadata: Metadata = {
   title: "Cómo calcular el precio de una pala de pádel de segunda mano | ATHMOV",
   description:
-    "Guía ATHMOV para valorar correctamente una pala de pádel usada según marca, modelo, estado y antigüedad.",
+    "Guía ATHMOV para valorar correctamente una pala de pádel usada según marca, estado, modelo y demanda.",
+
+  openGraph: {
+    title: "Cómo calcular el precio de una pala de pádel de segunda mano",
+    description:
+      "Aprende a valorar una pala usada como un profesional.",
+    type: "article",
+    images: ["/padel.jpg"],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Cómo calcular el precio de una pala de pádel usada",
+    description:
+      "Guía ATHMOV para valorar una pala de segunda mano.",
+    images: ["/padel.jpg"],
+  },
 };
 
 export default function PadelPriceArticlePage() {
   return (
+    <>
+<ArticleSEO
+  title="Cómo calcular el precio de una pala de pádel usada"
+  description="Guía ATHMOV para valorar correctamente una pala de pádel de segunda mano."
+  image="/padel.jpg"
+  url="/blog/como-valorar-pala-padel-segunda-mano"
+/>
     <main style={pageStyle}>
       <section style={heroStyle}>
         <div style={heroBackgroundTextStyle}>pádel</div>
@@ -161,28 +188,14 @@ export default function PadelPriceArticlePage() {
       Publicar en ATHMOV →
     </a>
   </section>
-  <section style={relatedStyle}>
-  <p style={relatedEyebrowStyle}>Más guías ATHMOV</p>
-
-  <div style={relatedGridStyle}>
-    <a href="/blog/como-detectar-pala-padel-falsa" style={relatedCardStyle}>
-      <span style={relatedCategoryStyle}>PÁDEL · AUTENTICIDAD</span>
-      <strong style={relatedTitleStyle}>
-        Cómo detectar una pala de pádel falsa
-      </strong>
-    </a>
-
-    <a href="/blog/como-calcular-precio-palos-golf-segunda-mano" style={relatedCardStyle}>
-      <span style={relatedCategoryStyle}>GOLF · MERCADO</span>
-      <strong style={relatedTitleStyle}>
-        Cómo calcular el precio de palos de golf de segunda mano
-      </strong>
-    </a>
-  </div>
-</section>
+  <RelatedArticles
+  category="padel"
+  currentHref="/blog/como-valorar-pala-padel-segunda-mano"
+/>
 </article>
     </main>
-  );
+  </>
+);
 }
 
 function TimelineRow({
@@ -638,48 +651,4 @@ const ctaButtonStyle = {
   padding: "15px 24px",
   textDecoration: "none",
   fontWeight: 900,
-};
-
-const relatedStyle = {
-  marginTop: "54px",
-  paddingTop: "34px",
-  borderTop: "1px solid rgba(0,0,0,0.08)",
-};
-
-const relatedEyebrowStyle = {
-  fontSize: "11px",
-  letterSpacing: "3px",
-  textTransform: "uppercase" as const,
-  color: "#777",
-  fontWeight: 900,
-  marginBottom: "18px",
-};
-
-const relatedGridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
-  gap: "14px",
-};
-
-const relatedCardStyle = {
-  background: "#fff",
-  border: "1px solid rgba(0,0,0,0.08)",
-  borderRadius: "20px",
-  padding: "20px",
-  textDecoration: "none",
-  color: "#111",
-};
-
-const relatedCategoryStyle = {
-  display: "block",
-  fontSize: "10px",
-  letterSpacing: "2px",
-  color: "#c9b896",
-  fontWeight: 900,
-  marginBottom: "10px",
-};
-
-const relatedTitleStyle = {
-  fontSize: "18px",
-  lineHeight: 1.35,
 };
