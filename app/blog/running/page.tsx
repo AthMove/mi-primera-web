@@ -1,9 +1,25 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Blog de Running | ATHMOV",
+  title: "Blog de Running | Guías de segunda mano | ATHMOV",
   description:
-    "Guías para comprar, vender y revisar zapatillas y material de running de segunda mano.",
+    "Guías ATHMOV para comprar, vender y valorar zapatillas de running de segunda mano: desgaste, kilómetros, amortiguación y consejos de compra.",
+
+  openGraph: {
+    title: "Blog de Running | ATHMOV",
+    description:
+      "Guías de running de segunda mano: compra, valoración y revisión de zapatillas.",
+    type: "website",
+    images: ["/running.jpg"],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Blog de Running | ATHMOV",
+    description:
+      "Guías de running de segunda mano: desgaste, kilómetros y valoración.",
+    images: ["/running.jpg"],
+  },
 };
 
 const articles = [
