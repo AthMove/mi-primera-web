@@ -1,14 +1,44 @@
-export const metadata = {
+import type { Metadata } from "next";
+import ArticleSEO from "@/components/ArticleSEO";
+import RelatedArticles from "@/components/RelatedArticles";
+
+export const metadata: Metadata = {
   title:
     "Qué revisar antes de comprar unas zapatillas de running de segunda mano | ATHMOV",
   description:
     "Guía ATHMOV para comprobar el estado real de unas zapatillas de running usadas antes de comprarlas.",
+
+  openGraph: {
+    title:
+      "Qué revisar antes de comprar unas zapatillas de running de segunda mano",
+    description:
+      "Guía ATHMOV para revisar unas zapatillas de running usadas antes de comprarlas.",
+    type: "article",
+    images: ["/running.jpg"],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title:
+      "Qué revisar antes de comprar unas zapatillas de running usadas",
+    description:
+      "Guía ATHMOV para revisar unas zapatillas de running usadas.",
+    images: ["/running.jpg"],
+  },
 };
 
 export default function RunningSecondHandArticlePage() {
   return (
-    <main style={pageStyle}>
-      <section style={heroStyle}>
+    <>
+<ArticleSEO
+  title="Qué revisar antes de comprar unas zapatillas de running usadas"
+  description="Guía ATHMOV para comprobar el estado real de unas zapatillas de running de segunda mano."
+  image="/running.jpg"
+  url="/blog/que-revisar-zapatillas-running-segunda-mano"
+/>
+
+<main style={pageStyle}>
+  <section style={heroStyle}>
         <div style={heroBackgroundTextStyle}>running</div>
         <div style={wrapStyle}>
 
@@ -251,9 +281,14 @@ export default function RunningSecondHandArticlePage() {
   Ver Running →
 </a>
         </section>
+        <RelatedArticles
+  category="running"
+  currentHref="/blog/que-revisar-zapatillas-running-segunda-mano"
+/>
       </article>
-    </main>
-  );
+ </main>
+</>
+);
 }
 
 function TimelineRow({
