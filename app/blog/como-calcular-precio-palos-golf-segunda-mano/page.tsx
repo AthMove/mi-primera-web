@@ -1,3 +1,5 @@
+import ArticleSEO from "@/components/ArticleSEO";
+import RelatedArticles from "@/components/RelatedArticles";
 export const metadata = {
   title: "Cómo calcular el precio de palos de golf de segunda mano | ATHMOV",
   description:
@@ -6,7 +8,15 @@ export const metadata = {
 
 export default function GolfPriceArticlePage() {
   return (
-    <main style={pageStyle}>
+    <>
+      <ArticleSEO
+        title="Cómo calcular el precio de palos de golf de segunda mano"
+        description="Guía ATHMOV para valorar correctamente palos de golf usados según marca, modelo, estado, antigüedad y demanda."
+        image="/golf.jpg"
+        url="/blog/como-calcular-precio-palos-golf-segunda-mano"
+      />
+
+      <main style={pageStyle}>
       <section style={heroStyle}>
         <div style={heroBackgroundTextStyle}>golf</div>
 
@@ -272,33 +282,13 @@ export default function GolfPriceArticlePage() {
             Publicar en ATHMOV →
           </a>
         </section>
-        <section style={relatedStyle}>
-  <p style={relatedEyebrowStyle}>Más guías ATHMOV</p>
-
-  <div style={relatedGridStyle}>
-    <a
-      href="/blog/cuando-comprar-vender-palos-golf-segunda-mano"
-      style={relatedCardStyle}
-    >
-      <span style={relatedCategoryStyle}>GOLF · MERCADO</span>
-      <strong style={relatedTitleStyle}>
-        Cuándo comprar y vender palos de golf de segunda mano
-      </strong>
-    </a>
-
-    <a
-      href="/blog/como-valorar-pala-padel-segunda-mano"
-      style={relatedCardStyle}
-    >
-      <span style={relatedCategoryStyle}>PÁDEL · MERCADO</span>
-      <strong style={relatedTitleStyle}>
-        Cómo calcular el precio de una pala de pádel usada
-      </strong>
-    </a>
-  </div>
-</section>
+<RelatedArticles
+  category="golf"
+  currentHref="/blog/como-calcular-precio-palos-golf-segunda-mano"
+/>
       </article>
-    </main>
+      </main>
+    </>
   );
 }
 
