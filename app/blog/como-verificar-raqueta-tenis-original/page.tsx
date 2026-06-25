@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import ArticleSEO from "@/components/ArticleSEO";
+import RelatedArticles from "@/components/RelatedArticles";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Cómo verificar una raqueta de tenis original | ATHMOV",
   description:
     "Guía para comprobar si una raqueta de tenis es original. Seriales, códigos de fabricante, acabados y señales de falsificación.",
@@ -10,13 +12,28 @@ export const metadata = {
       "Todo lo que necesitas comprobar antes de comprar una raqueta de segunda mano.",
     siteName: "ATHMOV",
     type: "article",
+    images: ["/tennis.jpg"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Cómo verificar una raqueta de tenis original",
+    description:
+      "Todo lo que necesitas comprobar antes de comprar una raqueta de segunda mano.",
+    images: ["/tennis.jpg"],
   },
 };
 
 export default function ComoDetectarPalaFalsa() {
-  return (
-    <>
-      <style>{`
+ return (
+  <>
+    <ArticleSEO
+      title="Cómo verificar una raqueta de tenis original"
+      description="Guía para comprobar si una raqueta de tenis es original antes de comprarla de segunda mano."
+      image="/tennis.jpg"
+      url="/blog/como-verificar-raqueta-tenis-original"
+    />
+
+    <style>{`
       @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
         /* ── RESET ── */
@@ -463,26 +480,6 @@ export default function ComoDetectarPalaFalsa() {
           </div>
         </header>
 
-        <section style={relatedStyle}>
-  <p style={relatedEyebrowStyle}>Más guías ATHMOV</p>
-
-  <div style={relatedGridStyle}>
-    <a href="/blog/como-detectar-pala-padel-falsa" style={relatedCardStyle}>
-      <span style={relatedCategoryStyle}>PÁDEL · AUTENTICIDAD</span>
-      <strong style={relatedTitleStyle}>
-        Cómo detectar una pala de pádel falsa
-      </strong>
-    </a>
-
-    <a href="/blog/como-calcular-precio-palos-golf-segunda-mano" style={relatedCardStyle}>
-      <span style={relatedCategoryStyle}>GOLF · MERCADO</span>
-      <strong style={relatedTitleStyle}>
-        Cómo calcular el precio de palos de golf de segunda mano
-      </strong>
-    </a>
-  </div>
-</section>
-
         {/* ── ARTICLE ── */}
         <main className="article-wrap">
 
@@ -771,42 +768,10 @@ export default function ComoDetectarPalaFalsa() {
   </div>
 </div>
 
-{/* RELATED */}
-<div className="related">
-  <p className="related-label">Más guías</p>
-
-  <div className="related-grid">
-    <a
-      href="/blog/como-detectar-pala-padel-falsa"
-      className="related-card"
-    >
-      <span className="rc-sport">🏓 Pádel</span>
-
-      <p className="rc-title">
-        Cómo detectar una pala de pádel falsa
-      </p>
-
-      <p className="rc-desc">
-        Serial, peso, acabados y señales de falsificación.
-      </p>
-    </a>
-
-    <a
-      href="/blog/cuando-comprar-vender-palos-golf-segunda-mano"
-      className="related-card"
-    >
-      <span className="rc-sport">⛳ Golf</span>
-
-      <p className="rc-title">
-        Cuándo vender tus palos de golf al mejor precio
-      </p>
-
-      <p className="rc-desc">
-        El calendario del mercado de segunda mano de golf, mes a mes.
-      </p>
-    </a>
-  </div>
-</div>
+<RelatedArticles
+  category="tenis"
+  currentHref="/blog/como-verificar-raqueta-tenis-original"
+/>
         </main>
 
         {/* ── FOOTER ── */}
@@ -825,47 +790,3 @@ export default function ComoDetectarPalaFalsa() {
     </>
   );
 }
-
-const relatedStyle = {
-  marginTop: "54px",
-  paddingTop: "34px",
-  borderTop: "1px solid rgba(0,0,0,0.08)",
-};
-
-const relatedEyebrowStyle = {
-  fontSize: "11px",
-  letterSpacing: "3px",
-  textTransform: "uppercase" as const,
-  color: "#777",
-  fontWeight: 900,
-  marginBottom: "18px",
-};
-
-const relatedGridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
-  gap: "14px",
-};
-
-const relatedCardStyle = {
-  background: "#fff",
-  border: "1px solid rgba(0,0,0,0.08)",
-  borderRadius: "20px",
-  padding: "20px",
-  textDecoration: "none",
-  color: "#111",
-};
-
-const relatedCategoryStyle = {
-  display: "block",
-  fontSize: "10px",
-  letterSpacing: "2px",
-  color: "#c9b896",
-  fontWeight: 900,
-  marginBottom: "10px",
-};
-
-const relatedTitleStyle = {
-  fontSize: "18px",
-  lineHeight: 1.35,
-};
