@@ -259,19 +259,9 @@ export default function GolfSecondHandArticlePage() {
             Publicar en ATHMOV →
           </a>
         </section>
-        <RelatedArticles
-  articles={[
-    {
-      category: "GOLF · AUTENTICIDAD",
-      title: "Cómo verificar unos palos de golf originales",
-      href: "/blog/como-verificar-palos-golf-originales",
-    },
-    {
-      category: "GOLF · MERCADO",
-      title: "Cómo calcular el precio de palos de golf de segunda mano",
-      href: "/blog/como-calcular-precio-palos-golf-segunda-mano",
-    },
-  ]}
+ <RelatedArticles
+  category="golf"
+  currentHref="/blog/cuando-comprar-vender-palos-golf-segunda-mano"
 />
       </article>
     </main>
