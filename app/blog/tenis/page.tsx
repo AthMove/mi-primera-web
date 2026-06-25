@@ -1,9 +1,25 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Blog de Tenis | ATHMOV",
+  title: "Blog de Tenis | Guías de segunda mano | ATHMOV",
   description:
-    "Guías para verificar, comprar y vender material de tenis de segunda mano.",
+    "Guías ATHMOV para verificar, comprar, vender y valorar raquetas de tenis de segunda mano: autenticidad, estado, precio y consejos de compra.",
+
+  openGraph: {
+    title: "Blog de Tenis | ATHMOV",
+    description:
+      "Guías de tenis de segunda mano: autenticidad, compra segura y valoración de raquetas.",
+    type: "website",
+    images: ["/tennis.jpg"],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Blog de Tenis | ATHMOV",
+    description:
+      "Guías de tenis de segunda mano: verificación, compra y valoración.",
+    images: ["/tennis.jpg"],
+  },
 };
 
 const articles = [
