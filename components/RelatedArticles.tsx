@@ -27,6 +27,11 @@ golf: [
   title: "Qué revisar antes de comprar unos hierros de golf de segunda mano",
   href: "/blog/que-revisar-hierros-golf-segunda-mano",
 },
+{
+  category: "GOLF · COMPRA",
+  title: "Qué revisar antes de comprar un putter de golf de segunda mano",
+  href: "/blog/que-revisar-putter-golf-segunda-mano",
+},
 ],
 
   padel: [

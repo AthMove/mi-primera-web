@@ -63,6 +63,14 @@ const articles = [
   href: "/blog/que-revisar-hierros-golf-segunda-mano",
   reading: "6 min",
 },
+{
+  category: "GOLF · COMPRA",
+  title: "Qué revisar antes de comprar un putter de golf de segunda mano",
+  description:
+    "Cara, inserto, hosel, varilla y grip: lo que debes comprobar antes de comprar un putter usado.",
+  href: "/blog/que-revisar-putter-golf-segunda-mano",
+  reading: "6 min",
+},
 ];
 
 export default function GolfBlogPage() {
