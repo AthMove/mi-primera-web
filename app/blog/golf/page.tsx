@@ -71,6 +71,14 @@ const articles = [
   href: "/blog/que-revisar-putter-golf-segunda-mano",
   reading: "6 min",
 },
+{
+  category: "GOLF · AUTENTICIDAD",
+  title: "Cómo saber si un driver de golf es original",
+  description:
+    "Número de serie, acabados, hosel, varilla y señales para detectar un driver falso.",
+  href: "/blog/como-saber-si-un-driver-golf-es-original",
+  reading: "6 min",
+},
 ];
 
 export default function GolfBlogPage() {

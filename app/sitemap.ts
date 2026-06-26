@@ -53,6 +53,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   url: `${baseUrl}/blog/que-revisar-putter-golf-segunda-mano`,
   lastModified: new Date(),
 },
+{
+  url: `${baseUrl}/blog/como-saber-si-un-driver-golf-es-original`,
+  lastModified: new Date(),
+},
 
     // Pádel
     {
