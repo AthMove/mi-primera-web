@@ -57,6 +57,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   url: `${baseUrl}/blog/como-saber-si-un-driver-golf-es-original`,
   lastModified: new Date(),
 },
+{
+  url: `${baseUrl}/blog/que-revisar-hierros-golf-segunda-mano`,
+  lastModified: new Date(),
+},
 
     // Pádel
     {

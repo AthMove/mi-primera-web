@@ -79,6 +79,14 @@ const articles = [
   href: "/blog/como-saber-si-un-driver-golf-es-original",
   reading: "6 min",
 },
+{
+  category: "GOLF · COMPRA",
+  title: "Qué revisar antes de comprar unos hierros de golf de segunda mano",
+  description:
+    "Cara, estrías, varillas, ferrules y grips: todo lo que debes revisar antes de comprar unos hierros usados.",
+  href: "/blog/que-revisar-hierros-golf-segunda-mano",
+  reading: "6 min",
+},
 ];
 
 export default function GolfBlogPage() {

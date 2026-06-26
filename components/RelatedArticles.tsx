@@ -37,6 +37,11 @@ golf: [
   title: "Cómo saber si un driver de golf es original",
   href: "/blog/como-saber-si-un-driver-golf-es-original",
 },
+{
+  category: "GOLF · COMPRA",
+  title: "Qué revisar antes de comprar unos hierros de golf de segunda mano",
+  href: "/blog/que-revisar-hierros-golf-segunda-mano",
+},
 ],
 
   padel: [
