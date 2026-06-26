@@ -31,6 +31,7 @@ export default function ComoDetectarPalaFalsa() {
       description="Guía para comprobar si una raqueta de tenis es original antes de comprarla de segunda mano."
       image="/tennis.jpg"
       url="/blog/como-verificar-raqueta-tenis-original"
+      category="tenis"
     />
 
     <style>{`

@@ -31,6 +31,7 @@ export default function ComoDetectarPalaFalsa() {
         description="Guía completa para verificar la autenticidad de una pala de pádel antes de comprarla de segunda mano."
         image="/padel.jpg"
         url="/blog/como-detectar-pala-padel-falsa"
+        category="padel"
       />
 
       <style>{`

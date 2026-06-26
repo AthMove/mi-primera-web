@@ -14,6 +14,7 @@ export default function GolfPriceArticlePage() {
         description="Guía ATHMOV para valorar correctamente palos de golf usados según marca, modelo, estado, antigüedad y demanda."
         image="/golf.jpg"
         url="/blog/como-calcular-precio-palos-golf-segunda-mano"
+          category="golf"
       />
 
       <main style={pageStyle}>

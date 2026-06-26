@@ -35,6 +35,7 @@ export default function RunningSecondHandArticlePage() {
   description="Guía ATHMOV para comprobar el estado real de unas zapatillas de running de segunda mano."
   image="/running.jpg"
   url="/blog/que-revisar-zapatillas-running-segunda-mano"
+  category="running"
 />
 
 <main style={pageStyle}>

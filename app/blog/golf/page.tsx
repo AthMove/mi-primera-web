@@ -28,7 +28,15 @@ const articles = [
     title: "Cómo verificar unos palos de golf originales",
     description:
       "Seriales, acabados, ferrules y detalles para detectar material auténtico.",
-   href: "/blog/como-verificar-palos-golf-originales",
+    href: "/blog/verificar-palos-golf",
+    reading: "6 min",
+  },
+  {
+    category: "GOLF · COMPRA",
+    title: "Qué revisar antes de comprar un driver de golf de segunda mano",
+    description:
+      "Cara, corona, varilla, grip y señales de desgaste antes de comprar un driver usado.",
+    href: "/blog/que-revisar-driver-golf-segunda-mano",
     reading: "6 min",
   },
   {
@@ -47,6 +55,14 @@ const articles = [
     href: "/blog/como-calcular-precio-palos-golf-segunda-mano",
     reading: "6 min",
   },
+  {
+  category: "GOLF · COMPRA",
+  title: "Qué revisar antes de comprar unos hierros de golf de segunda mano",
+  description:
+    "Cara, estrías, suela, varillas y grips: lo que debes comprobar antes de comprar unos hierros usados.",
+  href: "/blog/que-revisar-hierros-golf-segunda-mano",
+  reading: "6 min",
+},
 ];
 
 export default function GolfBlogPage() {

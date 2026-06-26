@@ -1,23 +1,33 @@
 import Link from "next/link";
 
 const relatedByCategory = {
-  golf: [
-    {
-      category: "GOLF · AUTENTICIDAD",
-      title: "Cómo verificar unos palos de golf originales",
-      href: "/blog/verificar-palos-golf",
-    },
-    {
-      category: "GOLF · MERCADO",
-      title: "Cómo calcular el precio de palos de golf de segunda mano",
-      href: "/blog/como-calcular-precio-palos-golf-segunda-mano",
-    },
-    {
-      category: "GOLF · MERCADO",
-      title: "Cuándo comprar y vender palos de golf de segunda mano",
-      href: "/blog/cuando-comprar-vender-palos-golf-segunda-mano",
-    },
-  ],
+golf: [
+  {
+    category: "GOLF · AUTENTICIDAD",
+    title: "Cómo verificar unos palos de golf originales",
+    href: "/blog/verificar-palos-golf",
+  },
+  {
+    category: "GOLF · COMPRA",
+    title: "Qué revisar antes de comprar un driver de golf de segunda mano",
+    href: "/blog/que-revisar-driver-golf-segunda-mano",
+  },
+  {
+    category: "GOLF · VALORACIÓN",
+    title: "Cómo calcular el precio de palos de golf de segunda mano",
+    href: "/blog/como-calcular-precio-palos-golf-segunda-mano",
+  },
+  {
+    category: "GOLF · MERCADO",
+    title: "Cuándo comprar y vender palos de golf de segunda mano",
+    href: "/blog/cuando-comprar-vender-palos-golf-segunda-mano",
+  },
+  {
+  category: "GOLF · COMPRA",
+  title: "Qué revisar antes de comprar unos hierros de golf de segunda mano",
+  href: "/blog/que-revisar-hierros-golf-segunda-mano",
+},
+],
 
   padel: [
     {

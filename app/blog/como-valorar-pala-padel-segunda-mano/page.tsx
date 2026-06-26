@@ -32,6 +32,7 @@ export default function PadelPriceArticlePage() {
   description="Guía ATHMOV para valorar correctamente una pala de pádel de segunda mano."
   image="/padel.jpg"
   url="/blog/como-valorar-pala-padel-segunda-mano"
+  category="padel"
 />
     <main style={pageStyle}>
       <section style={heroStyle}>
