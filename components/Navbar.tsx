@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 export default function Navbar() {
@@ -13,6 +13,12 @@ export default function Navbar() {
   const [ordersCount, setOrdersCount] = useState(0);
   const [notificationsCount, setNotificationsCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+const [showResults, setShowResults] = useState(false);
+const [scrolled, setScrolled] = useState(false);
+
+const searchRef = useRef<HTMLDivElement>(null);
 
   const updateCartCount = useCallback(() => {
     const cart = localStorage.getItem("athmov_cart");
@@ -110,6 +116,54 @@ const { data: orders } = await supabase
     window.location.href = "/";
   };
 
+  const handleSearch = (e: React.FormEvent) => {
+  e.preventDefault();
+
+  const query = searchQuery.trim();
+
+  if (!query) return;
+
+  window.location.href = `/products?search=${encodeURIComponent(query)}`;
+};
+
+const searchProducts = async (value: string) => {
+  setSearchQuery(value);
+
+  if (value.trim().length < 2) {
+    setSearchResults([]);
+    setShowResults(false);
+    return;
+  }
+
+ const { data } = await supabase
+  .from("products")
+  .select("id,title,brand,image,price")
+  .eq("moderation_status", "approved")
+  .or(
+    `title.ilike.%${value}%,brand.ilike.%${value}%,category.ilike.%${value}%`
+  )
+  .limit(5);
+
+  setSearchResults(data || []);
+  setShowResults(true);
+};
+
+useEffect(() => {
+  const handleClickOutside = (event: MouseEvent) => {
+    if (
+      searchRef.current &&
+      !searchRef.current.contains(event.target as Node)
+    ) {
+      setShowResults(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+
+  return () =>
+    document.removeEventListener("mousedown", handleClickOutside);
+}, []);
+
  useEffect(() => {
   updateCartCount();
   loadNotifications();
@@ -124,6 +178,16 @@ const { data: orders } = await supabase
     loadNotifications();
   }
 );
+
+useEffect(() => {
+  const onScroll = () => {
+    setScrolled(window.scrollY > 40);
+  };
+
+  window.addEventListener("scroll", onScroll);
+
+  return () => window.removeEventListener("scroll", onScroll);
+}, []);
 
     const channel = supabase
       .channel("navbar-notifications")
@@ -169,10 +233,15 @@ const { data: orders } = await supabase
   }, [loadNotifications, updateCartCount]);
 
   const badge = (count: number) => (count > 0 ? ` (${count})` : "");
+  const safeImage = (src?: string) => {
+  return src?.startsWith("http") || src?.startsWith("/") ? src : "/logo.png";
+};
 
  const mobileLinks = (
   <>
-    <p style={drawerSectionTitleStyle}>MARKETPLACE</p>
+    <p style={drawerSectionTitleStyle}>
+  🛍️ MARKETPLACE
+</p>
 
     <Link href="/products" style={drawerLinkStyle}>
   COMPRAR
@@ -190,15 +259,17 @@ const { data: orders } = await supabase
       GOLF
     </Link>
 
-    <Link href="/products?category=TENNIS" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-      TENIS
-    </Link>
+   <Link href="/products?category=TENIS" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
+  TENIS
+</Link>
 
     <Link href="/products?category=RUNNING" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
       RUNNING
     </Link>
 
-    <p style={drawerSectionTitleStyle}>SELLER</p>
+    <p style={drawerSectionTitleStyle}>
+  💼 SELLER
+</p>
 
     <Link href="/sell" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
       VENDER
@@ -228,7 +299,9 @@ const { data: orders } = await supabase
       </>
     )}
 
-    <p style={drawerSectionTitleStyle}>ACCOUNT</p>
+    <p style={drawerSectionTitleStyle}>
+  👤 ACCOUNT
+</p>
 
     <Link href="/cart" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
       CARRITO ({cartCount})
@@ -272,7 +345,15 @@ const { data: orders } = await supabase
 
   return (
     <>
-      <nav style={navStyle} className="athmov-navbar">
+      <nav
+  style={{
+    ...navStyle,
+    padding: scrolled ? "0 18px" : "0 22px",
+    height: scrolled ? 74 : 90,
+    transition: "all .28s ease",
+  }}
+  className="athmov-navbar"
+>
         <Link href="/" style={logoStyle}>
           <Image
             src="/logo.png"
@@ -291,24 +372,85 @@ const { data: orders } = await supabase
           <Link href="/cart" style={cartLinkStyle}>
             CARRITO ({cartCount})
           </Link>
+          <Link href="/products" style={navMainLinkStyle}>
+  Comprar
+</Link>
+
+<Link href="/sell" style={navMainLinkStyle}>
+  Vender
+</Link>
+
+<Link href="/blog" style={navMainLinkStyle}>
+  Blog
+</Link>
+
+<div
+  ref={searchRef}
+  style={searchWrapperStyle}
+>
+  <form onSubmit={handleSearch} style={searchFormStyle}>
+    <input
+      value={searchQuery}
+      onChange={(e) => searchProducts(e.target.value)}
+      onFocus={() => {
+        if (searchResults.length > 0) setShowResults(true);
+      }}
+      placeholder="Buscar palas, drivers, zapatillas..."
+      style={searchInputStyle}
+    />
+
+    <button type="submit" style={searchButtonStyle}>
+      Buscar
+    </button>
+  </form>
+
+  {showResults && searchResults.length > 0 && (
+    <div style={searchDropdownStyle}>
+      {searchResults.map((product) => (
+        <Link
+          key={product.id}
+          href={`/products/${product.id}`}
+          style={searchItemStyle}
+          onClick={() => setShowResults(false)}
+        >
+          <Image
+            src={safeImage(product.image)}
+            alt={product.title}
+            width={56}
+            height={56}
+            style={{
+              borderRadius: 12,
+              objectFit: "cover",
+            }}
+          />
+
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 800 }}>
+              {product.title}
+            </div>
+
+            <div
+              style={{
+                fontSize: 13,
+                color: "#666",
+              }}
+            >
+              {product.brand}
+            </div>
+          </div>
+
+          <strong>€{product.price}</strong>
+        </Link>
+      ))}
+    </div>
+  )}
+</div>
 
           {userEmail ? (
             <>
-              <Link href="/favorites" style={signInStyle}>
-                FAVORITOS
-              </Link>
-
-              <Link href="/messages" style={signInStyle}>
-                MENSAJES{badge(messagesCount)}
-              </Link>
-
-              <Link href="/offers" style={signInStyle}>
-                OFERTAS{badge(offersCount)}
-              </Link>
-
-              <Link href="/orders" style={signInStyle}>
-                PEDIDOS{badge(ordersCount)}
-              </Link>
+              <Link href="/account" style={signInStyle}>
+  CUENTA
+</Link>
             </>
           ) : (
             <>
@@ -321,9 +463,7 @@ const { data: orders } = await supabase
               </Link>
             </>
           )}
-<Link href="/blog" style={signInStyle}>
-  BLOG
-</Link>
+
           <button
             onClick={() => setMenuOpen(true)}
             style={menuButtonStyle}
@@ -345,16 +485,38 @@ const { data: orders } = await supabase
         <div style={overlayStyle} onClick={() => setMenuOpen(false)}>
           <aside style={drawerStyle} onClick={(e) => e.stopPropagation()}>
             <div style={drawerHeaderStyle}>
-              <span style={drawerTitleStyle}>ATHMOV</span>
+              <div>
+  <div style={drawerTitleStyle}>ATHMOV</div>
+
+  <div style={drawerSubtitleStyle}>
+    Marketplace Premium
+  </div>
+</div>
 
               <button onClick={() => setMenuOpen(false)} style={closeButtonStyle}>
                 ✕
               </button>
             </div>
 
-            <div style={drawerLinksStyle}>
-              {mobileLinks}
-            </div>
+           <div style={drawerLinksStyle}>
+
+  <div style={drawerHeroStyle}>
+    <div style={drawerHeroTitleStyle}>
+      Descubre ATHMOV
+    </div>
+
+    <div style={drawerHeroTextStyle}>
+      Compra y vende material deportivo premium de segunda mano.
+    </div>
+
+    <Link href="/products" style={drawerHeroButtonStyle}>
+      Explorar Marketplace →
+    </Link>
+  </div>
+
+  {mobileLinks}
+
+</div>
           </aside>
         </div>
       )}
@@ -392,7 +554,7 @@ const { data: orders } = await supabase
 }
 
 const navStyle = {
-  position: "sticky" as const,
+  position: "fixed" as const,
   top: "16px",
   zIndex: 100,
   backdropFilter: "blur(20px)",
@@ -405,6 +567,10 @@ const navStyle = {
   justifyContent: "space-between",
   padding: "0 22px",
   gap: "20px",
+  left: "50%",
+transform: "translateX(-50%)",
+width: "calc(100% - 40px)",
+maxWidth: "1450px",
 };
 
 const logoStyle = {
@@ -500,6 +666,13 @@ const drawerTitleStyle = {
   letterSpacing: "2px",
 };
 
+const drawerSubtitleStyle = {
+  fontSize: "12px",
+  color: "#777",
+  marginTop: "4px",
+  letterSpacing: "1px",
+};
+
 const closeButtonStyle = {
   background: "#111",
   color: "#fff",
@@ -513,16 +686,20 @@ const closeButtonStyle = {
 const drawerLinksStyle = {
   display: "flex",
   flexDirection: "column" as const,
-  gap: "18px",
+  gap: "10px",
   paddingBottom: "80px",
 };
 
 const drawerLinkStyle = {
   textDecoration: "none",
   color: "#111",
-  fontSize: "18px",
-  fontWeight: 800,
-  letterSpacing: "1.8px",
+  fontSize: "16px",
+  fontWeight: 850,
+  letterSpacing: "1.2px",
+  background: "#f7f7f4",
+  border: "1px solid rgba(0,0,0,0.06)",
+  borderRadius: "18px",
+  padding: "16px 18px",
 };
 
 const drawerButtonStyle = {
@@ -545,4 +722,100 @@ const drawerSectionTitleStyle = {
   opacity: 0.35,
   marginTop: "18px",
   marginBottom: "-4px",
+};
+
+const navMainLinkStyle = {
+  textDecoration: "none",
+  color: "#111",
+  fontSize: "12px",
+  fontWeight: 900,
+  letterSpacing: "1.3px",
+  textTransform: "uppercase" as const,
+};
+
+const searchFormStyle = {
+  display: "flex",
+  alignItems: "center",
+  background: "#fff",
+  border: "1px solid rgba(0,0,0,0.08)",
+  borderRadius: "999px",
+  padding: "4px",
+  minWidth: "420px",
+};
+
+const searchInputStyle = {
+  border: "none",
+  outline: "none",
+  background: "transparent",
+  padding: "10px 12px",
+  fontSize: "15px",
+  flex: 1,
+};
+
+const searchButtonStyle = {
+  border: "none",
+  background: "#111",
+  color: "#fff",
+  borderRadius: "999px",
+ padding: "10px 18px",
+  fontSize: "11px",
+  fontWeight: 900,
+  cursor: "pointer",
+};
+
+const searchWrapperStyle = {
+  position: "relative" as const,
+};
+
+const searchDropdownStyle = {
+  position: "absolute" as const,
+  top: "110%",
+  left: 0,
+  width: "100%",
+  background: "#fff",
+  borderRadius: "22px",
+  overflow: "hidden",
+  boxShadow: "0 25px 70px rgba(0,0,0,0.12)",
+  border: "1px solid rgba(0,0,0,0.08)",
+  zIndex: 999,
+};
+
+const searchItemStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: "14px",
+  padding: "14px",
+  textDecoration: "none",
+  color: "#111",
+  borderBottom: "1px solid rgba(0,0,0,0.05)",
+};
+
+const drawerHeroStyle = {
+  background: "linear-gradient(135deg,#111,#2b2b2b)",
+  color: "#fff",
+  borderRadius: "24px",
+  padding: "24px",
+  marginBottom: "20px",
+};
+
+const drawerHeroTitleStyle = {
+  fontSize: "22px",
+  fontWeight: 900,
+  marginBottom: "10px",
+};
+
+const drawerHeroTextStyle = {
+  color: "rgba(255,255,255,.75)",
+  lineHeight: 1.6,
+  marginBottom: "20px",
+};
+
+const drawerHeroButtonStyle = {
+  display: "inline-block",
+  background: "#fff",
+  color: "#111",
+  textDecoration: "none",
+  borderRadius: "999px",
+  padding: "12px 18px",
+  fontWeight: 900,
 };

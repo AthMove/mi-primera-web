@@ -68,6 +68,17 @@ export default function Home() {
     },
   ];
 
+  const popularBrands = [
+  "TaylorMade",
+  "Callaway",
+  "Ping",
+  "Titleist",
+  "Bullpadel",
+  "Nox",
+  "Nike",
+  "ASICS",
+];
+
   return (
     <main style={pageStyle} className="home-page">
       <section style={heroStyle} className="hero-section">
@@ -85,23 +96,19 @@ export default function Home() {
             vendedores y coleccionistas de confianza.
           </p>
 
-          <div style={heroActionsStyle}>
-            <button onClick={() => router.push("/products")} style={primaryButtonStyle}>
-              Comprar
-            </button>
+ <div style={heroActionsStyle}>
+  <button onClick={() => router.push("/products")} style={primaryButtonStyle}>
+    Comprar
+  </button>
 
-            <button onClick={() => router.push("/feed")} style={secondaryButtonStyle}>
-  Novedades
-</button>
+  <button onClick={() => router.push("/sell")} style={secondaryButtonStyle}>
+    Vender
+  </button>
+</div>
 
-<button onClick={() => router.push("/blog")} style={secondaryButtonStyle}>
-  Blog
-</button>
-
-<button onClick={() => router.push("/sell")} style={secondaryButtonStyle}>
-  Vender
-</button>
-          </div>
+<p style={heroProofStyle}>
+  Material deportivo premium seleccionado · Golf · Pádel · Tenis · Running
+</p>
         </div>
 
         <div style={heroImageStyle} className="hero-image">
@@ -169,22 +176,44 @@ export default function Home() {
               style={cardStyle}
               className="home-card"
             >
-              <div style={cardImageStyle}>
-                <Image
-                  src={safeImage(product.image)}
-                  alt={product.title || "Producto"}
-                  fill
-                  sizes="33vw"
-                  className="card-img"
-                  style={{ objectFit: "cover" }}
-                />
-              </div>
+            <div style={cardImageStyle}>
+  <span style={featuredBadgeStyle}>
+    {product.featured ? "⭐ DESTACADO" : "🔥 NUEVO"}
+  </span>
 
-              <div style={cardContentStyle}>
-                <p style={brandStyle}>{product.brand || "ATHMOV"}</p>
-                <h3 style={cardTitleStyle}>{product.title}</h3>
-                <p style={priceStyle}>€{product.price}</p>
-              </div>
+  <button
+    style={favoriteButtonStyle}
+    onClick={(e) => {
+      e.stopPropagation();
+    }}
+  >
+    ♡
+  </button>
+
+  <Image
+    src={safeImage(product.image)}
+    alt={product.title || "Producto"}
+    fill
+    sizes="33vw"
+    className="card-img"
+    style={{ objectFit: "cover" }}
+  />
+</div>
+
+  <div style={cardContentStyle}>
+
+  <p style={brandStyle}>{product.brand || "ATHMOV"}</p>
+
+  <h3 style={cardTitleStyle}>{product.title}</h3>
+
+  <p style={priceStyle}>€{product.price}</p>
+
+  <div style={productFooterStyle}>
+    <span>{product.location || "España"}</span>
+    <span>•</span>
+    <span>{product.condition || "Muy buen estado"}</span>
+  </div>
+</div>
             </article>
           ))}
         </div>
@@ -257,6 +286,32 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      <section style={sectionStyle}>
+  <div style={sectionHeaderStyle}>
+    <div>
+      <p style={eyebrowStyle}>MARCAS</p>
+      <h2 style={sectionTitleStyle}>Marcas populares</h2>
+    </div>
+
+    <button onClick={() => router.push("/products")} style={smallButtonStyle}>
+      Ver todas →
+    </button>
+  </div>
+
+  <div style={brandGridHomeStyle}>
+    {popularBrands.map((brand) => (
+      <button
+        key={brand}
+        onClick={() => router.push(`/products?brand=${encodeURIComponent(brand)}`)}
+        style={brandHomeCardStyle}
+        className="brand-home-card"
+      >
+        {brand}
+      </button>
+    ))}
+  </div>
+</section>
 
           {soldProducts.length > 0 && (
         <section style={sectionStyle}>
@@ -394,19 +449,19 @@ export default function Home() {
           <div style={footerColumnStyle}>
             <p style={footerTitleStyle}>Categorías</p>
 
-            <button onClick={() => router.push("/products?category=padel")} style={footerLinkStyle}>
+            <button onClick={() => router.push("/products?category=PADEL")} style={footerLinkStyle}>
               PADEL
             </button>
 
-            <button onClick={() => router.push("/products?category=golf")} style={footerLinkStyle}>
+            <button onClick={() => router.push("/products?category=GOLF")} style={footerLinkStyle}>
               GOLF
             </button>
 
-            <button onClick={() => router.push("/products?category=tennis")} style={footerLinkStyle}>
+            <button onClick={() => router.push("/products?category=TENIS")} style={footerLinkStyle}>
               TENIS
             </button>
 
-            <button onClick={() => router.push("/products?category=running")} style={footerLinkStyle}>
+            <button onClick={() => router.push("/products?category=RUNNING")} style={footerLinkStyle}>
               RUNNING
             </button>
           </div>
@@ -436,6 +491,15 @@ export default function Home() {
         .hero-image:hover .hero-img {
           transform: scale(1.05);
         }
+
+        .brand-home-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.brand-home-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 26px 80px rgba(0,0,0,0.09) !important;
+}
 
         @media (max-width: 1100px) {
           .hero-section {
@@ -469,6 +533,23 @@ export default function Home() {
     </main>
   );
 }
+
+const brandGridHomeStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))",
+  gap: "16px",
+};
+
+const brandHomeCardStyle = {
+  height: "92px",
+  background: "#fff",
+  border: "1px solid rgba(0,0,0,0.08)",
+  borderRadius: "24px",
+  fontSize: "18px",
+  fontWeight: 900,
+  cursor: "pointer",
+  boxShadow: "0 18px 60px rgba(0,0,0,0.04)",
+};
 
 const pageStyle = {
   minHeight: "100vh",
@@ -837,4 +918,69 @@ const footerEmailStyle = {
   color: "#111",
   fontWeight: 900,
   textDecoration: "none",
+};
+
+const productMetaStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: "14px",
+};
+
+const conditionBadgeStyle = {
+  background: "#f4f4f4",
+  color: "#111",
+  borderRadius: "999px",
+  padding: "6px 12px",
+  fontSize: "11px",
+  fontWeight: 800,
+};
+
+const heroProofStyle = {
+  marginTop: "18px",
+  color: "#777",
+  fontSize: "13px",
+  fontWeight: 800,
+  letterSpacing: "0.3px",
+};
+
+const productFooterStyle = {
+  display: "flex",
+  gap: "8px",
+  alignItems: "center",
+  marginTop: "12px",
+  color: "#777",
+  fontSize: "13px",
+};
+
+const featuredBadgeStyle = {
+  position: "absolute" as const,
+  top: "16px",
+  left: "16px",
+  zIndex: 5,
+  background: "#111",
+  color: "#fff",
+  borderRadius: "999px",
+  padding: "8px 14px",
+  fontSize: "11px",
+  fontWeight: 900,
+  letterSpacing: "0.5px",
+};
+
+const favoriteButtonStyle = {
+  position: "absolute" as const,
+  top: "16px",
+  right: "16px",
+  zIndex: 5,
+  width: "42px",
+  height: "42px",
+  borderRadius: "50%",
+  border: "none",
+  background: "rgba(255,255,255,0.95)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  fontSize: "20px",
+  cursor: "pointer",
+  boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
 };

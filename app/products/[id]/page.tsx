@@ -17,6 +17,7 @@ export default function ProductDetail() {
   const [notFound, setNotFound] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [sellerProfile, setSellerProfile] = useState<any>(null);
+  const [sellerReviews, setSellerReviews] = useState<any[]>([]);
 
   useEffect(() => {
     if (!id || id === "undefined") {
@@ -54,6 +55,14 @@ export default function ProductDetail() {
 
         setSellerProfile(sellerData);
 
+        const { data: reviewsData } = await supabase
+  .from("reviews")
+  .select("*")
+  .eq("seller_id", data.seller_id)
+  .order("created_at", { ascending: false });
+
+setSellerReviews(reviewsData || []);
+
         const images =
           data.images && Array.isArray(data.images) ? data.images : [data.image];
 
@@ -80,7 +89,7 @@ export default function ProductDetail() {
           .neq("id", data.id)
           .eq("sold", false)
           .eq("moderation_status", "approved")
-          .limit(3);
+          .limit(8);
 
         setRelated(relatedProducts || []);
       } catch {
@@ -519,6 +528,12 @@ export default function ProductDetail() {
 
   const buyerGuide = getBuyerGuide();
 
+  const averageRating =
+  sellerReviews.length > 0
+    ? sellerReviews.reduce((sum, review) => sum + Number(review.rating), 0) /
+      sellerReviews.length
+    : null;
+
   return (
     <main className="product-detail-page" style={pageStyle}>
       <button onClick={() => window.history.back()} style={backButtonStyle}>
@@ -527,13 +542,34 @@ export default function ProductDetail() {
 
       <div style={layoutStyle} className="product-detail-layout">
         <div>
-          <div style={mainImageStyle} className="product-detail-image">
+          <div
+  style={mainImageStyle}
+  className="product-detail-image image-zoom"
+>
+            <div style={imageBadgesStyle}>
+  <span style={statusBadgeStyle}>
+    {getConditionLabel(producto.condition)}
+  </span>
+
+  {producto.featured && (
+    <span style={featuredBadgeStyle}>
+      ⭐ Destacado
+    </span>
+  )}
+</div>
+
+<button
+  onClick={toggleFavorite}
+  style={favoriteFloatingStyle}
+>
+  {isFavorite ? "❤️" : "🤍"}
+</button>
             <Image
               src={safeImage(selectedImage)}
               alt={producto.title || "Producto"}
               fill
               sizes="(max-width: 900px) 100vw, 50vw"
-              className="main-product-image"
+              className="main-product-image zoom-image"
               style={{ objectFit: "cover", transition: "transform 0.5s ease" }}
             />
           </div>
@@ -563,8 +599,8 @@ export default function ProductDetail() {
           </div>
         </div>
 
-        <div>
-          <p style={brandStyle}>{producto.brand}</p>
+          <div style={productInfoStickyStyle}>
+  <p style={brandStyle}>{producto.brand}</p>
 
           <h1 style={titleStyle} className="product-detail-title">
             {producto.title}
@@ -573,6 +609,21 @@ export default function ProductDetail() {
           <p style={priceStyle} className="product-detail-price">
             €{producto.price}
           </p>
+
+<div style={quickInfoStyle}>
+  <span style={quickInfoItemStyle}>🚚 Envío protegido</span>
+  <span style={quickInfoItemStyle}>✓ Pago seguro</span>
+  <span style={quickInfoItemStyle}>↩ 48h para incidencias</span>
+</div>
+
+<div style={trustScoreStyle}>
+  <div>
+    <p style={trustScoreLabelStyle}>ATHMOV TRUST SCORE</p>
+    <h3 style={trustScoreTitleStyle}>Compra con confianza</h3>
+  </div>
+
+  <div style={trustScoreBadgeStyle}>9.2</div>
+</div>
 
           <p style={descriptionStyle}>{producto.description}</p>
 
@@ -654,6 +705,24 @@ export default function ProductDetail() {
             <div style={verifiedSellerBadgeStyle}>✓ Vendedor verificado</div>
           )}
 
+          <div style={sellerCardStyle}>
+  <div style={sellerAvatarStyle}>
+    {producto.brand?.charAt(0) || "A"}
+  </div>
+
+  <div style={{ flex: 1 }}>
+    <h3 style={sellerNameStyle}>
+      {sellerProfile?.seller_badge || "Vendedor ATHMOV"}
+    </h3>
+
+    <p style={sellerMetaStyle}>
+      {sellerProfile?.seller_verified
+        ? "✓ Vendedor verificado"
+        : "Miembro del marketplace"}
+    </p>
+  </div>
+</div>
+
           {producto.seller_id && (
             <button
               onClick={() => {
@@ -664,6 +733,46 @@ export default function ProductDetail() {
               Ver perfil del vendedor
             </button>
           )}
+
+          {sellerReviews.length > 0 && (
+  <div style={sellerRatingStyle}>
+    <div style={{ fontSize: "22px" }}>
+      {"★".repeat(Math.round(averageRating!))}
+      {"☆".repeat(5 - Math.round(averageRating!))}
+    </div>
+
+    <div style={{ fontWeight: 700 }}>
+      {averageRating?.toFixed(1)} / 5
+    </div>
+
+    <div
+      style={{
+        fontSize: 13,
+        color: "#666",
+      }}
+    >
+      Basado en {sellerReviews.length} valoración
+      {sellerReviews.length > 1 ? "es" : ""}
+    </div>
+  </div>
+)}
+
+{sellerReviews.length > 0 && (
+  <div style={reviewListStyle}>
+    {sellerReviews.slice(0, 3).map((review) => (
+      <div key={review.id} style={reviewItemStyle}>
+        <div style={reviewStarsStyle}>
+          {"★".repeat(Number(review.rating))}
+          {"☆".repeat(5 - Number(review.rating))}
+        </div>
+
+        {review.comment && (
+          <p style={reviewCommentStyle}>{review.comment}</p>
+        )}
+      </div>
+    ))}
+  </div>
+)}
 
           <div style={actionsStyle} className="product-detail-actions">
             <button onClick={messageSeller} style={secondaryButtonStyle}>
@@ -700,7 +809,8 @@ export default function ProductDetail() {
         <div style={relatedGridStyle} className="product-detail-related">
           {related.map((item) => (
             <div
-              key={item.id}
+  key={item.id}
+  className="related-card"
               onClick={() => (window.location.href = `/products/${item.id}`)}
               style={relatedCardStyle}
             >
@@ -728,6 +838,14 @@ export default function ProductDetail() {
         .main-product-image:hover {
           transform: scale(1.04);
         }
+
+        .image-zoom {
+  overflow: hidden;
+}
+
+.image-zoom:hover .zoom-image {
+  transform: scale(1.12);
+}
 
         @media (max-width: 1000px) {
           .product-detail-layout {
@@ -788,6 +906,15 @@ export default function ProductDetail() {
           .product-detail-related {
             grid-template-columns: 1fr !important;
           }
+
+          .related-card {
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+
+.related-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 28px 80px rgba(0,0,0,.12);
+}
         }
       `}</style>
     </main>
@@ -1045,7 +1172,7 @@ const relatedTitleStyle = {
 
 const relatedGridStyle = {
   display: "grid",
-  gridTemplateColumns: "repeat(3, 1fr)",
+  gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))",
   gap: "28px",
 };
 
@@ -1169,4 +1296,180 @@ const trustPanelItemStyle = {
   padding: "12px 14px",
   fontSize: "12px",
   fontWeight: 900,
+};
+
+const imageBadgesStyle = {
+  position: "absolute" as const,
+  top: "22px",
+  left: "22px",
+  display: "flex",
+  gap: "10px",
+  zIndex: 20,
+};
+
+const statusBadgeStyle = {
+  background: "#fff",
+  borderRadius: "999px",
+  padding: "10px 16px",
+  fontWeight: 800,
+  fontSize: "12px",
+  boxShadow: "0 10px 30px rgba(0,0,0,.12)",
+};
+
+const featuredBadgeStyle = {
+  background: "#111",
+  color: "#fff",
+  borderRadius: "999px",
+  padding: "10px 16px",
+  fontWeight: 800,
+  fontSize: "12px",
+};
+
+const favoriteFloatingStyle = {
+  position: "absolute" as const,
+  top: "22px",
+  right: "22px",
+  width: "52px",
+  height: "52px",
+  borderRadius: "50%",
+  border: "none",
+  background: "#fff",
+  fontSize: "24px",
+  cursor: "pointer",
+  zIndex: 20,
+  boxShadow: "0 10px 30px rgba(0,0,0,.12)",
+};
+
+const productInfoStickyStyle = {
+  position: "sticky" as const,
+  top: "120px",
+};
+
+const quickInfoStyle = {
+  display: "flex",
+  flexWrap: "wrap" as const,
+  gap: "10px",
+  marginTop: "18px",
+  marginBottom: "26px",
+};
+
+const quickInfoItemStyle = {
+  background: "#fff",
+  border: "1px solid rgba(0,0,0,0.08)",
+  borderRadius: "999px",
+  padding: "8px 14px",
+  fontSize: "12px",
+  fontWeight: 800,
+};
+
+const trustScoreStyle = {
+  maxWidth: "560px",
+  background: "#fff",
+  border: "1px solid rgba(0,0,0,0.08)",
+  borderRadius: "26px",
+  padding: "22px",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: "28px",
+};
+
+const trustScoreLabelStyle = {
+  fontSize: "10px",
+  letterSpacing: "2px",
+  opacity: 0.45,
+  margin: 0,
+};
+
+const trustScoreTitleStyle = {
+  fontSize: "22px",
+  margin: "8px 0 0",
+};
+
+const trustScoreBadgeStyle = {
+  width: "64px",
+  height: "64px",
+  borderRadius: "50%",
+  background: "#111",
+  color: "#fff",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: "22px",
+  fontWeight: 900,
+};
+
+const sellerCardStyle = {
+  marginTop: "22px",
+  display: "flex",
+  alignItems: "center",
+  gap: "18px",
+  background: "#fff",
+  border: "1px solid rgba(0,0,0,0.08)",
+  borderRadius: "24px",
+  padding: "20px",
+  maxWidth: "560px",
+};
+
+const sellerAvatarStyle = {
+  width: "62px",
+  height: "62px",
+  borderRadius: "50%",
+  background: "#111",
+  color: "#fff",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: "24px",
+  fontWeight: 900,
+};
+
+const sellerNameStyle = {
+  margin: 0,
+  fontSize: "18px",
+};
+
+const sellerMetaStyle = {
+  marginTop: "6px",
+  color: "#666",
+  fontSize: "14px",
+};
+
+const sellerRatingStyle = {
+  marginTop: "18px",
+  padding: "18px",
+  background: "#fff",
+  border: "1px solid rgba(0,0,0,.08)",
+  borderRadius: "22px",
+  display: "flex",
+  flexDirection: "column" as const,
+  gap: "6px",
+  maxWidth: "320px",
+};
+
+const reviewListStyle = {
+  marginTop: "14px",
+  display: "grid",
+  gap: "10px",
+  maxWidth: "560px",
+};
+
+const reviewItemStyle = {
+  background: "#fff",
+  border: "1px solid rgba(0,0,0,0.08)",
+  borderRadius: "18px",
+  padding: "16px",
+};
+
+const reviewStarsStyle = {
+  fontSize: "16px",
+  fontWeight: 900,
+};
+
+const reviewCommentStyle = {
+  marginTop: "8px",
+  marginBottom: 0,
+  color: "#555",
+  lineHeight: 1.6,
+  fontSize: "14px",
 };
