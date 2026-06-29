@@ -164,6 +164,17 @@ useEffect(() => {
     document.removeEventListener("mousedown", handleClickOutside);
 }, []);
 
+useEffect(() => {
+  const onScroll = () => {
+    setScrolled(window.scrollY > 40);
+  };
+
+ window.addEventListener("scroll", onScroll);
+onScroll();
+
+return () => window.removeEventListener("scroll", onScroll);
+}, []);
+
  useEffect(() => {
   updateCartCount();
   loadNotifications();
@@ -178,16 +189,6 @@ useEffect(() => {
     loadNotifications();
   }
 );
-
-useEffect(() => {
-  const onScroll = () => {
-    setScrolled(window.scrollY > 40);
-  };
-
-  window.addEventListener("scroll", onScroll);
-
-  return () => window.removeEventListener("scroll", onScroll);
-}, []);
 
     const channel = supabase
       .channel("navbar-notifications")
