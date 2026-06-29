@@ -82,6 +82,16 @@ export default function MessagesPage() {
           .eq("id", conversation.product_id)
           .maybeSingle();
 
+          const otherUserId = isSeller
+  ? conversation.buyer_id
+  : conversation.seller_id;
+
+const { data: otherUser } = await supabase
+  .from("profiles")
+  .select("full_name, username, avatar_url")
+  .eq("id", otherUserId)
+  .maybeSingle();
+
         const { data: lastMessage } = await supabase
           .from("conversation_messages")
           .select("*")
@@ -103,11 +113,12 @@ export default function MessagesPage() {
         const { data: unreadMessages } = await unreadQuery;
 
         return {
-          ...conversation,
-          product,
-          lastMessage,
-          unreadCount: unreadMessages?.length || 0,
-        };
+  ...conversation,
+  product,
+  otherUser,
+  lastMessage,
+  unreadCount: unreadMessages?.length || 0,
+};
       })
     );
 
@@ -188,6 +199,7 @@ export default function MessagesPage() {
             const lastMessage = conversation.lastMessage;
             const isSeller = conversation.seller_id === userId;
             const hasUnread = conversation.unreadCount > 0;
+            const isOnline = false;
 
             return (
               <article
@@ -204,6 +216,16 @@ export default function MessagesPage() {
                 }}
                 className="conversation-card"
               >
+
+              <div style={avatarStyle}>
+  <Image
+    src={safeImage(conversation.otherUser?.avatar_url)}
+    alt="Usuario"
+    fill
+    sizes="60px"
+    style={{ objectFit: "cover" }}
+  />
+</div>
                 <div style={imageWrapperStyle}>
                   <Image
                     src={safeImage(product?.image)}
@@ -217,13 +239,44 @@ export default function MessagesPage() {
                 </div>
 
                 <div style={{ flex: 1 }}>
-                  <p style={metaStyle}>
-                    {isSeller ? "Conversación con comprador" : "Conversación con vendedor"}
-                  </p>
+                 <div style={conversationMetaRowStyle}>
+  <span style={onlineDotStyle} />
+  <p style={metaStyle}>
+    {isOnline
+      ? "En línea"
+      : isSeller
+        ? "Conversación con comprador"
+        : "Conversación con vendedor"}
+  </p>
+</div>
+<h2 style={conversationTitleStyle}>
+  {conversation.otherUser?.full_name ||
+    conversation.otherUser?.username ||
+    "Usuario"}
+</h2>
 
-                  <h2 style={conversationTitleStyle}>
-                    {product?.title || "Producto"}
-                  </h2>
+<div style={productChipStyle}>
+  <Image
+    src={safeImage(product?.image)}
+    alt={product?.title}
+    width={44}
+    height={44}
+    style={{
+      borderRadius: 12,
+      objectFit: "cover",
+    }}
+  />
+
+  <div style={{ flex: 1 }}>
+    <div style={productNameStyle}>
+      {product?.title}
+    </div>
+
+    <div style={productPriceChipStyle}>
+      €{product?.price}
+    </div>
+  </div>
+</div>
 
                   <p
                     style={{
@@ -232,11 +285,11 @@ export default function MessagesPage() {
                       color: hasUnread ? "#111" : "#666",
                     }}
                   >
-                  {lastMessage?.is_image
-  ? "Imagen enviada"
+{lastMessage?.is_image
+  ? "📷 Imagen"
   : lastMessage?.is_offer
-    ? `Oferta: €${lastMessage?.offer_price}`
-    : lastMessage?.content || "Sin mensajes todavía"}
+  ? `💰 Oferta · €${lastMessage.offer_price}`
+  : lastMessage?.content || "Sin mensajes"}
                   </p>
 
                   <p style={timeStyle}>
@@ -482,4 +535,54 @@ const timeStyle = {
   color: "#999",
   marginTop: "8px",
   marginBottom: 0,
+};
+
+const conversationMetaRowStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: "8px",
+  marginBottom: "8px",
+};
+
+const onlineDotStyle = {
+  width: "8px",
+  height: "8px",
+  borderRadius: "999px",
+  background: "#34c759",
+  flexShrink: 0,
+};
+
+const avatarStyle = {
+  position: "relative" as const,
+  width: "58px",
+  height: "58px",
+  borderRadius: "50%",
+  overflow: "hidden",
+  flexShrink: 0,
+  border: "2px solid #fff",
+  boxShadow: "0 8px 20px rgba(0,0,0,.12)",
+};
+
+const productNameStyle = {
+  marginTop: "6px",
+  fontSize: "13px",
+  color: "#888",
+};
+
+const productChipStyle = {
+  marginTop: "10px",
+  display: "flex",
+  alignItems: "center",
+  gap: "12px",
+  background: "#f8f8f6",
+  borderRadius: "16px",
+  padding: "10px",
+  width: "fit-content",
+};
+
+const productPriceChipStyle = {
+  marginTop: "4px",
+  fontSize: "12px",
+  fontWeight: 800,
+  color: "#111",
 };

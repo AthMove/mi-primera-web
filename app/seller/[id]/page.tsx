@@ -33,8 +33,8 @@ export default function SellerPage() {
       .eq("moderation_status", "approved")
       .order("created_at", { ascending: false });
 
-  const { data: sellerReviews } = await supabase
-  .from("seller_reviews")
+ const { data: sellerReviews } = await supabase
+  .from("reviews")
   .select("*")
   .eq("seller_id", sellerId)
   .order("created_at", { ascending: false });

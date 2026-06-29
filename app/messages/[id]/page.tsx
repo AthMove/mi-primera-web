@@ -40,6 +40,8 @@ export default function ConversationPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [content, setContent] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+const [previewFile, setPreviewFile] = useState<File | null>(null);
   const [userId, setUserId] = useState("");
   const [otherUserId, setOtherUserId] = useState("");
   const [otherOnline, setOtherOnline] = useState(false);
@@ -160,7 +162,7 @@ export default function ConversationPage() {
       ? message.read_by_buyer
       : message.read_by_seller;
 
-    return otherHasRead ? "Visto" : "Entregado";
+    return otherHasRead ? "✓✓ Visto" : "✓ Entregado";
   };
 
   const loadMessages = async () => {
@@ -577,42 +579,56 @@ export default function ConversationPage() {
     window.location.href = checkoutData.url;
   };
 
-  const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (invalidConversationId) return;
+const uploadImage = async (
+  e: React.ChangeEvent<HTMLInputElement>
+) => {
+  if (invalidConversationId) return;
 
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const file = e.target.files?.[0];
 
-    try {
-      setUploading(true);
+  if (!file) return;
 
-      const fileExt = file.name.split(".").pop() || "jpg";
-      const fileName = `${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
+  setPreviewFile(file);
+  setPreviewImage(URL.createObjectURL(file));
 
-      const { error } = await supabase.storage
-        .from("chat-images")
-        .upload(fileName, file, {
-          cacheControl: "3600",
-          upsert: false,
-          contentType: file.type,
-        });
+  e.target.value = "";
+};
 
-      if (error) {
-        console.log("UPLOAD ERROR:", error);
-        alert(error.message);
-        return;
-      }
+const confirmImageUpload = async () => {
+  if (!previewFile) return;
 
-      const { data } = supabase.storage
-        .from("chat-images")
-        .getPublicUrl(fileName);
+  try {
+    setUploading(true);
 
-      await sendMessage(data.publicUrl);
-    } finally {
-      setUploading(false);
-      e.target.value = "";
+    const fileExt = previewFile.name.split(".").pop() || "jpg";
+    const fileName = `${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
+
+    const { error } = await supabase.storage
+      .from("chat-images")
+      .upload(fileName, previewFile, {
+        cacheControl: "3600",
+        upsert: false,
+        contentType: previewFile.type,
+      });
+
+    if (error) {
+      alert(error.message);
+      return;
     }
-  };
+
+    const { data } = supabase.storage
+      .from("chat-images")
+      .getPublicUrl(fileName);
+
+    await sendMessage(data.publicUrl);
+
+    setPreviewImage(null);
+    setPreviewFile(null);
+  } finally {
+    setUploading(false);
+  }
+};
+
 
   if (invalidConversationId) {
     return (
@@ -637,7 +653,9 @@ export default function ConversationPage() {
           <div>
             <p style={headerEyebrowStyle}>CHAT ATHMOV</p>
 
-            <h1 style={headerTitleStyle}>Conversación</h1>
+            <h1 style={headerTitleStyle}>
+  {productData?.title || "Conversación"}
+</h1>
 
             <p style={statusTextStyle}>
               <span
@@ -797,6 +815,34 @@ export default function ConversationPage() {
           <div ref={bottomRef} />
         </div>
 
+{previewImage && (
+  <div style={previewContainerStyle}>
+    <img
+      src={previewImage}
+      style={previewImageStyle}
+    />
+
+    <div style={previewButtonsStyle}>
+      <button
+        onClick={() => {
+          setPreviewImage(null);
+          setPreviewFile(null);
+        }}
+        style={rejectButtonStyle}
+      >
+        Cancelar
+      </button>
+
+      <button
+        onClick={confirmImageUpload}
+        style={acceptButtonStyle}
+      >
+        Enviar
+      </button>
+    </div>
+  </div>
+)}
+
         <div style={inputWrapperStyle} className="chat-input-wrapper">
           <input
             value={content}
@@ -811,12 +857,12 @@ export default function ConversationPage() {
                 sendMessage();
               }
             }}
-            placeholder="Escribe un mensaje..."
+            placeholder="Escribe un mensaje o pregunta por el producto..."
             style={inputStyle}
           />
 
           <label style={uploadButtonStyle}>
-            {uploading ? "..." : "+"}
+            {uploading ? "..." : "📷"}
 
             <input
               type="file"
@@ -827,11 +873,11 @@ export default function ConversationPage() {
           </label>
 
           <button onClick={sendOffer} style={offerButtonStyle}>
-            Oferta
+            Hacer oferta
           </button>
 
           <button onClick={() => sendMessage()} style={buttonStyle}>
-            Enviar
+            ➤
           </button>
         </div>
       </div>
@@ -1106,14 +1152,16 @@ const offerButtonStyle = {
 };
 
 const buttonStyle = {
+  width: "54px",
+  height: "54px",
   background: "#111",
   color: "#fff",
   border: "none",
   borderRadius: "999px",
-  padding: "0 28px",
-  fontWeight: 700,
+  fontWeight: 900,
   cursor: "pointer",
-  fontSize: "14px",
+  fontSize: "20px",
+  flexShrink: 0,
 };
 
 const timeStyle = {
@@ -1162,4 +1210,22 @@ const orderPreviewTextStyle = {
   margin: "4px 0 0",
   fontSize: "12px",
   color: "#666",
+};
+
+const previewContainerStyle = {
+  padding: "20px",
+  borderTop: "1px solid rgba(0,0,0,.06)",
+  background: "#fafafa",
+};
+
+const previewImageStyle = {
+  width: "220px",
+  borderRadius: "18px",
+  display: "block",
+};
+
+const previewButtonsStyle = {
+  display: "flex",
+  gap: "12px",
+  marginTop: "14px",
 };
