@@ -4,8 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "./LanguageProvider";
 
 export default function Navbar() {
+  const { lang, setLang, t } = useLanguage();
   const [cartCount, setCartCount] = useState(0);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [messagesCount, setMessagesCount] = useState(0);
@@ -370,19 +372,29 @@ return () => window.removeEventListener("scroll", onScroll);
         </Link>
 
         <div style={rightLinksStyle} className="desktop-only">
+ <select
+  value={lang}
+  onChange={(e) => setLang(e.target.value as "es" | "en" | "pt")}
+  style={languageSelectStyle}
+>
+  <option value="es">ES</option>
+  <option value="en">EN</option>
+  <option value="pt">PT</option>
+</select>
+
           <Link href="/cart" style={cartLinkStyle}>
             CARRITO ({cartCount})
           </Link>
           <Link href="/products" style={navMainLinkStyle}>
-  Comprar
+  {t.buy}
 </Link>
 
 <Link href="/sell" style={navMainLinkStyle}>
-  Vender
+  {t.sell}
 </Link>
 
 <Link href="/blog" style={navMainLinkStyle}>
-  Blog
+  {t.blog}
 </Link>
 
 <div
@@ -396,7 +408,7 @@ return () => window.removeEventListener("scroll", onScroll);
       onFocus={() => {
         if (searchResults.length > 0) setShowResults(true);
       }}
-      placeholder="Buscar palas, drivers, zapatillas..."
+      placeholder={t.searchPlaceholder}
       style={searchInputStyle}
     />
 
@@ -448,19 +460,29 @@ return () => window.removeEventListener("scroll", onScroll);
 </div>
 
           {userEmail ? (
-            <>
-              <Link href="/account" style={signInStyle}>
-  CUENTA
-</Link>
-            </>
-          ) : (
+  <>
+    <select
+      value={lang}
+      onChange={(e) => setLang(e.target.value as "es" | "en" | "pt")}
+      style={languageSelectStyle}
+    >
+      <option value="es">ES</option>
+      <option value="en">EN</option>
+      <option value="pt">PT</option>
+    </select>
+
+    <Link href="/account" style={signInStyle}>
+      {t.account}
+    </Link>
+  </>
+) : (
             <>
               <Link href="/auth" style={signInStyle}>
-                INICIAR SESIÓN
+               {t.login}
               </Link>
 
               <Link href="/auth" style={registerStyle}>
-                REGISTRARSE
+                {t.register}
               </Link>
             </>
           )}
@@ -819,4 +841,14 @@ const drawerHeroButtonStyle = {
   borderRadius: "999px",
   padding: "12px 18px",
   fontWeight: 900,
+};
+
+const languageSelectStyle = {
+  border: "1px solid rgba(0,0,0,.12)",
+  background: "#fff",
+  borderRadius: "999px",
+  padding: "10px 12px",
+  fontSize: "11px",
+  fontWeight: 800,
+  cursor: "pointer",
 };

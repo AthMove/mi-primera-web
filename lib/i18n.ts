@@ -1,0 +1,204 @@
+export const translations = {
+  es: {
+    buy: "Comprar",
+    sell: "Vender",
+    blog: "Blog",
+    login: "Iniciar sesión",
+    register: "Registrarse",
+    account: "Cuenta",
+    searchPlaceholder: "Buscar palas, drivers, zapatillas...",
+    homeEyebrow: "ATHMOV PREMIUM SECOND HAND",
+    homeTitle1: "Segunda mano.",
+    homeTitle2: "Primera clase.",
+    homeText:
+      "Compra y vende material deportivo premium de segunda mano de atletas, vendedores y coleccionistas de confianza.",
+    homeProof:
+      "Material deportivo premium seleccionado · Golf · Pádel · Tenis · Running",
+      latest: "ÚLTIMOS",
+news: "Novedades",
+viewFeed: "Ver feed →",
+
+categories: "CATEGORÍAS",
+exploreSports: "Explorar deportes",
+
+brands: "MARCAS",
+popularBrands: "Marcas populares",
+viewAll: "Ver todas →",
+
+marketActivity: "ACTIVIDAD DEL MERCADO",
+soldRecently: "Vendido recientemente",
+trust1Title: "Vendedores verificados",
+trust1Text: "ATHMOV revisa manualmente vendedores premium y coleccionistas deportivos.",
+
+trust2Title: "Protección al comprador",
+trust2Text: "Pagos seguros y transacciones protegidas dentro del marketplace.",
+
+trust3Title: "Marketplace seleccionado",
+trust3Text: "Solo marcas deportivas premium de pádel, golf, tenis y running.",
+
+trust4Title: "Segunda mano premium",
+trust4Text: "Material deportivo seleccionado de atletas y coleccionistas de confianza.",
+whyAthmov: "POR QUÉ ATHMOV",
+whyTitle: "El material deportivo premium merece una segunda vida.",
+
+why1Title: "Marketplace seleccionado",
+why1Text: "Un espacio premium para material deportivo de segunda mano de alta calidad.",
+
+why2Title: "Reputación del vendedor",
+why2Text: "Reseñas, pedidos, tracking y perfiles ayudan a construir confianza.",
+
+why3Title: "Creado para atletas",
+why3Text: "Material premium de pádel, golf, tenis y running.",
+
+readyTitle: "¿Listo para vender material premium?",
+readyText: "Publica tu equipamiento deportivo y llega a compradores que buscan piezas de calidad.",
+startSelling: "Empezar a vender",
+marketplace: "Marketplace",
+support: "Soporte",
+
+howWorks: "Cómo funciona",
+buyerGuide: "Guía del comprador",
+buyerProtection: "Protección al comprador",
+
+footerDescription:
+"Marketplace premium de segunda mano para atletas, coleccionistas y amantes del deporte.",
+
+rights:
+"© 2025 ATHMOV. Todos los derechos reservados.",
+  },
+
+  en: {
+    buy: "Buy",
+    sell: "Sell",
+    blog: "Blog",
+    login: "Sign in",
+    register: "Register",
+    account: "Account",
+    searchPlaceholder: "Search rackets, drivers, shoes...",
+    homeEyebrow: "ATHMOV PREMIUM SECOND HAND",
+    homeTitle1: "Second hand.",
+    homeTitle2: "First class.",
+    homeText:
+      "Buy and sell premium second-hand sports gear from trusted athletes, sellers and collectors.",
+    homeProof: "Selected premium sports gear · Golf · Padel · Tennis · Running",
+    latest: "LATEST",
+news: "New arrivals",
+viewFeed: "View feed →",
+
+categories: "CATEGORIES",
+exploreSports: "Explore sports",
+
+brands: "BRANDS",
+popularBrands: "Popular brands",
+viewAll: "View all →",
+
+marketActivity: "MARKET ACTIVITY",
+soldRecently: "Recently sold",
+trust1Title: "Verified sellers",
+trust1Text: "ATHMOV manually reviews premium sellers and collectors.",
+
+trust2Title: "Buyer protection",
+trust2Text: "Secure payments and protected transactions.",
+
+trust3Title: "Curated marketplace",
+trust3Text: "Only premium brands for padel, golf, tennis and running.",
+
+trust4Title: "Premium second hand",
+trust4Text: "Selected equipment from trusted athletes and collectors.",
+whyAthmov: "WHY ATHMOV",
+whyTitle: "Premium sports gear deserves a second life.",
+
+why1Title: "Curated marketplace",
+why1Text: "A premium marketplace for quality second-hand sports equipment.",
+
+why2Title: "Seller reputation",
+why2Text: "Reviews, orders and tracking help build trust.",
+
+why3Title: "Built for athletes",
+why3Text: "Premium gear for padel, golf, tennis and running.",
+
+readyTitle: "Ready to sell premium gear?",
+readyText: "Publish your equipment and reach buyers looking for quality.",
+startSelling: "Start selling",
+marketplace: "Marketplace",
+support: "Support",
+
+howWorks: "How it works",
+buyerGuide: "Buyer's guide",
+buyerProtection: "Buyer protection",
+
+footerDescription:
+"Premium second-hand marketplace for athletes, collectors and sports lovers.",
+
+rights:
+"© 2025 ATHMOV. All rights reserved.",
+  },
+
+  pt: {
+    buy: "Comprar",
+    sell: "Vender",
+    blog: "Blog",
+    login: "Iniciar sessão",
+    register: "Registar",
+    account: "Conta",
+    searchPlaceholder: "Pesquisar raquetes, drivers, sapatilhas...",
+    homeEyebrow: "ATHMOV PREMIUM SECOND HAND",
+    homeTitle1: "Segunda mão.",
+    homeTitle2: "Primeira classe.",
+    homeText:
+      "Compra e vende material desportivo premium em segunda mão de atletas, vendedores e colecionadores de confiança.",
+    homeProof:
+      "Material desportivo premium selecionado · Golfe · Padel · Ténis · Running",
+      latest: "ÚLTIMOS",
+news: "Novidades",
+viewFeed: "Ver feed →",
+
+categories: "CATEGORIAS",
+exploreSports: "Explorar desportos",
+
+brands: "MARCAS",
+popularBrands: "Marcas populares",
+viewAll: "Ver todas →",
+
+marketActivity: "ATIVIDADE DO MERCADO",
+soldRecently: "Vendido recentemente",
+trust1Title: "Vendedores verificados",
+trust1Text: "A ATHMOV verifica manualmente vendedores premium.",
+
+trust2Title: "Proteção do comprador",
+trust2Text: "Pagamentos seguros e transações protegidas.",
+
+trust3Title: "Marketplace selecionado",
+trust3Text: "Apenas marcas premium de padel, golfe, ténis e running.",
+
+trust4Title: "Segunda mão premium",
+trust4Text: "Equipamento selecionado de atletas e colecionadores.",
+whyAthmov: "PORQUE ATHMOV",
+whyTitle: "O material desportivo premium merece uma segunda vida.",
+
+why1Title: "Marketplace selecionado",
+why1Text: "Marketplace premium para equipamento desportivo usado.",
+
+why2Title: "Reputação do vendedor",
+why2Text: "Avaliações, encomendas e tracking geram confiança.",
+
+why3Title: "Criado para atletas",
+why3Text: "Material premium de padel, golfe, ténis e running.",
+
+readyTitle: "Pronto para vender material premium?",
+readyText: "Publique o seu equipamento e encontre compradores.",
+startSelling: "Começar a vender",
+marketplace: "Marketplace",
+support: "Suporte",
+
+howWorks: "Como funciona",
+buyerGuide: "Guia do comprador",
+buyerProtection: "Proteção do comprador",
+
+footerDescription:
+"Marketplace premium de segunda mão para atletas, colecionadores e amantes do desporto.",
+
+rights:
+"© 2025 ATHMOV. Todos os direitos reservados.",
+  },
+};

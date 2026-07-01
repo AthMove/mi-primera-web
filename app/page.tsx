@@ -4,9 +4,11 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function Home() {
   const router = useRouter();
+  const { t } = useLanguage();
 
   const [newDrops, setNewDrops] = useState<any[]>([]);
   const [soldProducts, setSoldProducts] = useState<any[]>([]);
@@ -83,31 +85,28 @@ export default function Home() {
     <main style={pageStyle} className="home-page">
       <section style={heroStyle} className="hero-section">
         <div>
-          <p style={eyebrowStyle}>ATHMOV PREMIUM SECOND HAND</p>
+          <p style={eyebrowStyle}>{t.homeEyebrow}</p>
 
-          <h1 style={heroTitleStyle} className="hero-title">
-            Segunda mano.
-            <br />
-            Primera clase.
-          </h1>
+<h1 style={heroTitleStyle} className="hero-title">
+  {t.homeTitle1}
+  <br />
+  {t.homeTitle2}
+</h1>
 
-          <p style={heroTextStyle}>
-            Compra y vende material deportivo premium de segunda mano de atletas,
-            vendedores y coleccionistas de confianza.
-          </p>
+<p style={heroTextStyle}>{t.homeText}</p>
 
  <div style={heroActionsStyle}>
   <button onClick={() => router.push("/products")} style={primaryButtonStyle}>
-    Comprar
+   {t.buy}
   </button>
 
   <button onClick={() => router.push("/sell")} style={secondaryButtonStyle}>
-    Vender
+    {t.sell}
   </button>
 </div>
 
 <p style={heroProofStyle}>
-  Material deportivo premium seleccionado · Golf · Pádel · Tenis · Running
+  {t.homeProof}
 </p>
         </div>
 
@@ -128,30 +127,30 @@ export default function Home() {
 
       <section style={trustSectionStyle} className="trust-grid">
         <div style={trustCardStyle}>
-          <p style={trustCardTitleStyle}>Vendedores verificados</p>
+          <p style={trustCardTitleStyle}>{t.trust1Title}</p>
           <p style={trustCardTextStyle}>
-            ATHMOV revisa manualmente vendedores premium y coleccionistas deportivos.
+            {t.trust1Text}
           </p>
         </div>
 
         <div style={trustCardStyle}>
-          <p style={trustCardTitleStyle}>Protección al comprador</p>
+          <p style={trustCardTitleStyle}>{t.trust2Title}</p>
           <p style={trustCardTextStyle}>
-            Pagos seguros y transacciones protegidas dentro del marketplace.
+            {t.trust2Text}
           </p>
         </div>
 
         <div style={trustCardStyle}>
-          <p style={trustCardTitleStyle}>Marketplace seleccionado</p>
+          <p style={trustCardTitleStyle}>{t.trust3Title}</p>
           <p style={trustCardTextStyle}>
-            Solo marcas deportivas premium de pádel, golf, tenis y running.
+            {t.trust3Text}
           </p>
         </div>
 
         <div style={trustCardStyle}>
-          <p style={trustCardTitleStyle}>Segunda mano premium</p>
+          <p style={trustCardTitleStyle}>{t.trust4Title}</p>
           <p style={trustCardTextStyle}>
-            Material deportivo seleccionado de atletas y coleccionistas de confianza.
+           {t.trust4Text}
           </p>
         </div>
       </section>
@@ -159,12 +158,12 @@ export default function Home() {
       <section style={sectionStyle}>
         <div style={sectionHeaderStyle}>
           <div>
-            <p style={eyebrowStyle}>ÚLTIMOS</p>
-            <h2 style={sectionTitleStyle}>Novedades</h2>
+            <p style={eyebrowStyle}>{t.latest}</p>
+<h2 style={sectionTitleStyle}>{t.news}</h2>
           </div>
 
           <button onClick={() => router.push("/feed")} style={smallButtonStyle}>
-            Ver feed →
+            {t.viewFeed}
           </button>
         </div>
 
@@ -220,31 +219,31 @@ export default function Home() {
       </section>
 
       <section style={darkSectionStyle}>
-        <p style={eyebrowLightStyle}>POR QUÉ ATHMOV</p>
+        <p style={eyebrowLightStyle}>{t.whyAthmov}</p>
 
         <h2 style={darkTitleStyle}>
-          El material deportivo premium merece una segunda vida.
+          {t.whyTitle}
         </h2>
 
         <div style={trustGridStyle}>
           <div>
-            <h3 style={trustTitleStyle}>Marketplace seleccionado</h3>
+            <h3 style={trustTitleStyle}>{t.why1Title}</h3>
             <p style={trustTextStyle}>
-              Un espacio premium para material deportivo de segunda mano de alta calidad.
+              {t.why1Text}
             </p>
           </div>
 
           <div>
-            <h3 style={trustTitleStyle}>Reputación del vendedor</h3>
+            <h3 style={trustTitleStyle}>{t.why2Title}</h3>
             <p style={trustTextStyle}>
-              Reseñas, pedidos, tracking y perfiles de vendedor ayudan a construir confianza.
+              {t.why2Text}
             </p>
           </div>
 
           <div>
-            <h3 style={trustTitleStyle}>Creado para atletas</h3>
+            <h3 style={trustTitleStyle}>{t.why3Title}</h3>
             <p style={trustTextStyle}>
-              Material premium de pádel, golf, tenis y running.
+              {t.why3Text}
             </p>
           </div>
         </div>
@@ -253,8 +252,8 @@ export default function Home() {
       <section style={sectionStyle}>
         <div style={sectionHeaderStyle}>
           <div>
-            <p style={eyebrowStyle}>CATEGORÍAS</p>
-            <h2 style={sectionTitleStyle}>Explorar deportes</h2>
+            <p style={eyebrowStyle}>{t.categories}</p>
+<h2 style={sectionTitleStyle}>{t.exploreSports}</h2>
           </div>
         </div>
 
@@ -290,12 +289,12 @@ export default function Home() {
       <section style={sectionStyle}>
   <div style={sectionHeaderStyle}>
     <div>
-      <p style={eyebrowStyle}>MARCAS</p>
-      <h2 style={sectionTitleStyle}>Marcas populares</h2>
+     <p style={eyebrowStyle}>{t.brands}</p>
+<h2 style={sectionTitleStyle}>{t.popularBrands}</h2>
     </div>
 
     <button onClick={() => router.push("/products")} style={smallButtonStyle}>
-      Ver todas →
+      {t.viewAll}
     </button>
   </div>
 
@@ -317,8 +316,8 @@ export default function Home() {
         <section style={sectionStyle}>
           <div style={sectionHeaderStyle}>
             <div>
-              <p style={eyebrowStyle}>ACTIVIDAD DEL MERCADO</p>
-              <h2 style={sectionTitleStyle}>Vendido recientemente</h2>
+              <p style={eyebrowStyle}>{t.marketActivity}</p>
+<h2 style={sectionTitleStyle}>{t.soldRecently}</h2>
             </div>
           </div>
 
@@ -392,13 +391,13 @@ export default function Home() {
 </section>
 
 <section style={sellerCtaStyle}>
-        <h2 style={ctaTitleStyle}>¿Listo para vender material premium?</h2>
+        <h2 style={ctaTitleStyle}>¿{t.readyTitle}?</h2>
         <p style={ctaTextStyle}>
-          Publica tu equipamiento deportivo y llega a compradores que buscan piezas de calidad.
+          {t.readyText}
         </p>
 
         <button onClick={() => router.push("/sell")} style={primaryButtonStyle}>
-          Empezar a vender
+          {t.startSelling}
         </button>
       </section>
 
@@ -408,7 +407,7 @@ export default function Home() {
             <h3 style={footerLogoStyle}>ATHMOV</h3>
 
             <p style={footerTextStyle}>
-  Marketplace premium de segunda mano para atletas, coleccionistas y amantes del deporte.
+  {t.footerDescription}
 </p>
 
 <a href="mailto:contact@athmov.com" style={footerEmailStyle}>
@@ -417,14 +416,14 @@ export default function Home() {
           </div>
 
           <div style={footerColumnStyle}>
-            <p style={footerTitleStyle}>Marketplace</p>
+            <p style={footerTitleStyle}>{t.marketplace}</p>
 
             <button onClick={() => router.push("/products")} style={footerLinkStyle}>
-              Comprar
+             {t.buy}
             </button>
 
             <button onClick={() => router.push("/sell")} style={footerLinkStyle}>
-              Vender
+              {t.sell}
             </button>
 
             <button onClick={() => router.push("/blog")} style={footerLinkStyle}>
@@ -433,17 +432,17 @@ export default function Home() {
           </div>
 
           <div style={footerColumnStyle}>
-            <p style={footerTitleStyle}>Soporte</p>
+            <p style={footerTitleStyle}>{t.support}</p>
 
             <button onClick={() => router.push("/how-it-works")} style={footerLinkStyle}>
-              Cómo funciona
+              {t.howWorks}
             </button>
 
             <button onClick={() => router.push("/buyer-guide")} style={footerLinkStyle}>
-              Guía del comprador
+              {t.buyerGuide}
             </button>
 
-            <button style={footerLinkStyle}>Protección al comprador</button>
+            <button style={footerLinkStyle}>{t.buyerProtection}</button>
           </div>
 
           <div style={footerColumnStyle}>
@@ -468,7 +467,7 @@ export default function Home() {
         </div>
 
        <div style={footerBottomStyle}>
-  © 2025 ATHMOV. Todos los derechos reservados. · Contacto: contact@athmov.com
+  {t.rights} · Contacto: contact@athmov.com
 </div>
       </footer>
 

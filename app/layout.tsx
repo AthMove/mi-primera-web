@@ -1,6 +1,6 @@
 import "./globals.css";
-import "./globals.css";
-import Navbar from "@/components/Navbar";
+import Navbar from "../components/Navbar";
+import { LanguageProvider } from "../components/LanguageProvider";
 
 export const metadata = {
   title: "ATHMOV",
@@ -20,8 +20,10 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body>
-        <Navbar />
-        {children}
+        <LanguageProvider>
+          <Navbar />
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );
