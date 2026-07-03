@@ -54,14 +54,6 @@ const articles = [
       "Aprende a valorar drivers, hierros, wedges y sets completos.",
     href: "/blog/como-calcular-precio-palos-golf-segunda-mano",
     reading: "6 min",
-  },
-  {
-  category: "GOLF · COMPRA",
-  title: "Qué revisar antes de comprar unos hierros de golf de segunda mano",
-  description:
-    "Cara, estrías, suela, varillas y grips: lo que debes comprobar antes de comprar unos hierros usados.",
-  href: "/blog/que-revisar-hierros-golf-segunda-mano",
-  reading: "6 min",
 },
 {
   category: "GOLF · COMPRA",
@@ -134,8 +126,8 @@ export default function GolfBlogPage() {
         <h2 style={sectionTitleStyle}>Todo sobre Golf</h2>
 
         <div style={gridStyle}>
-          {rest.map((article) => (
-            <Link key={article.href} href={article.href} style={cardStyle}>
+         {rest.map((article, index) => (
+  <Link key={`${article.href}-${index}`} href={article.href} style={cardStyle}>
               <div>
                 <p style={cardCategoryStyle}>{article.category}</p>
                 <h3 style={cardTitleStyle}>{article.title}</h3>

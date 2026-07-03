@@ -351,17 +351,15 @@ export default function Home() {
       <section style={sectionStyle}>
   <div style={sectionHeaderStyle}>
     <div>
-      <p style={eyebrowStyle}>ATHMOV JOURNAL</p>
-      <h2 style={sectionTitleStyle}>
-        Guías para comprar y vender mejor
-      </h2>
+      <p style={eyebrowStyle}>{t.blogEyebrow}</p>
+<h2 style={sectionTitleStyle}>{t.blogTitle}</h2>
     </div>
 
     <button
       onClick={() => router.push("/blog")}
       style={smallButtonStyle}
     >
-      Ver blog →
+      {t.viewBlog}
     </button>
   </div>
 
@@ -391,7 +389,7 @@ export default function Home() {
 </section>
 
 <section style={sellerCtaStyle}>
-        <h2 style={ctaTitleStyle}>¿{t.readyTitle}?</h2>
+        <h2 style={ctaTitleStyle}>{t.readyTitle}</h2>
         <p style={ctaTextStyle}>
           {t.readyText}
         </p>

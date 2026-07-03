@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { translations } from "../lib/i18n";
 
 type Language = "es" | "en" | "pt";
@@ -17,7 +17,22 @@ export function LanguageProvider({
   children: React.ReactNode;
 }) {
   const [lang, setLang] = useState<Language>("es");
+  const [mounted, setMounted] = useState(false);
 
+  useEffect(() => {
+    const savedLang = localStorage.getItem("athmov-language") as Language | null;
+
+    if (savedLang === "es" || savedLang === "en" || savedLang === "pt") {
+      setLang(savedLang);
+    }
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("athmov-language", lang);
+  }, [lang]);
+
+  if (!mounted) return null;
   return (
     <LanguageContext.Provider
       value={{

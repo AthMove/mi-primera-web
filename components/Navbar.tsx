@@ -413,8 +413,8 @@ return () => window.removeEventListener("scroll", onScroll);
     />
 
     <button type="submit" style={searchButtonStyle}>
-      Buscar
-    </button>
+  {t.searchButton}
+</button>
   </form>
 
   {showResults && searchResults.length > 0 && (

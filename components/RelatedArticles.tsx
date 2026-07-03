@@ -114,8 +114,8 @@ export default function RelatedArticles({
       <h2 style={titleStyle}>También te puede interesar</h2>
 
       <div style={gridStyle}>
-        {articles.map((article) => (
-          <Link key={article.href} href={article.href} style={cardStyle}>
+        {articles.map((article, index) => (
+          <Link key={`${article.href}-${index}`} href={article.href} style={cardStyle}>
             <span style={categoryStyle}>{article.category}</span>
 
             <h3 style={cardTitleStyle}>{article.title}</h3>
