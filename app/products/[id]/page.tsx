@@ -4,9 +4,11 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function ProductDetail() {
   const params = useParams();
+  const { t } = useLanguage();
   const id = String(params.id);
 
   const [producto, setProducto] = useState<any>(null);
@@ -171,7 +173,7 @@ setSellerReviews(reviewsData || []);
     if (!producto) return;
 
     if (producto.sold) {
-      alert("Este producto ya se ha vendido");
+      alert(t.productAlreadySold);
       return;
     }
 
@@ -180,12 +182,12 @@ setSellerReviews(reviewsData || []);
     } = await supabase.auth.getUser();
 
     if (!user) {
-      alert("Debes iniciar sesión");
+      alert(t.loginRequired);
       return;
     }
 
     if (user.id === producto.seller_id) {
-      alert("No puedes comprar tu propio producto");
+      alert(t.cannotBuyOwnProduct);
       return;
     }
 
@@ -203,7 +205,7 @@ setSellerReviews(reviewsData || []);
       !sellerProfile?.stripe_charges_enabled ||
       !sellerProfile?.stripe_payouts_enabled
     ) {
-      alert("El vendedor todavía no tiene los pagos de Stripe activos");
+     alert(t.sellerStripeInactive);
       return;
     }
 
@@ -237,7 +239,7 @@ setSellerReviews(reviewsData || []);
         .single();
 
       if (orderError || !order) {
-        alert(orderError?.message || "No se pudo crear el pedido");
+        alert(orderError?.message || t.orderCreateError);
         return;
       }
 
@@ -266,10 +268,10 @@ setSellerReviews(reviewsData || []);
         return;
       }
 
-      alert(data.error || "No se pudo iniciar el checkout");
+      alert(data.error || t.checkoutError);
     } catch (error) {
       console.log(error);
-      alert("Error al iniciar el checkout");
+      alert(t.checkoutStartError);
     } finally {
       setCheckoutLoading(false);
     }
@@ -281,7 +283,7 @@ setSellerReviews(reviewsData || []);
     } = await supabase.auth.getUser();
 
     if (!user) {
-      alert("Debes iniciar sesión");
+      alert(t.loginRequired);
       return;
     }
 
@@ -312,22 +314,22 @@ setSellerReviews(reviewsData || []);
     if (!producto) return;
 
     if (producto.sold) {
-      alert("Este producto ya se ha vendido");
+      alert(t.productAlreadySold);
       return;
     }
 
     if (!producto?.seller_id) {
-      alert("Este producto no tiene vendedor asociado");
+      alert(t.sellerNotAssociated);
       return;
     }
 
-    const amount = prompt("Introduce tu oferta");
+    const amount = prompt(t.enterOffer)
     if (!amount) return;
 
     const numericAmount = Number(amount);
 
     if (!numericAmount || numericAmount <= 0) {
-      alert("Introduce una cantidad válida");
+      alert(t.invalidAmount);
       return;
     }
 
@@ -336,12 +338,12 @@ setSellerReviews(reviewsData || []);
     } = await supabase.auth.getUser();
 
     if (!user) {
-      alert("Debes iniciar sesión");
+      alert(t.loginRequired);
       return;
     }
 
     if (user.id === producto.seller_id) {
-      alert("No puedes hacer una oferta sobre tu propio producto");
+      alert(t.cannotOfferOwnProduct);
       return;
     }
 
@@ -374,7 +376,7 @@ setSellerReviews(reviewsData || []);
       }),
     });
 
-    alert("Oferta enviada");
+    alert(t.offerSent);
   };
     const messageSeller = async () => {
     const {
@@ -382,17 +384,17 @@ setSellerReviews(reviewsData || []);
     } = await supabase.auth.getUser();
 
     if (!user) {
-      alert("Debes iniciar sesión");
+      alert(t.loginRequired);
       return;
     }
 
     if (!producto?.seller_id) {
-      alert("Este producto no tiene vendedor asociado");
+      alert(t.sellerNotAssociated);
       return;
     }
 
     if (user.id === producto.seller_id) {
-      alert("No puedes escribirte a ti mismo");
+      alert(t.cannotMessageYourself);
       return;
     }
 
@@ -420,7 +422,7 @@ setSellerReviews(reviewsData || []);
         .single();
 
       if (error || !newConversation) {
-        alert(error?.message || "No se pudo crear la conversación");
+        alert(error?.message || t.conversationError);
         return;
       }
 
@@ -482,31 +484,28 @@ setSellerReviews(reviewsData || []);
       localStorage.setItem("athmov_cart", JSON.stringify(cart));
     }
 
-    alert("Añadido al carrito");
+    alert(t.addedToCart);
   };
 
   if (loading) {
-    return <div style={{ padding: "60px" }}>Cargando producto...</div>;
+    return <div style={{ padding: "60px" }}>{t.loadingProduct}</div>;
   }
 
   if (notFound || !producto) {
-    return <div style={{ padding: "60px" }}>Producto no encontrado</div>;
+    return <div style={{ padding: "60px" }}>{t.productNotFound}</div>;
   }
 
   if (producto.sold) {
     return (
       <main style={pageStyle}>
-        <button onClick={() => window.history.back()} style={backButtonStyle}>
-          ← Volver
-        </button>
+       <button onClick={() => window.history.back()} style={backButtonStyle}>
+  {t.back}
+</button>
 
         <section style={soldCardStyle}>
           <p style={soldEyebrowStyle}>ATHMOV MARKETPLACE</p>
-          <h1 style={soldTitleStyle}>Este producto se ha vendido</h1>
-          <p style={soldTextStyle}>
-            Este artículo ya no está disponible. Puedes seguir explorando
-            material deportivo premium similar.
-          </p>
+          <h1 style={soldTitleStyle}>{t.productSoldTitle}</h1>
+          <p style={soldTextStyle}>{t.productSoldText}</p>
 
           <button
             onClick={() => {
@@ -514,7 +513,7 @@ setSellerReviews(reviewsData || []);
             }}
             style={buyButtonStyle}
           >
-            Volver al marketplace
+            {t.backToMarketplace}
           </button>
         </section>
       </main>
@@ -537,7 +536,7 @@ setSellerReviews(reviewsData || []);
   return (
     <main className="product-detail-page" style={pageStyle}>
       <button onClick={() => window.history.back()} style={backButtonStyle}>
-        ← Volver
+        {t.back}
       </button>
 
       <div style={layoutStyle} className="product-detail-layout">
@@ -611,15 +610,15 @@ setSellerReviews(reviewsData || []);
           </p>
 
 <div style={quickInfoStyle}>
-  <span style={quickInfoItemStyle}>🚚 Envío protegido</span>
-  <span style={quickInfoItemStyle}>✓ Pago seguro</span>
-  <span style={quickInfoItemStyle}>↩ 48h para incidencias</span>
+  <span style={quickInfoItemStyle}>🚚 {t.protectedShipping}</span>
+  <span style={quickInfoItemStyle}>✓ {t.securePaymentShort}</span>
+  <span style={quickInfoItemStyle}>↩ {t.incidentWindow}</span>
 </div>
 
 <div style={trustScoreStyle}>
   <div>
-    <p style={trustScoreLabelStyle}>ATHMOV TRUST SCORE</p>
-    <h3 style={trustScoreTitleStyle}>Compra con confianza</h3>
+   <p style={trustScoreLabelStyle}>{t.trustScore}</p>
+<h3 style={trustScoreTitleStyle}>{t.buyWithConfidenceShort}</h3>
   </div>
 
   <div style={trustScoreBadgeStyle}>9.2</div>
@@ -629,13 +628,13 @@ setSellerReviews(reviewsData || []);
 
           <div style={metaGridStyle} className="product-detail-meta">
             {[
-              ["ESTADO", getConditionLabel(producto.condition)],
-              [
-                "VENDEDOR",
-                sellerProfile?.seller_verified ? "Verificado" : "Disponible",
-              ],
-              ["UBICACIÓN", producto.location || "España"],
-            ].map(([label, value]) => (
+  [t.condition, getConditionLabel(producto.condition)],
+  [
+    t.seller,
+    sellerProfile?.seller_verified ? t.verified : t.available,
+  ],
+  [t.location, producto.location || "España"],
+].map(([label, value]) => (
               <div key={label} style={metaCardStyle}>
                 <p style={metaLabelStyle}>{label}</p>
                 <p style={metaValueStyle}>{value}</p>
@@ -643,21 +642,21 @@ setSellerReviews(reviewsData || []);
             ))}
           </div>
 
-          <div style={trustPanelStyle}>
-            <div style={trustPanelItemStyle}>✓ Protección al comprador</div>
-            <div style={trustPanelItemStyle}>✓ Pago seguro</div>
-            <div style={trustPanelItemStyle}>
-              {sellerProfile?.seller_verified
-                ? "✓ Vendedor verificado"
-                : "Perfil del vendedor disponible"}
-            </div>
-            <div style={trustPanelItemStyle}>✓ Marketplace seleccionado</div>
-          </div>
+        <div style={trustPanelStyle}>
+  <div style={trustPanelItemStyle}>✓ {t.buyerProtection}</div>
+  <div style={trustPanelItemStyle}>✓ {t.securePaymentShort}</div>
+  <div style={trustPanelItemStyle}>
+    {sellerProfile?.seller_verified
+      ? `✓ ${t.sellerVerified}`
+      : t.sellerProfileAvailable}
+  </div>
+  <div style={trustPanelItemStyle}>✓ {t.selectedMarketplace}</div>
+</div>
 
           <section style={buyerGuideStyle}>
             <div style={buyerGuideHeaderStyle}>
               <div>
-                <p style={buyerGuideEyebrowStyle}>GUÍA DEL COMPRADOR · BETA</p>
+               <p style={buyerGuideEyebrowStyle}>{t.buyerGuideBeta}</p>
                 <h2 style={buyerGuideTitleStyle}>{buyerGuide.title}</h2>
               </div>
 
@@ -702,9 +701,10 @@ setSellerReviews(reviewsData || []);
           </section>
 
           {sellerProfile?.seller_verified && (
-            <div style={verifiedSellerBadgeStyle}>✓ Vendedor verificado</div>
-          )}
-
+  <div style={verifiedSellerBadgeStyle}>
+    ✓ {t.sellerVerified}
+  </div>
+)}
           <div style={sellerCardStyle}>
   <div style={sellerAvatarStyle}>
     {producto.brand?.charAt(0) || "A"}
@@ -712,14 +712,14 @@ setSellerReviews(reviewsData || []);
 
   <div style={{ flex: 1 }}>
     <h3 style={sellerNameStyle}>
-      {sellerProfile?.seller_badge || "Vendedor ATHMOV"}
-    </h3>
+  {sellerProfile?.seller_badge || t.athmovSeller}
+</h3>
 
-    <p style={sellerMetaStyle}>
-      {sellerProfile?.seller_verified
-        ? "✓ Vendedor verificado"
-        : "Miembro del marketplace"}
-    </p>
+   <p style={sellerMetaStyle}>
+  {sellerProfile?.seller_verified
+    ? `✓ ${t.sellerVerified}`
+    : t.marketplaceMember}
+</p>
   </div>
 </div>
 
@@ -730,7 +730,7 @@ setSellerReviews(reviewsData || []);
               }}
               style={sellerButtonStyle}
             >
-              Ver perfil del vendedor
+              {t.viewSellerProfile}
             </button>
           )}
 
@@ -775,29 +775,29 @@ setSellerReviews(reviewsData || []);
 )}
 
           <div style={actionsStyle} className="product-detail-actions">
-            <button onClick={messageSeller} style={secondaryButtonStyle}>
-              Solicitar vídeo de verificación
-            </button>
+           <button onClick={messageSeller} style={secondaryButtonStyle}>
+  {t.requestVerificationVideo}
+</button>
 
-            <button onClick={buyNow} style={buyButtonStyle}>
-              {checkoutLoading ? "Redirigiendo..." : "Comprar ahora"}
-            </button>
+<button onClick={buyNow} style={buyButtonStyle}>
+  {checkoutLoading ? t.redirecting : t.buyNow}
+</button>
 
-            <button onClick={addToCart} style={primaryButtonStyle}>
-              Añadir al carrito
-            </button>
+<button onClick={addToCart} style={primaryButtonStyle}>
+  {t.addToCart}
+</button>
 
-            <button onClick={toggleFavorite} style={secondaryButtonStyle}>
-              {isFavorite ? "❤️ En favoritos" : "🤍 Añadir a favoritos"}
-            </button>
+<button onClick={toggleFavorite} style={secondaryButtonStyle}>
+  {isFavorite ? t.inFavorites : t.addToFavorites}
+</button>
 
-            <button onClick={messageSeller} style={secondaryButtonStyle}>
-              Escribir al vendedor
-            </button>
+<button onClick={messageSeller} style={secondaryButtonStyle}>
+  {t.messageSeller}
+</button>
 
-            <button onClick={makeOffer} style={secondaryButtonStyle}>
-              Hacer oferta
-            </button>
+<button onClick={makeOffer} style={secondaryButtonStyle}>
+  {t.makeOffer}
+</button>
           </div>
         </div>
       </div>

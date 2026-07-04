@@ -4,9 +4,11 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function ProductsClient() {
   const router = useRouter();
+  const { t } = useLanguage();
   const searchParams = useSearchParams();
   const categoryFilter = searchParams.get("category");
 
@@ -138,17 +140,16 @@ export default function ProductsClient() {
     <main style={pageStyle} className="marketplace-page">
       <section style={heroStyle}>
         <div>
-          <p style={eyebrowStyle}>ATHMOV MARKETPLACE</p>
+          <p style={eyebrowStyle}>{t.marketplaceEyebrow}</p>
 
           <h1 style={titleStyle} className="marketplace-title">
-            Premium sports
-            <br />
-            gear marketplace.
+          {t.marketplaceTitle1}
+<br />
+{t.marketplaceTitle2}
           </h1>
 
           <p style={subtitleStyle}>
-            Compra y vende material deportivo premium con protección al
-            comprador, pagos seguros y vendedores verificados.
+            {t.marketplaceSubtitle}
           </p>
 
           <div style={heroActionsStyle}>
@@ -156,27 +157,27 @@ export default function ProductsClient() {
               onClick={() => router.push("/sell")}
               style={primaryButtonStyle}
             >
-              Vender producto
+              {t.sellProduct}
             </button>
 
             <button
               onClick={() => router.push("/buyer-guide")}
               style={secondaryButtonStyle}
             >
-              Guía del comprador
+              {t.buyerGuide}
             </button>
           </div>
         </div>
 
         <div style={heroCardStyle}>
-          <p style={heroCardEyebrowStyle}>ATHMOV PROTECTION</p>
-          <h2 style={heroCardTitleStyle}>Compra con más confianza</h2>
+         <p style={heroCardEyebrowStyle}>{t.protectionEyebrow}</p>
+          <h2 style={heroCardTitleStyle}>{t.buyWithConfidence}</h2>
 
           <div style={trustGridStyle}>
-            <span>✓ Pago seguro</span>
-            <span>✓ Protección al comprador</span>
-            <span>✓ Vendedores verificados</span>
-            <span>✓ Marketplace seleccionado</span>
+            <span>✓ {t.securePayment}</span>
+<span>✓ {t.buyerProtection}</span>
+<span>✓ {t.verifiedSellers}</span>
+<span>✓ {t.selectedMarketplace}</span>
           </div>
         </div>
       </section>
@@ -184,15 +185,15 @@ export default function ProductsClient() {
         <section style={featuredSectionStyle}>
           <div style={sectionHeaderStyle}>
             <div>
-              <p style={eyebrowStyle}>CURATED DROPS</p>
-              <h2 style={sectionTitleStyle}>Productos destacados</h2>
+              <p style={eyebrowStyle}>{t.curatedDrops}</p>
+              <h2 style={sectionTitleStyle}>{t.featuredProducts}</h2>
             </div>
 
             <button
               onClick={() => router.push("/products")}
               style={smallButtonStyle}
             >
-              Ver todo →
+              {t.viewAll}
             </button>
           </div>
 
@@ -262,7 +263,7 @@ export default function ProductsClient() {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar por producto, marca o deporte..."
+            placeholder={t.searchMarketplace}
             style={searchInputStyle}
           />
 
@@ -273,9 +274,9 @@ export default function ProductsClient() {
             }
             style={sortSelectStyle}
           >
-            <option value="latest">Más recientes</option>
-            <option value="price_low">Precio: menor a mayor</option>
-            <option value="price_high">Precio: mayor a menor</option>
+            <option value="latest">{t.sortLatest}</option>
+<option value="price_low">{t.sortPriceLow}</option>
+<option value="price_high">{t.sortPriceHigh}</option>
           </select>
         </div>
       </section>
@@ -288,21 +289,23 @@ export default function ProductsClient() {
             <p style={eyebrowStyle}>MARKETPLACE</p>
 
             <h2 style={sectionTitleStyle}>
-              {categoryFilter ? categoryFilter : "Todos los productos"}
+              {categoryFilter ? categoryFilter : t.allProducts}
             </h2>
           </div>
 
           <p style={countStyle}>
-            {filteredProducts.length} producto
-            {filteredProducts.length === 1 ? "" : "s"}
+            {filteredProducts.length}{" "}
+{filteredProducts.length === 1
+  ? t.productCountSingular
+  : t.productCountPlural}
           </p>
         </div>
 
         {loading ? (
-          <div style={emptyStyle}>Cargando productos...</div>
+          <div style={emptyStyle}>{t.productsLoading}</div>
         ) : filteredProducts.length === 0 ? (
           <div style={emptyStyle}>
-            No hay productos disponibles en esta categoría.
+            {t.noProducts}
           </div>
         ) : (
           <div style={gridStyle}>
@@ -327,7 +330,7 @@ export default function ProductsClient() {
                   />
 
                   {product.featured && (
-                    <span style={featuredBadgeStyle}>DESTACADO</span>
+                    <span style={featuredBadgeStyle}>{t.featured}</span>
                   )}
                 </div>
 
@@ -341,7 +344,7 @@ export default function ProductsClient() {
                   <div style={cardBottomStyle}>
                     <strong style={priceStyle}>€{product.price}</strong>
 
-                    <span style={openStyle}>Ver →</span>
+                    <span style={openStyle}>{t.viewProduct}</span>
                   </div>
                 </div>
               </article>
@@ -354,15 +357,15 @@ export default function ProductsClient() {
         <section style={feedSectionStyle}>
           <div style={sectionHeaderStyle}>
             <div>
-              <p style={eyebrowStyle}>ATHMOV COMMUNITY</p>
-              <h2 style={sectionTitleStyle}>Feed & comunidad</h2>
+              <p style={eyebrowStyle}>{t.communityEyebrow}</p>
+<h2 style={sectionTitleStyle}>{t.communityTitle}</h2>
             </div>
 
             <button
               onClick={() => router.push("/feed")}
               style={smallButtonStyle}
             >
-              Abrir feed →
+              {t.openFeed}
             </button>
           </div>
 
