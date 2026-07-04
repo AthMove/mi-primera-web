@@ -4,10 +4,12 @@ import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function SellerPage() {
   const params = useParams();
   const router = useRouter();
+  const { t } = useLanguage();
   const sellerId = String(params.id);
 
   const [loading, setLoading] = useState(true);
@@ -75,7 +77,7 @@ const averageRating =
     : "0.0";
 
   if (loading) {
-    return <main style={pageStyle}>Loading seller...</main>;
+    return <main style={pageStyle}>{t.loadingSeller}</main>;
   }
 
   return (
@@ -100,7 +102,7 @@ const averageRating =
         </div>
 
         <div style={{ flex: 1 }}>
-          <p style={eyebrowStyle}>VENDEDOR ATHMOV VERIFICADO</p>
+          <p style={eyebrowStyle}>{t.verifiedAthmovSeller}</p>
 
           <h1 style={titleStyle} className="seller-title">
             {sellerName}
@@ -120,10 +122,10 @@ const averageRating =
     cursor: "pointer",
   }}
 >
-  Dejar valoración
+  {t.leaveReview}
 </button>
             {seller?.seller_verified && (
-             <span style={verifiedBadgeStyle}>VERIFICADO</span>
+             <span style={verifiedBadgeStyle}>{t.verifiedLabel}</span>
             )}
 
             <span style={levelBadgeStyle}>
@@ -134,15 +136,15 @@ const averageRating =
               )
                 .toString()
                 .toUpperCase()}{" "}
-             VENDEDOR
+             {t.sellerLabel}
             </span>
 
-            <span style={trustBadgeStyle}>MARKETPLACE DE CONFIANZA</span>
+            <span style={trustBadgeStyle}>{t.trustedMarketplace}</span>
           </div>
 
           <p style={bioStyle}>
             {seller?.bio ||
-              "Premium ATHMOV seller focused on curated sports gear, fast shipping and trusted transactions."}
+              t.defaultSellerBio}
           </p>
 
           <div style={infoRowStyle}>
@@ -154,14 +156,14 @@ const averageRating =
             </div>
 
             <div style={infoCardStyle}>
-              <p style={infoLabelStyle}>Tiempo de respuesta</p>
+              <p style={infoLabelStyle}>T{t.responseTime}</p>
               <p style={infoValueStyle}>
                {seller?.response_time || "< 1 hora"}
               </p>
             </div>
 
             <div style={infoCardStyle}>
-              <p style={infoLabelStyle}>Miembro desde</p>
+              <p style={infoLabelStyle}>T{t.memberSince}</p>
               <p style={infoValueStyle}>
                 {seller?.created_at
                   ? new Date(seller.created_at).getFullYear()
@@ -173,10 +175,10 @@ const averageRating =
       </section>
 
       <section style={trustSectionStyle}>
-        <div style={trustCardStyle}>✓ Identidad verificada</div>
-        <div style={trustCardStyle}>✓ Pagos seguros</div>
-        <div style={trustCardStyle}>✓ Marketplace premium</div>
-        <div style={trustCardStyle}>✓ Vendedor confiable</div>
+        <div style={trustCardStyle}>✓ {t.verifiedIdentity}</div>
+        <div style={trustCardStyle}>✓ {t.securePayments}</div>
+        <div style={trustCardStyle}>✓ {t.premiumMarketplace}</div>
+        <div style={trustCardStyle}>✓ {t.trustedSeller}</div>
       </section>
 
     <section style={statsGridStyle}>
@@ -186,17 +188,17 @@ const averageRating =
   </div>
 
   <div style={statCardStyle}>
-    <p style={statLabelStyle}>Valoración</p>
+    <p style={statLabelStyle}>{t.reviewsLabel}</p>
     <h2 style={statValueStyle}>★ {averageRating}</h2>
   </div>
 
   <div style={statCardStyle}>
-    <p style={statLabelStyle}>Productos activos</p>
+    <p style={statLabelStyle}>{t.activeProducts}</p>
     <h2 style={statValueStyle}>{activeCount}</h2>
   </div>
 
   <div style={statCardStyle}>
-    <p style={statLabelStyle}>Productos vendidos</p>
+    <p style={statLabelStyle}>{t.soldProducts}</p>
     <h2 style={statValueStyle}>{soldCount}</h2>
   </div>
 </section>
@@ -204,14 +206,14 @@ const averageRating =
       <section style={sectionStyle}>
         <div style={sectionHeaderStyle}>
           <div>
-            <p style={sectionEyebrowStyle}>INVENTARIO DEL VENDEDOR</p>
+            <p style={sectionEyebrowStyle}> {t.sellerInventory}</p>
             <h2 style={sectionTitleStyle}>Productos activos</h2>
           </div>
         </div>
 
         {products.filter((p) => !p.sold).length === 0 ? (
           <div style={emptyStyle}>
-           Este vendedor no tiene productos activos.
+          {t.noActiveProducts}
           </div>
         ) : (
           <div style={gridStyle}>
@@ -256,13 +258,13 @@ const averageRating =
       <section style={sectionStyle}>
         <div style={sectionHeaderStyle}>
           <div>
-            <p style={sectionEyebrowStyle}>FEEDBACK DEL COMPRADOR</p>
+            <p style={sectionEyebrowStyle}>{t.buyerFeedback}</p>
             <h2 style={sectionTitleStyle}>Valoraciones</h2>
           </div>
         </div>
 
         {reviews.length === 0 ? (
-       <div style={emptyStyle}>Todavía no hay valoraciones.</div>
+       <div style={emptyStyle}>{t.noReviewsYet}</div>
         ) : (
           <div style={reviewsGridStyle}>
             {reviews.map((review) => (
@@ -278,7 +280,7 @@ const averageRating =
                 </p>
 
                 <p style={reviewTextStyle}>
-  {review.comment || "Sin comentario."}
+  {review.comment || t.noComment}
 </p>
 
 <p style={reviewDateStyle}>
