@@ -3,10 +3,12 @@
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function SellerReviewPage() {
   const params = useParams();
   const router = useRouter();
+  const { t } = useLanguage();
   const sellerId = String(params.id);
 
   const [rating, setRating] = useState("5");
@@ -17,7 +19,7 @@ export default function SellerReviewPage() {
     e.preventDefault();
 
     if (!comment.trim()) {
-      alert("Escribe una valoración");
+      alert(t.reviewRequired)
       return;
     }
 
@@ -29,14 +31,14 @@ export default function SellerReviewPage() {
 
     if (!user) {
       setLoading(false);
-      alert("Debes iniciar sesión");
+      alert(t.loginRequired)
       router.push("/auth");
       return;
     }
 
     if (user.id === sellerId) {
       setLoading(false);
-      alert("No puedes valorarte a ti mismo");
+      alert(t.cannotReviewYourself);
       return;
     }
 
@@ -50,7 +52,7 @@ export default function SellerReviewPage() {
 
     if (!order) {
       setLoading(false);
-      alert("Solo compradores con pedidos completados pueden valorar vendedores");
+      alert(t.onlyCompletedOrdersReview);
       return;
     }
 
@@ -63,7 +65,7 @@ export default function SellerReviewPage() {
 
     if (existingReview) {
       setLoading(false);
-      alert("Ya has valorado a este vendedor");
+      alert(t.alreadyReviewedSeller);
       return;
     }
 
@@ -84,15 +86,15 @@ export default function SellerReviewPage() {
       return;
     }
 
-    alert("Valoración enviada");
+    alert(t.reviewSent);
     router.push(`/seller/${sellerId}`);
   };
 
   return (
     <main style={pageStyle}>
       <section style={cardStyle}>
-        <p style={eyebrowStyle}>ATHMOV REVIEW</p>
-        <h1 style={titleStyle}>Valorar vendedor</h1>
+        <p style={eyebrowStyle}>{t.reviewEyebrow}</p>
+        <h1 style={titleStyle}>{t.reviewSellerTitle}</h1>
 
         <form onSubmit={submitReview} style={formStyle}>
           <select
@@ -110,7 +112,7 @@ export default function SellerReviewPage() {
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            placeholder="Describe tu experiencia con este vendedor..."
+            placeholder={t.reviewPlaceholder}
             required
             style={textareaStyle}
           />
@@ -124,7 +126,7 @@ export default function SellerReviewPage() {
               cursor: loading ? "not-allowed" : "pointer",
             }}
           >
-            {loading ? "Enviando..." : "Enviar valoración"}
+            {loading ? t.sendingReview : t.sendReview}
           </button>
         </form>
       </section>

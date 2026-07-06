@@ -357,30 +357,24 @@ return () => window.removeEventListener("scroll", onScroll);
   }}
   className="athmov-navbar"
 >
-        <Link href="/" style={logoStyle}>
-          <Image
-            src="/logo.png"
-            alt="ATHMOV"
-            fill
-            sizes="220px"
-            style={{
-              objectFit: "contain",
-              objectPosition: "left center",
-            }}
-            priority
-          />
-        </Link>
+<Link href="/" style={logoStyle}>
+  <Image
+    src="/logo.png"
+    alt="ATHMOV"
+    width={210}
+    height={52}
+    priority
+    style={{
+      width: "210px",
+      height: "auto",
+      display: "block",
+      objectFit: "contain",
+    }}
+  />
+</Link>
 
         <div style={rightLinksStyle} className="desktop-only">
- <select
-  value={lang}
-  onChange={(e) => setLang(e.target.value as "es" | "en" | "pt")}
-  style={languageSelectStyle}
->
-  <option value="es">ES</option>
-  <option value="en">EN</option>
-  <option value="pt">PT</option>
-</select>
+ 
 
           <Link href="/cart" style={cartLinkStyle}>
             CARRITO ({cartCount})
@@ -461,15 +455,6 @@ return () => window.removeEventListener("scroll", onScroll);
 
           {userEmail ? (
   <>
-    <select
-      value={lang}
-      onChange={(e) => setLang(e.target.value as "es" | "en" | "pt")}
-      style={languageSelectStyle}
-    >
-      <option value="es">ES</option>
-      <option value="en">EN</option>
-      <option value="pt">PT</option>
-    </select>
 
     <Link href="/account" style={signInStyle}>
       {t.account}
@@ -535,7 +520,31 @@ return () => window.removeEventListener("scroll", onScroll);
     <Link href="/products" style={drawerHeroButtonStyle}>
       Explorar Marketplace →
     </Link>
+  <div style={{ marginTop: 24 }}>
+  <div style={drawerSectionTitleStyle}>
+    IDIOMA
   </div>
+
+  <select
+    value={lang}
+    onChange={(e) => setLang(e.target.value as "es" | "en" | "pt")}
+    style={{
+      width: "100%",
+      marginTop: 10,
+      padding: "14px",
+      borderRadius: "16px",
+      border: "1px solid rgba(0,0,0,.08)",
+      background: "#fff",
+      fontWeight: 700,
+      fontSize: "14px",
+    }}
+  >
+    <option value="es">🇪🇸 Español</option>
+    <option value="en">🇬🇧 English</option>
+    <option value="pt">🇵🇹 Português</option>
+  </select>
+</div>
+</div>
 
   {mobileLinks}
 
@@ -578,37 +587,38 @@ return () => window.removeEventListener("scroll", onScroll);
 
 const navStyle = {
   position: "fixed" as const,
-  top: "16px",
+  top: "18px",
+  left: "50%",
+  transform: "translateX(-50%)",
   zIndex: 100,
-  backdropFilter: "blur(20px)",
-  background: "rgba(255,255,255,0.72)",
-  border: "1px solid rgba(255,255,255,0.4)",
-  boxShadow: "0 10px 40px rgba(0,0,0,0.06)",
-  borderRadius: "28px",
+  width: "calc(100% - 48px)",
+  maxWidth: "1500px",
+  height: 82,
+  padding: "0 22px",
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
-  padding: "0 22px",
-  gap: "20px",
-  left: "50%",
-transform: "translateX(-50%)",
-width: "calc(100% - 40px)",
-maxWidth: "1450px",
+  gap: "18px",
+  borderRadius: "999px",
+  background: "rgba(255,255,255,0.74)",
+  backdropFilter: "blur(28px)",
+  WebkitBackdropFilter: "blur(28px)",
+  border: "1px solid rgba(255,255,255,0.55)",
+ boxShadow: "0 28px 90px rgba(0,0,0,0.12)",
 };
 
 const logoStyle = {
-  position: "relative" as const,
-  width: "220px",
-  height: "86px",
-  display: "block",
+  display: "flex",
+  alignItems: "center",
   flexShrink: 0,
+  textDecoration: "none",
 };
 
 const rightLinksStyle = {
   display: "flex",
   justifyContent: "flex-end",
   alignItems: "center",
-  gap: "12px",
+  gap: "18px",
   flexWrap: "wrap" as const,
 };
 
@@ -750,20 +760,21 @@ const drawerSectionTitleStyle = {
 const navMainLinkStyle = {
   textDecoration: "none",
   color: "#111",
-  fontSize: "12px",
+ fontSize: "13px",
   fontWeight: 900,
-  letterSpacing: "1.3px",
+  letterSpacing: "1.8px",
   textTransform: "uppercase" as const,
 };
 
 const searchFormStyle = {
   display: "flex",
   alignItems: "center",
-  background: "#fff",
-  border: "1px solid rgba(0,0,0,0.08)",
+  background: "rgba(255,255,255,0.82)",
+  border: "1px solid rgba(0,0,0,0.06)",
   borderRadius: "999px",
-  padding: "4px",
-  minWidth: "420px",
+  padding: "5px",
+  minWidth: "460px",
+  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.7)",
 };
 
 const searchInputStyle = {

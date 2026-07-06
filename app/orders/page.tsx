@@ -2,8 +2,10 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function OrdersPage() {
+  const { t } = useLanguage();
   const [orders, setOrders] = useState<any[]>([]);
   const [userId, setUserId] = useState("");
   const [loading, setLoading] = useState(true);
@@ -120,13 +122,13 @@ export default function OrdersPage() {
     const supabase = await getSupabase();
 
     const confirmUpdate = confirm(
-      `¿Marcar este pedido como "${getStatusLabel(status)}"?`
-    );
+  `${t.confirmStatusChange} "${getStatusLabel(status)}"?`
+)
 
     if (!confirmUpdate) return;
 
     if (status === "completed" && order.dispute_status === "open") {
-      alert("Este pedido tiene una disputa abierta. El pago no puede liberarse todavía.");
+      alert(t.hasOpenDispute);
       return;
     }
 
@@ -178,7 +180,7 @@ export default function OrdersPage() {
 const releaseData = await releaseResponse.json();
 
 if (!releaseResponse.ok) {
-  alert(releaseData.error || "No se pudo liberar el pago");
+  alert(releaseData.error || t.releasePaymentError);
   return;
 }
       await supabase.rpc("update_seller_reputation", {
@@ -225,7 +227,7 @@ if (!releaseResponse.ok) {
     const supabase = await getSupabase();
 
     if (!carrier.trim() || !trackingNumber.trim()) {
-      alert("Introduce la empresa de transporte y el número de seguimiento");
+     alert(t.enterCarrierTracking);
       return;
     }
 
@@ -279,7 +281,7 @@ if (!releaseResponse.ok) {
     const supabase = await getSupabase();
 
     if (!disputeReason.trim()) {
-      alert("Describe el problema");
+      alert(t.describeProblem);
       return;
     }
 
@@ -373,7 +375,7 @@ if (!releaseResponse.ok) {
     const supabase = await getSupabase();
 
     if (!comment.trim()) {
-      alert("Escribe una reseña breve");
+      alert(t.writeShortReview);
       return;
     }
 
@@ -385,7 +387,7 @@ if (!releaseResponse.ok) {
       .maybeSingle();
 
     if (existingReview) {
-      alert("Ya has valorado este pedido");
+      alert(t.alreadyReviewedOrder);
       setReviewOrder(null);
       return;
     }
@@ -454,16 +456,16 @@ if (!releaseResponse.ok) {
     });
   };
 
-  const getStatusLabel = (status: string) => {
-    if (status === "pending") return "Pendiente";
-    if (status === "paid") return "Pagado";
-    if (status === "preparing") return "Preparando";
-    if (status === "shipped") return "Enviado";
-    if (status === "delivered") return "Entregado";
-    if (status === "completed") return "Completado";
-    if (status === "refunded") return "Reembolsado";
-    return status || "Pagado";
-  };
+const getStatusLabel = (status: string) => {
+  if (status === "pending") return t.statusPending;
+  if (status === "paid") return t.statusPaid;
+  if (status === "preparing") return t.statusPreparing;
+  if (status === "shipped") return t.statusShipped;
+  if (status === "delivered") return t.statusDelivered;
+  if (status === "completed") return t.statusCompleted;
+  if (status === "refunded") return t.statusRefunded;
+  return status;
+};
 
   const getStepIndex = (status: string) => {
     const steps = ["paid", "preparing", "shipped", "delivered", "completed"];
@@ -473,7 +475,7 @@ if (!releaseResponse.ok) {
 
   const getEstimatedDelivery = (order: any) => {
     const baseDate = order.shipped_at || order.created_at;
-    if (!baseDate) return "Estimado tras el envío";
+    if (!baseDate) return t.estimatedAfterShipping;
 
     const start = new Date(baseDate);
     const end = new Date(baseDate);
@@ -527,7 +529,7 @@ if (!releaseResponse.ok) {
           seller_id: order.seller_id,
           product_id: order.product_id,
           order_id: order.id,
-          last_message: "Conversación iniciada",
+          last_message: t.conversationStarted,
           last_message_at: new Date().toISOString(),
         },
       ])
@@ -552,7 +554,7 @@ if (!releaseResponse.ok) {
       .maybeSingle();
 
     if (!sellerProfile?.stripe_account_id) {
-      alert("El vendedor no ha conectado los pagos de Stripe");
+      alert(t.sellerStripeMissing);
       return;
     }
 
@@ -564,7 +566,7 @@ if (!releaseResponse.ok) {
       body: JSON.stringify({
         orderId: order.id,
         offerId: order.offer_id,
-        title: order.product?.title || "Oferta ATHMOV",
+        title: order.product?.title || t.athmovOffer,
         image:
           order.product?.image ||
           order.product?.image_url ||
@@ -584,7 +586,7 @@ if (!releaseResponse.ok) {
       return;
     }
 
-    alert(data.error || "No se pudo iniciar el pago de la oferta");
+   alert(data.error || t.offerCheckoutError);
   };
 
   const filteredOrders = orders.filter((order: any) => {
@@ -594,17 +596,17 @@ if (!releaseResponse.ok) {
   });
 
   if (loading) {
-    return <main style={pageStyle}>Cargando pedidos...</main>;
+    return <main style={pageStyle}>{t.loadingOrders}</main>;
   }
 
   return (
     <main style={pageStyle} className="orders-page">
       <section style={headerStyle}>
         <h1 style={titleStyle} className="orders-title">
-          Pedidos
+          {t.ordersTitle}
         </h1>
 
-        <p style={subtitleStyle}>Sigue tus compras y ventas.</p>
+        <p style={subtitleStyle}>{t.ordersSubtitle}</p>
 
         <div style={tabsStyle} className="orders-tabs">
           <button
@@ -614,7 +616,7 @@ if (!releaseResponse.ok) {
               ...(filter === "all" ? activeTabStyle : {}),
             }}
           >
-            Todos
+           {t.ordersAll}
           </button>
 
           <button
@@ -624,7 +626,7 @@ if (!releaseResponse.ok) {
               ...(filter === "buying" ? activeTabStyle : {}),
             }}
           >
-            Compras
+            {t.ordersBuying}
           </button>
 
           <button
@@ -634,16 +636,16 @@ if (!releaseResponse.ok) {
               ...(filter === "selling" ? activeTabStyle : {}),
             }}
           >
-            Ventas
+            {t.ordersSelling}
           </button>
         </div>
       </section>
 
       {filteredOrders.length === 0 ? (
         <section style={emptyStyle}>
-          <h2 style={{ fontSize: "32px", margin: 0 }}>Todavía no hay pedidos</h2>
+          <h2 style={{ fontSize: "32px", margin: 0 }}>{t.noOrdersTitle}</h2>
           <p style={{ color: "#666", marginTop: "12px" }}>
-            Tus compras y ventas aparecerán aquí.
+            {t.noOrdersText}
           </p>
         </section>
       ) : (
@@ -663,7 +665,7 @@ if (!releaseResponse.ok) {
                         order.product?.image_url ||
                         order.product?.images?.[0]
                     )}
-                    alt={order.product?.title || "Producto"}
+                    alt={order.product?.title || t.productFallback}
                     fill
                     sizes="120px"
                     style={{ objectFit: "cover" }}
@@ -671,10 +673,10 @@ if (!releaseResponse.ok) {
                 </div>
 
                 <div style={{ flex: 1 }}>
-                  <p style={metaStyle}>{isSeller ? "Venta" : "Compra"}</p>
+                  <p style={metaStyle}>{isSeller ? t.sale : t.purchase}</p>
 
                   <h2 style={orderTitleStyle}>
-                    {order.product?.title || "Producto"}
+                    {order.product?.title || t.productFallback}
                   </h2>
 
                   <p
@@ -691,31 +693,31 @@ if (!releaseResponse.ok) {
                       window.location.href = `/seller/${profileId}`;
                     }}
                   >
-                    {isSeller ? "Comprador" : "Vendedor"} ·{" "}
+                    {isSeller ? t.buyer : t.orderSeller} ·{" "}
                     {formatDate(order.created_at)}
                   </p>
 
                   {(order.carrier || order.tracking_number) && (
                     <div style={trackingBoxStyle}>
-                      <strong>Seguimiento</strong>
+                      <strong>{t.tracking}</strong>
 
                       <span>
-                        {order.carrier || "Transportista"} ·{" "}
+                        {order.carrier || t.carrierFallback} ·{" "}
                         {order.tracking_number}
                       </span>
 
                       {order.shipped_at && (
-                        <small>Enviado el {formatDate(order.shipped_at)}</small>
+                        <small>{t.sentOn} {formatDate(order.shipped_at)}</small>
                       )}
 
                       {status === "shipped" && (
                         <small>
-                          Esperando confirmación de entrega del transportista
+                         {t.waitingCarrierDelivery}
                         </small>
                       )}
 
                       {status === "delivered" && order.delivered_at && (
-                        <small>Entregado el {formatDate(order.delivered_at)}</small>
+                        <small>{t.deliveredOn} {formatDate(order.delivered_at)}</small>
                       )}
 
                       {getTrackingUrl(order.carrier, order.tracking_number) && (
@@ -728,7 +730,7 @@ if (!releaseResponse.ok) {
                           rel="noopener noreferrer"
                           style={trackingLinkStyle}
                         >
-                          Ver seguimiento →
+                          {t.viewTracking}
                         </a>
                       )}
                     </div>
@@ -736,11 +738,9 @@ if (!releaseResponse.ok) {
 
                   {hasOpenDispute && (
                     <div style={disputeWarningStyle}>
-                      <strong>Incidencia reportada</strong>
+                      <strong>{t.issueReported}</strong>
                       <span>
-                        Este pedido está en revisión por ATHMOV. Las reseñas,
-                        la confirmación de entrega y los pagos quedan bloqueados
-                        temporalmente.
+                        {t.issueReviewBlocked}
                       </span>
                     </div>
                   )}
@@ -794,19 +794,21 @@ if (!releaseResponse.ok) {
                     )}
                   </div>
 
-                  <div style={protectionGridStyle}>
-                    <div style={protectionCardStyle}>
-                      <span style={protectionLabelStyle}>
-                        Entrega estimada
-                      </span>
-                      <strong>{getEstimatedDelivery(order)}</strong>
-                    </div>
+               <div style={protectionGridStyle}>
+  <div style={protectionCardStyle}>
+    <span style={protectionLabelStyle}>
+      {t.estimatedDelivery}
+    </span>
+    <strong>{getEstimatedDelivery(order)}</strong>
+  </div>
 
-                    <div style={protectionCardStyle}>
-                      <span style={protectionLabelStyle}>Protección ATHMOV</span>
-                      <strong>Pago seguro y soporte en incidencias</strong>
-                    </div>
-                  </div>
+  <div style={protectionCardStyle}>
+    <span style={protectionLabelStyle}>
+      {t.athmovProtection}
+    </span>
+    <strong>{t.securePaymentAndSupport}</strong>
+  </div>
+</div>
                 </div>
 
                 <div style={rightStyle} className="order-actions">
@@ -815,18 +817,18 @@ if (!releaseResponse.ok) {
                   <span style={statusStyle}>{getStatusLabel(status)}</span>
 
                   {isSeller && order.transfer_status === "released" && (
-                    <span style={paidOutStyle}>Pagado ✓</span>
+                    <span style={paidOutStyle}>{t.paidOut}</span>
                   )}
 
                   {isSeller && order.transfer_status !== "released" && (
-                    <span style={pendingPayoutStyle}>Pago pendiente</span>
+                    <span style={pendingPayoutStyle}>{t.pendingPayout}</span>
                   )}
 
                   <button
                     onClick={() => openOrderChat(order)}
                     style={reviewButtonStyle}
                   >
-                    {isSeller ? "Escribir al comprador" : "Escribir al vendedor"}
+                    {isSeller ? t.writeBuyer : t.writeSeller}
                   </button>
 
                   {isBuyer &&
@@ -836,7 +838,7 @@ if (!releaseResponse.ok) {
                         onClick={() => payAcceptedOffer(order)}
                         style={buttonStyle}
                       >
-                        Pagar oferta aceptada
+                        {t.payAcceptedOffer}
                       </button>
                     )}
 
@@ -845,7 +847,7 @@ if (!releaseResponse.ok) {
                       onClick={() => updateOrderStatus(order, "preparing")}
                       style={buttonStyle}
                     >
-                      Empezar preparación
+                      {t.startPreparing}
                     </button>
                   )}
 
@@ -854,7 +856,7 @@ if (!releaseResponse.ok) {
                       onClick={() => openTrackingModal(order)}
                       style={buttonStyle}
                     >
-                      Añadir seguimiento
+                      {t.addTracking}
                     </button>
                   )}
 
@@ -865,7 +867,7 @@ if (!releaseResponse.ok) {
                         onClick={() => setDisputeOrder(order)}
                         style={reviewButtonStyle}
                       >
-                        Reportar incidencia
+                        {t.reportIssue}
                       </button>
                     )}
 
@@ -876,7 +878,7 @@ if (!releaseResponse.ok) {
                         onClick={() => setDisputeOrder(order)}
                         style={reviewButtonStyle}
                       >
-                        Reportar incidencia
+                        {t.reportIssue}
                       </button>
                     )}
 
@@ -888,11 +890,11 @@ if (!releaseResponse.ok) {
                         onClick={() => setReviewOrder(order)}
                         style={reviewButtonStyle}
                       >
-                        Dejar reseña
+                       {t.leaveReviewShort}
                       </button>
                     )}
 
-                  {order.review && <span style={reviewedStyle}>Valorado</span>}
+                  {order.review && <span style={reviewedStyle}>{t.reviewed}</span>}
                 </div>
               </article>
             );
@@ -910,10 +912,10 @@ if (!releaseResponse.ok) {
               ✕
             </button>
 
-            <p style={eyebrowStyle}>ENVÍO ATHMOV</p>
-            <h2 style={modalTitleStyle}>Añadir seguimiento</h2>
+            <p style={eyebrowStyle}>{t.shippingEyebrow}</p>
+            <h2 style={modalTitleStyle}>{t.trackingModalTitle}</h2>
             <p style={modalTextStyle}>
-              {trackingOrder.product?.title || "Producto"}
+              {trackingOrder.product?.title || t.productFallback}
             </p>
 
             <select
@@ -921,7 +923,7 @@ if (!releaseResponse.ok) {
               onChange={(e) => setCarrier(e.target.value)}
               style={modalInputStyle}
             >
-              <option value="">Selecciona transportista</option>
+              <option value="">{t.selectCarrier}</option>
               <option value="SEUR">SEUR</option>
               <option value="MRW">MRW</option>
               <option value="DHL Express">DHL Express</option>
@@ -930,12 +932,12 @@ if (!releaseResponse.ok) {
             <input
               value={trackingNumber}
               onChange={(e) => setTrackingNumber(e.target.value)}
-              placeholder="Número de seguimiento"
+              placeholder={t.trackingNumber}
               style={modalInputStyle}
             />
 
             <button onClick={saveTracking} style={buttonStyle}>
-              {savingTracking ? "Guardando..." : "Guardar seguimiento"}
+              {savingTracking ? t.saving : t.saveTracking}
             </button>
           </div>
         </div>
@@ -951,18 +953,17 @@ if (!releaseResponse.ok) {
               ✕
             </button>
 
-            <p style={eyebrowStyle}>PROTECCIÓN ATHMOV</p>
-            <h2 style={modalTitleStyle}>Reportar incidencia</h2>
+            <p style={eyebrowStyle}>{t.protectionEyebrowOrders}</p>
+            <h2 style={modalTitleStyle}>{t.disputeModalTitle}</h2>
 
             <p style={modalTextStyle}>
-              Cuéntanos qué ha ocurrido con este pedido. ATHMOV revisará el caso
-              antes de liberar el pago.
+              {t.disputeModalText}
             </p>
 
             <textarea
               value={disputeReason}
               onChange={(e) => setDisputeReason(e.target.value)}
-              placeholder="Ejemplo: el artículo llegó dañado, el seguimiento no funciona, el producto no parece auténtico..."
+              placeholder={t.disputePlaceholder}
               style={textareaStyle}
             />
 
@@ -978,7 +979,7 @@ if (!releaseResponse.ok) {
             />
 
             <button onClick={openDispute} style={buttonStyle}>
-              {savingDispute ? "Enviando..." : "Enviar incidencia"}
+              {savingDispute ? t.sending : t.sendIssue}
             </button>
           </div>
         </div>
@@ -994,11 +995,11 @@ if (!releaseResponse.ok) {
               ✕
             </button>
 
-            <p style={eyebrowStyle}>RESEÑA ATHMOV</p>
-            <h2 style={modalTitleStyle}>Valora tu compra</h2>
+            <p style={eyebrowStyle}>{t.reviewEyebrowOrders}</p>
+            <h2 style={modalTitleStyle}>{t.reviewModalTitle}</h2>
 
             <p style={modalTextStyle}>
-              {reviewOrder.product?.title || "Producto"}
+              {reviewOrder.product?.title || t.productFallback}
             </p>
 
             <div style={starsStyle}>
@@ -1019,12 +1020,12 @@ if (!releaseResponse.ok) {
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Escribe tu experiencia con este vendedor..."
+              placeholder={t.orderReviewPlaceholder}
               style={textareaStyle}
             />
 
             <button onClick={submitReview} style={buttonStyle}>
-              {savingReview ? "Guardando..." : "Enviar reseña"}
+              {savingReview ? t.saving : t.sendOrderReview}
             </button>
           </div>
         </div>

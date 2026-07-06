@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function CartPage() {
   const [cart, setCart] = useState<any[]>([]);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const { t } = useLanguage();
 
   useEffect(() => {
     setCart(JSON.parse(localStorage.getItem("athmov_cart") || "[]"));
@@ -35,7 +37,7 @@ export default function CartPage() {
 
   const handleCheckout = async () => {
   if (cart.length === 0) {
-    alert("El carrito está vacío");
+    alert(t.cartEmptyAlert)
     return;
   }
 
@@ -72,24 +74,24 @@ export default function CartPage() {
   if (data.url) {
     window.location.href = data.url;
   } else {
-    alert(data.error || "Error creando checkout");
+    alert(data.error || t.checkoutCreateError);
   }
 };
 
   return (
     <main style={pageStyle}>
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
-        <p style={eyebrowStyle}>ATHMOV CARRITO</p>
-        <h1 style={titleStyle}>Tu carrito</h1>
+        <p style={eyebrowStyle}>{t.cartEyebrow}</p>
+        <h1 style={titleStyle}>{t.cartTitle}</h1>
 
         {cart.length === 0 ? (
           <section style={emptyStyle}>
-            <h2 style={{ fontSize: "42px", margin: 0 }}>Tu carrito está vacío</h2>
+            <h2 style={{ fontSize: "42px", margin: 0 }}>{t.cartEmptyTitle}</h2>
             <p style={{ color: "#666", marginTop: "14px" }}>
-              Descubre material deportivo premium de atletas y vendedores.
+              {t.cartEmptyText}
             </p>
             <Link href="/products" style={shopButtonStyle}>
-              Seguir comprando
+              {t.continueShopping}
             </Link>
           </section>
         ) : (
@@ -116,38 +118,38 @@ export default function CartPage() {
                     onClick={() => removeItem(item.id)}
                     style={removeButtonStyle}
                   >
-                    Eliminar
+                    {t.remove}
                   </button>
                 </article>
               ))}
             </section>
 
             <aside style={summaryStyle}>
-              <p style={eyebrowStyle}>RESUMEN DEL PEDIDO</p>
+              <p style={eyebrowStyle}>{t.orderSummary}</p>
 
               <div style={summaryRowStyle}>
-                <span>Subtotal</span>
+                <span>{t.subtotal}</span>
                 <strong>€{total}</strong>
               </div>
 
               <div style={summaryRowStyle}>
-                <span>Servicio</span>
-                <strong>Incluido</strong>
+                <span>{t.service}</span>
+                <strong>{t.included}</strong>
               </div>
 
               <div style={dividerStyle} />
 
               <div style={totalRowStyle}>
-                <span>Total</span>
+                <span>{t.total}</span>
                 <strong>€{total}</strong>
               </div>
 
               <button onClick={handleCheckout} style={checkoutButtonStyle}>
-                Finalizar compra
+                {t.checkout}
               </button>
 
               <p style={secureTextStyle}>
-                Pago seguro. Protección al comprador incluida.
+                {t.secureCheckoutText}
               </p>
             </aside>
           </div>

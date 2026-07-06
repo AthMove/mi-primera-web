@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function SuccessClient() {
   const params = useSearchParams();
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -46,43 +48,42 @@ export default function SuccessClient() {
       <section style={cardStyle}>
         <div style={checkStyle}>✓</div>
 
-        <p style={eyebrowStyle}>ATHMOV CHECKOUT</p>
+        <p style={eyebrowStyle}>{t.checkoutEyebrow}</p>
 
         <h1 style={titleStyle}>
-          {loading ? "Procesando pedido..." : "Pedido confirmado"}
+          {loading ? t.processingOrder : t.orderConfirmed}
         </h1>
 
         <p style={textStyle}>
-          Tu pago se ha completado correctamente. La Protección al Comprador de
-          ATHMOV ya está activa y el vendedor preparará el envío con seguimiento.
+          {t.successText}
         </p>
 
         <div style={timelineStyle}>
           <div style={stepStyle}>
             <span style={dotActiveStyle}>✓</span>
-            <p>Pagado</p>
+            <p>{t.paid}</p>
           </div>
 
           <div style={lineStyle} />
 
           <div style={stepStyle}>
             <span style={dotStyle}>2</span>
-            <p>El vendedor envía</p>
+            <p>{t.sellerShips}</p>
           </div>
 
           <div style={lineStyle} />
 
           <div style={stepStyle}>
             <span style={dotStyle}>3</span>
-            <p>Entregado</p>
+            <p>{t.delivered}</p>
           </div>
         </div>
 
         <div style={trustGridStyle}>
-          <div style={trustCardStyle}>✓ Pago seguro</div>
-          <div style={trustCardStyle}>✓ Protección al comprador</div>
-          <div style={trustCardStyle}>✓ Envío con seguimiento</div>
-          <div style={trustCardStyle}>✓ Marketplace premium</div>
+          <div style={trustCardStyle}>✓ {t.securePayments}</div>
+          <div style={trustCardStyle}>✓ {t.buyerProtection}</div>
+          <div style={trustCardStyle}>✓ {t.trackedShipping}</div>
+          <div style={trustCardStyle}>✓ {t.premiumMarketplace}</div>
         </div>
 
         <div style={actionsStyle}>
@@ -90,14 +91,14 @@ export default function SuccessClient() {
             onClick={() => (window.location.href = "/orders")}
             style={buttonStyle}
           >
-            Ver pedido
+            {t.viewOrder}
           </button>
 
           <button
             onClick={() => (window.location.href = "/products")}
             style={secondaryButtonStyle}
           >
-            Seguir comprando
+            {t.continueShopping}
           </button>
         </div>
       </section>
