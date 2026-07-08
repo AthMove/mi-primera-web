@@ -36,39 +36,13 @@ export default function OrdersPage() {
     return createNotification(payload);
   };
 
-  useEffect(() => {
-    let channel: any = null;
-    let supabaseClient: any = null;
+ useEffect(() => {
+  const start = async () => {
+    await loadOrders();
+  };
 
-    const start = async () => {
-      const supabase = await getSupabase();
-      supabaseClient = supabase;
-
-      await loadOrders();
-
-      channel = supabase
-        .channel("orders-realtime")
-        .on(
-          "postgres_changes",
-          { event: "*", schema: "public", table: "orders" },
-          () => loadOrders()
-        )
-        .on(
-          "postgres_changes",
-          { event: "*", schema: "public", table: "reviews" },
-          () => loadOrders()
-        )
-        .subscribe();
-    };
-
-    start();
-
-    return () => {
-      if (supabaseClient && channel) {
-        supabaseClient.removeChannel(channel);
-      }
-    };
-  }, []);
+  start();
+}, []);
 
   const loadOrders = async () => {
     const supabase = await getSupabase();
@@ -641,6 +615,53 @@ const getStatusLabel = (status: string) => {
         </div>
       </section>
 
+      <section style={statsGridStyle}>
+  <div
+  style={statCardStyle}
+  className="order-stat"
+>
+    <span>Activos</span>
+    <strong style={{
+fontSize:"42px",
+fontWeight:900,
+letterSpacing:"-2px"
+}}>
+      {orders.filter((o) =>
+        ["paid", "preparing", "shipped", "delivered"].includes(o.status)
+      ).length}
+    </strong>
+  </div>
+
+  <div style={statCardStyle}>
+    <span>En tránsito</span>
+    <strong>
+      {orders.filter((o) => o.status === "shipped").length}
+    </strong>
+  </div>
+
+  <div style={statCardStyle}>
+    <span>Finalizados</span>
+    <strong>
+      {orders.filter((o) => o.status === "completed").length}
+    </strong>
+  </div>
+</section>
+
+<section style={ordersTrustStyle}>
+  <div>
+    <strong>Compra protegida por ATHMOV</strong>
+    <p>
+      Tu pago queda protegido hasta que el pedido se entregue correctamente.
+    </p>
+  </div>
+
+  <div style={ordersTrustItemsStyle}>
+    <span>✓ Pago seguro</span>
+    <span>✓ Seguimiento del envío</span>
+    <span>✓ Soporte ATHMOV</span>
+  </div>
+</section>
+
       {filteredOrders.length === 0 ? (
         <section style={emptyStyle}>
           <h2 style={{ fontSize: "32px", margin: 0 }}>{t.noOrdersTitle}</h2>
@@ -668,16 +689,27 @@ const getStatusLabel = (status: string) => {
                     alt={order.product?.title || t.productFallback}
                     fill
                     sizes="120px"
-                    style={{ objectFit: "cover" }}
+style={{
+  objectFit: "contain",
+  padding: "10px",
+  transition:"all .35s ease",
+  filter: "drop-shadow(0 20px 35px rgba(0,0,0,.18))",
+}}
                   />
                 </div>
 
                 <div style={{ flex: 1 }}>
-                  <p style={metaStyle}>{isSeller ? t.sale : t.purchase}</p>
+                  <p style={metaStyle}>
+  {isSeller ? t.sale : t.purchase}
+</p>
 
-                  <h2 style={orderTitleStyle}>
-                    {order.product?.title || t.productFallback}
-                  </h2>
+<div style={badgeStyle}>
+  ✓ PROTEGIDO POR ATHMOV
+</div>
+
+<h2 style={orderTitleStyle}>
+  {order.product?.title || t.productFallback}
+</h2>
 
                   <p
                     style={{
@@ -797,14 +829,14 @@ const getStatusLabel = (status: string) => {
                <div style={protectionGridStyle}>
   <div style={protectionCardStyle}>
     <span style={protectionLabelStyle}>
-      {t.estimatedDelivery}
+      📦 {t.estimatedDelivery}
     </span>
     <strong>{getEstimatedDelivery(order)}</strong>
   </div>
 
   <div style={protectionCardStyle}>
     <span style={protectionLabelStyle}>
-      {t.athmovProtection}
+      🛡 {t.athmovProtection}
     </span>
     <strong>{t.securePaymentAndSupport}</strong>
   </div>
@@ -814,7 +846,27 @@ const getStatusLabel = (status: string) => {
                 <div style={rightStyle} className="order-actions">
                   <strong style={amountStyle}>€{order.amount}</strong>
 
-                  <span style={statusStyle}>{getStatusLabel(status)}</span>
+<span
+  style={{
+    ...statusPillStyle,
+    background:
+      status === "completed"
+        ? "#111"
+        : status === "delivered"
+        ? "#eaf8ef"
+        : status === "shipped"
+        ? "#eef5ff"
+        : "#f5f2ea",
+    color:
+      status === "completed"
+        ? "#fff"
+        : "#111",
+  }}
+>
+  {status === "pending" && order.payment_status === "paid"
+    ? "Pago confirmado"
+    : getStatusLabel(status)}
+</span>
 
                   {isSeller && order.transfer_status === "released" && (
                     <span style={paidOutStyle}>{t.paidOut}</span>
@@ -828,12 +880,13 @@ const getStatusLabel = (status: string) => {
                     onClick={() => openOrderChat(order)}
                     style={reviewButtonStyle}
                   >
-                    {isSeller ? t.writeBuyer : t.writeSeller}
+                    💬 Contactar
                   </button>
 
                   {isBuyer &&
-                    order.payment_status === "pending" &&
-                    order.status === "pending" && (
+  order.offer_id &&
+  order.payment_status === "pending" &&
+  order.status === "pending" && (
                       <button
                         onClick={() => payAcceptedOffer(order)}
                         style={buttonStyle}
@@ -1032,14 +1085,27 @@ const getStatusLabel = (status: string) => {
       )}
 
       <style>{`
+
+      .order-stat:hover{
+transform:translateY(-4px);
+box-shadow:0 26px 80px rgba(0,0,0,.08);
+}
+
+.order-card:hover img{
+    transform:scale(1.08);
+}
+
+      button:hover{
+transform:translateY(-2px);
+}
         .order-card {
           transition: transform 0.22s ease, box-shadow 0.22s ease;
         }
 
-        .order-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 30px 80px rgba(0,0,0,0.06) !important;
-        }
+       .order-card:hover{
+transform:translateY(-8px);
+box-shadow:0 40px 120px rgba(0,0,0,.08)!important;
+}
 
         .order-timeline {
           overflow-x: auto;
@@ -1158,19 +1224,19 @@ const listStyle = {
 const orderStyle = {
   display: "flex",
   alignItems: "center",
-  gap: "28px",
+  gap: "40px",
   background: "rgba(255,255,255,0.92)",
   backdropFilter: "blur(10px)",
   border: "1px solid rgba(0,0,0,0.04)",
   borderRadius: "32px",
-  padding: "36px",
-  boxShadow: "none",
+  padding: "30px 34px",
+ boxShadow: "0 28px 90px rgba(0,0,0,.05)",
 };
 
 const imageWrapperStyle = {
   position: "relative" as const,
-  width: "110px",
-  height: "110px",
+width: "170px",
+height: "170px",
   borderRadius: "18px",
   overflow: "hidden",
   background: "#f6f6f3",
@@ -1220,15 +1286,21 @@ const reviewPreviewStyle = {
 };
 
 const rightStyle = {
+  width: "230px",
   display: "flex",
   flexDirection: "column" as const,
-  alignItems: "flex-end",
-  gap: "10px",
+  alignItems: "stretch",
+  gap: "14px",
+  paddingLeft: "24px",
+  borderLeft: "1px solid rgba(0,0,0,.08)",
 };
 
 const amountStyle = {
-  fontSize: "34px",
-  fontWeight: 500,
+  fontSize: "48px",
+  fontWeight: 900,
+  letterSpacing: "-2px",
+  textAlign: "center" as const,
+  marginBottom: "4px",
 };
 
 const statusStyle = {
@@ -1239,6 +1311,10 @@ const statusStyle = {
 };
 
 const buttonStyle = {
+  width: "100%",
+justifyContent: "center",
+display: "flex",
+alignItems: "center",
   background: "#111",
   color: "#fff",
   border: "none",
@@ -1248,9 +1324,14 @@ const buttonStyle = {
   fontSize: "13px",
   letterSpacing: "0.3px",
   cursor: "pointer",
+  transition: "all .25s ease",
 };
 
 const reviewButtonStyle = {
+  width: "100%",
+justifyContent: "center",
+display: "flex",
+alignItems: "center",
   background: "#fff",
   color: "#111",
   border: "1px solid rgba(0,0,0,0.08)",
@@ -1378,8 +1459,8 @@ const timelineStepStyle = {
 };
 
 const timelineDotStyle = {
-  width: "28px",
-  height: "28px",
+ width:"24px",
+height:"24px",
   borderRadius: "999px",
   background: "#eee",
   color: "#aaa",
@@ -1439,10 +1520,11 @@ const protectionCardStyle = {
   background: "#fff",
   border: "1px solid rgba(0,0,0,0.06)",
   borderRadius: "18px",
-  padding: "14px",
+ padding:"18px",
   display: "flex",
   flexDirection: "column" as const,
   gap: "6px",
+  boxShadow:"0 14px 35px rgba(0,0,0,.04)",
 };
 
 const protectionLabelStyle = {
@@ -1486,4 +1568,81 @@ const pendingPayoutStyle = {
   fontSize: "11px",
   fontWeight: 900,
   textTransform: "uppercase" as const,
+};
+
+const statsGridStyle = {
+  maxWidth: "1100px",
+  margin: "0 auto 34px",
+  display: "grid",
+  gridTemplateColumns: "repeat(3, 1fr)",
+  gap: "18px",
+};
+
+const statCardStyle = {
+  background: "#fff",
+  border: "1px solid rgba(0,0,0,.05)",
+  borderRadius: "28px",
+  padding: "26px",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  boxShadow: "0 24px 80px rgba(0,0,0,.04)",
+  fontSize: "13px",
+  fontWeight: 900,
+  letterSpacing: "1px",
+  textTransform: "uppercase" as const,
+  transition:"all .25s ease",
+cursor:"default",
+};
+
+const statusPillStyle = {
+  background: "#f1efe8",
+  color: "#111",
+  borderRadius: "999px",
+  padding: "9px 14px",
+  fontSize: "11px",
+  fontWeight: 900,
+  letterSpacing: "1px",
+  textTransform: "uppercase" as const,
+  alignSelf: "center",
+};
+
+const badgeStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "6px",
+  background: "#111",
+  color: "#fff",
+  padding: "6px 12px",
+  borderRadius: "999px",
+  fontSize: "10px",
+  fontWeight: 900,
+  letterSpacing: "1.4px",
+  marginTop: "8px",
+  marginBottom: "16px",
+  boxShadow:"0 10px 30px rgba(0,0,0,.12)",
+  transition:"all .25s ease",
+};
+
+const ordersTrustStyle = {
+  maxWidth: "1100px",
+  margin: "0 auto 28px",
+  background: "#111",
+  color: "#fff",
+  borderRadius: "30px",
+  padding: "28px 32px",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: "24px",
+  boxShadow: "0 30px 90px rgba(0,0,0,.12)",
+};
+
+const ordersTrustItemsStyle = {
+  display: "flex",
+  flexWrap: "wrap" as const,
+  gap: "10px",
+  fontSize: "12px",
+  fontWeight: 900,
+  color: "rgba(255,255,255,.72)",
 };

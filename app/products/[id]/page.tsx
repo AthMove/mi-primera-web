@@ -11,6 +11,7 @@ export default function ProductDetail() {
   const { t } = useLanguage();
   const id = String(params.id);
 
+  const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
   const [producto, setProducto] = useState<any>(null);
   const [related, setRelated] = useState<any[]>([]);
   const [selectedImage, setSelectedImage] = useState("");
@@ -18,6 +19,7 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [showStickyBar, setShowStickyBar] = useState(false);
   const [sellerProfile, setSellerProfile] = useState<any>(null);
   const [sellerReviews, setSellerReviews] = useState<any[]>([]);
 
@@ -107,6 +109,15 @@ setSellerReviews(reviewsData || []);
   const safeImage = (src?: string) => {
     return src?.startsWith("http") || src?.startsWith("/") ? src : "/logo.png";
   };
+
+  const handleImageMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const rect = e.currentTarget.getBoundingClientRect();
+
+  setMousePosition({
+    x: ((e.clientX - rect.left) / rect.width) * 100,
+    y: ((e.clientY - rect.top) / rect.height) * 100,
+  });
+};
 
   const getConditionLabel = (condition?: string) => {
     if (condition === "New") return "Nuevo";
@@ -487,6 +498,16 @@ setSellerReviews(reviewsData || []);
     alert(t.addedToCart);
   };
 
+  useEffect(() => {
+  const handleScroll = () => {
+    setShowStickyBar(window.scrollY > 650);
+  };
+
+  window.addEventListener("scroll", handleScroll);
+
+  return () => window.removeEventListener("scroll", handleScroll);
+}, []);
+
   if (loading) {
     return <div style={{ padding: "60px" }}>{t.loadingProduct}</div>;
   }
@@ -512,6 +533,7 @@ setSellerReviews(reviewsData || []);
               window.location.href = "/products";
             }}
             style={buyButtonStyle}
+            className="buy-button"
           >
             {t.backToMarketplace}
           </button>
@@ -541,41 +563,58 @@ setSellerReviews(reviewsData || []);
 
       <div style={layoutStyle} className="product-detail-layout">
         <div>
-          <div
+ <div
   style={mainImageStyle}
-  className="product-detail-image image-zoom"
+  className="product-detail-image"
+  onMouseMove={handleImageMove}
 >
-            <div style={imageBadgesStyle}>
-  <span style={statusBadgeStyle}>
-    {getConditionLabel(producto.condition)}
-  </span>
-
-  {producto.featured && (
-    <span style={featuredBadgeStyle}>
-      ⭐ Destacado
+  <div style={imageBadgesStyle}>
+    <span style={statusBadgeStyle}>
+      {getConditionLabel(producto.condition)}
     </span>
-  )}
-</div>
 
-<button
-  onClick={toggleFavorite}
-  style={favoriteFloatingStyle}
->
-  {isFavorite ? "❤️" : "🤍"}
-</button>
-            <Image
-              src={safeImage(selectedImage)}
-              alt={producto.title || "Producto"}
-              fill
-              sizes="(max-width: 900px) 100vw, 50vw"
-              className="main-product-image zoom-image"
-style={{
-  objectFit: "contain",
-  padding: "18px",
-  transform: "scale(1.12)",
-}}
-            />
-          </div>
+    {producto.featured && (
+      <span style={featuredBadgeStyle}>⭐ Destacado</span>
+    )}
+  </div>
+
+  <button onClick={toggleFavorite} style={favoriteFloatingStyle}>
+    {isFavorite ? "❤️" : "🤍"}
+  </button>
+
+  <div
+    style={{
+      position: "absolute",
+      width: "420px",
+      height: "420px",
+      borderRadius: "50%",
+      background: "rgba(255,255,255,.75)",
+      filter: "blur(90px)",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%,-50%)",
+      pointerEvents: "none",
+      zIndex: 1,
+    }}
+  />
+
+  <img
+    src={safeImage(selectedImage)}
+    alt={producto.title || "Producto"}
+    className="product-main-image product-zoom-image"
+    style={{
+      width: "100%",
+      height: "100%",
+      objectFit: "contain",
+      objectPosition: `${mousePosition.x}% ${mousePosition.y}%`,
+      padding: "56px",
+      transition: "transform .35s ease, object-position .15s ease",
+      filter: "drop-shadow(0 35px 55px rgba(0,0,0,.18))",
+      position: "relative",
+      zIndex: 2,
+    }}
+  />
+</div>
 
           <div style={thumbGridStyle} className="product-detail-thumbs">
             {images.map((img: string, index: number) => (
@@ -595,7 +634,10 @@ style={{
                   alt={`Producto ${index + 1}`}
                   fill
                   sizes="180px"
-                  style={{ objectFit: "cover" }}
+                  style={{
+  objectFit: "contain",
+  padding: "14px",
+}}
                 />
               </button>
             ))}
@@ -609,9 +651,124 @@ style={{
             {producto.title}
           </h1>
 
-          <p style={priceStyle} className="product-detail-price">
-            €{producto.price}
-          </p>
+   <p style={priceStyle} className="product-detail-price">
+  €{producto.price}
+</p>
+
+<div
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    marginTop: "-18px",
+    marginBottom: "34px",
+  }}
+>
+  <span
+    style={{
+      background: "#111",
+      color: "#fff",
+      padding: "8px 14px",
+      borderRadius: "999px",
+      fontSize: "12px",
+      fontWeight: 900,
+    }}
+  >
+    Mejor precio
+  </span>
+
+  <span
+    style={{
+      color: "#777",
+      fontSize: "14px",
+      fontWeight: 600,
+    }}
+  >
+    Precio verificado por ATHMOV
+  </span>
+</div>
+
+<div style={conditionBadgeStyle}>
+  {getConditionLabel(producto.condition)}
+</div>
+
+<div
+  style={{
+    display: "flex",
+    gap: "10px",
+    flexWrap: "wrap",
+    marginBottom: "28px",
+  }}
+>
+  <span
+    style={{
+      background: "#111",
+      color: "#fff",
+      borderRadius: "999px",
+      padding: "8px 14px",
+      fontSize: "12px",
+      fontWeight: 800,
+    }}
+  >
+    ✓ Verificado
+  </span>
+
+  <span
+    style={{
+      background: "#f3f3ef",
+      borderRadius: "999px",
+      padding: "8px 14px",
+      fontSize: "12px",
+      fontWeight: 800,
+    }}
+  >
+    🚚 Envío protegido
+  </span>
+
+  <span
+    style={{
+      background: "#f3f3ef",
+      borderRadius: "999px",
+      padding: "8px 14px",
+      fontSize: "12px",
+      fontWeight: 800,
+    }}
+  >
+    ⭐ Marketplace Premium
+  </span>
+</div>
+
+<div
+  style={{
+    background: "linear-gradient(180deg,#ffffff,#f7f7f3)",
+    border: "1px solid rgba(0,0,0,.05)",
+    borderRadius: "30px",
+    padding: "30px",
+    marginBottom: "34px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "18px",
+    boxShadow: "0 25px 80px rgba(0,0,0,.06)",
+  }}
+>
+ <strong
+  style={{
+    fontSize: "22px",
+    fontWeight: 900,
+    letterSpacing: "-0.5px",
+  }}
+>
+  Compra protegida por ATHMOV
+</strong>
+
+  <p>✓ Pago seguro mediante Stripe</p>
+
+<p>✓ Vendedor verificado</p>
+
+<p>✓ Envío con seguimiento</p>
+
+<p>✓ Soporte ATHMOV hasta la entrega</p>
+</div>
 
           <section style={marketInsightStyle}>
   <p style={marketLabelStyle}>MARKET INSIGHTS</p>
@@ -654,6 +811,67 @@ style={{
 </div>
 
           <p style={descriptionStyle}>{producto.description}</p>
+
+          <div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(4,1fr)",
+    gap: "14px",
+    margin: "28px 0",
+  }}
+>
+  <div
+    style={{
+      background: "#fff",
+      borderRadius: "20px",
+      padding: "18px",
+      textAlign: "center",
+      border: "1px solid rgba(0,0,0,.06)",
+    }}
+  >
+    <div style={{ fontSize: 26 }}>📦</div>
+    <strong>En stock</strong>
+  </div>
+
+  <div
+    style={{
+      background: "#fff",
+      borderRadius: "20px",
+      padding: "18px",
+      textAlign: "center",
+      border: "1px solid rgba(0,0,0,.06)",
+    }}
+  >
+    <div style={{ fontSize: 26 }}>🚚</div>
+    <strong>24-72 h</strong>
+  </div>
+
+  <div
+    style={{
+      background: "#fff",
+      borderRadius: "20px",
+      padding: "18px",
+      textAlign: "center",
+      border: "1px solid rgba(0,0,0,.06)",
+    }}
+  >
+    <div style={{ fontSize: 26 }}>🛡</div>
+    <strong>Protegido</strong>
+  </div>
+
+  <div
+    style={{
+      background: "#fff",
+      borderRadius: "20px",
+      padding: "18px",
+      textAlign: "center",
+      border: "1px solid rgba(0,0,0,.06)",
+    }}
+  >
+    <div style={{ fontSize: 26 }}>💳</div>
+    <strong>Stripe</strong>
+  </div>
+</div>
 
           <div style={metaGridStyle} className="product-detail-meta">
             {[
@@ -735,6 +953,15 @@ style={{
   </div>
 )}
  <div style={sellerPremiumCardStyle}>
+  <div
+  style={{
+    height: "3px",
+    width: "90px",
+    borderRadius: "999px",
+    background: "linear-gradient(90deg,#fff,#8f8f8f)",
+    marginBottom: "24px",
+  }}
+/>
   <div style={sellerPremiumTopStyle}>
     <div style={sellerAvatarLargeStyle}>
      <Image
@@ -820,11 +1047,12 @@ style={{
 )}
 
           <div style={actionsStyle} className="product-detail-actions">
-           <button onClick={messageSeller} style={secondaryButtonStyle}>
-  {t.requestVerificationVideo}
-</button>
 
-<button onClick={buyNow} style={buyButtonStyle}>
+<button
+  onClick={buyNow}
+  style={buyButtonStyle}
+  className="buy-button"
+>
   {checkoutLoading ? t.redirecting : t.buyNow}
 </button>
 
@@ -832,21 +1060,24 @@ style={{
   {t.addToCart}
 </button>
 
-<button onClick={toggleFavorite} style={secondaryButtonStyle}>
-  {isFavorite ? t.inFavorites : t.addToFavorites}
-</button>
+<div style={secondaryActionsGridStyle}>
+  <button onClick={messageSeller} style={secondaryButtonStyle}>
+    {t.messageSeller}
+  </button>
 
-<button onClick={messageSeller} style={secondaryButtonStyle}>
-  {t.messageSeller}
-</button>
+  <button onClick={makeOffer} style={secondaryButtonStyle}>
+    {t.makeOffer}
+  </button>
 
-<button onClick={makeOffer} style={secondaryButtonStyle}>
-  {t.makeOffer}
-</button>
-          </div>
+  <button onClick={toggleFavorite} style={secondaryButtonStyle}>
+    {isFavorite ? t.inFavorites : t.addToFavorites}
+  </button>
+</div>
         </div>
       </div>
+      </div>
 
+{showStickyBar && (
 <div style={stickyBuyBarStyle}>
   <div>
     <div style={{ fontSize: 12, opacity: 0.55 }}>
@@ -882,6 +1113,7 @@ style={{
     </button>
   </div>
 </div>
+)}
 
       <section style={relatedSectionStyle}>
         <p style={relatedEyebrowStyle}>SELECCIÓN ATHMOV</p>
@@ -896,19 +1128,56 @@ style={{
               style={relatedCardStyle}
             >
               <div style={relatedImageStyle}>
-                <Image
-                  src={safeImage(item.image)}
-                  alt={item.title || "Producto"}
-                  fill
-                  sizes="33vw"
-                  style={{ objectFit: "cover" }}
-                />
+<Image
+  src={safeImage(item.image)}
+  alt={item.title || "Producto"}
+  fill
+  sizes="33vw"
+  className="product-main-image"
+  style={{
+    objectFit: "contain",
+    objectPosition: "center",
+    padding: "42px",
+    transition: "transform 0.5s ease",
+  }}
+/>
               </div>
-
-              <div style={{ padding: "0px" }}>
+              <div style={{ padding: "28px" }}>
                 <p style={relatedBrandStyle}>{item.brand}</p>
                 <h3 style={relatedProductTitleStyle}>{item.title}</h3>
-                <p style={relatedPriceStyle}>€{item.price}</p>
+                <p
+  style={{
+    color: "#777",
+    fontSize: "14px",
+    marginTop: "-8px",
+    marginBottom: "18px",
+  }}
+>
+  Excelente estado · Vendedor verificado
+</p>
+                <div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: "10px",
+  }}
+>
+  <p style={relatedPriceStyle}>€{item.price}</p>
+
+  <span
+    style={{
+      background: "#111",
+      color: "#fff",
+      borderRadius: "999px",
+      padding: "8px 14px",
+      fontSize: "12px",
+      fontWeight: 800,
+    }}
+  >
+    Ver
+  </span>
+</div>
               </div>
             </div>
           ))}
@@ -916,6 +1185,69 @@ style={{
       </section>
 
       <style>{`
+
+      .buy-button{
+    position:relative;
+    overflow:hidden;
+}
+
+.buy-button::before{
+    content:"";
+    position:absolute;
+    left:-120%;
+    top:0;
+    width:70%;
+    height:100%;
+    background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.28),
+        transparent
+    );
+    transition:.7s;
+}
+
+.buy-button:hover::before{
+    left:150%;
+}
+
+      .product-detail-layout{
+    animation:fadeUp .7s ease;
+}
+
+@keyframes fadeUp{
+    from{
+        opacity:0;
+        transform:translateY(35px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+      .product-detail-thumbs button:hover{
+    transform:translateY(-6px);
+    box-shadow:0 25px 70px rgba(0,0,0,.12);
+}
+
+      .product-main-image{
+transition:transform .55s ease;
+}
+
+.product-main-image{
+  transition: transform .6s ease;
+}
+
+ .buy-button:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 35px 90px rgba(0,0,0,.28);
+}
+
+.buy-button:active{
+  transform: translateY(-1px);
+}
+
         .main-product-image:hover {
           transform: scale(1.04);
         }
@@ -924,7 +1256,7 @@ style={{
   overflow: hidden;
 }
 
-.image-zoom:hover .zoom-image {
+.product-detail-image:hover .product-zoom-image {
   transform: scale(1.12);
 }
 
@@ -970,9 +1302,9 @@ style={{
         }
 
         @media (max-width: 700px) {
-          .product-detail-page {
-            padding: 30px 18px !important;
-          }
+        .product-detail-page {
+  padding: 130px 18px 110px !important;
+}
 
           .product-detail-image {
             height: 420px !important;
@@ -1031,7 +1363,10 @@ style={{
 const pageStyle = {
   minHeight: "100vh",
   background: "#f7f7f3",
-  padding: "60px",
+  paddingTop: "140px",
+  paddingLeft: "60px",
+  paddingRight: "60px",
+  paddingBottom: "60px",
   fontFamily: "Inter, sans-serif",
 };
 
@@ -1079,23 +1414,24 @@ const soldTextStyle = {
 
 const layoutStyle = {
   display: "grid",
-  gridTemplateColumns: "1.15fr 0.85fr",
-  gap: "70px",
-  maxWidth: "1480px",
+  gridTemplateColumns: "1.08fr .92fr",
+  gap: "90px",
+  maxWidth: "1500px",
   margin: "0 auto",
   alignItems: "start",
 };
 
 const mainImageStyle = {
   position: "relative" as const,
-  height: "760px",
-  borderRadius: "38px",
+  width: "100%",
+  minHeight: "720px",
+  borderRadius: "42px",
   overflow: "hidden",
-  background: `
-    radial-gradient(circle at top,#ffffff,#f2f2f2)
-  `,
-  border: "1px solid rgba(0,0,0,.05)",
-  boxShadow: "0 40px 120px rgba(0,0,0,.10)",
+background:
+"radial-gradient(circle at 50% 35%, #ffffff 0%, #f7f7f3 45%, #ecece8 100%)",
+  boxShadow:"0 60px 180px rgba(0,0,0,.14)",
+  border: "1px solid rgba(0,0,0,.04)",
+  cursor: "zoom-in",
 };
 
 const thumbGridStyle = {
@@ -1107,31 +1443,40 @@ const thumbGridStyle = {
 
 const thumbButtonStyle = {
   position: "relative" as const,
-  height: "120px",
-  borderRadius: "22px",
+  height: "140px",
+  borderRadius: "26px",
   overflow: "hidden",
-  background: "#fff",
+  background:"linear-gradient(180deg,#fff,#f5f5f2)",
   cursor: "pointer",
+  boxShadow: "0 18px 50px rgba(0,0,0,.06)",
+  transition:"all .3s ease",
 };
 
 const brandStyle = {
-  fontSize: "12px",
-  letterSpacing: "3px",
-  opacity: 0.5,
+  fontSize: "13px",
+  letterSpacing: "4px",
+  opacity: 0.45,
+  fontWeight: 900,
+  textTransform: "uppercase" as const,
+  marginBottom: "12px",
 };
 
 const titleStyle = {
-  fontSize: "72px",
-  lineHeight: 1,
-  marginTop: "10px",
-  marginBottom: "24px",
+  fontSize: "76px",
+  lineHeight: .92,
+  marginTop: "12px",
+  marginBottom: "26px",
+  letterSpacing: "-5px",
+  fontWeight: 950,
 };
 
 const priceStyle = {
- fontSize: "62px",
-fontWeight: 900,
-letterSpacing: "-3px",
-  marginBottom: "32px",
+  fontSize:"82px",
+fontWeight: 950,
+letterSpacing:"-5px",
+marginTop: "10px",
+marginBottom: "36px",
+  color: "#111",
 };
 
 const descriptionStyle = {
@@ -1226,22 +1571,28 @@ const sellerButtonStyle = {
 
 const actionsStyle = {
   display: "grid",
-  gridTemplateColumns: "1fr 1fr",
+  gridTemplateColumns: "1fr",
   gap: "14px",
-  marginTop: "40px",
-  maxWidth: "560px",
+  marginTop: "34px",
+  maxWidth: "100%",
 };
 
 const buyButtonStyle = {
-  background: "#111",
-  color: "#fff",
+  width: "100%",
+  height:"76px",
   border: "none",
   borderRadius: "999px",
-  padding: "22px",
-  fontSize: "20px",
-  fontWeight: 900,
-  boxShadow: "0 25px 60px rgba(0,0,0,.25)",
-}
+  background:
+"linear-gradient(135deg,#000,#2c2c2c)",
+  color: "#fff",
+  fontSize: "18px",
+  fontWeight: 950,
+  letterSpacing:"1px",
+  cursor: "pointer",
+  boxShadow: "0 28px 80px rgba(0,0,0,.25)",
+  transition: "all .30s ease",
+};
+
 const primaryButtonStyle = {
   background: "#222",
   color: "#fff",
@@ -1289,17 +1640,19 @@ const relatedGridStyle = {
 };
 
 const relatedCardStyle = {
-  background: "#fff",
-  borderRadius: "28px",
+  background: "rgba(255,255,255,.86)",
+  backdropFilter: "blur(20px)",
+  borderRadius: "34px",
   overflow: "hidden",
   cursor: "pointer",
-  border: "1px solid rgba(0,0,0,0.06)",
+  border: "1px solid rgba(255,255,255,.65)",
+  boxShadow: "0 28px 90px rgba(0,0,0,.08)",
 };
 
 const relatedImageStyle = {
   position: "relative" as const,
-  height: "260px",
-  background: "#f8f8f6",
+  height: "360px",
+  background: "linear-gradient(180deg,#fff,#f4f4f0)",
 };
 
 const relatedBrandStyle = {
@@ -1455,7 +1808,13 @@ const favoriteFloatingStyle = {
 const productInfoStickyStyle = {
   position: "sticky" as const,
   top: "120px",
-  alignSelf: "start",
+  alignSelf: "flex-start",
+  background:"rgba(255,255,255,.82)",
+ backdropFilter:"blur(35px)",
+  border: "1px solid rgba(255,255,255,.65)",
+  borderRadius: "42px",
+  padding: "48px",
+  boxShadow:"0 55px 150px rgba(0,0,0,.10)",
 };
 
 const quickInfoStyle = {
@@ -1588,32 +1947,34 @@ const reviewCommentStyle = {
 };
 
 const stickyBuyBarStyle = {
-  position: "sticky" as const,
-  bottom: "20px",
-  marginTop: "60px",
-  maxWidth: "1400px",
-  marginLeft: "auto",
-  marginRight: "auto",
+  position: "fixed" as const,
+  left: "50%",
+  transform: "translateX(-50%)",
+  bottom: "28px",
+  width: "calc(100% - 36px)",
+  maxWidth: "620px",
   background: "rgba(255,255,255,.94)",
   border: "1px solid rgba(255,255,255,.6)",
-backdropFilter: "blur(24px)",
+  backdropFilter: "blur(24px)",
   borderRadius: "24px",
-  padding: "18px 24px",
+  padding: "14px 18px",
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
   boxShadow: "0 35px 90px rgba(0,0,0,.15)",
-  zIndex: 100,
+  zIndex: 80,
 };
 
 const sellerPremiumCardStyle = {
   marginTop: "28px",
   maxWidth: "560px",
-  background: "#111",
+  background:
+"linear-gradient(160deg,#111 0%,#1d1d1d 45%,#2b2b2b 100%)",
   color: "#fff",
-  borderRadius: "30px",
-  padding: "28px",
-  boxShadow: "0 28px 90px rgba(0,0,0,.16)",
+  borderRadius:"38px",
+  padding: "32px",
+  boxShadow:"0 55px 160px rgba(0,0,0,.28)",
+  border: "1px solid rgba(255,255,255,.08)",
 };
 
 const sellerPremiumTopStyle = {
@@ -1623,16 +1984,20 @@ const sellerPremiumTopStyle = {
 };
 
 const sellerAvatarLargeStyle = {
-  width: "76px",
-  height: "76px",
+  position: "relative" as const,
+  overflow: "hidden",
+  width:"96px",
+height:"96px",
   borderRadius: "50%",
   background: "#fff",
   color: "#111",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  fontSize: "30px",
-  fontWeight: 900,
+  fontSize: "34px",
+  fontWeight: 950,
+  boxShadow: "0 18px 50px rgba(0,0,0,.25)",
+  border:"3px solid rgba(255,255,255,.15)",
 };
 
 const sellerVerifiedTextStyle = {
@@ -1644,7 +2009,9 @@ const sellerVerifiedTextStyle = {
 
 const sellerPremiumNameStyle = {
   margin: "8px 0 6px",
-  fontSize: "24px",
+  fontSize: "30px",
+  fontWeight: 900,
+  letterSpacing: "-1px",
 };
 
 const sellerStarsStyle = {
@@ -1700,4 +2067,36 @@ const marketFooterStyle = {
   marginTop: "18px",
   color: "#666",
   fontSize: "13px",
+};
+
+const trustCardStyle = {
+  background: "#fafaf8",
+  border: "1px solid rgba(0,0,0,.08)",
+  borderRadius: "24px",
+  padding: "26px",
+  margin: "26px 0",
+  display: "flex",
+  flexDirection: "column" as const,
+  gap: "12px",
+  boxShadow: "0 18px 50px rgba(0,0,0,.05)",
+};
+
+const conditionBadgeStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  width: "fit-content",
+  background: "#f3f3ef",
+  border: "1px solid rgba(0,0,0,.06)",
+  borderRadius: "999px",
+  padding: "10px 18px",
+  fontSize: "13px",
+  fontWeight: 900,
+  letterSpacing: "0.5px",
+  marginBottom: "24px",
+};
+
+const secondaryActionsGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(3, 1fr)",
+  gap: "12px",
 };

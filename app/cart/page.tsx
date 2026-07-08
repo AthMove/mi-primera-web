@@ -82,7 +82,7 @@ export default function CartPage() {
     <main style={pageStyle}>
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
         <p style={eyebrowStyle}>{t.cartEyebrow}</p>
-        <h1 style={titleStyle}>{t.cartTitle}</h1>
+        <h1 style={titleStyle}>Checkout seguro</h1>
 
         {cart.length === 0 ? (
           <section style={emptyStyle}>
@@ -104,7 +104,7 @@ export default function CartPage() {
                       src={item.imagen}
                       alt={item.nombre}
                       fill
-                      style={{ objectFit: "cover" }}
+                      style={{ objectFit: "contain", padding: "18px" }}
                     />
                   </div>
 
@@ -143,6 +143,12 @@ export default function CartPage() {
                 <span>{t.total}</span>
                 <strong>€{total}</strong>
               </div>
+              <div style={protectionBoxStyle}>
+  <strong>Compra protegida por ATHMOV</strong>
+  <p>✓ Pago seguro mediante Stripe</p>
+  <p>✓ Protección al comprador</p>
+  <p>✓ Soporte hasta la entrega</p>
+</div>
 
               <button onClick={handleCheckout} style={checkoutButtonStyle}>
                 {t.checkout}
@@ -242,4 +248,16 @@ const shopButtonStyle = {
   padding: "16px 26px",
   borderRadius: "999px",
   fontWeight: 800,
+};
+
+const protectionBoxStyle = {
+  background: "rgba(255,255,255,0.08)",
+  border: "1px solid rgba(255,255,255,0.12)",
+  borderRadius: "24px",
+  padding: "20px",
+  marginBottom: "24px",
+  display: "grid",
+  gap: "10px",
+  fontSize: "14px",
+  color: "rgba(255,255,255,0.78)",
 };

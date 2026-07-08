@@ -91,7 +91,11 @@ export default function Home() {
       fill
       priority
       sizes="100vw"
-      style={{ objectFit: "cover" }}
+      style={{
+  objectFit: "contain",
+  objectPosition: "center",
+  padding: "14px",
+}}
     />
     <div style={heroOverlayStyle} />
   </div>
@@ -100,9 +104,9 @@ export default function Home() {
     <p style={eyebrowStyle}>ATHMOV PREMIUM SECOND HAND</p>
 
     <h1 style={heroTitleStyle} className="hero-title">
-      Segunda mano.
-      <br />
-      Primera clase.
+   Luxury sports.
+<br />
+Second hand.
     </h1>
 
     <p style={heroTextStyle}>
@@ -159,11 +163,11 @@ export default function Home() {
 
     <div style={heroActionsStyle}>
     <button onClick={() => router.push("/products")} style={heroPrimaryButtonStyle}>
-  Explorar marketplace
+  Shop Gear
 </button>
 
 <button onClick={() => router.push("/sell")} style={heroSecondaryButtonStyle}>
-  Empezar a vender
+  Sell Yours
 </button>
     </div>
   </div>
@@ -207,6 +211,20 @@ export default function Home() {
           {newDrops.map((product) => (
             <article
               key={product.id}
+
+              onMouseMove={(e) => {
+  const rect = e.currentTarget.getBoundingClientRect();
+
+  e.currentTarget.style.setProperty(
+    "--x",
+    `${e.clientX - rect.left}px`
+  );
+
+  e.currentTarget.style.setProperty(
+    "--y",
+    `${e.clientY - rect.top}px`
+  );
+}}
               onClick={() => router.push(`/products/${product.id}`)}
               style={cardStyle}
               className="home-card"
@@ -230,10 +248,10 @@ export default function Home() {
   fill
   sizes="33vw"
   className="card-img"
-style={{
-  objectFit: "contain",
-  padding: "30px",
-}}
+  style={{
+    objectFit: "contain",
+    padding: "22px",
+  }}
 />
 </div>
 
@@ -539,20 +557,43 @@ style={{
     transform: translateY(-16px) scale(1.015);
 
     box-shadow:
-        0 70px 180px rgba(0,0,0,.16);
+        0 80px 180px rgba(0,0,0,.18);
 
-    border-color: rgba(255,255,255,.9);
+    border-color: rgba(255,255,255,.95);
 }
 
-        .card-img,
+.home-card::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+
+    background:
+        radial-gradient(
+            circle at var(--x,50%) var(--y,50%),
+            rgba(255,255,255,.18),
+            transparent 45%
+        );
+
+    opacity:0;
+    transition:.35s;
+}
+
+.home-card:hover::before{
+    opacity:1;
+}
+
+        .card-img{
+    transition: transform .6s ease;
+    filter: drop-shadow(0 35px 55px rgba(0,0,0,.18));
+}
         .hero-img {
           transition: transform 0.55s ease;
         }
 
-        .home-card:hover .card-img,
-        .hero-image:hover .hero-img {
-          transform: scale(1.05);
-        }
+       .home-card:hover .card-img{
+    transform: scale(1.03);
+}
 
         .brand-home-card {
   transition: transform 0.25s ease, box-shadow 0.25s ease;
@@ -638,33 +679,15 @@ const pageStyle = {
 
 const heroStyle = {
   position: "relative" as const,
-  minHeight: "86vh",
-
-  borderRadius: "52px",
-
+  minHeight: "88vh",
+  borderRadius: "0 0 64px 64px",
   overflow: "hidden",
-
   display: "flex",
-
   alignItems: "center",
-
-  justifyContent: "space-between",
-
-  padding: "80px",
-
-  marginBottom: "110px",
-
-  background: `
-linear-gradient(
-135deg,
-#0b0b0b 0%,
-#141414 45%,
-#1d1d1d 100%)
-`,
-
-  boxShadow: "0 60px 160px rgba(0,0,0,.30)",
-
-  border: "1px solid rgba(255,255,255,.06)",
+  padding: "120px 90px 90px",
+  marginBottom: "50px",
+  background: "#111",
+  boxShadow: "0 60px 160px rgba(0,0,0,.26)",
 };
 
 const heroBackgroundStyle = {
@@ -691,11 +714,11 @@ transparent 45%
 ),
 
 linear-gradient(
-90deg,
-rgba(0,0,0,.72) 0%,
-rgba(0,0,0,.42) 42%,
-rgba(0,0,0,.10) 75%,
-transparent 100%
+  90deg,
+  rgba(0,0,0,.78) 0%,
+  rgba(0,0,0,.55) 45%,
+  rgba(0,0,0,.20) 75%,
+  transparent 100%
 )
 `,
 
@@ -706,14 +729,7 @@ const heroContentStyle = {
   position: "relative" as const,
   zIndex: 2,
   maxWidth: "760px",
-  padding: "40px 70px",
-  marginLeft: "70px",
-  marginBottom: "0",
   color: "#fff",
-  display: "flex",
-  flexDirection: "column" as const,
-  justifyContent: "center",
-  height: "100%",
 };
 
 const eyebrowStyle = {
@@ -724,29 +740,23 @@ const eyebrowStyle = {
 };
 
 const heroTitleStyle = {
-  fontSize: "128px",
+  fontSize: "104px",
   color: "#fff",
-
-  lineHeight: 0.88,
-
+  lineHeight: 0.9,
   margin: 0,
-
-  letterSpacing: "-8px",
-
+  letterSpacing: "-7px",
   fontWeight: 950,
-
-  maxWidth: "560px",
-
-  textShadow: "0 15px 40px rgba(0,0,0,.30)",
+  maxWidth: "820px",
+  textShadow: "0 18px 50px rgba(0,0,0,.35)",
 };
 
 const heroTextStyle = {
   marginTop: "34px",
- color: "rgba(255,255,255,0.92)",
-  fontSize: "22px",
-  lineHeight: 1.65,
-  fontWeight: 700,
-  maxWidth: "620px",
+  color: "rgba(255,255,255,0.82)",
+  fontSize: "24px",
+  lineHeight: 1.6,
+  fontWeight: 650,
+  maxWidth: "680px",
   textShadow: "0 8px 24px rgba(0,0,0,.25)",
 };
 
@@ -838,7 +848,7 @@ const trustCardTextStyle = {
 const sectionStyle = {
   maxWidth: "1400px",
   margin: "0 auto",
-  padding: "70px 60px",
+  padding: "48px 60px",
 };
 
 const sectionHeaderStyle = {
@@ -858,17 +868,19 @@ const sectionTitleStyle = {
 const smallButtonStyle = {
   background: "#111",
   color: "#fff",
-  border: "none",
+  border: "1px solid rgba(255,255,255,.08)",
   borderRadius: "999px",
-  padding: "13px 18px",
+  padding: "12px 22px",
   fontWeight: 800,
+  fontSize: "14px",
   cursor: "pointer",
+  boxShadow: "0 12px 30px rgba(0,0,0,.12)",
 };
 
 const gridStyle = {
   display: "grid",
 gridTemplateColumns: "repeat(auto-fit,minmax(420px,1fr))",
-gap: "42px",
+gap: "32px",
 };
 
 const cardStyle = {
@@ -897,7 +909,7 @@ const categoryCardStyle = {
 
 const cardImageStyle = {
   position: "relative" as const,
-  height: "440px",
+ height: "460px",
   background: "#fafaf7",
   overflow: "hidden",
 };
@@ -915,17 +927,17 @@ const brandStyle = {
 };
 
 const cardTitleStyle = {
-  fontSize: "42px",
+  fontSize: "26px",
   fontWeight: 950,
   lineHeight: 1.02,
   marginTop: "14px",
   marginBottom: "22px",
-  letterSpacing: "-2.5px",
+  letterSpacing: "-1px",
   color: "#111",
 };
 
 const priceStyle = {
-  fontSize: "52px",
+  fontSize: "38px",
   fontWeight: 950,
   letterSpacing: "-3px",
   marginTop: "18px",
@@ -1200,7 +1212,7 @@ const footerBrandStyle = {
 
 const editorialSectionStyle = {
   maxWidth: "1400px",
-  margin: "0 auto 40px",
+  margin: "0 auto 10px",
   padding: "80px 60px",
   display: "grid",
   gridTemplateColumns: "1.2fr 0.8fr",

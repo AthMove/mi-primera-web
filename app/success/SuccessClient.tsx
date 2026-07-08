@@ -50,13 +50,13 @@ export default function SuccessClient() {
 
         <p style={eyebrowStyle}>{t.checkoutEyebrow}</p>
 
-        <h1 style={titleStyle}>
-          {loading ? t.processingOrder : t.orderConfirmed}
-        </h1>
+       <h1 style={titleStyle}>
+  {loading ? "Procesando tu pedido" : "Pago confirmado"}
+</h1>
 
         <p style={textStyle}>
-          {t.successText}
-        </p>
+  Tu compra está protegida por ATHMOV. El vendedor ha sido notificado y podrás seguir el estado del envío desde tus pedidos.
+</p>
 
         <div style={timelineStyle}>
           <div style={stepStyle}>
@@ -85,6 +85,14 @@ export default function SuccessClient() {
           <div style={trustCardStyle}>✓ {t.trackedShipping}</div>
           <div style={trustCardStyle}>✓ {t.premiumMarketplace}</div>
         </div>
+
+<div style={nextStepStyle}>
+  <p style={nextStepLabelStyle}>SIGUIENTE PASO</p>
+  <h3 style={nextStepTitleStyle}>El vendedor preparará el envío</h3>
+  <p style={nextStepTextStyle}>
+    Te avisaremos cuando el pedido tenga número de seguimiento.
+  </p>
+</div>
 
         <div style={actionsStyle}>
           <button
@@ -255,4 +263,33 @@ const secondaryButtonStyle = {
   fontWeight: 900,
   cursor: "pointer",
   fontSize: "15px",
+};
+
+const nextStepStyle = {
+  maxWidth: "560px",
+  margin: "30px auto 0",
+  background: "linear-gradient(180deg,#ffffff,#f7f7f3)",
+  border: "1px solid rgba(0,0,0,0.06)",
+  borderRadius: "28px",
+  padding: "26px",
+};
+
+const nextStepLabelStyle = {
+  fontSize: "10px",
+  letterSpacing: "3px",
+  opacity: 0.45,
+  margin: "0 0 10px",
+  fontWeight: 900,
+};
+
+const nextStepTitleStyle = {
+  fontSize: "24px",
+  margin: 0,
+  letterSpacing: "-0.5px",
+};
+
+const nextStepTextStyle = {
+  color: "#666",
+  margin: "10px 0 0",
+  lineHeight: 1.6,
 };

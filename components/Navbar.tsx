@@ -349,28 +349,26 @@ return () => window.removeEventListener("scroll", onScroll);
   return (
     <>
       <nav
-  style={{
-    ...navStyle,
-    padding: scrolled ? "0 18px" : "0 22px",
-    height: scrolled ? 74 : 90,
-    transition: "all .28s ease",
-  }}
+ style={{
+  ...navStyle,
+  padding: scrolled ? "0 24px" : "0 30px",
+  height: scrolled ? 68 : 74,
+  transition: "all .28s ease",
+}}
   className="athmov-navbar"
 >
 <Link href="/" style={logoStyle}>
-  <Image
-    src="/logo.png"
-    alt="ATHMOV"
-    width={210}
-    height={52}
-    priority
-    style={{
-      width: "210px",
-      height: "auto",
-      display: "block",
-      objectFit: "contain",
-    }}
-  />
+<Image
+  src="/logo.png"
+  alt="ATHMOV"
+  width={170}
+  height={92}
+  priority
+  style={{
+    display: "block",
+    objectFit: "contain",
+  }}
+/>
 </Link>
 
         <div style={rightLinksStyle} className="desktop-only">
@@ -593,23 +591,24 @@ const navStyle = {
   zIndex: 100,
   width: "calc(100% - 48px)",
   maxWidth: "1500px",
-  height: 82,
-  padding: "0 22px",
+  height: 74,
+  padding: "0 30px",
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
   gap: "18px",
   borderRadius: "999px",
-  background: "rgba(255,255,255,0.74)",
-  backdropFilter: "blur(28px)",
-  WebkitBackdropFilter: "blur(28px)",
+  background: "rgba(255,255,255,0.88)",
+  backdropFilter: "blur(36px)",
+  WebkitBackdropFilter: "blur(36px)",
   border: "1px solid rgba(255,255,255,0.55)",
- boxShadow: "0 28px 90px rgba(0,0,0,0.12)",
+boxShadow: "0 24px 70px rgba(0,0,0,.08)",
 };
 
 const logoStyle = {
   display: "flex",
   alignItems: "center",
+   height: "100%",
   flexShrink: 0,
   textDecoration: "none",
 };
