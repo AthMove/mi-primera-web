@@ -12,10 +12,22 @@ export default function Home() {
 
   const [newDrops, setNewDrops] = useState<any[]>([]);
   const [soldProducts, setSoldProducts] = useState<any[]>([]);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     loadHome();
   }, []);
+
+ useEffect(() => {
+  const checkMobile = () => {
+    setIsMobile(window.innerWidth <= 768);
+  };
+
+  checkMobile();
+  window.addEventListener("resize", checkMobile);
+
+  return () => window.removeEventListener("resize", checkMobile);
+}, []);
 
   const loadHome = async () => {
     const { data: drops } = await supabase
@@ -83,7 +95,17 @@ export default function Home() {
 
   return (
     <main style={pageStyle} className="home-page">
-     <section style={heroStyle} className="hero-section">
+     <section
+  style={{
+    ...heroStyle,
+    minHeight: isMobile ? "auto" : heroStyle.minHeight,
+    padding: isMobile ? "120px 24px 56px" : heroStyle.padding,
+    marginBottom: isMobile ? "34px" : heroStyle.marginBottom,
+    borderRadius: isMobile ? "0 0 34px 34px" : heroStyle.borderRadius,
+    alignItems: isMobile ? "flex-start" : heroStyle.alignItems,
+  }}
+  className="hero-section"
+>
   <div style={heroBackgroundStyle}>
     <Image
       src="/hero-premium.jpg"
@@ -103,13 +125,27 @@ export default function Home() {
   <div style={heroContentStyle}>
     <p style={eyebrowStyle}>ATHMOV PREMIUM SECOND HAND</p>
 
-    <h1 style={heroTitleStyle} className="hero-title">
+    <h1
+  style={{
+    ...heroTitleStyle,
+    fontSize: isMobile ? "48px" : heroTitleStyle.fontSize,
+    lineHeight: isMobile ? 1 : heroTitleStyle.lineHeight,
+    letterSpacing: isMobile ? "-2.6px" : heroTitleStyle.letterSpacing,
+  }}
+  className="hero-title"
+>
    Luxury sports.
 <br />
 Second hand.
     </h1>
 
-    <p style={heroTextStyle}>
+   <p
+  style={{
+    ...heroTextStyle,
+    fontSize: isMobile ? "17px" : heroTextStyle.fontSize,
+    lineHeight: isMobile ? 1.55 : heroTextStyle.lineHeight,
+  }}
+>
       Compra y vende material deportivo premium de segunda mano con vendedores
       verificados, pagos seguros y protección al comprador.
     </p>
@@ -161,23 +197,54 @@ Second hand.
   </span>
 </div>
 
-    <div style={heroActionsStyle}>
-    <button onClick={() => router.push("/products")} style={heroPrimaryButtonStyle}>
+    <div
+  style={{
+    ...heroActionsStyle,
+    width: isMobile ? "100%" : "auto",
+  }}
+>
+   <button
+  onClick={() => router.push("/products")}
+  style={{
+    ...heroPrimaryButtonStyle,
+    width: isMobile ? "100%" : "auto",
+  }}
+>
   Shop Gear
 </button>
 
-<button onClick={() => router.push("/sell")} style={heroSecondaryButtonStyle}>
+<button
+  onClick={() => router.push("/sell")}
+  style={{
+    ...heroSecondaryButtonStyle,
+    width: isMobile ? "100%" : "auto",
+  }}
+>
   Sell Yours
 </button>
     </div>
   </div>
 </section>
 
-<section style={editorialSectionStyle}>
+<section
+  style={{
+    ...editorialSectionStyle,
+    padding: isMobile ? "50px 24px" : editorialSectionStyle.padding,
+    gridTemplateColumns: isMobile ? "1fr" : editorialSectionStyle.gridTemplateColumns,
+    gap: isMobile ? "28px" : editorialSectionStyle.gap,
+  }}
+>
   <div>
     <p style={eyebrowStyle}>ATHMOV EXPERIENCE</p>
 
-    <h2 style={editorialTitleStyle}>
+    <h2
+  style={{
+    ...editorialTitleStyle,
+    fontSize: isMobile ? "42px" : editorialTitleStyle.fontSize,
+    lineHeight: isMobile ? 1 : editorialTitleStyle.lineHeight,
+    letterSpacing: isMobile ? "-2px" : editorialTitleStyle.letterSpacing,
+  }}
+>
       Equipamiento premium que merece seguir compitiendo.
     </h2>
 
@@ -195,7 +262,12 @@ Second hand.
   </div>
 </section>
 
-      <section style={sectionStyle}>
+    <section
+  style={{
+    ...sectionStyle,
+    padding: isMobile ? "42px 24px" : sectionStyle.padding,
+  }}
+>
         <div style={sectionHeaderStyle}>
           <div>
             <p style={eyebrowStyle}>{t.latest}</p>
@@ -207,7 +279,13 @@ Second hand.
           </button>
         </div>
 
-        <div style={gridStyle}>
+       <div
+  style={{
+    ...gridStyle,
+    gridTemplateColumns: isMobile ? "1fr" : gridStyle.gridTemplateColumns,
+    gap: isMobile ? "22px" : gridStyle.gap,
+  }}
+>
           {newDrops.map((product) => (
             <article
               key={product.id}
@@ -229,7 +307,12 @@ Second hand.
               style={cardStyle}
               className="home-card"
             >
-            <div style={cardImageStyle}>
+           <div
+  style={{
+    ...cardImageStyle,
+    height: isMobile ? "300px" : cardImageStyle.height,
+  }}
+>
   <span style={featuredBadgeStyle}>
     {product.featured ? "⭐ DESTACADO" : "🔥 NUEVO"}
   </span>
@@ -254,14 +337,23 @@ Second hand.
   }}
 />
 </div>
-
-  <div style={cardContentStyle}>
+<div
+  style={{
+    ...cardContentStyle,
+    padding: isMobile ? "24px" : cardContentStyle.padding,
+  }}
+>
 
   <p style={brandStyle}>{product.brand || "ATHMOV"}</p>
 
   <h3 style={cardTitleStyle}>{product.title}</h3>
 
-  <p style={priceStyle}>€{product.price}</p>
+ <p
+  style={{
+    ...priceStyle,
+    fontSize: isMobile ? "30px" : priceStyle.fontSize,
+  }}
+>€{product.price}</p>
 
   <div style={productFooterStyle}>
     <span>{product.location || "España"}</span>
@@ -305,7 +397,12 @@ Second hand.
         </div>
       </section>
 
-      <section style={sectionStyle}>
+   <section
+  style={{
+    ...sectionStyle,
+    padding: isMobile ? "42px 24px" : sectionStyle.padding,
+  }}
+>
         <div style={sectionHeaderStyle}>
           <div>
             <p style={eyebrowStyle}>{t.categories}</p>
@@ -313,7 +410,13 @@ Second hand.
           </div>
         </div>
 
-        <div style={gridStyle}>
+        <div
+  style={{
+    ...gridStyle,
+    gridTemplateColumns: isMobile ? "1fr" : gridStyle.gridTemplateColumns,
+    gap: isMobile ? "24px" : gridStyle.gap,
+  }}
+>
           {categories.map((category) => (
             <article
               key={category.title}
@@ -321,7 +424,12 @@ Second hand.
               style={categoryCardStyle}
               className="home-card"
             >
-              <div style={cardImageStyle}>
+              <div
+  style={{
+    ...cardImageStyle,
+    height: isMobile ? "260px" : cardImageStyle.height,
+  }}
+>
                 <Image
                   src={category.image}
                   alt={category.title}
@@ -342,7 +450,12 @@ Second hand.
         </div>
       </section>
 
-      <section style={sectionStyle}>
+     <section
+  style={{
+    ...sectionStyle,
+    padding: isMobile ? "42px 24px" : sectionStyle.padding,
+  }}
+>
   <div style={sectionHeaderStyle}>
     <div>
      <p style={eyebrowStyle}>{t.brands}</p>
@@ -369,7 +482,12 @@ Second hand.
 </section>
 
           {soldProducts.length > 0 && (
-        <section style={sectionStyle}>
+       <section
+  style={{
+    ...sectionStyle,
+    padding: isMobile ? "42px 24px" : sectionStyle.padding,
+  }}
+>
           <div style={sectionHeaderStyle}>
             <div>
               <p style={eyebrowStyle}>{t.marketActivity}</p>
@@ -404,7 +522,12 @@ Second hand.
       )}
 
       {/* BLOG ATHMOV */}
-      <section style={sectionStyle}>
+      <section
+  style={{
+    ...sectionStyle,
+    padding: isMobile ? "42px 24px" : sectionStyle.padding,
+  }}
+>
   <div style={sectionHeaderStyle}>
     <div>
       <p style={eyebrowStyle}>{t.blogEyebrow}</p>
@@ -419,7 +542,13 @@ Second hand.
     </button>
   </div>
 
-  <div style={gridStyle}>
+  <div
+  style={{
+    ...gridStyle,
+    gridTemplateColumns: isMobile ? "1fr" : gridStyle.gridTemplateColumns,
+    gap: isMobile ? "24px" : gridStyle.gap,
+  }}
+>
     <article
       onClick={() =>
         router.push(
@@ -432,7 +561,12 @@ Second hand.
       <div style={cardContentStyle}>
         <p style={brandStyle}>GOLF · MERCADO</p>
 
-        <h3 style={cardTitleStyle}>
+        <h3
+  style={{
+    ...cardTitleStyle,
+    fontSize: isMobile ? "22px" : cardTitleStyle.fontSize,
+  }}
+>
           Cuándo comprar y vender palos de golf de segunda mano
         </h3>
 
@@ -689,8 +823,12 @@ opacity:.72;
   }
 
   .card-img {
-    padding: 18px !important;
-  }
+  padding: 18px !important;
+}
+
+.category-img {
+  padding: 0 !important;
+}
 
   .trust-grid {
     grid-template-columns: 1fr !important;
