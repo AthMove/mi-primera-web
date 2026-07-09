@@ -17,10 +17,19 @@ export default function SellerPage() {
   const [products, setProducts] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
     loadSeller();
   }, []);
+
+  useEffect(() => {
+  const onScroll = () => setScrollY(window.scrollY);
+
+  window.addEventListener("scroll", onScroll);
+
+  return () => window.removeEventListener("scroll", onScroll);
+}, []);
 
   const loadSeller = async () => {
     const { data: sellerProfile } = await supabase
@@ -142,9 +151,39 @@ const averageRating =
 
   return (
     <main style={pageStyle} className="seller-page">
-      <section style={heroStyle} className="seller-hero">
-        <div style={heroOverlayStyle} />
-
+     <section
+  style={{
+    ...heroStyle,
+    backgroundPosition: `center ${scrollY * 0.18}px`,
+  }}
+  className="seller-hero"
+>
+  <div
+style={{
+position:"absolute",
+top:-180,
+right:-120,
+width:500,
+height:500,
+borderRadius:"50%",
+background:
+"radial-gradient(circle, rgba(255,255,255,.22), transparent 70%)",
+filter:"blur(40px)",
+pointerEvents:"none",
+}}
+/>
+<div
+  style={{
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 220,
+    background:
+      "linear-gradient(to top, rgba(0,0,0,.72), transparent)",
+    pointerEvents: "none",
+  }}
+/>
         <div style={avatarWrapperStyle}>
           <div style={avatarStyle}>
             <Image
@@ -165,7 +204,13 @@ style={{
           )}
         </div>
 
-        <div style={{ flex: 1 }}>
+        <div
+  style={{
+    flex: 1,
+    position: "relative",
+    zIndex: 2,
+  }}
+>
           <p style={eyebrowStyle}>{t.verifiedAthmovSeller}</p>
 
           <h1 style={titleStyle} className="seller-title">
@@ -185,6 +230,19 @@ style={{
   </span>
 
   <span style={trustBadgeStyle}>{t.trustedMarketplace}</span>
+</div>
+
+<div style={heroActionsStyle}>
+  <button style={heroPrimaryButtonStyle}>
+    Seguir vendedor
+  </button>
+
+  <button
+    onClick={() => navigator.clipboard.writeText(window.location.href)}
+    style={heroSecondaryButtonStyle}
+  >
+    Compartir perfil
+  </button>
 </div>
 
           <p style={bioStyle}>
@@ -227,6 +285,32 @@ style={{
           </div>
         </div>
       </section>
+
+   <section style={floatingStatsStyle}>
+  {[
+    {
+      label: "TRUST SCORE",
+      value: averageRating === "0.0" ? "NEW" : "9.8",
+    },
+    {
+      label: "VENTAS",
+      value: soldCount,
+    },
+    {
+      label: "VALORACIÓN",
+      value: `★ ${averageRating}`,
+    },
+    {
+      label: "PRODUCTOS",
+      value: activeCount,
+    },
+  ].map((item) => (
+    <div key={item.label} style={floatingStatItemStyle}>
+      <p style={floatingStatLabelStyle}>{item.label}</p>
+      <h2 style={floatingStatValueStyle}>{item.value}</h2>
+    </div>
+  ))}
+</section>
 
       <section style={trustSectionStyle}>
         <div style={trustCardStyle}>✓ {t.verifiedIdentity}</div>
@@ -296,6 +380,44 @@ filter:"blur(30px)"
   </div>
 </section>
 
+<section style={activitySectionStyle}>
+  <div style={activityCardStyle}>
+    <span style={activityIconStyle}>🛡️</span>
+
+    <div>
+      <strong>Perfil verificado</strong>
+      <p>Identidad revisada por ATHMOV.</p>
+    </div>
+  </div>
+
+  <div style={activityCardStyle}>
+    <span style={activityIconStyle}>📦</span>
+
+    <div>
+      <strong>{soldCount} ventas realizadas</strong>
+      <p>Historial público de ventas.</p>
+    </div>
+  </div>
+
+  <div style={activityCardStyle}>
+    <span style={activityIconStyle}>⚡</span>
+
+    <div>
+      <strong>Respuesta rápida</strong>
+      <p>{seller?.response_time || "< 1 hora"}</p>
+    </div>
+  </div>
+
+  <div style={activityCardStyle}>
+    <span style={activityIconStyle}>⭐</span>
+
+    <div>
+      <strong>{averageRating}/5</strong>
+      <p>{totalReviews} valoraciones verificadas.</p>
+    </div>
+  </div>
+</section>
+
       <section style={sectionStyle}>
         <div style={sectionHeaderStyle}>
           <div>
@@ -311,67 +433,62 @@ filter:"blur(30px)"
         ) : (
           <div style={gridStyle}>
             {products
-              .filter((p) => !p.sold)
-              .map((product) => (
-                <article
-                  key={product.id}
-                  style={cardStyle}
-                  className="seller-product-card"
-                  onClick={() =>
-                    router.push(`/products/${product.id}`)
-                  }
-                >
-     <div style={imageWrapperStyle}>
-  <span style={productBadgeStyle}>
-    {product.featured ? "⭐ DESTACADO" : "DISPONIBLE"}
-  </span>
+  .filter((p) => !p.sold)
+  .map((product) => (
+    <article
+      key={product.id}
+      style={cardStyle}
+      className="seller-product-card"
+      onClick={() => router.push(`/products/${product.id}`)}
+    >
+      <div style={imageWrapperStyle}>
+        <span style={productBadgeStyle}>
+          {product.featured ? "⭐ DESTACADO" : "DISPONIBLE"}
+        </span>
 
-<button
-  className="favorite-pop"
-  style={favoriteButtonStyle}
-  onClick={(e) => {
-    e.stopPropagation();
-    toggleProductFavorite(product);
-  }}
->
-  {favorites.includes(String(product.id)) ? "❤️" : "🤍"}
-</button>
+        <button
+          className="favorite-pop"
+          style={favoriteButtonStyle}
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleProductFavorite(product);
+          }}
+        >
+          {favorites.includes(String(product.id)) ? "❤️" : "🤍"}
+        </button>
 
-  <Image
-  className="seller-product-image"
-  src={safeImage(product.image)}
-    alt={product.title || "Product"}
-    fill
-    sizes="33vw"
- style={{
-  objectFit: "contain",
-  padding: "0px",
-  transform: "scale(1.08)",
-}}
-  />
-</div>
+        <Image
+          className="seller-product-image"
+          src={safeImage(product.image)}
+          alt={product.title || "Product"}
+          fill
+          sizes="33vw"
+          style={{
+            objectFit: "contain",
+            objectPosition: "center bottom",
+            padding: 0,
+            transform: "scale(1.24)",
+            transition: "transform .6s ease",
+            filter: "drop-shadow(0 35px 70px rgba(0,0,0,.18))",
+          }}
+        />
+      </div>
 
-                  <div style={cardContentStyle}>
-  <p style={brandStyle}>
-    {product.brand || "ATHMOV"}
-  </p>
+      <div style={cardContentStyle}>
+        <p style={brandStyle}>{product.brand || "ATHMOV"}</p>
 
-  <h3 style={cardTitleStyle}>
-    {product.title}
-  </h3>
+        <h3 style={cardTitleStyle}>{product.title}</h3>
 
-  <p style={priceStyle}>
-  {product.price} €
-</p>
+        <p style={priceStyle}>{product.price} €</p>
 
-  <div style={productMetaStyle}>
-    <span>{product.location || "España"}</span>
-    <span>•</span>
-    <span>{product.condition || "Excelente"}</span>
-  </div>
-</div>
-                </article>
-              ))}
+        <div style={productMetaStyle}>
+          <span>{product.location || "España"}</span>
+          <span>•</span>
+          <span>{product.condition || "Excelente"}</span>
+        </div>
+      </div>
+    </article>
+  ))}
           </div>
         )}
       </section>
@@ -417,6 +534,23 @@ filter:"blur(30px)"
       </section>
 
       <style>{`
+      .seller-product-card:hover{
+
+transform:
+translateY(-14px)
+scale(1.015);
+
+box-shadow:
+0 60px 140px rgba(0,0,0,.15);
+}
+
+.seller-product-card:hover .seller-product-image{
+
+transform:
+scale(1.30)
+translateY(-10px);
+
+}
 
       .seller-hero:hover img{
   transform:scale(1.04);
@@ -505,8 +639,13 @@ filter:"blur(30px)"
         }
 
         @media (max-width: 700px) {
-          .seller-page {
-            padding: 110px 18px 40px !important;
+  .seller-page {
+  padding: 110px 18px 40px !important;
+}
+
+.seller-product-card:first-child {
+  grid-column: span 1 !important;
+}
           }
 
           .seller-title {
@@ -514,16 +653,31 @@ filter:"blur(30px)"
             letter-spacing: -2px !important;
           }
         }
-     @keyframes pulseScore{
-  0%{
-    transform:scale(1);
+  @keyframes pulseScore{
+  0%{ transform:scale(1); }
+  50%{ transform:scale(1.06); }
+  100%{ transform:scale(1); }
+}
+
+@keyframes floatUp{
+  from{
+    opacity:0;
+    transform:translateY(40px);
   }
-  50%{
-    transform:scale(1.06);
+
+  to{
+    opacity:1;
+    transform:translateY(0);
   }
-  100%{
-    transform:scale(1);
-  }
+}
+
+.seller-hero{
+    animation:floatUp .7s ease;
+}
+
+.seller-hero + section{
+    animation:floatUp .9s ease;
+}
 }
 
 button{
@@ -541,26 +695,40 @@ button:hover{
 
 const pageStyle = {
   minHeight: "100vh",
-  background: `
-radial-gradient(circle at top left,#ffffff 0%,transparent 35%),
-radial-gradient(circle at bottom right,#ececec 0%,transparent 30%),
-linear-gradient(180deg,#fafaf8 0%,#f3f3ef 100%)
+  background:`
+radial-gradient(circle at top left,#ffffff 0%,transparent 30%),
+radial-gradient(circle at bottom right,#efede7 0%,transparent 35%),
+linear-gradient(
+180deg,
+#fafaf8 0%,
+#f4f3ef 45%,
+#efeee9 100%)
 `,
-  padding: "80px 60px",
+  padding: "140px 60px 80px",
   fontFamily: "Inter, sans-serif",
 };
 
 const heroStyle = {
   position: "relative" as const,
-  overflow: "hidden",
+  overflow: "visible",
   maxWidth: "1280px",
-  margin: "0 auto 40px",
-  minHeight: "360px",
+ margin: "0 auto 0",
+  minHeight: "520px",
   justifyContent: "space-between",
-  background:
-"linear-gradient(135deg,#111 0%,#1b1b1b 60%,#2b2b2b 100%)",
+background: `
+linear-gradient(
+rgba(0,0,0,.30),
+rgba(0,0,0,.58)
+),
+url("/seller-cover.png")
+`,
+backgroundSize: "cover",
+backgroundPosition: "center",
+backgroundRepeat: "no-repeat",
 boxShadow: "0 45px 120px rgba(0,0,0,.25)",
   borderRadius: "42px",
+backdropFilter: "blur(18px)",
+border: "1px solid rgba(255,255,255,.08)",
   padding: "60px",
   display: "flex",
   gap: "34px",
@@ -568,21 +736,10 @@ boxShadow: "0 45px 120px rgba(0,0,0,.25)",
   color: "#fff",
 };
 
-const heroOverlayStyle = {
-  position: "absolute" as const,
-  inset: 0,
-  background: `
-radial-gradient(circle at top right,
-rgba(255,255,255,.10),
-transparent 40%),
-radial-gradient(circle at bottom left,
-rgba(188,166,91,.08),
-transparent 45%)
-`,
-};
 
 const avatarWrapperStyle = {
   position: "relative" as const,
+  zIndex: 2,
 };
 
 const avatarStyle = {
@@ -593,9 +750,11 @@ const avatarStyle = {
   position: "relative" as const,
   border: "8px solid rgba(255,255,255,.18)",
 boxShadow:
-  "0 25px 70px rgba(0,0,0,.35), 0 0 0 8px rgba(255,255,255,.05)",
+"0 35px 90px rgba(0,0,0,.45), 0 0 0 10px rgba(255,255,255,.06)",
 transition: "all .35s ease",
 background: "#fff",
+transform:"translateY(70px)",
+zIndex: 3,
 };
 
 const verifiedCircleStyle = {
@@ -621,7 +780,7 @@ const eyebrowStyle = {
 };
 
 const titleStyle = {
-  fontSize: "100px",
+  fontSize: "76px",
   textShadow: "0 8px 30px rgba(0,0,0,.25)",
   lineHeight: 1,
   margin: 0,
@@ -784,25 +943,41 @@ const emptyStyle = {
 const gridStyle = {
   display: "grid",
   gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))",
-  gap: "28px",
+  gap: "42px",
 };
 
 const cardStyle = {
-  background: "rgba(255,255,255,.85)",
+  background: `
+linear-gradient(
+180deg,
+rgba(255,255,255,.92),
+rgba(250,250,248,.82)
+),
+`,
 backdropFilter: "blur(18px)",
   borderRadius: "32px",
   overflow: "hidden",
   cursor: "pointer",
   border: "1px solid rgba(0,0,0,.04)",
-  boxShadow: "0 25px 90px rgba(0,0,0,.07)",
+  boxShadow:
+  "0 35px 120px rgba(0,0,0,.08), 0 8px 30px rgba(255,255,255,.6) inset",
   transition: "transform .35s ease, box-shadow .35s ease",
   position: "relative" as const,
 };
 
 const imageWrapperStyle = {
-  height: "470px",
+  height: "560px",
   position: "relative" as const,
-  background: "linear-gradient(180deg,#fcfcfc,#efefef)",
+  background:
+"radial-gradient(circle at center,#ffffff 0%,#f7f7f3 55%,#ecece8 100%)",
+boxShadow: "inset 0 120px 180px rgba(255,255,255,.35)",
+borderBottom:"1px solid rgba(0,0,0,.05)",
+
+backgroundImage:`
+radial-gradient(circle at top,
+rgba(255,255,255,.9),
+transparent 55%)
+`,
   overflow: "hidden",
 };
 
@@ -827,10 +1002,11 @@ const cardTitleStyle = {
 };
 
 const priceStyle = {
-  fontSize: "42px",
-  fontWeight: 900,
-  letterSpacing: "-2px",
+  fontSize: "56px",
+  fontWeight: 950,
+  letterSpacing: "-3px",
   marginTop: "18px",
+  color: "#111",
 };
 
 const reviewsGridStyle = {
@@ -967,4 +1143,99 @@ const trustScoreCircleStyle = {
   fontWeight: 900,
   animation: "pulseScore 3s infinite",
 boxShadow: "0 18px 50px rgba(0,0,0,.25)",
+};
+
+const heroActionsStyle = {
+  display: "flex",
+  gap: "12px",
+  flexWrap: "wrap" as const,
+  marginTop: "24px",
+};
+
+const heroPrimaryButtonStyle = {
+  background: "#fff",
+  color: "#111",
+  border: "none",
+  borderRadius: "999px",
+  padding: "15px 24px",
+  fontWeight: 900,
+  cursor: "pointer",
+};
+
+const heroSecondaryButtonStyle = {
+  background: "rgba(255,255,255,.08)",
+  color: "#fff",
+  border: "1px solid rgba(255,255,255,.18)",
+  borderRadius: "999px",
+  padding: "15px 24px",
+  fontWeight: 900,
+  cursor: "pointer",
+};
+
+const activitySectionStyle = {
+  maxWidth: "1280px",
+  margin: "34px auto 0",
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))",
+  gap: "18px",
+};
+
+const activityCardStyle = {
+  background: "rgba(255,255,255,.82)",
+backdropFilter: "blur(20px)",
+border: "1px solid rgba(255,255,255,.7)",
+  borderRadius: "28px",
+  padding: "26px",
+  display: "flex",
+  gap: "18px",
+  alignItems: "center",
+  boxShadow: "0 20px 60px rgba(0,0,0,.05)",
+};
+
+const activityIconStyle = {
+  width: "56px",
+  height: "56px",
+  borderRadius: "18px",
+  background: "#111",
+  color: "#fff",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: "24px",
+  flexShrink: 0,
+};
+
+const floatingStatsStyle = {
+  maxWidth: "1100px",
+  margin: "-70px auto 50px",
+  position: "relative" as const,
+  zIndex: 5,
+  background: "rgba(255,255,255,.88)",
+  backdropFilter: "blur(28px)",
+  border: "1px solid rgba(255,255,255,.65)",
+  borderRadius: "34px",
+  padding: "28px",
+  display: "grid",
+  gridTemplateColumns: "repeat(4,1fr)",
+  gap: "18px",
+  boxShadow: "0 35px 110px rgba(0,0,0,.16)",
+};
+
+const floatingStatItemStyle = {
+  textAlign: "center" as const,
+};
+
+const floatingStatLabelStyle = {
+  margin: 0,
+  fontSize: "11px",
+  letterSpacing: "3px",
+  color: "#888",
+  fontWeight: 800,
+};
+
+const floatingStatValueStyle = {
+  margin: "14px 0 0",
+  fontSize: "52px",
+  fontWeight: 900,
+  letterSpacing: "-3px",
 };
