@@ -12,3 +12,54 @@
     justify-content: space-between !important;
   }
 }
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+video {
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  main {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  h1 {
+    font-size: clamp(38px, 12vw, 54px) !important;
+    line-height: 1.05 !important;
+    letter-spacing: -2px !important;
+  }
+
+  h2 {
+    font-size: clamp(30px, 9vw, 42px) !important;
+    line-height: 1.1 !important;
+  }
+
+  p {
+    max-width: 100%;
+  }
+
+  section {
+    max-width: 100% !important;
+  }
+
+  button {
+    min-height: 46px;
+  }
+
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}

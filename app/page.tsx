@@ -620,34 +620,82 @@ transition:.25s;
 opacity:.72;
 }
 
-        @media (max-width: 1100px) {
-          .hero-section {
-            grid-template-columns: 1fr !important;
-          }
+      @media (max-width: 700px) {
+  .home-page {
+    padding-top: 92px !important;
+    overflow-x: hidden !important;
+  }
 
-          .hero-title {
-            font-size: 58px !important;
-          }
+  .hero-section {
+    min-height: auto !important;
+    height: auto !important;
+    padding: 120px 22px 54px !important;
+    margin: 0 0 34px !important;
+    border-radius: 0 0 34px 34px !important;
+    align-items: flex-start !important;
+  }
 
-          .trust-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
-          }
-        }
+  .hero-section img {
+    object-fit: cover !important;
+    object-position: center bottom !important;
+    opacity: .52 !important;
+    padding: 0 !important;
+  }
 
-        @media (max-width: 700px) {
-          .home-page {
-            padding-top: 110px !important;
-          }
+  .hero-title {
+    font-size: 48px !important;
+    line-height: 1 !important;
+    letter-spacing: -2.6px !important;
+    max-width: 100% !important;
+  }
 
-          .hero-title {
-            font-size: 44px !important;
-            letter-spacing: -2px !important;
-          }
+  .hero-section p {
+    font-size: 16px !important;
+    line-height: 1.55 !important;
+    max-width: 100% !important;
+  }
 
-          .trust-grid {
-            grid-template-columns: 1fr !important;
-          }
-        }
+  .hero-section button {
+    width: 100% !important;
+    height: 58px !important;
+    justify-content: center !important;
+  }
+
+  .hero-section > div:last-child {
+    max-width: 100% !important;
+  }
+
+  .hero-section div[style*="flex-wrap"] {
+    width: 100% !important;
+  }
+
+  section {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  h2 {
+    font-size: 38px !important;
+    line-height: 1.05 !important;
+    letter-spacing: -2px !important;
+  }
+
+  .home-card {
+    border-radius: 28px !important;
+  }
+
+  .home-card > div:first-child {
+    height: 330px !important;
+  }
+
+  .card-img {
+    padding: 18px !important;
+  }
+
+  .trust-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
       `}</style>
     </main>
   );
@@ -879,8 +927,8 @@ const smallButtonStyle = {
 
 const gridStyle = {
   display: "grid",
-gridTemplateColumns: "repeat(auto-fit,minmax(420px,1fr))",
-gap: "32px",
+  gridTemplateColumns: "repeat(auto-fit,minmax(min(100%, 360px),1fr))",
+  gap: "32px",
 };
 
 const cardStyle = {

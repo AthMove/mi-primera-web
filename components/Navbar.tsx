@@ -361,9 +361,10 @@ return () => window.removeEventListener("scroll", onScroll);
 <Image
   src="/logo.png"
   alt="ATHMOV"
-  width={170}
-  height={92}
+  width={150}
+  height={70}
   priority
+  className="navbar-logo"
   style={{
     display: "block",
     objectFit: "contain",
@@ -515,6 +516,45 @@ return () => window.removeEventListener("scroll", onScroll);
       Compra y vende material deportivo premium de segunda mano.
     </div>
 
+    <form
+  onSubmit={handleSearch}
+  style={{
+    display: "flex",
+    marginTop: 18,
+    gap: 8,
+  }}
+>
+  <input
+    value={searchQuery}
+    onChange={(e) => searchProducts(e.target.value)}
+    placeholder="Buscar..."
+    style={{
+      flex: 1,
+      border: "none",
+      outline: "none",
+      borderRadius: 14,
+      padding: "14px 16px",
+      fontSize: 15,
+      background: "#fff",
+      color: "#111",
+    }}
+  />
+
+  <button
+    type="submit"
+    style={{
+      border: "none",
+      background: "#fff",
+      borderRadius: 14,
+      padding: "0 18px",
+      fontWeight: 800,
+      cursor: "pointer",
+    }}
+  >
+    🔍
+  </button>
+</form>
+
     <Link href="/products" style={drawerHeroButtonStyle}>
       Explorar Marketplace →
     </Link>
@@ -552,33 +592,55 @@ return () => window.removeEventListener("scroll", onScroll);
       )}
 
       <style>{`
-        .mobile-only {
-          display: none !important;
-        }
+  .mobile-only {
+    display: none !important;
+  }
 
-        @media (max-width: 1100px) {
-          .desktop-only {
-            display: none !important;
-          }
+  .athmov-navbar {
+    transition: all .28s ease;
+  }
 
-          .mobile-only {
-            display: flex !important;
-            align-items: center;
-            justify-content: center;
-          }
+  @media (max-width: 1100px) {
+    .desktop-only {
+      display: none !important;
+    }
 
-          .athmov-navbar {
-            padding: 14px 18px !important;
-          }
-        }
+    .mobile-only {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+    }
 
-        @media (max-width: 700px) {
-          .athmov-navbar {
-            top: 10px !important;
-            border-radius: 26px !important;
-          }
-        }
-      `}</style>
+    .athmov-navbar {
+      height: 74px !important;
+      width: calc(100% - 28px) !important;
+      padding: 0 18px !important;
+      top: 12px !important;
+      border-radius: 28px !important;
+    }
+
+    .navbar-logo {
+      width: 132px !important;
+      height: auto !important;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .athmov-navbar {
+      height: 70px !important;
+      width: calc(100% - 20px) !important;
+      padding: 0 16px !important;
+      top: 10px !important;
+      border-radius: 26px !important;
+      background: rgba(255,255,255,.92) !important;
+      box-shadow: 0 18px 50px rgba(0,0,0,.10) !important;
+    }
+
+    .navbar-logo {
+      width: 126px !important;
+    }
+  }
+`}</style>
     </>
   );
 }
@@ -653,15 +715,19 @@ const registerStyle = {
 
 const menuButtonStyle = {
   display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
   background: "#111",
   color: "#fff",
   border: "none",
   borderRadius: "999px",
-  padding: "12px 18px",
+  padding: "13px 20px",
   fontSize: "11px",
-  fontWeight: 800,
-  letterSpacing: "1.5px",
+  fontWeight: 900,
+  letterSpacing: "1.8px",
   cursor: "pointer",
+  minWidth: "86px",
+  height: "46px",
 };
 
 const overlayStyle = {
@@ -677,12 +743,16 @@ const drawerStyle = {
   right: 0,
   top: 0,
   height: "100dvh",
-  width: "86%",
-  maxWidth: "380px",
-  background: "#fff",
-  padding: "26px 26px 110px",
-  boxShadow: "-30px 0 100px rgba(0,0,0,0.18)",
+  width: "88%",
+  maxWidth: "420px",
+  background: "rgba(255,255,255,.96)",
+  backdropFilter: "blur(28px)",
+  WebkitBackdropFilter: "blur(28px)",
+  padding: "26px 22px 110px",
+  boxShadow: "-30px 0 100px rgba(0,0,0,0.20)",
   overflowY: "auto" as const,
+  borderTopLeftRadius: "30px",
+  borderBottomLeftRadius: "30px",
 };
 
 const drawerHeaderStyle = {
