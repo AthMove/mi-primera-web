@@ -5,6 +5,10 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useLanguage } from "@/components/LanguageProvider";
+import HeroSection from "@/components/home/HeroSection";
+import EditorialSection from "@/components/home/EditorialSection";
+import LatestDropsSection from "@/components/home/LatestDropsSection";
+import FollowedSellersSection from "@/components/home/FollowedSellersSection";
 
 export default function Home() {
   const router = useRouter();
@@ -12,11 +16,89 @@ export default function Home() {
 
   const [newDrops, setNewDrops] = useState<any[]>([]);
   const [soldProducts, setSoldProducts] = useState<any[]>([]);
+  const [followedSellers, setFollowedSellers] = useState<any[]>([]);
+ const [followedSellerProducts, setFollowedSellerProducts] = useState<any[]>([]);
   const [isMobile, setIsMobile] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
 
-  useEffect(() => {
-    loadHome();
-  }, []);
+
+const loadFollowedSellers = async () => {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    setFollowedSellers([]);
+    setFollowedSellerProducts([]);
+    return;
+  }
+
+  const { data: follows, error: followsError } = await supabase
+    .from("seller_follows")
+    .select("seller_id")
+    .eq("follower_id", user.id);
+
+  if (followsError || !follows?.length) {
+    setFollowedSellers([]);
+    setFollowedSellerProducts([]);
+    return;
+  }
+
+  const sellerIds = (follows as { seller_id: string }[]).map(
+    (follow) => follow.seller_id
+  );
+
+  const { data: sellers, error: sellersError } = await supabase
+    .from("profiles")
+    .select(`
+      id,
+      full_name,
+      username,
+      avatar_url,
+      location,
+      seller_verified,
+      seller_level,
+      seller_badge,
+      total_sales,
+      response_time
+    `)
+    .in("id", sellerIds);
+
+  if (sellersError) {
+    console.log("Error cargando vendedores seguidos:", sellersError);
+    setFollowedSellers([]);
+    setFollowedSellerProducts([]);
+    return;
+  }
+
+  setFollowedSellers(sellers || []);
+
+  const { data: sellerProducts, error: sellerProductsError } = await supabase
+    .from("products")
+    .select("*")
+    .in("seller_id", sellerIds)
+    .eq("moderation_status", "approved")
+    .eq("sold", false)
+    .order("created_at", { ascending: false })
+    .limit(8);
+
+  if (sellerProductsError) {
+    console.log(
+      "Error cargando productos de vendedores seguidos:",
+      sellerProductsError
+    );
+
+    setFollowedSellerProducts([]);
+    return;
+  }
+
+  setFollowedSellerProducts(sellerProducts || []);
+};
+
+useEffect(() => {
+  loadHome();
+  loadFollowedSellers();
+}, []);
 
  useEffect(() => {
   const checkMobile = () => {
@@ -27,6 +109,46 @@ export default function Home() {
   window.addEventListener("resize", checkMobile);
 
   return () => window.removeEventListener("resize", checkMobile);
+}, []);
+
+useEffect(() => {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+         const originalDelay =
+  Number(entry.target.getAttribute("data-delay")) || 0;
+
+const delay = window.innerWidth <= 768
+  ? Math.min(originalDelay, 80)
+  : originalDelay;
+
+          setTimeout(() => {
+            entry.target.classList.add("visible");
+          }, delay);
+
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    {
+      threshold: 0.15,
+    }
+  );
+
+  document.querySelectorAll(".fade-up").forEach((el) => observer.observe(el));
+
+  return () => observer.disconnect();
+}, []);
+
+useEffect(() => {
+  const handleScroll = () => {
+    setScrollY(window.scrollY);
+  };
+
+  window.addEventListener("scroll", handleScroll, { passive: true });
+
+  return () => window.removeEventListener("scroll", handleScroll);
 }, []);
 
   const loadHome = async () => {
@@ -95,281 +217,45 @@ export default function Home() {
 
   return (
     <main style={pageStyle} className="home-page">
-     <section
-  style={{
-    ...heroStyle,
-    minHeight: isMobile ? "auto" : heroStyle.minHeight,
-    padding: isMobile ? "120px 24px 56px" : heroStyle.padding,
-    marginBottom: isMobile ? "34px" : heroStyle.marginBottom,
-    borderRadius: isMobile ? "0 0 34px 34px" : heroStyle.borderRadius,
-    alignItems: isMobile ? "flex-start" : heroStyle.alignItems,
-  }}
-  className="hero-section"
->
-  <div style={heroBackgroundStyle}>
-    <Image
-      src="/hero-premium.jpg"
-      alt="ATHMOV premium sports marketplace"
-      fill
-      priority
-      sizes="100vw"
-      style={{
-  objectFit: "contain",
-  objectPosition: "center",
-  padding: "14px",
-}}
-    />
-    <div style={heroOverlayStyle} />
-  </div>
-
-  <div style={heroContentStyle}>
-    <p style={eyebrowStyle}>ATHMOV PREMIUM SECOND HAND</p>
-
-    <h1
-  style={{
-    ...heroTitleStyle,
-    fontSize: isMobile ? "48px" : heroTitleStyle.fontSize,
-    lineHeight: isMobile ? 1 : heroTitleStyle.lineHeight,
-    letterSpacing: isMobile ? "-2.6px" : heroTitleStyle.letterSpacing,
-  }}
-  className="hero-title"
->
-   Luxury sports.
-<br />
-Second hand.
-    </h1>
-
-   <p
-  style={{
-    ...heroTextStyle,
-    fontSize: isMobile ? "17px" : heroTextStyle.fontSize,
-    lineHeight: isMobile ? 1.55 : heroTextStyle.lineHeight,
-  }}
->
-      Compra y vende material deportivo premium de segunda mano con vendedores
-      verificados, pagos seguros y protección al comprador.
-    </p>
-
-<div style={heroTrustBadgesStyle}>
-  <span
-    style={{
-      padding: "12px 20px",
-      borderRadius: "999px",
-      background: "rgba(255,255,255,.10)",
-      border: "1px solid rgba(255,255,255,.12)",
-      backdropFilter: "blur(12px)",
-      color: "#fff",
-      fontSize: "13px",
-      fontWeight: 800,
-    }}
-  >
-    ✓ Pagos seguros
-  </span>
-
-  <span
-    style={{
-      padding: "12px 20px",
-      borderRadius: "999px",
-      background: "rgba(255,255,255,.10)",
-      border: "1px solid rgba(255,255,255,.12)",
-      backdropFilter: "blur(12px)",
-      color: "#fff",
-      fontSize: "13px",
-      fontWeight: 800,
-    }}
-  >
-    ✓ Vendedores verificados
-  </span>
-
-  <span
-    style={{
-      padding: "12px 20px",
-      borderRadius: "999px",
-      background: "rgba(255,255,255,.10)",
-      border: "1px solid rgba(255,255,255,.12)",
-      backdropFilter: "blur(12px)",
-      color: "#fff",
-      fontSize: "13px",
-      fontWeight: 800,
-    }}
-  >
-    ✓ Protección al comprador
-  </span>
-</div>
-
-    <div
-  style={{
-    ...heroActionsStyle,
-    width: isMobile ? "100%" : "auto",
-  }}
->
-   <button
-  onClick={() => router.push("/products")}
-  style={{
-    ...heroPrimaryButtonStyle,
-    width: isMobile ? "100%" : "auto",
-  }}
->
-  Shop Gear
-</button>
-
-<button
-  onClick={() => router.push("/sell")}
-  style={{
-    ...heroSecondaryButtonStyle,
-    width: isMobile ? "100%" : "auto",
-  }}
->
-  Sell Yours
-</button>
-    </div>
-  </div>
-</section>
-
-<section
-  style={{
-    ...editorialSectionStyle,
-    padding: isMobile ? "50px 24px" : editorialSectionStyle.padding,
-    gridTemplateColumns: isMobile ? "1fr" : editorialSectionStyle.gridTemplateColumns,
-    gap: isMobile ? "28px" : editorialSectionStyle.gap,
-  }}
->
-  <div>
-    <p style={eyebrowStyle}>ATHMOV EXPERIENCE</p>
-
-    <h2
-  style={{
-    ...editorialTitleStyle,
-    fontSize: isMobile ? "42px" : editorialTitleStyle.fontSize,
-    lineHeight: isMobile ? 1 : editorialTitleStyle.lineHeight,
-    letterSpacing: isMobile ? "-2px" : editorialTitleStyle.letterSpacing,
-  }}
->
-      Equipamiento premium que merece seguir compitiendo.
-    </h2>
-
-    <p style={editorialTextStyle}>
-      Seleccionamos material deportivo de segunda mano con foco en calidad,
-      confianza y protección al comprador.
-    </p>
-  </div>
-
-  <div style={editorialGridStyle}>
-    <div>✓ Vendedores verificados</div>
-    <div>✓ Pagos seguros</div>
-    <div>✓ Protección al comprador</div>
-    <div>✓ Material premium</div>
-  </div>
-</section>
-
-    <section
-  style={{
-    ...sectionStyle,
-    padding: isMobile ? "42px 24px" : sectionStyle.padding,
-  }}
->
-        <div style={sectionHeaderStyle}>
-          <div>
-            <p style={eyebrowStyle}>{t.latest}</p>
-<h2 style={sectionTitleStyle}>{t.news}</h2>
-          </div>
-
-          <button onClick={() => router.push("/feed")} style={smallButtonStyle}>
-            {t.viewFeed}
-          </button>
-        </div>
-
-       <div
-  style={{
-    ...gridStyle,
-    gridTemplateColumns: isMobile ? "1fr" : gridStyle.gridTemplateColumns,
-    gap: isMobile ? "22px" : gridStyle.gap,
-  }}
->
-          {newDrops.map((product) => (
-            <article
-              key={product.id}
-
-              onMouseMove={(e) => {
-  const rect = e.currentTarget.getBoundingClientRect();
-
-  e.currentTarget.style.setProperty(
-    "--x",
-    `${e.clientX - rect.left}px`
-  );
-
-  e.currentTarget.style.setProperty(
-    "--y",
-    `${e.clientY - rect.top}px`
-  );
-}}
-              onClick={() => router.push(`/products/${product.id}`)}
-              style={cardStyle}
-              className="home-card"
-            >
-           <div
-  style={{
-    ...cardImageStyle,
-    height: isMobile ? "300px" : cardImageStyle.height,
-  }}
->
-  <span style={featuredBadgeStyle}>
-    {product.featured ? "⭐ DESTACADO" : "🔥 NUEVO"}
-  </span>
-
-  <button
-    style={favoriteButtonStyle}
-    onClick={(e) => {
-      e.stopPropagation();
-    }}
-  >
-    ♡
-  </button>
-<Image
-  src={safeImage(product.image)}
-  alt={product.title || "Producto"}
-  fill
-  sizes="33vw"
-  className="card-img"
-  style={{
-    objectFit: "contain",
-    padding: "22px",
-  }}
+      <div className="ambient-light" />
+    
+    <HeroSection
+  isMobile={isMobile}
+  scrollY={scrollY}
 />
-</div>
-<div
+
+<EditorialSection
+  isMobile={isMobile}
+/>
+
+   <LatestDropsSection
+  isMobile={isMobile}
+  products={newDrops}
+/>
+
+<FollowedSellersSection
+  isMobile={isMobile}
+  sellers={followedSellers}
+/>
+      <section
+      className="fade-up"
+      data-delay="180"
   style={{
-    ...cardContentStyle,
-    padding: isMobile ? "24px" : cardContentStyle.padding,
+    ...darkSectionStyle,
+    margin: isMobile ? "24px 18px" : darkSectionStyle.margin,
+    padding: isMobile ? "38px 24px" : darkSectionStyle.padding,
+    borderRadius: isMobile ? "30px" : darkSectionStyle.borderRadius,
   }}
 >
-
-  <p style={brandStyle}>{product.brand || "ATHMOV"}</p>
-
-  <h3 style={cardTitleStyle}>{product.title}</h3>
-
- <p
-  style={{
-    ...priceStyle,
-    fontSize: isMobile ? "30px" : priceStyle.fontSize,
-  }}
->€{product.price}</p>
-
-  <div style={productFooterStyle}>
-    <span>{product.location || "España"}</span>
-    <span>•</span>
-    <span>{product.condition || "Muy buen estado"}</span>
-  </div>
-</div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section style={darkSectionStyle}>
         <p style={eyebrowLightStyle}>{t.whyAthmov}</p>
 
-        <h2 style={darkTitleStyle}>
+<h2
+  style={{
+    ...darkTitleStyle,
+    fontSize: isMobile ? "38px" : darkTitleStyle.fontSize,
+    letterSpacing: isMobile ? "-2px" : darkTitleStyle.letterSpacing,
+  }}
+>
           {t.whyTitle}
         </h2>
 
@@ -398,15 +284,34 @@ Second hand.
       </section>
 
    <section
+   className="fade-up"
+   data-delay="240"
   style={{
     ...sectionStyle,
+    marginBottom: "34px",
     padding: isMobile ? "42px 24px" : sectionStyle.padding,
   }}
 >
-        <div style={sectionHeaderStyle}>
+        <div
+  style={{
+    ...sectionHeaderStyle,
+    flexDirection: isMobile ? "column" : "row",
+    alignItems: isMobile ? "flex-start" : "flex-end",
+    gap: isMobile ? "16px" : sectionHeaderStyle.gap,
+  }}
+>
           <div>
             <p style={eyebrowStyle}>{t.categories}</p>
-<h2 style={sectionTitleStyle}>{t.exploreSports}</h2>
+<h2
+  style={{
+    ...sectionTitleStyle,
+    fontSize: isMobile ? "38px" : sectionTitleStyle.fontSize,
+    lineHeight: isMobile ? 1.05 : undefined,
+    letterSpacing: isMobile ? "-2px" : sectionTitleStyle.letterSpacing,
+  }}
+>
+ {t.exploreSports}
+</h2>
           </div>
         </div>
 
@@ -417,13 +322,14 @@ Second hand.
     gap: isMobile ? "24px" : gridStyle.gap,
   }}
 >
-          {categories.map((category) => (
-            <article
-              key={category.title}
-              onClick={() => router.push(category.href)}
-              style={categoryCardStyle}
-              className="home-card"
-            >
+          {categories.map((category, index) => (
+<article
+  key={category.title}
+  data-delay={index * 80}
+  onClick={() => router.push(category.href)}
+  style={categoryCardStyle}
+  className="home-card fade-up"
+>
               <div
   style={{
     ...cardImageStyle,
@@ -451,15 +357,34 @@ Second hand.
       </section>
 
      <section
+  className="fade-up"
+  data-delay="300"
   style={{
     ...sectionStyle,
+    marginBottom: "34px",
     padding: isMobile ? "42px 24px" : sectionStyle.padding,
   }}
 >
-  <div style={sectionHeaderStyle}>
+  <div
+  style={{
+    ...sectionHeaderStyle,
+    flexDirection: isMobile ? "column" : "row",
+    alignItems: isMobile ? "flex-start" : "flex-end",
+    gap: isMobile ? "16px" : sectionHeaderStyle.gap,
+  }}
+>
     <div>
      <p style={eyebrowStyle}>{t.brands}</p>
-<h2 style={sectionTitleStyle}>{t.popularBrands}</h2>
+ <h2
+  style={{
+    ...sectionTitleStyle,
+    fontSize: isMobile ? "38px" : sectionTitleStyle.fontSize,
+    lineHeight: isMobile ? 1.05 : undefined,
+    letterSpacing: isMobile ? "-2px" : sectionTitleStyle.letterSpacing,
+  }}
+>
+ {t.popularBrands}
+</h2>
     </div>
 
     <button onClick={() => router.push("/products")} style={smallButtonStyle}>
@@ -467,13 +392,25 @@ Second hand.
     </button>
   </div>
 
-  <div style={brandGridHomeStyle}>
-    {popularBrands.map((brand) => (
-      <button
+<div
+  style={{
+    ...brandGridHomeStyle,
+    gridTemplateColumns: isMobile ? "repeat(2, 1fr)" : brandGridHomeStyle.gridTemplateColumns,
+    gap: isMobile ? "12px" : brandGridHomeStyle.gap,
+  }}
+>
+   {popularBrands.map((brand, index) => (
+  <button
+    className="brand-home-card fade-up"
+    data-delay={index * 40}
         key={brand}
         onClick={() => router.push(`/products?brand=${encodeURIComponent(brand)}`)}
-        style={brandHomeCardStyle}
-        className="brand-home-card"
+       style={{
+  ...brandHomeCardStyle,
+  height: isMobile ? "72px" : brandHomeCardStyle.height,
+  fontSize: isMobile ? "15px" : brandHomeCardStyle.fontSize,
+  borderRadius: isMobile ? "18px" : brandHomeCardStyle.borderRadius,
+}}
       >
         {brand}
       </button>
@@ -483,21 +420,45 @@ Second hand.
 
           {soldProducts.length > 0 && (
        <section
+  className="fade-up"
+  data-delay="360"
   style={{
     ...sectionStyle,
+    marginBottom: "34px",
     padding: isMobile ? "42px 24px" : sectionStyle.padding,
   }}
 >
-          <div style={sectionHeaderStyle}>
+         <div
+  style={{
+    ...sectionHeaderStyle,
+    flexDirection: isMobile ? "column" : "row",
+    alignItems: isMobile ? "flex-start" : "flex-end",
+    gap: isMobile ? "16px" : sectionHeaderStyle.gap,
+  }}
+>
             <div>
               <p style={eyebrowStyle}>{t.marketActivity}</p>
-<h2 style={sectionTitleStyle}>{t.soldRecently}</h2>
+<h2
+  style={{
+    ...sectionTitleStyle,
+    fontSize: isMobile ? "38px" : sectionTitleStyle.fontSize,
+    lineHeight: isMobile ? 1.05 : undefined,
+    letterSpacing: isMobile ? "-2px" : sectionTitleStyle.letterSpacing,
+  }}
+>
+ {t.soldRecently}
+</h2>
             </div>
           </div>
 
           <div style={soldGridStyle}>
-            {soldProducts.map((product) => (
-              <article key={product.id} style={soldCardStyle}>
+            {soldProducts.map((product, index) => (
+  <article
+    key={product.id}
+    style={soldCardStyle}
+    className="fade-up"
+    data-delay={index * 80}
+  >
                 <div style={soldImageStyle}>
                   <Image
                     src={safeImage(product.image)}
@@ -523,20 +484,43 @@ Second hand.
 
       {/* BLOG ATHMOV */}
       <section
+      className="fade-up"
+      data-delay="420"
   style={{
     ...sectionStyle,
+    marginBottom: "34px",
     padding: isMobile ? "42px 24px" : sectionStyle.padding,
   }}
 >
-  <div style={sectionHeaderStyle}>
+ <div
+  style={{
+    ...sectionHeaderStyle,
+    flexDirection: isMobile ? "column" : "row",
+    alignItems: isMobile ? "flex-start" : "flex-end",
+    gap: isMobile ? "16px" : sectionHeaderStyle.gap,
+  }}
+>
     <div>
       <p style={eyebrowStyle}>{t.blogEyebrow}</p>
-<h2 style={sectionTitleStyle}>{t.blogTitle}</h2>
+<h2
+  style={{
+    ...sectionTitleStyle,
+    fontSize: isMobile ? "38px" : sectionTitleStyle.fontSize,
+    lineHeight: isMobile ? 1.05 : undefined,
+    letterSpacing: isMobile ? "-2px" : sectionTitleStyle.letterSpacing,
+  }}
+>
+  {t.blogTitle}
+</h2>
     </div>
 
     <button
       onClick={() => router.push("/blog")}
-      style={smallButtonStyle}
+      style={{
+  ...smallButtonStyle,
+  padding: isMobile ? "10px 16px" : smallButtonStyle.padding,
+  fontSize: isMobile ? "12px" : smallButtonStyle.fontSize,
+}}
     >
       {t.viewBlog}
     </button>
@@ -549,16 +533,22 @@ Second hand.
     gap: isMobile ? "24px" : gridStyle.gap,
   }}
 >
-    <article
+ <article
+  data-delay="0"
       onClick={() =>
         router.push(
           "/blog/cuando-comprar-vender-palos-golf-segunda-mano"
         )
       }
       style={cardStyle}
-      className="home-card"
+      className="home-card fade-up"
     >
-      <div style={cardContentStyle}>
+      <div
+  style={{
+    ...cardContentStyle,
+    padding: isMobile ? "24px" : cardContentStyle.padding,
+  }}
+>
         <p style={brandStyle}>GOLF · MERCADO</p>
 
         <h3
@@ -578,21 +568,68 @@ Second hand.
   </div>
 </section>
 
-<section style={sellerCtaStyle}>
-        <h2 style={ctaTitleStyle}>{t.readyTitle}</h2>
-        <p style={ctaTextStyle}>
-          {t.readyText}
-        </p>
+<section
+  className="fade-up"
+  data-delay="480"
+  style={{
+    ...sellerCtaStyle,
+    padding: isMobile ? "48px 24px" : sellerCtaStyle.padding,
+    margin: isMobile ? "40px 18px 70px" : sellerCtaStyle.margin,
+    borderRadius: isMobile ? "30px" : sellerCtaStyle.borderRadius,
+  }}
+>
+  <h2
+    style={{
+      ...ctaTitleStyle,
+      fontSize: isMobile ? "40px" : ctaTitleStyle.fontSize,
+      letterSpacing: isMobile ? "-2px" : ctaTitleStyle.letterSpacing,
+      lineHeight: isMobile ? 1.05 : undefined,
+    }}
+  >
+    {t.readyTitle}
+  </h2>
 
-        <button onClick={() => router.push("/sell")} style={heroPrimaryButtonStyle}>
-          {t.startSelling}
-        </button>
-      </section>
+  <p style={ctaTextStyle}>{t.readyText}</p>
 
-      <footer style={footerStyle}>
-        <div style={footerGridStyle}>
+  <button
+    onClick={() => router.push("/sell")}
+    style={{
+      ...heroPrimaryButtonStyle,
+      width: isMobile ? "100%" : "auto",
+    }}
+  >
+    {t.startSelling}
+  </button>
+</section>
+
+<footer
+  style={{
+    ...footerStyle,
+    padding: isMobile ? "64px 24px 36px" : footerStyle.padding,
+    marginTop: isMobile ? "70px" : footerStyle.marginTop,
+    borderTopLeftRadius: isMobile
+      ? "30px"
+      : footerStyle.borderTopLeftRadius,
+    borderTopRightRadius: isMobile
+      ? "30px"
+      : footerStyle.borderTopRightRadius,
+  }}
+>
+        <div
+  style={{
+    ...footerGridStyle,
+    gridTemplateColumns: isMobile ? "1fr" : footerGridStyle.gridTemplateColumns,
+    gap: isMobile ? "38px" : footerGridStyle.gap,
+  }}
+>
           <div>
-            <div style={footerBrandStyle}>
+<div
+  style={{
+    ...footerBrandStyle,
+    fontSize: isMobile ? "42px" : footerBrandStyle.fontSize,
+    letterSpacing: isMobile ? "-2px" : footerBrandStyle.letterSpacing,
+  }}
+>
   ATHMOV
 </div>
 
@@ -656,7 +693,13 @@ Second hand.
           </div>
         </div>
 
-       <div style={footerBottomStyle}>
+      <div
+  style={{
+    ...footerBottomStyle,
+    marginTop: isMobile ? "42px" : footerBottomStyle.marginTop,
+    lineHeight: isMobile ? 1.6 : undefined,
+  }}
+>
   {t.rights} · Contacto: contact@athmov.com
 </div>
       </footer>
@@ -717,9 +760,25 @@ Second hand.
     opacity:1;
 }
 
-        .card-img{
-    transition: transform .6s ease;
-    filter: drop-shadow(0 35px 55px rgba(0,0,0,.18));
+.card-img{
+    transition:
+        transform .6s ease,
+        opacity .45s ease,
+        filter .45s ease;
+
+    opacity:.0;
+
+    filter:
+        blur(8px)
+        drop-shadow(0 35px 55px rgba(0,0,0,.18));
+}
+
+.card-img.loaded{
+    opacity:1;
+
+    filter:
+        blur(0)
+        drop-shadow(0 35px 55px rgba(0,0,0,.18));
 }
         .hero-img {
           transition: transform 0.55s ease;
@@ -754,11 +813,160 @@ transition:.25s;
 opacity:.72;
 }
 
+.fade-up{
+  opacity:0;
+  transform:translateY(60px);
+  transition:
+      opacity .8s ease,
+      transform .8s ease;
+}
+
+.fade-up.visible{
+  opacity:1;
+  transform:translateY(0);
+}
+
+.fade-up h2{
+    opacity:0;
+    transform:translateY(18px);
+    transition:
+        opacity .65s ease,
+        transform .65s ease;
+    transition-delay:.18s;
+}
+
+.fade-up.visible h2{
+    opacity:1;
+    transform:translateY(0);
+}
+
+.fade-up p{
+    transition:opacity .65s ease;
+}
+
+.fade-up button{
+    transition:
+        opacity .65s ease,
+        transform .65s ease;
+}
+
+.fade-up.visible button{
+    transition-delay:.30s;
+}
+
+.ambient-light{
+    position:fixed;
+    inset:-30%;
+    pointer-events:none;
+    z-index:0;
+
+    background:
+      radial-gradient(circle, rgba(201,175,92,.10), transparent 45%),
+      radial-gradient(circle, rgba(255,255,255,.18), transparent 40%);
+
+    filter:blur(140px);
+
+    animation:ambientMove 22s ease-in-out infinite alternate;
+}
+
+@keyframes ambientMove{
+
+    0%{
+        transform:
+            translate(-8%,-5%)
+            rotate(0deg);
+    }
+
+    100%{
+        transform:
+            translate(8%,6%)
+            rotate(10deg);
+    }
+
+}
+
+@media (max-width: 700px) {
+  .fade-up {
+    transform: translateY(28px);
+    transition:
+      opacity .55s ease,
+      transform .55s ease;
+  }
+}
+  .followed-seller-card {
+  transition:
+    transform .4s ease,
+    box-shadow .4s ease,
+    border-color .4s ease;
+}
+
+.followed-seller-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 55px 140px rgba(0,0,0,.25) !important;
+  border-color: rgba(255,255,255,.2) !important;
+}
+
+.followed-seller-card img {
+  transition: transform .5s ease;
+}
+
+.followed-seller-card:hover img {
+  transform: scale(1.06);
+}
+
+.hero-section {
+  isolation: isolate;
+}
+
+@keyframes heroLuxuryZoom {
+  0% {
+    scale: 1.05;
+  }
+
+  100% {
+    scale: 1.10;
+  }
+}
+
+@media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
+  .hero-background-luxury {
+    animation: heroLuxuryZoom 14s ease-in-out infinite alternate;
+    transform-origin: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-up,
+  .hero-section * {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
       @media (max-width: 700px) {
   .home-page {
     padding-top: 92px !important;
     overflow-x: hidden !important;
   }
+
+  .home-card::before,
+.home-card::after {
+  display: none !important;
+}
+
+  .home-card:hover {
+  transform: none !important;
+  box-shadow: 0 24px 70px rgba(0,0,0,.08) !important;
+}
+
+.home-card:hover .card-img {
+  transform: none !important;
+}
+
+.brand-home-card:hover {
+  transform: none !important;
+}
 
   .hero-section {
     min-height: auto !important;
@@ -858,7 +1066,12 @@ const brandHomeCardStyle = {
 
 const pageStyle = {
   minHeight: "100vh",
-  background: "linear-gradient(to bottom, #f8f8f4, #eeeeea)",
+  background: `
+radial-gradient(circle at 15% 15%, rgba(201,175,92,.08), transparent 28%),
+radial-gradient(circle at 85% 30%, rgba(255,255,255,.35), transparent 26%),
+radial-gradient(circle at 40% 85%, rgba(220,220,220,.22), transparent 30%),
+linear-gradient(to bottom,#f8f8f4,#eeeeea)
+`,
   fontFamily: "Inter, sans-serif",
   color: "#111",
 };
@@ -1035,6 +1248,11 @@ const sectionStyle = {
   maxWidth: "1400px",
   margin: "0 auto",
   padding: "48px 60px",
+  background: "rgba(255,255,255,.55)",
+backdropFilter: "blur(26px)",
+border: "1px solid rgba(255,255,255,.55)",
+borderRadius: "42px",
+boxShadow: "0 30px 90px rgba(0,0,0,.05)",
 };
 
 const sectionHeaderStyle = {
@@ -1300,7 +1518,9 @@ const footerLinkStyle = {
 
 const footerBottomStyle = {
   maxWidth: "1400px",
-  margin: "60px auto 0",
+  marginTop: "60px",
+  marginLeft: "auto",
+  marginRight: "auto",
   borderTop: "1px solid rgba(255,255,255,.12)",
   paddingTop: "28px",
   color: "rgba(255,255,255,.45)",

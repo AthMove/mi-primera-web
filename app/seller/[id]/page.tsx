@@ -18,6 +18,9 @@ export default function SellerPage() {
   const [reviews, setReviews] = useState<any[]>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [scrollY, setScrollY] = useState(0);
+  const [isFollowing, setIsFollowing] = useState(false);
+const [followersCount, setFollowersCount] = useState(0);
+const [followLoading, setFollowLoading] = useState(false);
 
   useEffect(() => {
     loadSeller();
@@ -59,7 +62,23 @@ const {
   data: { user },
 } = await supabase.auth.getUser();
 
+const { count } = await supabase
+  .from("seller_followers")
+  .select("*", { count: "exact", head: true })
+  .eq("seller_id", sellerId);
+
+setFollowersCount(count || 0);
+
 if (user) {
+  const { data: following } = await supabase
+  .from("seller_followers")
+  .select("id")
+  .eq("seller_id", sellerId)
+  .eq("follower_id", user.id)
+  .maybeSingle();
+
+setIsFollowing(!!following);
+
   const { data } = await supabase
     .from("favorites")
     .select("product_id")
@@ -118,6 +137,56 @@ await supabase.from("favorites").insert([
 setFavorites((prev) => [...prev, String(product.id)]);
 
 alert("Añadido a favoritos");
+};
+
+const toggleFollowSeller = async () => {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    alert(t.loginRequired);
+    return;
+  }
+
+  if (user.id === sellerId) {
+    alert("No puedes seguir tu propio perfil");
+    return;
+  }
+
+  if (isFollowing) {
+    const { error } = await supabase
+      .from("seller_followers")
+      .delete()
+      .eq("seller_id", sellerId)
+      .eq("follower_id", user.id);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    setIsFollowing(false);
+    setFollowersCount((prev) => Math.max(prev - 1, 0));
+    return;
+  }
+
+  const { error } = await supabase
+    .from("seller_followers")
+    .insert([
+      {
+        seller_id: sellerId,
+        follower_id: user.id,
+      },
+    ]);
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  setIsFollowing(true);
+  setFollowersCount((prev) => prev + 1);
 };
 
 const sellerName =
@@ -233,9 +302,16 @@ style={{
 </div>
 
 <div style={heroActionsStyle}>
-  <button style={heroPrimaryButtonStyle}>
-    Seguir vendedor
-  </button>
+<button
+  onClick={toggleFollowSeller}
+  style={{
+    ...heroPrimaryButtonStyle,
+    background: isFollowing ? "#111" : "#fff",
+    color: isFollowing ? "#fff" : "#111",
+  }}
+>
+  {isFollowing ? "Siguiendo" : "Seguir vendedor"}
+</button>
 
   <button
     onClick={() => navigator.clipboard.writeText(window.location.href)}
@@ -286,7 +362,10 @@ style={{
         </div>
       </section>
 
-   <section style={floatingStatsStyle}>
+   <section
+  style={floatingStatsStyle}
+  className="floating-stats"
+>
   {[
     {
       label: "TRUST SCORE",
@@ -297,12 +376,12 @@ style={{
       value: soldCount,
     },
     {
+  label: "SEGUIDORES",
+  value: followersCount,
+},
+    {
       label: "VALORACIÓN",
       value: `★ ${averageRating}`,
-    },
-    {
-      label: "PRODUCTOS",
-      value: activeCount,
     },
   ].map((item) => (
     <div key={item.label} style={floatingStatItemStyle}>
@@ -632,61 +711,104 @@ translateY(-10px);
 }
 
 @media (max-width: 900px) {
-          .seller-hero {
-            flex-direction: column !important;
-            align-items: flex-start !important;
-          }
-        }
+  .seller-hero {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    padding: 42px !important;
+  }
 
-        @media (max-width: 700px) {
+  .floating-stats {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 700px) {
   .seller-page {
-  padding: 110px 18px 40px !important;
-}
-
-.seller-product-card:first-child {
-  grid-column: span 1 !important;
-}
-          }
-
-          .seller-title {
-            font-size: 44px !important;
-            letter-spacing: -2px !important;
-          }
-        }
-  @keyframes pulseScore{
-  0%{ transform:scale(1); }
-  50%{ transform:scale(1.06); }
-  100%{ transform:scale(1); }
-}
-
-@keyframes floatUp{
-  from{
-    opacity:0;
-    transform:translateY(40px);
+    padding: 110px 18px 40px !important;
+    overflow-x: hidden !important;
   }
 
-  to{
-    opacity:1;
-    transform:translateY(0);
+  .seller-hero {
+    min-height: auto !important;
+    padding: 34px 22px 60px !important;
+    border-radius: 30px !important;
+    gap: 24px !important;
+    background-position: center !important;
+  }
+
+  .seller-title {
+    font-size: 44px !important;
+    line-height: 1 !important;
+    letter-spacing: -2px !important;
+    overflow-wrap: anywhere;
+  }
+
+  .seller-product-card:first-child {
+    grid-column: span 1 !important;
+  }
+
+  .seller-product-card:hover {
+    transform: none !important;
+  }
+
+  .seller-product-card:hover .seller-product-image {
+    transform: scale(1.24) !important;
+  }
+
+  .seller-product-card::after {
+    display: none !important;
+  }
+
+  .favorite-pop:hover {
+    transform: none !important;
+  }
+
+  button:hover {
+    transform: none !important;
   }
 }
 
-.seller-hero{
-    animation:floatUp .7s ease;
+@keyframes pulseScore {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.06);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
-.seller-hero + section{
-    animation:floatUp .9s ease;
-}
+@keyframes floatUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-button{
-  transition:all .28s ease;
+.seller-hero {
+  animation: floatUp 0.7s ease;
 }
 
-button:hover{
-  transform:translateY(-3px);
-  box-shadow:0 18px 40px rgba(0,0,0,.18);
+.seller-hero + section {
+  animation: floatUp 0.9s ease;
+}
+
+button {
+  transition: all 0.28s ease;
+}
+
+button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
 }
       `}</style>
     </main>

@@ -49,13 +49,29 @@ export default function ProductDetail() {
 
         setProducto(data);
 
-        const { data: sellerData } = await supabase
-          .from("profiles")
-          .select(
-            "seller_verified, seller_level, seller_badge, stripe_account_id, stripe_charges_enabled, stripe_payouts_enabled"
-          )
-          .eq("id", data.seller_id)
-          .maybeSingle();
+  const { data: sellerData } = await supabase
+  .from("profiles")
+  .select(
+    `
+      id,
+      full_name,
+      username,
+      avatar_url,
+      location,
+      response_time,
+      created_at,
+      total_sales,
+      last_active,
+      seller_verified,
+      seller_level,
+      seller_badge,
+      stripe_account_id,
+      stripe_charges_enabled,
+      stripe_payouts_enabled
+    `
+  )
+  .eq("id", data.seller_id)
+  .maybeSingle();
 
         setSellerProfile(sellerData);
 
@@ -180,113 +196,120 @@ setSellerReviews(reviewsData || []);
     };
   };
 
-  const buyNow = async () => {
-    if (!producto) return;
+ const buyNow = async () => {
+  if (!producto) return;
 
-    if (producto.sold) {
-      alert(t.productAlreadySold);
-      return;
-    }
+  if (producto.sold) {
+    alert(t.productAlreadySold);
+    return;
+  }
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-    if (!user) {
-      alert(t.loginRequired);
-      return;
-    }
+  if (!user) {
+    alert(t.loginRequired);
+    return;
+  }
 
-    if (user.id === producto.seller_id) {
-      alert(t.cannotBuyOwnProduct);
-      return;
-    }
+  if (user.id === producto.seller_id) {
+    alert(t.cannotBuyOwnProduct);
+    return;
+  }
 
-    const { data: sellerProfile, error: sellerError } = await supabase
-      .from("profiles")
-      .select(
-        "seller_verified, seller_level, seller_badge, stripe_account_id, stripe_charges_enabled, stripe_payouts_enabled"
-      )
-      .eq("id", producto.seller_id)
-      .maybeSingle();
+  const { data: checkoutSeller, error: sellerError } = await supabase
+    .from("profiles")
+    .select(
+      `
+        stripe_account_id,
+        stripe_charges_enabled,
+        stripe_payouts_enabled
+      `
+    )
+    .eq("id", producto.seller_id)
+    .maybeSingle();
 
-    if (
-      sellerError ||
-      !sellerProfile?.stripe_account_id ||
-      !sellerProfile?.stripe_charges_enabled ||
-      !sellerProfile?.stripe_payouts_enabled
-    ) {
-     alert(t.sellerStripeInactive);
-      return;
-    }
+  if (
+    sellerError ||
+    !checkoutSeller?.stripe_account_id ||
+    !checkoutSeller?.stripe_charges_enabled ||
+    !checkoutSeller?.stripe_payouts_enabled
+  ) {
+    alert(t.sellerStripeInactive);
+    return;
+  }
 
-    try {
-      setCheckoutLoading(true);
+  try {
+    setCheckoutLoading(true);
 
-      const price = Number(producto.price);
-      const platformFee = Number(((price * 8) / 100).toFixed(2));
-      const sellerAmount = Number((price - platformFee).toFixed(2));
-      const stripeFeeEstimate = Number((price * 0.015 + 0.25).toFixed(2));
+    const price = Number(producto.price);
+    const platformFee = Number(((price * 8) / 100).toFixed(2));
+    const sellerAmount = Number((price - platformFee).toFixed(2));
+    const stripeFeeEstimate = Number(
+      (price * 0.015 + 0.25).toFixed(2)
+    );
 
-      const { data: order, error: orderError } = await supabase
-        .from("orders")
-        .insert([
-          {
-            product_id: producto.id,
-            buyer_id: user.id,
-            seller_id: producto.seller_id,
-            amount: price,
-            platform_fee_percent: 8,
-            platform_fee: platformFee,
-            seller_amount: sellerAmount,
-            stripe_fee_estimate: stripeFeeEstimate,
-            seller_stripe_account_id: sellerProfile.stripe_account_id,
-            status: "pending",
-            payment_status: "pending",
-            transfer_status: "pending",
-          },
-        ])
-        .select()
-        .single();
-
-      if (orderError || !order) {
-        alert(orderError?.message || t.orderCreateError);
-        return;
-      }
-
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+    const { data: order, error: orderError } = await supabase
+      .from("orders")
+      .insert([
+        {
+          product_id: producto.id,
+          buyer_id: user.id,
+          seller_id: producto.seller_id,
+          amount: price,
+          platform_fee_percent: 8,
+          platform_fee: platformFee,
+          seller_amount: sellerAmount,
+          stripe_fee_estimate: stripeFeeEstimate,
+          seller_stripe_account_id:
+            checkoutSeller.stripe_account_id,
+          status: "pending",
+          payment_status: "pending",
+          transfer_status: "pending",
         },
-        body: JSON.stringify({
-          orderId: order.id,
-          title: producto.title,
-          image: safeImage(producto.image),
-          price,
-          productId: producto.id,
-          sellerId: producto.seller_id,
-          buyerId: user.id,
-          stripeAccountId: sellerProfile.stripe_account_id,
-          origin: window.location.origin,
-        }),
-      });
+      ])
+      .select()
+      .single();
 
-      const data = await response.json();
-
-      if (data.url) {
-        window.location.href = data.url;
-        return;
-      }
-
-      alert(data.error || t.checkoutError);
-    } catch (error) {
-      console.log(error);
-      alert(t.checkoutStartError);
-    } finally {
-      setCheckoutLoading(false);
+    if (orderError || !order) {
+      alert(orderError?.message || t.orderCreateError);
+      return;
     }
-  };
+
+    const response = await fetch("/api/checkout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        orderId: order.id,
+        title: producto.title,
+        image: safeImage(producto.image),
+        price,
+        productId: producto.id,
+        sellerId: producto.seller_id,
+        buyerId: user.id,
+        stripeAccountId: checkoutSeller.stripe_account_id,
+        origin: window.location.origin,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (data.url) {
+      window.location.href = data.url;
+      return;
+    }
+
+    alert(data.error || t.checkoutError);
+  } catch (error) {
+    console.log(error);
+    alert(t.checkoutStartError);
+  } finally {
+    setCheckoutLoading(false);
+  }
+};
 
   const toggleFavorite = async () => {
     const {
@@ -555,6 +578,17 @@ setSellerReviews(reviewsData || []);
       sellerReviews.length
     : null;
 
+    const memberSince =
+  sellerProfile?.created_at
+    ? new Date(sellerProfile.created_at).getFullYear()
+    : "2025";
+
+const responseTime =
+  sellerProfile?.response_time || "< 1 hora";
+
+const sales =
+  sellerProfile?.total_sales || 0;
+
   return (
     <main className="product-detail-page" style={pageStyle}>
       <button onClick={() => window.history.back()} style={backButtonStyle}>
@@ -585,11 +619,11 @@ setSellerReviews(reviewsData || []);
   <div
     style={{
       position: "absolute",
-      width: "420px",
-      height: "420px",
+      width: "560px",
+height: "560px",
       borderRadius: "50%",
       background: "rgba(255,255,255,.75)",
-      filter: "blur(90px)",
+      filter: "blur(130px)",
       top: "50%",
       left: "50%",
       transform: "translate(-50%,-50%)",
@@ -609,7 +643,7 @@ setSellerReviews(reviewsData || []);
       objectPosition: `${mousePosition.x}% ${mousePosition.y}%`,
       padding: "56px",
       transition: "transform .35s ease, object-position .15s ease",
-      filter: "drop-shadow(0 35px 55px rgba(0,0,0,.18))",
+      filter: "drop-shadow(0 55px 90px rgba(0,0,0,.22))",
       position: "relative",
       zIndex: 2,
     }}
@@ -644,16 +678,95 @@ setSellerReviews(reviewsData || []);
           </div>
         </div>
 
-          <div style={productInfoStickyStyle}>
+          <div
+  style={productInfoStickyStyle}
+  className="product-info-panel"
+>
   <p style={brandStyle}>{producto.brand}</p>
 
           <h1 style={titleStyle} className="product-detail-title">
             {producto.title}
           </h1>
 
-   <p style={priceStyle} className="product-detail-price">
-  €{producto.price}
-</p>
+ <div
+  style={{
+    display: "flex",
+    alignItems: "flex-end",
+    gap: "14px",
+    marginBottom: "34px",
+  }}
+>
+  <span
+    className="product-detail-price"
+    style={{
+      fontSize: "82px",
+      fontWeight: 950,
+      letterSpacing: "-5px",
+      lineHeight: 1,
+    }}
+  >
+    €{producto.price}
+  </span>
+
+  <span
+    style={{
+      marginBottom: "12px",
+      color: "#888",
+      fontSize: "15px",
+      fontWeight: 700,
+    }}
+  >
+    IVA incl.
+  </span>
+</div>
+
+<div
+  style={{
+    display: "flex",
+    gap: "10px",
+    flexWrap: "wrap",
+    marginBottom: "34px",
+  }}
+>
+  <span
+    style={{
+      background: "#111",
+      color: "#fff",
+      borderRadius: "999px",
+      padding: "10px 18px",
+      fontWeight: 800,
+      fontSize: "12px",
+    }}
+  >
+    ATHMOV PREMIUM
+  </span>
+
+  <span
+    style={{
+      background: "#fff",
+      border: "1px solid rgba(0,0,0,.08)",
+      borderRadius: "999px",
+      padding: "10px 18px",
+      fontWeight: 700,
+      fontSize: "12px",
+    }}
+  >
+    Pago protegido
+  </span>
+
+  <span
+    style={{
+      background: "#fff",
+      border: "1px solid rgba(0,0,0,.08)",
+      borderRadius: "999px",
+      padding: "10px 18px",
+      fontWeight: 700,
+      fontSize: "12px",
+    }}
+  >
+    Envío asegurado
+  </span>
+</div>
 
 <div
   style={{
@@ -770,30 +883,103 @@ setSellerReviews(reviewsData || []);
 <p>✓ Soporte ATHMOV hasta la entrega</p>
 </div>
 
-          <section style={marketInsightStyle}>
-  <p style={marketLabelStyle}>MARKET INSIGHTS</p>
+   <div style={marketCardStyle}>
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 28,
+    }}
+  >
+    <div>
+      <p style={marketLabelStyle}>MARKET VALUE</p>
+
+      <h3
+        style={{
+          margin: "6px 0 0",
+          fontSize: 28,
+          fontWeight: 900,
+        }}
+      >
+        Precio del mercado
+      </h3>
+    </div>
+
+    <div
+      style={{
+        background: "#111",
+        color: "#fff",
+        padding: "10px 18px",
+        borderRadius: "999px",
+        fontWeight: 800,
+      }}
+    >
+      -8%
+    </div>
+  </div>
+
+  <div
+    style={{
+      position: "relative",
+      height: 12,
+      borderRadius: 999,
+      background: "#ececec",
+      overflow: "hidden",
+      marginBottom: 28,
+    }}
+  >
+    <div
+      style={{
+        width: "62%",
+        height: "100%",
+        background: "linear-gradient(90deg,#22c55e,#84cc16)",
+      }}
+    />
+  </div>
 
   <div style={marketRowStyle}>
     <span>Precio medio</span>
-    <strong>
-      €
-      {Math.round(Number(producto.price) * 1.08)}
-    </strong>
+    <strong>€{Math.round(Number(producto.price) * 1.08)}</strong>
   </div>
 
   <div style={marketRowStyle}>
-    <span>Tu precio</span>
+    <span>Precio ATHMOV</span>
     <strong>€{producto.price}</strong>
   </div>
 
-  <div style={marketStatusStyle}>
-    ✓ Buen precio
+  <p
+    style={{
+      marginTop: 22,
+      color: "#22a559",
+      fontWeight: 800,
+    }}
+  >
+    Este producto está un 8% por debajo del precio medio del mercado.
+  </p>
+</div>
+
+<div style={trustStripStyle}>
+  <div style={trustStripItemStyle}>
+    <span>🛡</span>
+    <span>Compra protegida</span>
   </div>
 
-  <div style={marketFooterStyle}>
-    Tiempo medio de venta: 6-10 días
+  <div style={trustStripItemStyle}>
+    <span>💳</span>
+    <span>Pago seguro</span>
   </div>
-</section>
+
+  <div style={trustStripItemStyle}>
+    <span>🚚</span>
+    <span>Envío protegido</span>
+  </div>
+
+  <div style={trustStripItemStyle}>
+    <span>⭐</span>
+    <span>Marketplace Premium</span>
+  </div>
+</div>
 
 <div style={quickInfoStyle}>
   <span style={quickInfoItemStyle}>🚚 {t.protectedShipping}</span>
@@ -812,7 +998,8 @@ setSellerReviews(reviewsData || []);
 
           <p style={descriptionStyle}>{producto.description}</p>
 
-          <div
+<div
+  className="product-feature-grid"
   style={{
     display: "grid",
     gridTemplateColumns: "repeat(4,1fr)",
@@ -900,6 +1087,60 @@ setSellerReviews(reviewsData || []);
   <div style={trustPanelItemStyle}>✓ {t.selectedMarketplace}</div>
 </div>
 
+<div style={timelineStyle}>
+  <h3 style={timelineTitleStyle}>Historial del producto</h3>
+
+  <div style={timelineItemStyle}>
+    <span>📅</span>
+    <div>
+      <strong>Publicado</strong>
+      <p>
+        {new Date(producto.created_at).toLocaleDateString("es-ES")}
+      </p>
+    </div>
+  </div>
+
+  <div style={timelineItemStyle}>
+    <span>👁</span>
+    <div>
+      <strong>Visualizaciones</strong>
+      <p>{producto.views || 0}</p>
+    </div>
+  </div>
+
+  <div style={timelineItemStyle}>
+    <span>❤</span>
+    <div>
+      <strong>Favoritos</strong>
+      <p>{producto.favorites_count || 0}</p>
+    </div>
+  </div>
+
+  <div style={timelineItemStyle}>
+    <span>📍</span>
+    <div>
+      <strong>Ubicación</strong>
+      <p>{producto.location || "España"}</p>
+    </div>
+  </div>
+
+  <div style={timelineItemStyle}>
+    <span>🚚</span>
+    <div>
+      <strong>Entrega estimada</strong>
+      <p>24-72 horas</p>
+    </div>
+  </div>
+
+  <div style={timelineItemStyle}>
+    <span>🛡</span>
+    <div>
+      <strong>Estado</strong>
+      <p>Verificado por ATHMOV</p>
+    </div>
+  </div>
+</div>
+
           <section style={buyerGuideStyle}>
             <div style={buyerGuideHeaderStyle}>
               <div>
@@ -952,7 +1193,16 @@ setSellerReviews(reviewsData || []);
     ✓ {t.sellerVerified}
   </div>
 )}
- <div style={sellerPremiumCardStyle}>
+<div
+  style={{
+    ...sellerPremiumCardStyle,
+    cursor: "pointer",
+  }}
+  className="seller-premium-card"
+  onClick={() =>
+    window.location.href = `/profile/${sellerProfile?.id}`
+  }
+>
   <div
   style={{
     height: "3px",
@@ -962,8 +1212,14 @@ setSellerReviews(reviewsData || []);
     marginBottom: "24px",
   }}
 />
-  <div style={sellerPremiumTopStyle}>
-    <div style={sellerAvatarLargeStyle}>
+  <div
+  style={sellerPremiumTopStyle}
+  className="seller-premium-top"
+>
+    <div
+  style={sellerAvatarLargeStyle}
+  className="seller-premium-avatar"
+>
      <Image
     src={safeImage(sellerProfile?.avatar_url)}
     fill
@@ -977,9 +1233,15 @@ setSellerReviews(reviewsData || []);
         ATHMOV VERIFIED SELLER
       </p>
 
-      <h3 style={sellerPremiumNameStyle}>
-        {sellerProfile?.seller_badge || t.athmovSeller}
-      </h3>
+      <h3
+  style={sellerPremiumNameStyle}
+  className="seller-premium-name"
+>
+  {sellerProfile?.full_name ||
+    sellerProfile?.username ||
+    sellerProfile?.seller_badge ||
+    t.athmovSeller}
+</h3>
 
       <p style={sellerStarsStyle}>
         ★★★★★ <span style={{ opacity: 0.55 }}>({sellerReviews.length} reseñas)</span>
@@ -987,47 +1249,34 @@ setSellerReviews(reviewsData || []);
     </div>
   </div>
 
-  <div style={sellerStatsGridStyle}>
-    <div>✓ Vendedor verificado</div>
-    <div>✓ Pagos seguros</div>
-    <div>✓ Perfil revisado</div>
-    <div>✓ Marketplace premium</div>
+<div
+  style={sellerStatsGridStyle}
+  className="seller-stats-grid"
+>
+  <div style={sellerStatCardStyle}>
+    <strong>{sales}</strong>
+    <span>Ventas</span>
+  </div>
+
+  <div style={sellerStatCardStyle}>
+    <strong>
+      {averageRating !== null ? averageRating.toFixed(1) : "Nuevo"}
+    </strong>
+    <span>Valoración</span>
+  </div>
+
+  <div style={sellerStatCardStyle}>
+    <strong>{responseTime}</strong>
+    <span>Respuesta</span>
+  </div>
+
+  <div style={sellerStatCardStyle}>
+    <strong>{memberSince}</strong>
+    <span>Miembro</span>
   </div>
 </div>
 
-          {producto.seller_id && (
-            <button
-              onClick={() => {
-                window.location.href = `/seller/${producto.seller_id}`;
-              }}
-              style={sellerButtonStyle}
-            >
-              {t.viewSellerProfile}
-            </button>
-          )}
-
-          {sellerReviews.length > 0 && (
-  <div style={sellerRatingStyle}>
-    <div style={{ fontSize: "22px" }}>
-      {"★".repeat(Math.round(averageRating!))}
-      {"☆".repeat(5 - Math.round(averageRating!))}
-    </div>
-
-    <div style={{ fontWeight: 700 }}>
-      {averageRating?.toFixed(1)} / 5
-    </div>
-
-    <div
-      style={{
-        fontSize: 13,
-        color: "#666",
-      }}
-    >
-      Basado en {sellerReviews.length} valoración
-      {sellerReviews.length > 1 ? "es" : ""}
-    </div>
-  </div>
-)}
+</div>
 
 {sellerReviews.length > 0 && (
   <div style={reviewListStyle}>
@@ -1060,7 +1309,10 @@ setSellerReviews(reviewsData || []);
   {t.addToCart}
 </button>
 
-<div style={secondaryActionsGridStyle}>
+<div
+  style={secondaryActionsGridStyle}
+  className="secondary-actions-grid"
+>
   <button onClick={messageSeller} style={secondaryButtonStyle}>
     {t.messageSeller}
   </button>
@@ -1078,7 +1330,7 @@ setSellerReviews(reviewsData || []);
       </div>
 
 {showStickyBar && (
-<div style={stickyBuyBarStyle}>
+<div style={stickyBuyBarStyle} className="sticky-buy-bar">
   <div>
     <div style={{ fontSize: 12, opacity: 0.55 }}>
       {producto.brand}
@@ -1089,13 +1341,14 @@ setSellerReviews(reviewsData || []);
     </div>
   </div>
 
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: 18,
-    }}
-  >
+ <div
+  className="sticky-buy-actions"
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: 18,
+  }}
+>
     <div
       style={{
         fontSize: 28,
@@ -1186,6 +1439,24 @@ setSellerReviews(reviewsData || []);
 
       <style>{`
 
+      .seller-premium-card{
+    transition:.45s ease;
+}
+
+.seller-premium-card:hover{
+    transform:translateY(-10px);
+    box-shadow:0 70px 180px rgba(0,0,0,.35);
+}
+
+.seller-stats-grid > div{
+    transition:.35s;
+}
+
+.seller-stats-grid > div:hover{
+    transform:translateY(-6px);
+    background:rgba(255,255,255,.15);
+}
+
       .buy-button{
     position:relative;
     overflow:hidden;
@@ -1260,8 +1531,8 @@ transition:transform .55s ease;
   transform: scale(1.12);
 }
 
-.product-detail-actions button{
-  transition:all .28s ease;
+.product-detail-actions button {
+  transition: all .28s ease;
 }
 
 .product-detail-actions button:hover{
@@ -1302,6 +1573,124 @@ transition:transform .55s ease;
         }
 
         @media (max-width: 700px) {
+
+        .seller-stats-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+.seller-stats-grid > div {
+  min-width: 0 !important;
+  padding: 16px 8px !important;
+}
+
+.seller-stats-grid strong {
+  font-size: 18px !important;
+  overflow-wrap: anywhere;
+}
+
+.seller-stats-grid span {
+  font-size: 11px !important;
+}
+
+.seller-premium-card {
+  padding: 24px 18px !important;
+  border-radius: 28px !important;
+}
+
+.seller-premium-top {
+  align-items: flex-start !important;
+}
+
+.seller-premium-avatar {
+  width: 72px !important;
+  height: 72px !important;
+  flex-shrink: 0 !important;
+}
+
+.seller-premium-name {
+  font-size: 24px !important;
+  line-height: 1.05 !important;
+  overflow-wrap: anywhere;
+}
+
+        .product-info-panel {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  position: static !important;
+}
+
+        .product-detail-layout > div:last-child {
+  min-width: 0 !important;
+}
+
+.product-detail-layout > div:last-child > div {
+  position: static !important;
+  top: auto !important;
+  padding: 28px 20px !important;
+  border-radius: 30px !important;
+}
+
+.product-feature-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+.product-feature-grid > div {
+  padding: 15px 8px !important;
+  border-radius: 18px !important;
+  font-size: 13px !important;
+}
+
+.secondary-actions-grid {
+  grid-template-columns: 1fr !important;
+}
+
+.sticky-buy-bar {
+  bottom: 12px !important;
+  width: calc(100% - 24px) !important;
+  padding: 12px !important;
+  border-radius: 22px !important;
+  gap: 12px !important;
+}
+
+.sticky-buy-bar > div:first-child {
+  display: none !important;
+}
+
+.sticky-buy-actions {
+  width: 100% !important;
+  gap: 10px !important;
+}
+
+.sticky-buy-actions > div {
+  font-size: 24px !important;
+  white-space: nowrap !important;
+}
+
+.sticky-buy-actions button {
+  height: 54px !important;
+  flex: 1 !important;
+  width: auto !important;
+  padding: 0 20px !important;
+  font-size: 14px !important;
+}
+
+.product-detail-image .product-zoom-image {
+  padding: 28px !important;
+  transform: none !important;
+  object-position: center !important;
+}
+
+.product-detail-image:hover .product-zoom-image {
+  transform: none !important;
+}
+
+.product-detail-page {
+  overflow-x: hidden !important;
+}
+
         .product-detail-page {
   padding: 130px 18px 110px !important;
 }
@@ -1354,11 +1743,51 @@ transition:transform .55s ease;
   transform: translateY(-8px);
   box-shadow: 0 28px 80px rgba(0,0,0,.12);
 }
-        }
+
+.product-detail-price {
+  animation: priceFade .8s ease;
+}
+
+.seller-premium-card {
+  animation: sellerCard .9s ease;
+}
+
+@keyframes priceFade {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sellerCard {
+  from {
+    opacity: 0;
+    transform: translateY(35px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
       `}</style>
     </main>
   );
 }
+
+const marketCardStyle = {
+  maxWidth: "560px",
+  background: "#fff",
+  borderRadius: "34px",
+  padding: "34px",
+  border: "1px solid rgba(0,0,0,.05)",
+  boxShadow: "0 28px 90px rgba(0,0,0,.07)",
+};
 
 const pageStyle = {
   minHeight: "100vh",
@@ -1428,7 +1857,7 @@ const mainImageStyle = {
   borderRadius: "42px",
   overflow: "hidden",
 background:
-"radial-gradient(circle at 50% 35%, #ffffff 0%, #f7f7f3 45%, #ecece8 100%)",
+"radial-gradient(circle at 50% 28%, #ffffff 0%, #fcfcfb 28%, #f5f5f2 58%, #ecece8 100%)",
   boxShadow:"0 60px 180px rgba(0,0,0,.14)",
   border: "1px solid rgba(0,0,0,.04)",
   cursor: "zoom-in",
@@ -1927,21 +2356,23 @@ const reviewListStyle = {
 };
 
 const reviewItemStyle = {
-  background: "#fff",
-  border: "1px solid rgba(0,0,0,0.08)",
+  background: "rgba(255,255,255,.06)",
+  border: "1px solid rgba(255,255,255,.08)",
   borderRadius: "18px",
-  padding: "16px",
+  padding: "18px",
+  backdropFilter: "blur(10px)",
 };
 
 const reviewStarsStyle = {
   fontSize: "16px",
   fontWeight: 900,
+  color: "#fff",
 };
 
 const reviewCommentStyle = {
-  marginTop: "8px",
+  marginTop: "10px",
   marginBottom: 0,
-  color: "#555",
+  color: "rgba(255,255,255,.78)",
   lineHeight: 1.6,
   fontSize: "14px",
 };
@@ -1996,8 +2427,9 @@ height:"96px",
   justifyContent: "center",
   fontSize: "34px",
   fontWeight: 950,
-  boxShadow: "0 18px 50px rgba(0,0,0,.25)",
-  border:"3px solid rgba(255,255,255,.15)",
+  border:"3px solid rgba(255,255,255,.25)",
+boxShadow:
+"0 0 0 6px rgba(255,255,255,.04),0 18px 50px rgba(0,0,0,.35)",
 };
 
 const sellerVerifiedTextStyle = {
@@ -2021,12 +2453,9 @@ const sellerStarsStyle = {
 
 const sellerStatsGridStyle = {
   display: "grid",
-  gridTemplateColumns: "repeat(2, 1fr)",
-  gap: "10px",
-  marginTop: "22px",
-  color: "rgba(255,255,255,.72)",
-  fontSize: "13px",
-  fontWeight: 800,
+  gridTemplateColumns: "repeat(4,1fr)",
+  gap: "12px",
+  marginTop: "28px",
 };
 
 const marketInsightStyle = {
@@ -2099,4 +2528,61 @@ const secondaryActionsGridStyle = {
   display: "grid",
   gridTemplateColumns: "repeat(3, 1fr)",
   gap: "12px",
+};
+
+const sellerStatCardStyle = {
+  background: "rgba(255,255,255,.08)",
+  borderRadius: "18px",
+  padding: "18px 12px",
+  textAlign: "center" as const,
+  display: "flex",
+  flexDirection: "column" as const,
+  gap: "8px",
+};
+
+const timelineStyle = {
+  maxWidth: "560px",
+  background: "#fff",
+  borderRadius: "28px",
+  padding: "30px",
+  marginTop: "34px",
+  marginBottom: "34px",
+  border: "1px solid rgba(0,0,0,.06)",
+  boxShadow: "0 20px 60px rgba(0,0,0,.06)",
+};
+
+const timelineTitleStyle = {
+  fontSize: "24px",
+  fontWeight: 900,
+  marginBottom: "26px",
+};
+
+const timelineItemStyle = {
+  display: "flex",
+  alignItems: "flex-start",
+  gap: "18px",
+  padding: "16px 0",
+  borderBottom: "1px solid rgba(0,0,0,.06)",
+};
+
+const trustStripStyle = {
+  maxWidth: "560px",
+  display: "grid",
+  gridTemplateColumns: "repeat(2,1fr)",
+  gap: "12px",
+  marginTop: "24px",
+  marginBottom: "32px",
+};
+
+const trustStripItemStyle = {
+  background: "#fff",
+  border: "1px solid rgba(0,0,0,.06)",
+  borderRadius: "18px",
+  padding: "16px",
+  display: "flex",
+  alignItems: "center",
+  gap: "12px",
+  fontWeight: 800,
+  fontSize: "14px",
+  boxShadow: "0 10px 30px rgba(0,0,0,.04)",
 };
