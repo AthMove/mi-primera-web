@@ -5,6 +5,8 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useLanguage } from "@/components/LanguageProvider";
+import ProductGallery from "@/components/product/ProductGallery";
+import ProductPurchasePanel from "@/components/product/ProductPurchasePanel";
 
 export default function ProductDetail() {
   const params = useParams();
@@ -596,404 +598,41 @@ const sales =
       </button>
 
       <div style={layoutStyle} className="product-detail-layout">
-        <div>
- <div
-  style={mainImageStyle}
-  className="product-detail-image"
-  onMouseMove={handleImageMove}
->
-  <div style={imageBadgesStyle}>
-    <span style={statusBadgeStyle}>
-      {getConditionLabel(producto.condition)}
-    </span>
+   <ProductGallery
+  title={producto.title}
+  images={images}
+  selectedImage={selectedImage}
+  conditionLabel={getConditionLabel(producto.condition)}
+  featured={producto.featured}
+  isFavorite={isFavorite}
+  mousePosition={mousePosition}
+  onSelectImage={setSelectedImage}
+  onToggleFavorite={toggleFavorite}
+  onImageMove={handleImageMove}
+/>
 
-    {producto.featured && (
-      <span style={featuredBadgeStyle}>⭐ Destacado</span>
-    )}
-  </div>
-
-  <button onClick={toggleFavorite} style={favoriteFloatingStyle}>
-    {isFavorite ? "❤️" : "🤍"}
-  </button>
-
-  <div
-    style={{
-      position: "absolute",
-      width: "560px",
-height: "560px",
-      borderRadius: "50%",
-      background: "rgba(255,255,255,.75)",
-      filter: "blur(130px)",
-      top: "50%",
-      left: "50%",
-      transform: "translate(-50%,-50%)",
-      pointerEvents: "none",
-      zIndex: 1,
-    }}
-  />
-
-  <img
-    src={safeImage(selectedImage)}
-    alt={producto.title || "Producto"}
-    className="product-main-image product-zoom-image"
-    style={{
-      width: "100%",
-      height: "100%",
-      objectFit: "contain",
-      objectPosition: `${mousePosition.x}% ${mousePosition.y}%`,
-      padding: "56px",
-      transition: "transform .35s ease, object-position .15s ease",
-      filter: "drop-shadow(0 55px 90px rgba(0,0,0,.22))",
-      position: "relative",
-      zIndex: 2,
-    }}
-  />
-</div>
-
-          <div style={thumbGridStyle} className="product-detail-thumbs">
-            {images.map((img: string, index: number) => (
-              <button
-                key={index}
-                onClick={() => setSelectedImage(img)}
-                style={{
-                  ...thumbButtonStyle,
-                  border:
-                    selectedImage === img
-                      ? "2px solid #111"
-                      : "1px solid rgba(0,0,0,0.08)",
-                }}
-              >
-                <Image
-                  src={safeImage(img)}
-                  alt={`Producto ${index + 1}`}
-                  fill
-                  sizes="180px"
-                  style={{
-  objectFit: "contain",
-  padding: "14px",
-}}
-                />
-              </button>
-            ))}
-          </div>
-        </div>
-
-          <div
-  style={productInfoStickyStyle}
-  className="product-info-panel"
->
-  <p style={brandStyle}>{producto.brand}</p>
-
-          <h1 style={titleStyle} className="product-detail-title">
-            {producto.title}
-          </h1>
-
- <div
-  style={{
-    display: "flex",
-    alignItems: "flex-end",
-    gap: "14px",
-    marginBottom: "34px",
-  }}
->
-  <span
-    className="product-detail-price"
-    style={{
-      fontSize: "82px",
-      fontWeight: 950,
-      letterSpacing: "-5px",
-      lineHeight: 1,
-    }}
-  >
-    €{producto.price}
-  </span>
-
-  <span
-    style={{
-      marginBottom: "12px",
-      color: "#888",
-      fontSize: "15px",
-      fontWeight: 700,
-    }}
-  >
-    IVA incl.
-  </span>
-</div>
-
-<div
-  style={{
-    display: "flex",
-    gap: "10px",
-    flexWrap: "wrap",
-    marginBottom: "34px",
-  }}
->
-  <span
-    style={{
-      background: "#111",
-      color: "#fff",
-      borderRadius: "999px",
-      padding: "10px 18px",
-      fontWeight: 800,
-      fontSize: "12px",
-    }}
-  >
-    ATHMOV PREMIUM
-  </span>
-
-  <span
-    style={{
-      background: "#fff",
-      border: "1px solid rgba(0,0,0,.08)",
-      borderRadius: "999px",
-      padding: "10px 18px",
-      fontWeight: 700,
-      fontSize: "12px",
-    }}
-  >
-    Pago protegido
-  </span>
-
-  <span
-    style={{
-      background: "#fff",
-      border: "1px solid rgba(0,0,0,.08)",
-      borderRadius: "999px",
-      padding: "10px 18px",
-      fontWeight: 700,
-      fontSize: "12px",
-    }}
-  >
-    Envío asegurado
-  </span>
-</div>
-
-<div
-  style={{
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    marginTop: "-18px",
-    marginBottom: "34px",
-  }}
->
-  <span
-    style={{
-      background: "#111",
-      color: "#fff",
-      padding: "8px 14px",
-      borderRadius: "999px",
-      fontSize: "12px",
-      fontWeight: 900,
-    }}
-  >
-    Mejor precio
-  </span>
-
-  <span
-    style={{
-      color: "#777",
-      fontSize: "14px",
-      fontWeight: 600,
-    }}
-  >
-    Precio verificado por ATHMOV
-  </span>
-</div>
-
-<div style={conditionBadgeStyle}>
-  {getConditionLabel(producto.condition)}
-</div>
-
-<div
-  style={{
-    display: "flex",
-    gap: "10px",
-    flexWrap: "wrap",
-    marginBottom: "28px",
-  }}
->
-  <span
-    style={{
-      background: "#111",
-      color: "#fff",
-      borderRadius: "999px",
-      padding: "8px 14px",
-      fontSize: "12px",
-      fontWeight: 800,
-    }}
-  >
-    ✓ Verificado
-  </span>
-
-  <span
-    style={{
-      background: "#f3f3ef",
-      borderRadius: "999px",
-      padding: "8px 14px",
-      fontSize: "12px",
-      fontWeight: 800,
-    }}
-  >
-    🚚 Envío protegido
-  </span>
-
-  <span
-    style={{
-      background: "#f3f3ef",
-      borderRadius: "999px",
-      padding: "8px 14px",
-      fontSize: "12px",
-      fontWeight: 800,
-    }}
-  >
-    ⭐ Marketplace Premium
-  </span>
-</div>
-
-<div
-  style={{
-    background: "linear-gradient(180deg,#ffffff,#f7f7f3)",
-    border: "1px solid rgba(0,0,0,.05)",
-    borderRadius: "30px",
-    padding: "30px",
-    marginBottom: "34px",
-    display: "flex",
-    flexDirection: "column",
-    gap: "18px",
-    boxShadow: "0 25px 80px rgba(0,0,0,.06)",
-  }}
->
- <strong
-  style={{
-    fontSize: "22px",
-    fontWeight: 900,
-    letterSpacing: "-0.5px",
-  }}
->
-  Compra protegida por ATHMOV
-</strong>
-
-  <p>✓ Pago seguro mediante Stripe</p>
-
-<p>✓ Vendedor verificado</p>
-
-<p>✓ Envío con seguimiento</p>
-
-<p>✓ Soporte ATHMOV hasta la entrega</p>
-</div>
-
-   <div style={marketCardStyle}>
-  <div
-    style={{
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: 28,
-    }}
-  >
-    <div>
-      <p style={marketLabelStyle}>MARKET VALUE</p>
-
-      <h3
-        style={{
-          margin: "6px 0 0",
-          fontSize: 28,
-          fontWeight: 900,
-        }}
-      >
-        Precio del mercado
-      </h3>
-    </div>
-
-    <div
-      style={{
-        background: "#111",
-        color: "#fff",
-        padding: "10px 18px",
-        borderRadius: "999px",
-        fontWeight: 800,
-      }}
-    >
-      -8%
-    </div>
-  </div>
-
-  <div
-    style={{
-      position: "relative",
-      height: 12,
-      borderRadius: 999,
-      background: "#ececec",
-      overflow: "hidden",
-      marginBottom: 28,
-    }}
-  >
-    <div
-      style={{
-        width: "62%",
-        height: "100%",
-        background: "linear-gradient(90deg,#22c55e,#84cc16)",
-      }}
-    />
-  </div>
-
-  <div style={marketRowStyle}>
-    <span>Precio medio</span>
-    <strong>€{Math.round(Number(producto.price) * 1.08)}</strong>
-  </div>
-
-  <div style={marketRowStyle}>
-    <span>Precio ATHMOV</span>
-    <strong>€{producto.price}</strong>
-  </div>
-
-  <p
-    style={{
-      marginTop: 22,
-      color: "#22a559",
-      fontWeight: 800,
-    }}
-  >
-    Este producto está un 8% por debajo del precio medio del mercado.
-  </p>
-</div>
-
-<div style={trustStripStyle}>
-  <div style={trustStripItemStyle}>
-    <span>🛡</span>
-    <span>Compra protegida</span>
-  </div>
-
-  <div style={trustStripItemStyle}>
-    <span>💳</span>
-    <span>Pago seguro</span>
-  </div>
-
-  <div style={trustStripItemStyle}>
-    <span>🚚</span>
-    <span>Envío protegido</span>
-  </div>
-
-  <div style={trustStripItemStyle}>
-    <span>⭐</span>
-    <span>Marketplace Premium</span>
-  </div>
-</div>
-
-<div style={quickInfoStyle}>
-  <span style={quickInfoItemStyle}>🚚 {t.protectedShipping}</span>
-  <span style={quickInfoItemStyle}>✓ {t.securePaymentShort}</span>
-  <span style={quickInfoItemStyle}>↩ {t.incidentWindow}</span>
-</div>
-
-<div style={trustScoreStyle}>
-  <div>
-   <p style={trustScoreLabelStyle}>{t.trustScore}</p>
-<h3 style={trustScoreTitleStyle}>{t.buyWithConfidenceShort}</h3>
-  </div>
-
-  <div style={trustScoreBadgeStyle}>9.2</div>
+   <ProductPurchasePanel
+  brand={producto.brand}
+  title={producto.title}
+  price={producto.price}
+  condition={getConditionLabel(producto.condition)}
+  location={producto.location || "España"}
+  sellerVerified={Boolean(sellerProfile?.seller_verified)}
+  checkoutLoading={checkoutLoading}
+  isFavorite={isFavorite}
+  buyNowLabel={t.buyNow}
+  redirectingLabel={t.redirecting}
+  addToCartLabel={t.addToCart}
+  makeOfferLabel={t.makeOffer}
+  messageSellerLabel={t.messageSeller}
+  addToFavoritesLabel={t.addToFavorites}
+  inFavoritesLabel={t.inFavorites}
+  onBuyNow={buyNow}
+  onAddToCart={addToCart}
+  onMakeOffer={makeOffer}
+  onMessageSeller={messageSeller}
+  onToggleFavorite={toggleFavorite}
+/>
 </div>
 
           <p style={descriptionStyle}>{producto.description}</p>
@@ -1075,18 +714,6 @@ height: "560px",
               </div>
             ))}
           </div>
-
-        <div style={trustPanelStyle}>
-  <div style={trustPanelItemStyle}>✓ {t.buyerProtection}</div>
-  <div style={trustPanelItemStyle}>✓ {t.securePaymentShort}</div>
-  <div style={trustPanelItemStyle}>
-    {sellerProfile?.seller_verified
-      ? `✓ ${t.sellerVerified}`
-      : t.sellerProfileAvailable}
-  </div>
-  <div style={trustPanelItemStyle}>✓ {t.selectedMarketplace}</div>
-</div>
-
 <div style={timelineStyle}>
   <h3 style={timelineTitleStyle}>Historial del producto</h3>
 
@@ -1199,9 +826,9 @@ height: "560px",
     cursor: "pointer",
   }}
   className="seller-premium-card"
-  onClick={() =>
-    window.location.href = `/profile/${sellerProfile?.id}`
-  }
+  onClick={() => {
+    window.location.href = `/seller/${sellerProfile?.id}`;
+  }}
 >
   <div
   style={{
@@ -1288,84 +915,49 @@ height: "560px",
         </div>
 
         {review.comment && (
-          <p style={reviewCommentStyle}>{review.comment}</p>
+          <p style={reviewCommentStyle}>
+            {review.comment}
+          </p>
         )}
       </div>
     ))}
   </div>
 )}
 
-          <div style={actionsStyle} className="product-detail-actions">
-
-<button
-  onClick={buyNow}
-  style={buyButtonStyle}
-  className="buy-button"
->
-  {checkoutLoading ? t.redirecting : t.buyNow}
-</button>
-
-<button onClick={addToCart} style={primaryButtonStyle}>
-  {t.addToCart}
-</button>
-
-<div
-  style={secondaryActionsGridStyle}
-  className="secondary-actions-grid"
->
-  <button onClick={messageSeller} style={secondaryButtonStyle}>
-    {t.messageSeller}
-  </button>
-
-  <button onClick={makeOffer} style={secondaryButtonStyle}>
-    {t.makeOffer}
-  </button>
-
-  <button onClick={toggleFavorite} style={secondaryButtonStyle}>
-    {isFavorite ? t.inFavorites : t.addToFavorites}
-  </button>
-</div>
-        </div>
-      </div>
-      </div>
-
 {showStickyBar && (
-<div style={stickyBuyBarStyle} className="sticky-buy-bar">
-  <div>
-    <div style={{ fontSize: 12, opacity: 0.55 }}>
-      {producto.brand}
+  <div style={stickyBuyBarStyle} className="sticky-buy-bar">
+    <div>
+      <div style={{ fontSize: 12, opacity: 0.55 }}>
+        {producto.brand}
+      </div>
+
+      <div style={{ fontWeight: 800, fontSize: 18 }}>
+        {producto.title}
+      </div>
     </div>
 
-    <div style={{ fontWeight: 800, fontSize: 18 }}>
-      {producto.title}
-    </div>
-  </div>
-
- <div
-  className="sticky-buy-actions"
-  style={{
-    display: "flex",
-    alignItems: "center",
-    gap: 18,
-  }}
->
     <div
+      className="sticky-buy-actions"
       style={{
-        fontSize: 28,
-        fontWeight: 900,
+        display: "flex",
+        alignItems: "center",
+        gap: 18,
       }}
     >
-      €{producto.price}
-    </div>
+      <div
+        style={{
+          fontSize: 28,
+          fontWeight: 900,
+        }}
+      >
+        €{producto.price}
+      </div>
 
-    <button
-      onClick={buyNow}
-      style={buyButtonStyle}
-    >
-      {t.buyNow}
-    </button>
+      <button onClick={buyNow} style={buyButtonStyle}>
+        {t.buyNow}
+      </button>
+    </div>
   </div>
-</div>
 )}
 
       <section style={relatedSectionStyle}>
@@ -1850,36 +1442,6 @@ const layoutStyle = {
   alignItems: "start",
 };
 
-const mainImageStyle = {
-  position: "relative" as const,
-  width: "100%",
-  minHeight: "720px",
-  borderRadius: "42px",
-  overflow: "hidden",
-background:
-"radial-gradient(circle at 50% 28%, #ffffff 0%, #fcfcfb 28%, #f5f5f2 58%, #ecece8 100%)",
-  boxShadow:"0 60px 180px rgba(0,0,0,.14)",
-  border: "1px solid rgba(0,0,0,.04)",
-  cursor: "zoom-in",
-};
-
-const thumbGridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(3, 1fr)",
-  gap: "14px",
-  marginTop: "18px",
-};
-
-const thumbButtonStyle = {
-  position: "relative" as const,
-  height: "140px",
-  borderRadius: "26px",
-  overflow: "hidden",
-  background:"linear-gradient(180deg,#fff,#f5f5f2)",
-  cursor: "pointer",
-  boxShadow: "0 18px 50px rgba(0,0,0,.06)",
-  transition:"all .3s ease",
-};
 
 const brandStyle = {
   fontSize: "13px",
@@ -1998,14 +1560,6 @@ const sellerButtonStyle = {
   cursor: "pointer",
 };
 
-const actionsStyle = {
-  display: "grid",
-  gridTemplateColumns: "1fr",
-  gap: "14px",
-  marginTop: "34px",
-  maxWidth: "100%",
-};
-
 const buyButtonStyle = {
   width: "100%",
   height:"76px",
@@ -2022,27 +1576,7 @@ const buyButtonStyle = {
   transition: "all .30s ease",
 };
 
-const primaryButtonStyle = {
-  background: "#222",
-  color: "#fff",
-  border: "none",
-  padding: "18px 36px",
-  borderRadius: "999px",
-  fontSize: "16px",
-  fontWeight: 700,
-  cursor: "pointer",
-};
 
-const secondaryButtonStyle = {
-  background: "#fff",
-  color: "#111",
-  border: "1px solid rgba(0,0,0,0.12)",
-  padding: "18px 36px",
-  borderRadius: "999px",
-  fontSize: "16px",
-  fontWeight: 700,
-  cursor: "pointer",
-};
 
 const relatedSectionStyle = {
   maxWidth: "1400px",
@@ -2172,80 +1706,6 @@ const verifiedSellerBadgeStyle = {
   textTransform: "uppercase" as const,
 };
 
-const trustPanelStyle = {
-  marginTop: "24px",
-  maxWidth: "560px",
-  background: "#fff",
-  border: "1px solid rgba(0,0,0,0.06)",
-  borderRadius: "26px",
-  padding: "18px",
-  display: "grid",
-  gridTemplateColumns: "repeat(2, 1fr)",
-  gap: "12px",
-};
-
-const trustPanelItemStyle = {
-  background: "#f7f7f3",
-  borderRadius: "999px",
-  padding: "12px 14px",
-  fontSize: "12px",
-  fontWeight: 900,
-};
-
-const imageBadgesStyle = {
-  position: "absolute" as const,
-  top: "22px",
-  left: "22px",
-  display: "flex",
-  gap: "10px",
-  zIndex: 20,
-};
-
-const statusBadgeStyle = {
-  background: "#fff",
-  borderRadius: "999px",
-  padding: "10px 16px",
-  fontWeight: 800,
-  fontSize: "12px",
-  boxShadow: "0 10px 30px rgba(0,0,0,.12)",
-};
-
-const featuredBadgeStyle = {
-  background: "#111",
-  color: "#fff",
-  borderRadius: "999px",
-  padding: "10px 16px",
-  fontWeight: 800,
-  fontSize: "12px",
-};
-
-const favoriteFloatingStyle = {
-  position: "absolute" as const,
-  top: "22px",
-  right: "22px",
-  width: "52px",
-  height: "52px",
-  borderRadius: "50%",
-  border: "none",
-  background: "#fff",
-  fontSize: "24px",
-  cursor: "pointer",
-  zIndex: 20,
-  boxShadow: "0 10px 30px rgba(0,0,0,.12)",
-};
-
-const productInfoStickyStyle = {
-  position: "sticky" as const,
-  top: "120px",
-  alignSelf: "flex-start",
-  background:"rgba(255,255,255,.82)",
- backdropFilter:"blur(35px)",
-  border: "1px solid rgba(255,255,255,.65)",
-  borderRadius: "42px",
-  padding: "48px",
-  boxShadow:"0 55px 150px rgba(0,0,0,.10)",
-};
-
 const quickInfoStyle = {
   display: "flex",
   flexWrap: "wrap" as const,
@@ -2356,23 +1816,23 @@ const reviewListStyle = {
 };
 
 const reviewItemStyle = {
-  background: "rgba(255,255,255,.06)",
-  border: "1px solid rgba(255,255,255,.08)",
+  background: "#ffffff",
+  border: "1px solid rgba(0,0,0,.07)",
   borderRadius: "18px",
   padding: "18px",
-  backdropFilter: "blur(10px)",
+  boxShadow: "0 12px 35px rgba(0,0,0,.04)",
 };
 
 const reviewStarsStyle = {
   fontSize: "16px",
-  fontWeight: 900,
-  color: "#fff",
+  fontWeight: 700,
+  color: "#111111",
 };
 
 const reviewCommentStyle = {
   marginTop: "10px",
   marginBottom: 0,
-  color: "rgba(255,255,255,.78)",
+  color: "#666666",
   lineHeight: 1.6,
   fontSize: "14px",
 };
@@ -2522,12 +1982,6 @@ const conditionBadgeStyle = {
   fontWeight: 900,
   letterSpacing: "0.5px",
   marginBottom: "24px",
-};
-
-const secondaryActionsGridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(3, 1fr)",
-  gap: "12px",
 };
 
 const sellerStatCardStyle = {

@@ -5,6 +5,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useLanguage } from "@/components/LanguageProvider";
+import ProductCard from "@/components/home/cards/ProductCard";
+import FeaturedProducts from "@/components/home/FeaturedProducts";
 
 export default function ProductsClient() {
   const router = useRouter();
@@ -16,11 +18,26 @@ export default function ProductsClient() {
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
   const [feedPosts, setFeedPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
   const [debug, setDebug] = useState("");
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<"latest" | "price_low" | "price_high">(
     "latest"
   );
+
+  useEffect(() => {
+  const checkMobile = () => {
+    setIsMobile(window.innerWidth <= 700);
+  };
+
+  checkMobile();
+
+  window.addEventListener("resize", checkMobile);
+
+  return () => {
+    window.removeEventListener("resize", checkMobile);
+  };
+}, []);
 
   useEffect(() => {
     loadMarketplace();
@@ -181,55 +198,11 @@ export default function ProductsClient() {
           </div>
         </div>
       </section>
-            {featuredProducts.length > 0 && (
-        <section style={featuredSectionStyle}>
-          <div style={sectionHeaderStyle}>
-            <div>
-              <p style={eyebrowStyle}>{t.curatedDrops}</p>
-              <h2 style={sectionTitleStyle}>{t.featuredProducts}</h2>
-            </div>
 
-            <button
-              onClick={() => router.push("/products")}
-              style={smallButtonStyle}
-            >
-              {t.viewAll}
-            </button>
-          </div>
-
-          <div style={featuredGridStyle}>
-            {featuredProducts.map((product: any) => (
-              <article
-                key={product.id}
-                style={featuredCardStyle}
-                onClick={() => router.push(`/products/${product.id}`)}
-              >
-                <Image
-                  src={safeImage(
-                    product.image ||
-                      product.image_url ||
-                      product.images?.[0]
-                  )}
-                  alt={product.title || "Producto"}
-                  fill
-                  sizes="33vw"
-                  style={{ objectFit: "cover" }}
-                />
-
-                <div style={featuredOverlayStyle}>
-                  <p style={featuredBrandStyle}>
-                    {product.brand || "ATHMOV"}
-                  </p>
-
-                  <h3 style={featuredTitleStyle}>{product.title}</h3>
-
-                  <p style={featuredPriceStyle}>€{product.price}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-      )}
+      <FeaturedProducts
+  featuredProducts={featuredProducts}
+  isMobile={isMobile}
+/>
 
       <section style={filtersSectionStyle}>
         <div style={categoryRowStyle}>
@@ -310,45 +283,14 @@ export default function ProductsClient() {
         ) : (
           <div style={gridStyle}>
             {filteredProducts.map((product: any) => (
-              <article
-                key={product.id}
-                style={cardStyle}
-                className="marketplace-card"
-                onClick={() => router.push(`/products/${product.id}`)}
-              >
-                <div style={imageWrapperStyle}>
-                  <Image
-                    src={safeImage(
-                      product.image ||
-                        product.image_url ||
-                        product.images?.[0]
-                    )}
-                    alt={product.title || "Producto"}
-                    fill
-                    sizes="25vw"
-                    style={{ objectFit: "cover" }}
-                  />
-
-                  {product.featured && (
-                    <span style={featuredBadgeStyle}>{t.featured}</span>
-                  )}
-                </div>
-
-                <div style={cardContentStyle}>
-                  <p style={brandStyle}>{product.brand || "ATHMOV"}</p>
-
-                  <h2 style={productTitleStyle}>
-                    {product.title || "Producto"}
-                  </h2>
-
-                  <div style={cardBottomStyle}>
-                    <strong style={priceStyle}>€{product.price}</strong>
-
-                    <span style={openStyle}>{t.viewProduct}</span>
-                  </div>
-                </div>
-              </article>
-            ))}
+  <ProductCard
+    key={product.id}
+    product={product}
+    compact
+    showFavorite
+    showRating
+  />
+))}
           </div>
         )}
       </section>
@@ -677,8 +619,9 @@ const emptyStyle = {
 
 const gridStyle = {
   display: "grid",
-  gridTemplateColumns: "repeat(4, 1fr)",
-  gap: "28px",
+  gridTemplateColumns: "repeat(auto-fill, minmax(300px, 340px))",
+  justifyContent: "center",
+  gap: "36px",
 };
 
 const cardStyle = {
