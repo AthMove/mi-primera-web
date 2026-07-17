@@ -3,15 +3,18 @@
 import type { CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import ProductCard from "../cards/ProductCard";
+import SkeletonCard from "@/components/common/SkeletonCard";
 
 type FollowedSellerProductsSectionProps = {
   isMobile: boolean;
   products: any[];
+  loading?: boolean;
 };
 
 export default function FollowedSellerProductsSection({
   isMobile,
   products,
+  loading = false,
 }: FollowedSellerProductsSectionProps) {
   const router = useRouter();
 

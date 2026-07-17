@@ -1,0 +1,338 @@
+
+        .home-card {
+          transition: transform 0.28s ease, box-shadow 0.28s ease;
+        }
+
+        .home-card::after{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    background:
+      linear-gradient(
+        125deg,
+        transparent 25%,
+        rgba(255,255,255,.35) 50%,
+        transparent 75%
+      );
+
+    transform:translateX(-130%);
+    transition:.9s;
+}
+
+.home-card:hover::after{
+    transform:translateX(130%);
+}
+
+.home-card:hover{
+    transform: translateY(-16px) scale(1.015);
+
+    box-shadow:
+        0 80px 180px rgba(0,0,0,.18);
+
+    border-color: rgba(255,255,255,.95);
+}
+
+.home-card::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+
+    background:
+        radial-gradient(
+            circle at var(--x,50%) var(--y,50%),
+            rgba(255,255,255,.18),
+            transparent 45%
+        );
+
+    opacity:0;
+    transition:.35s;
+}
+
+.home-card:hover::before{
+    opacity:1;
+}
+
+.card-img{
+    transition:
+        transform .6s ease,
+        opacity .45s ease,
+        filter .45s ease;
+
+    opacity:.0;
+
+    filter:
+        blur(8px)
+        drop-shadow(0 35px 55px rgba(0,0,0,.18));
+}
+
+.card-img.loaded{
+    opacity:1;
+
+    filter:
+        blur(0)
+        drop-shadow(0 35px 55px rgba(0,0,0,.18));
+}
+        .hero-img {
+          transition: transform 0.55s ease;
+        }
+
+       .home-card:hover .card-img{
+    transform: scale(1.03);
+}
+
+        .brand-home-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.brand-home-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 26px 80px rgba(0,0,0,0.09) !important;
+}
+
+button{
+transition:.28s;
+}
+
+button:hover{
+transform:translateY(-2px);
+}
+
+.athmov-navbar a{
+transition:.25s;
+}
+
+.athmov-navbar a:hover{
+opacity:.72;
+}
+
+.fade-up{
+  opacity:0;
+  transform:translateY(60px);
+  transition:
+      opacity .8s ease,
+      transform .8s ease;
+}
+
+.fade-up.visible{
+  opacity:1;
+  transform:translateY(0);
+}
+
+.fade-up h2{
+    opacity:0;
+    transform:translateY(18px);
+    transition:
+        opacity .65s ease,
+        transform .65s ease;
+    transition-delay:.18s;
+}
+
+.fade-up.visible h2{
+    opacity:1;
+    transform:translateY(0);
+}
+
+.fade-up p{
+    transition:opacity .65s ease;
+}
+
+.fade-up button{
+    transition:
+        opacity .65s ease,
+        transform .65s ease;
+}
+
+.fade-up.visible button{
+    transition-delay:.30s;
+}
+
+.ambient-light{
+    position:fixed;
+    inset:-30%;
+    pointer-events:none;
+    z-index:0;
+
+    background:
+      radial-gradient(circle, rgba(201,175,92,.10), transparent 45%),
+      radial-gradient(circle, rgba(255,255,255,.18), transparent 40%);
+
+    filter:blur(140px);
+
+    animation:ambientMove 22s ease-in-out infinite alternate;
+}
+
+@keyframes ambientMove{
+
+    0%{
+        transform:
+            translate(-8%,-5%)
+            rotate(0deg);
+    }
+
+    100%{
+        transform:
+            translate(8%,6%)
+            rotate(10deg);
+    }
+
+}
+
+@media (max-width: 700px) {
+  .fade-up {
+    transform: translateY(28px);
+    transition:
+      opacity .55s ease,
+      transform .55s ease;
+  }
+}
+  .followed-seller-card {
+  transition:
+    transform .4s ease,
+    box-shadow .4s ease,
+    border-color .4s ease;
+}
+
+.followed-seller-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 55px 140px rgba(0,0,0,.25) !important;
+  border-color: rgba(255,255,255,.2) !important;
+}
+
+.followed-seller-card img {
+  transition: transform .5s ease;
+}
+
+.followed-seller-card:hover img {
+  transform: scale(1.06);
+}
+
+.hero-section {
+  isolation: isolate;
+}
+
+@keyframes heroLuxuryZoom {
+  0% {
+    scale: 1.05;
+  }
+
+  100% {
+    scale: 1.10;
+  }
+}
+
+@media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
+  .hero-background-luxury {
+    animation: heroLuxuryZoom 14s ease-in-out infinite alternate;
+    transform-origin: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-up,
+  .hero-section * {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+      @media (max-width: 700px) {
+  .home-page {
+    padding-top: 92px !important;
+    overflow-x: hidden !important;
+  }
+
+  .home-card::before,
+.home-card::after {
+  display: none !important;
+}
+
+  .home-card:hover {
+  transform: none !important;
+  box-shadow: 0 24px 70px rgba(0,0,0,.08) !important;
+}
+
+.home-card:hover .card-img {
+  transform: none !important;
+}
+
+.brand-home-card:hover {
+  transform: none !important;
+}
+
+  .hero-section {
+    min-height: auto !important;
+    height: auto !important;
+    padding: 120px 22px 54px !important;
+    margin: 0 0 34px !important;
+    border-radius: 0 0 34px 34px !important;
+    align-items: flex-start !important;
+  }
+
+  .hero-section img {
+    object-fit: cover !important;
+    object-position: center bottom !important;
+    opacity: .52 !important;
+    padding: 0 !important;
+  }
+
+  .hero-title {
+    font-size: 48px !important;
+    line-height: 1 !important;
+    letter-spacing: -2.6px !important;
+    max-width: 100% !important;
+  }
+
+  .hero-section p {
+    font-size: 16px !important;
+    line-height: 1.55 !important;
+    max-width: 100% !important;
+  }
+
+  .hero-section button {
+    width: 100% !important;
+    height: 58px !important;
+    justify-content: center !important;
+  }
+
+  .hero-section > div:last-child {
+    max-width: 100% !important;
+  }
+
+  .hero-section div[style*="flex-wrap"] {
+    width: 100% !important;
+  }
+
+  section {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  h2 {
+    font-size: 38px !important;
+    line-height: 1.05 !important;
+    letter-spacing: -2px !important;
+  }
+
+  .home-card {
+    border-radius: 28px !important;
+  }
+
+  .home-card > div:first-child {
+    height: 330px !important;
+  }
+
+  .card-img {
+  padding: 18px !important;
+}
+
+.category-img {
+  padding: 0 !important;
+}
+
+  .trust-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
