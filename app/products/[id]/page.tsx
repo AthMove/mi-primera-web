@@ -1,15 +1,22 @@
 "use client";
 
 import Image from "next/image";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useLanguage } from "@/components/LanguageProvider";
 import ProductGallery from "@/components/product/ProductGallery";
 import ProductPurchasePanel from "@/components/product/ProductPurchasePanel";
+import ProductFeatureGrid from "@/components/product/ProductFeatureGrid";
+import ProductTimeline from "@/components/product/ProductTimeline";
+import ProductBuyerGuide from "@/components/product/ProductBuyerGuide";
+import SellerPremiumCard from "@/components/product/SellerPremiumCard";
+import StickyBuyBar from "@/components/product/StickyBuyBar";
+import RelatedProducts from "@/components/product/RelatedProducts";
 
 export default function ProductDetail() {
   const params = useParams();
+  const router = useRouter();
   const { t } = useLanguage();
   const id = String(params.id);
 
@@ -21,9 +28,10 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const [showStickyBar, setShowStickyBar] = useState(false);
   const [sellerProfile, setSellerProfile] = useState<any>(null);
   const [sellerReviews, setSellerReviews] = useState<any[]>([]);
+  const [sellerProducts, setSellerProducts] = useState<any[]>([]);
+ 
 
   useEffect(() => {
     if (!id || id === "undefined") {
@@ -523,16 +531,6 @@ setSellerReviews(reviewsData || []);
     alert(t.addedToCart);
   };
 
-  useEffect(() => {
-  const handleScroll = () => {
-    setShowStickyBar(window.scrollY > 650);
-  };
-
-  window.addEventListener("scroll", handleScroll);
-
-  return () => window.removeEventListener("scroll", handleScroll);
-}, []);
-
   if (loading) {
     return <div style={{ padding: "60px" }}>{t.loadingProduct}</div>;
   }
@@ -591,14 +589,36 @@ const responseTime =
 const sales =
   sellerProfile?.total_sales || 0;
 
-  return (
-    <main className="product-detail-page" style={pageStyle}>
-      <button onClick={() => window.history.back()} style={backButtonStyle}>
-        {t.back}
-      </button>
+return (
+  <main className="product-detail-page" style={pageStyle}>
+    <nav className="product-breadcrumb">
+      <span onClick={() => router.push("/")}>Inicio</span>
+
+      <span className="breadcrumb-separator">›</span>
+
+      <span
+        onClick={() =>
+          router.push(
+            `/products?category=${encodeURIComponent(
+              producto.category || ""
+            )}`
+          )
+        }
+      >
+        {producto.category}
+      </span>
+
+      <span className="breadcrumb-separator">›</span>
+
+      <strong>{producto.title}</strong>
+    </nav>
+
+    <button onClick={() => window.history.back()} style={backButtonStyle}>
+      {t.back}
+    </button>
 
       <div style={layoutStyle} className="product-detail-layout">
-   <ProductGallery
+ <ProductGallery
   title={producto.title}
   images={images}
   selectedImage={selectedImage}
@@ -609,8 +629,10 @@ const sales =
   onSelectImage={setSelectedImage}
   onToggleFavorite={toggleFavorite}
   onImageMove={handleImageMove}
+  onMouseLeave={() => setMousePosition({ x: 50, y: 50 })}
 />
 
+<div id="purchase-panel">
    <ProductPurchasePanel
   brand={producto.brand}
   title={producto.title}
@@ -634,400 +656,48 @@ const sales =
   onToggleFavorite={toggleFavorite}
 />
 </div>
+<StickyBuyBar
+  title={producto.title}
+  price={producto.price}
+  checkoutLoading={checkoutLoading}
+  buyNowLabel={t.buyNow}
+  redirectingLabel={t.redirecting}
+  onBuyNow={buyNow}
+/>
+</div>
 
           <p style={descriptionStyle}>{producto.description}</p>
 
-<div
-  className="product-feature-grid"
-  style={{
-    display: "grid",
-    gridTemplateColumns: "repeat(4,1fr)",
-    gap: "14px",
-    margin: "28px 0",
-  }}
->
-  <div
-    style={{
-      background: "#fff",
-      borderRadius: "20px",
-      padding: "18px",
-      textAlign: "center",
-      border: "1px solid rgba(0,0,0,.06)",
-    }}
-  >
-    <div style={{ fontSize: 26 }}>📦</div>
-    <strong>En stock</strong>
-  </div>
+<ProductFeatureGrid />
 
-  <div
-    style={{
-      background: "#fff",
-      borderRadius: "20px",
-      padding: "18px",
-      textAlign: "center",
-      border: "1px solid rgba(0,0,0,.06)",
-    }}
-  >
-    <div style={{ fontSize: 26 }}>🚚</div>
-    <strong>24-72 h</strong>
-  </div>
-
-  <div
-    style={{
-      background: "#fff",
-      borderRadius: "20px",
-      padding: "18px",
-      textAlign: "center",
-      border: "1px solid rgba(0,0,0,.06)",
-    }}
-  >
-    <div style={{ fontSize: 26 }}>🛡</div>
-    <strong>Protegido</strong>
-  </div>
-
-  <div
-    style={{
-      background: "#fff",
-      borderRadius: "20px",
-      padding: "18px",
-      textAlign: "center",
-      border: "1px solid rgba(0,0,0,.06)",
-    }}
-  >
-    <div style={{ fontSize: 26 }}>💳</div>
-    <strong>Stripe</strong>
-  </div>
-</div>
-
-          <div style={metaGridStyle} className="product-detail-meta">
-            {[
-  [t.condition, getConditionLabel(producto.condition)],
-  [
-    t.seller,
-    sellerProfile?.seller_verified ? t.verified : t.available,
-  ],
-  [t.location, producto.location || "España"],
-].map(([label, value]) => (
-              <div key={label} style={metaCardStyle}>
-                <p style={metaLabelStyle}>{label}</p>
-                <p style={metaValueStyle}>{value}</p>
-              </div>
-            ))}
-          </div>
-<div style={timelineStyle}>
-  <h3 style={timelineTitleStyle}>Historial del producto</h3>
-
-  <div style={timelineItemStyle}>
-    <span>📅</span>
-    <div>
-      <strong>Publicado</strong>
-      <p>
-        {new Date(producto.created_at).toLocaleDateString("es-ES")}
-      </p>
-    </div>
-  </div>
-
-  <div style={timelineItemStyle}>
-    <span>👁</span>
-    <div>
-      <strong>Visualizaciones</strong>
-      <p>{producto.views || 0}</p>
-    </div>
-  </div>
-
-  <div style={timelineItemStyle}>
-    <span>❤</span>
-    <div>
-      <strong>Favoritos</strong>
-      <p>{producto.favorites_count || 0}</p>
-    </div>
-  </div>
-
-  <div style={timelineItemStyle}>
-    <span>📍</span>
-    <div>
-      <strong>Ubicación</strong>
-      <p>{producto.location || "España"}</p>
-    </div>
-  </div>
-
-  <div style={timelineItemStyle}>
-    <span>🚚</span>
-    <div>
-      <strong>Entrega estimada</strong>
-      <p>24-72 horas</p>
-    </div>
-  </div>
-
-  <div style={timelineItemStyle}>
-    <span>🛡</span>
-    <div>
-      <strong>Estado</strong>
-      <p>Verificado por ATHMOV</p>
-    </div>
-  </div>
-</div>
-
-          <section style={buyerGuideStyle}>
-            <div style={buyerGuideHeaderStyle}>
-              <div>
-               <p style={buyerGuideEyebrowStyle}>{t.buyerGuideBeta}</p>
-                <h2 style={buyerGuideTitleStyle}>{buyerGuide.title}</h2>
-              </div>
-
-              <div style={buyerGuideBadgeStyle}>{buyerGuide.sport}</div>
-            </div>
-
-            <p style={buyerGuideTextStyle}>
-              Aprende cómo verificar este producto antes de comprarlo.
-              Recomendamos comprobar números de serie, pedir vídeos y comparar
-              detalles con el catálogo oficial de la marca.
-            </p>
-
-            <div style={buyerGuideCardsStyle}>
-              {buyerGuide.tips.map((tip, index) => {
-                const icons = ["🔍", "🎥", "📋"];
-
-                return (
-                  <div key={tip} style={buyerGuideCardStyle}>
-                    <div style={buyerGuideIconStyle}>{icons[index] || "✓"}</div>
-
-                    <div>
-                      <h4 style={buyerGuideCardTitleStyle}>
-                        {index === 0
-                          ? "Revisa marcas de autenticidad"
-                          : index === 1
-                            ? "Pide pruebas adicionales"
-                            : "Compara el estado"}
-                      </h4>
-
-                      <p style={buyerGuideCardTextStyle}>{tip}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div style={buyerGuideFooterStyle}>
-              ATHMOV está actualmente en beta. Las herramientas de verificación
-              son educativas y están diseñadas para ayudar a los compradores a
-              tomar decisiones más seguras.
-            </div>
-          </section>
-
-          {sellerProfile?.seller_verified && (
-  <div style={verifiedSellerBadgeStyle}>
-    ✓ {t.sellerVerified}
-  </div>
-)}
-<div
-  style={{
-    ...sellerPremiumCardStyle,
-    cursor: "pointer",
-  }}
-  className="seller-premium-card"
-  onClick={() => {
-    window.location.href = `/seller/${sellerProfile?.id}`;
-  }}
->
-  <div
-  style={{
-    height: "3px",
-    width: "90px",
-    borderRadius: "999px",
-    background: "linear-gradient(90deg,#fff,#8f8f8f)",
-    marginBottom: "24px",
-  }}
+<ProductTimeline
+  createdAt={producto.created_at}
+  views={producto.views}
+  favorites={producto.favorites_count}
+  location={producto.location}
 />
-  <div
-  style={sellerPremiumTopStyle}
-  className="seller-premium-top"
->
-    <div
-  style={sellerAvatarLargeStyle}
-  className="seller-premium-avatar"
->
-     <Image
-    src={safeImage(sellerProfile?.avatar_url)}
-    fill
-    style={{ objectFit:"cover" }}
-    alt=""
+
+          <ProductBuyerGuide
+  guide={buyerGuide}
+  eyebrow={t.buyerGuideBeta}
 />
-    </div>
 
-    <div>
-      <p style={sellerVerifiedTextStyle}>
-        ATHMOV VERIFIED SELLER
-      </p>
-
-      <h3
-  style={sellerPremiumNameStyle}
-  className="seller-premium-name"
->
-  {sellerProfile?.full_name ||
-    sellerProfile?.username ||
-    sellerProfile?.seller_badge ||
-    t.athmovSeller}
-</h3>
-
-      <p style={sellerStarsStyle}>
-        ★★★★★ <span style={{ opacity: 0.55 }}>({sellerReviews.length} reseñas)</span>
-      </p>
-    </div>
-  </div>
-
-<div
-  style={sellerStatsGridStyle}
-  className="seller-stats-grid"
->
-  <div style={sellerStatCardStyle}>
-    <strong>{sales}</strong>
-    <span>Ventas</span>
-  </div>
-
-  <div style={sellerStatCardStyle}>
-    <strong>
-      {averageRating !== null ? averageRating.toFixed(1) : "Nuevo"}
-    </strong>
-    <span>Valoración</span>
-  </div>
-
-  <div style={sellerStatCardStyle}>
-    <strong>{responseTime}</strong>
-    <span>Respuesta</span>
-  </div>
-
-  <div style={sellerStatCardStyle}>
-    <strong>{memberSince}</strong>
-    <span>Miembro</span>
-  </div>
-</div>
-
-</div>
-
-{sellerReviews.length > 0 && (
-  <div style={reviewListStyle}>
-    {sellerReviews.slice(0, 3).map((review) => (
-      <div key={review.id} style={reviewItemStyle}>
-        <div style={reviewStarsStyle}>
-          {"★".repeat(Number(review.rating))}
-          {"☆".repeat(5 - Number(review.rating))}
-        </div>
-
-        {review.comment && (
-          <p style={reviewCommentStyle}>
-            {review.comment}
-          </p>
-        )}
-      </div>
-    ))}
-  </div>
-)}
-
-{showStickyBar && (
-  <div style={stickyBuyBarStyle} className="sticky-buy-bar">
-    <div>
-      <div style={{ fontSize: 12, opacity: 0.55 }}>
-        {producto.brand}
-      </div>
-
-      <div style={{ fontWeight: 800, fontSize: 18 }}>
-        {producto.title}
-      </div>
-    </div>
-
-    <div
-      className="sticky-buy-actions"
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 18,
-      }}
-    >
-      <div
-        style={{
-          fontSize: 28,
-          fontWeight: 900,
-        }}
-      >
-        €{producto.price}
-      </div>
-
-      <button onClick={buyNow} style={buyButtonStyle}>
-        {t.buyNow}
-      </button>
-    </div>
-  </div>
-)}
-
-      <section style={relatedSectionStyle}>
-        <p style={relatedEyebrowStyle}>SELECCIÓN ATHMOV</p>
-        <h2 style={relatedTitleStyle}>También te puede gustar</h2>
-
-        <div style={relatedGridStyle} className="product-detail-related">
-          {related.map((item) => (
-            <div
-  key={item.id}
-  className="related-card"
-              onClick={() => (window.location.href = `/products/${item.id}`)}
-              style={relatedCardStyle}
-            >
-              <div style={relatedImageStyle}>
-<Image
-  src={safeImage(item.image)}
-  alt={item.title || "Producto"}
-  fill
-  sizes="33vw"
-  className="product-main-image"
-  style={{
-    objectFit: "contain",
-    objectPosition: "center",
-    padding: "42px",
-    transition: "transform 0.5s ease",
-  }}
+         <SellerPremiumCard
+  seller={sellerProfile}
+  reviews={sellerReviews}
+  averageRating={averageRating}
+  memberSince={memberSince}
+  responseTime={responseTime}
+  sales={sales}
+  safeImage={safeImage}
+  verifiedLabel={t.sellerVerified}
+  sellerLabel={t.athmovSeller}
 />
-              </div>
-              <div style={{ padding: "28px" }}>
-                <p style={relatedBrandStyle}>{item.brand}</p>
-                <h3 style={relatedProductTitleStyle}>{item.title}</h3>
-                <p
-  style={{
-    color: "#777",
-    fontSize: "14px",
-    marginTop: "-8px",
-    marginBottom: "18px",
-  }}
->
-  Excelente estado · Vendedor verificado
-</p>
-                <div
-  style={{
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: "10px",
-  }}
->
-  <p style={relatedPriceStyle}>€{item.price}</p>
 
-  <span
-    style={{
-      background: "#111",
-      color: "#fff",
-      borderRadius: "999px",
-      padding: "8px 14px",
-      fontSize: "12px",
-      fontWeight: 800,
-    }}
-  >
-    Ver
-  </span>
-</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+     <RelatedProducts
+  products={related}
+  safeImage={safeImage}
+/>
 
       <style>{`
 
@@ -1149,6 +819,68 @@ transition:transform .55s ease;
     transform:translateY(-6px);
     box-shadow:0 22px 60px rgba(0,0,0,.08);
 }
+
+.product-navigation{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  margin:60px auto 0;
+  max-width:1500px;
+}
+
+.product-navigation button{
+  border:none;
+  border-radius:999px;
+
+  padding:14px 22px;
+
+  background:#111;
+  color:#fff;
+
+  font-size:14px;
+  cursor:pointer;
+
+  transition:all .25s ease;
+}
+
+.product-navigation button:hover{
+  transform:translateY(-3px);
+  box-shadow:0 18px 45px rgba(0,0,0,.18);
+}
+
+.product-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 1500px;
+  margin: 0 auto 22px;
+  font-size: 13px;
+  color: #777;
+}
+
+.product-breadcrumb span:not(.breadcrumb-separator) {
+  cursor: pointer;
+  transition: color .25s ease;
+}
+
+.product-breadcrumb span:not(.breadcrumb-separator):hover {
+  color: #111;
+}
+
+.product-breadcrumb .breadcrumb-separator {
+  cursor: default;
+  color: #aaa;
+}
+
+.product-breadcrumb strong {
+  color: #111;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 420px;
+}
         @media (max-width: 1000px) {
           .product-detail-layout {
             grid-template-columns: 1fr !important;
@@ -1165,6 +897,18 @@ transition:transform .55s ease;
         }
 
         @media (max-width: 700px) {
+
+        .product-breadcrumb {
+  gap: 7px;
+  margin-bottom: 18px;
+  font-size: 12px;
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.product-breadcrumb strong {
+  max-width: 150px;
+}
 
         .seller-stats-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
@@ -1372,15 +1116,6 @@ transition:transform .55s ease;
   );
 }
 
-const marketCardStyle = {
-  maxWidth: "560px",
-  background: "#fff",
-  borderRadius: "34px",
-  padding: "34px",
-  border: "1px solid rgba(0,0,0,.05)",
-  boxShadow: "0 28px 90px rgba(0,0,0,.07)",
-};
-
 const pageStyle = {
   minHeight: "100vh",
   background: "#f7f7f3",
@@ -1442,122 +1177,11 @@ const layoutStyle = {
   alignItems: "start",
 };
 
-
-const brandStyle = {
-  fontSize: "13px",
-  letterSpacing: "4px",
-  opacity: 0.45,
-  fontWeight: 900,
-  textTransform: "uppercase" as const,
-  marginBottom: "12px",
-};
-
-const titleStyle = {
-  fontSize: "76px",
-  lineHeight: .92,
-  marginTop: "12px",
-  marginBottom: "26px",
-  letterSpacing: "-5px",
-  fontWeight: 950,
-};
-
-const priceStyle = {
-  fontSize:"82px",
-fontWeight: 950,
-letterSpacing:"-5px",
-marginTop: "10px",
-marginBottom: "36px",
-  color: "#111",
-};
-
 const descriptionStyle = {
   fontSize: "18px",
   color: "#555",
   lineHeight: 1.7,
   maxWidth: "520px",
-};
-
-const metaGridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(3, 1fr)",
-  gap: "12px",
-  marginTop: "34px",
-  maxWidth: "520px",
-};
-
-const metaCardStyle = {
-  border: "1px solid rgba(0,0,0,.05)",
-  borderRadius: "22px",
-  padding: "22px",
-  background: "#fff",
-  boxShadow: "0 15px 40px rgba(0,0,0,.05)",
-};
-
-const metaLabelStyle = {
-  fontSize: "10px",
-  letterSpacing: "2px",
-  opacity: 0.45,
-  margin: 0,
-};
-
-const metaValueStyle = {
-  fontSize: "15px",
-  fontWeight: 700,
-  marginTop: "8px",
-  marginBottom: 0,
-};
-
-const buyerGuideStyle = {
-  marginTop: "28px",
-  maxWidth: "560px",
-  background: "#111",
-  color: "#fff",
-  borderRadius: "28px",
-  padding: "26px",
-  boxShadow: "0 24px 80px rgba(0,0,0,0.12)",
-};
-
-const buyerGuideEyebrowStyle = {
-  fontSize: "10px",
-  letterSpacing: "2px",
-  opacity: 0.45,
-  marginBottom: "8px",
-};
-
-const buyerGuideTitleStyle = {
-  fontSize: "28px",
-  lineHeight: 1.05,
-  letterSpacing: "-1px",
-  margin: 0,
-};
-
-const buyerGuideBadgeStyle = {
-  background: "#fff",
-  color: "#111",
-  borderRadius: "999px",
-  padding: "8px 12px",
-  fontSize: "11px",
-  fontWeight: 900,
-  whiteSpace: "nowrap" as const,
-};
-
-const buyerGuideTextStyle = {
-  margin: 0,
-  color: "rgba(255,255,255,0.72)",
-  lineHeight: 1.5,
-  fontSize: "13px",
-};
-
-const sellerButtonStyle = {
-  marginTop: "24px",
-  background: "transparent",
-  color: "#111",
-  border: "1px solid rgba(0,0,0,0.14)",
-  padding: "14px 22px",
-  borderRadius: "999px",
-  fontSize: "14px",
-  fontWeight: 800,
-  cursor: "pointer",
 };
 
 const buyButtonStyle = {
@@ -1574,469 +1198,4 @@ const buyButtonStyle = {
   cursor: "pointer",
   boxShadow: "0 28px 80px rgba(0,0,0,.25)",
   transition: "all .30s ease",
-};
-
-
-
-const relatedSectionStyle = {
-  maxWidth: "1400px",
-  margin: "90px auto 0",
-};
-
-const relatedEyebrowStyle = {
-  fontSize: "12px",
-  letterSpacing: "3px",
-  opacity: 0.5,
-  marginBottom: "10px",
-};
-
-const relatedTitleStyle = {
-  fontSize: "42px",
-  marginBottom: "30px",
-  letterSpacing: "-2px",
-};
-
-const relatedGridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))",
-  gap: "28px",
-};
-
-const relatedCardStyle = {
-  background: "rgba(255,255,255,.86)",
-  backdropFilter: "blur(20px)",
-  borderRadius: "34px",
-  overflow: "hidden",
-  cursor: "pointer",
-  border: "1px solid rgba(255,255,255,.65)",
-  boxShadow: "0 28px 90px rgba(0,0,0,.08)",
-};
-
-const relatedImageStyle = {
-  position: "relative" as const,
-  height: "360px",
-  background: "linear-gradient(180deg,#fff,#f4f4f0)",
-};
-
-const relatedBrandStyle = {
-  fontSize: "11px",
-  letterSpacing: "2px",
-  opacity: 0.45,
-};
-
-const relatedProductTitleStyle = {
-  fontSize: "26px",
-  marginTop: "10px",
-  marginBottom: "14px",
-};
-
-const relatedPriceStyle = {
-  fontSize: "24px",
-  fontWeight: 700,
-};
-
-const buyerGuideHeaderStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "flex-start",
-  gap: "18px",
-  marginBottom: "18px",
-};
-
-const buyerGuideCardsStyle = {
-  display: "grid",
-  gap: "12px",
-  marginTop: "20px",
-};
-
-const buyerGuideCardStyle = {
-  display: "flex",
-  gap: "14px",
-  padding: "15px",
-  borderRadius: "20px",
-  background: "rgba(255,255,255,0.06)",
-  border: "1px solid rgba(255,255,255,0.08)",
-};
-
-const buyerGuideIconStyle = {
-  width: "34px",
-  height: "34px",
-  borderRadius: "999px",
-  background: "rgba(255,255,255,0.1)",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  flexShrink: 0,
-};
-
-const buyerGuideCardTitleStyle = {
-  margin: 0,
-  fontSize: "14px",
-  color: "#fff",
-};
-
-const buyerGuideCardTextStyle = {
-  marginTop: "6px",
-  marginBottom: 0,
-  color: "rgba(255,255,255,0.55)",
-  fontSize: "12px",
-  lineHeight: 1.6,
-};
-
-const buyerGuideFooterStyle = {
-  marginTop: "18px",
-  paddingTop: "16px",
-  borderTop: "1px solid rgba(255,255,255,0.1)",
-  color: "rgba(255,255,255,0.42)",
-  fontSize: "12px",
-  lineHeight: 1.6,
-};
-
-const verifiedSellerBadgeStyle = {
-  marginTop: "24px",
-  display: "inline-flex",
-  alignItems: "center",
-  background: "#111",
-  color: "#fff",
-  borderRadius: "999px",
-  padding: "10px 14px",
-  fontSize: "11px",
-  fontWeight: 800,
-  letterSpacing: "1px",
-  textTransform: "uppercase" as const,
-};
-
-const quickInfoStyle = {
-  display: "flex",
-  flexWrap: "wrap" as const,
-  gap: "10px",
-  marginTop: "18px",
-  marginBottom: "26px",
-};
-
-const quickInfoItemStyle = {
-  background: "#fff",
-  border: "1px solid rgba(0,0,0,0.08)",
-  borderRadius: "999px",
-  padding: "8px 14px",
-  fontSize: "12px",
-  fontWeight: 800,
-};
-
-const trustScoreStyle = {
-  maxWidth: "560px",
-  background: "#fff",
-  border: "1px solid rgba(0,0,0,0.08)",
-  borderRadius: "26px",
-  padding: "22px",
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  marginBottom: "28px",
-};
-
-const trustScoreLabelStyle = {
-  fontSize: "10px",
-  letterSpacing: "2px",
-  opacity: 0.45,
-  margin: 0,
-};
-
-const trustScoreTitleStyle = {
-  fontSize: "22px",
-  margin: "8px 0 0",
-};
-
-const trustScoreBadgeStyle = {
-  width: "64px",
-  height: "64px",
-  borderRadius: "50%",
-  background: "#111",
-  color: "#fff",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  fontSize: "22px",
-  fontWeight: 900,
-};
-
-const sellerCardStyle = {
-  marginTop: "22px",
-  display: "flex",
-  alignItems: "center",
-  gap: "18px",
-  background: "#fff",
-  border: "1px solid rgba(0,0,0,0.08)",
-  borderRadius: "24px",
-  padding: "20px",
-  maxWidth: "560px",
-};
-
-const sellerAvatarStyle = {
-  width: "62px",
-  height: "62px",
-  borderRadius: "50%",
-  background: "#111",
-  color: "#fff",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  fontSize: "24px",
-  fontWeight: 900,
-};
-
-const sellerNameStyle = {
-  margin: 0,
-  fontSize: "18px",
-};
-
-const sellerMetaStyle = {
-  marginTop: "6px",
-  color: "#666",
-  fontSize: "14px",
-};
-
-const sellerRatingStyle = {
-  marginTop: "18px",
-  padding: "18px",
-  background: "#fff",
-  border: "1px solid rgba(0,0,0,.08)",
-  borderRadius: "22px",
-  display: "flex",
-  flexDirection: "column" as const,
-  gap: "6px",
-  maxWidth: "320px",
-};
-
-const reviewListStyle = {
-  marginTop: "14px",
-  display: "grid",
-  gap: "10px",
-  maxWidth: "560px",
-};
-
-const reviewItemStyle = {
-  background: "#ffffff",
-  border: "1px solid rgba(0,0,0,.07)",
-  borderRadius: "18px",
-  padding: "18px",
-  boxShadow: "0 12px 35px rgba(0,0,0,.04)",
-};
-
-const reviewStarsStyle = {
-  fontSize: "16px",
-  fontWeight: 700,
-  color: "#111111",
-};
-
-const reviewCommentStyle = {
-  marginTop: "10px",
-  marginBottom: 0,
-  color: "#666666",
-  lineHeight: 1.6,
-  fontSize: "14px",
-};
-
-const stickyBuyBarStyle = {
-  position: "fixed" as const,
-  left: "50%",
-  transform: "translateX(-50%)",
-  bottom: "28px",
-  width: "calc(100% - 36px)",
-  maxWidth: "620px",
-  background: "rgba(255,255,255,.94)",
-  border: "1px solid rgba(255,255,255,.6)",
-  backdropFilter: "blur(24px)",
-  borderRadius: "24px",
-  padding: "14px 18px",
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  boxShadow: "0 35px 90px rgba(0,0,0,.15)",
-  zIndex: 80,
-};
-
-const sellerPremiumCardStyle = {
-  marginTop: "28px",
-  maxWidth: "560px",
-  background:
-"linear-gradient(160deg,#111 0%,#1d1d1d 45%,#2b2b2b 100%)",
-  color: "#fff",
-  borderRadius:"38px",
-  padding: "32px",
-  boxShadow:"0 55px 160px rgba(0,0,0,.28)",
-  border: "1px solid rgba(255,255,255,.08)",
-};
-
-const sellerPremiumTopStyle = {
-  display: "flex",
-  alignItems: "center",
-  gap: "18px",
-};
-
-const sellerAvatarLargeStyle = {
-  position: "relative" as const,
-  overflow: "hidden",
-  width:"96px",
-height:"96px",
-  borderRadius: "50%",
-  background: "#fff",
-  color: "#111",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  fontSize: "34px",
-  fontWeight: 950,
-  border:"3px solid rgba(255,255,255,.25)",
-boxShadow:
-"0 0 0 6px rgba(255,255,255,.04),0 18px 50px rgba(0,0,0,.35)",
-};
-
-const sellerVerifiedTextStyle = {
-  margin: 0,
-  fontSize: "10px",
-  letterSpacing: "2px",
-  opacity: 0.5,
-};
-
-const sellerPremiumNameStyle = {
-  margin: "8px 0 6px",
-  fontSize: "30px",
-  fontWeight: 900,
-  letterSpacing: "-1px",
-};
-
-const sellerStarsStyle = {
-  margin: 0,
-  fontSize: "14px",
-};
-
-const sellerStatsGridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(4,1fr)",
-  gap: "12px",
-  marginTop: "28px",
-};
-
-const marketInsightStyle = {
-  maxWidth: "560px",
-  background: "#fff",
-  borderRadius: "30px",
-  padding: "28px",
-  border: "1px solid rgba(0,0,0,.05)",
-  boxShadow: "0 20px 60px rgba(0,0,0,.06)",
-};
-
-const marketLabelStyle = {
-  fontSize: "11px",
-  letterSpacing: "2px",
-  opacity: .5,
-  marginBottom: "18px",
-};
-
-const marketRowStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-  marginBottom: "14px",
-  fontSize: "16px",
-};
-
-const marketStatusStyle = {
-  marginTop: "18px",
-  display: "inline-block",
-  background: "#111",
-  color: "#fff",
-  borderRadius: "999px",
-  padding: "8px 16px",
-  fontWeight: 800,
-  fontSize: "13px",
-};
-
-const marketFooterStyle = {
-  marginTop: "18px",
-  color: "#666",
-  fontSize: "13px",
-};
-
-const trustCardStyle = {
-  background: "#fafaf8",
-  border: "1px solid rgba(0,0,0,.08)",
-  borderRadius: "24px",
-  padding: "26px",
-  margin: "26px 0",
-  display: "flex",
-  flexDirection: "column" as const,
-  gap: "12px",
-  boxShadow: "0 18px 50px rgba(0,0,0,.05)",
-};
-
-const conditionBadgeStyle = {
-  display: "inline-flex",
-  alignItems: "center",
-  width: "fit-content",
-  background: "#f3f3ef",
-  border: "1px solid rgba(0,0,0,.06)",
-  borderRadius: "999px",
-  padding: "10px 18px",
-  fontSize: "13px",
-  fontWeight: 900,
-  letterSpacing: "0.5px",
-  marginBottom: "24px",
-};
-
-const sellerStatCardStyle = {
-  background: "rgba(255,255,255,.08)",
-  borderRadius: "18px",
-  padding: "18px 12px",
-  textAlign: "center" as const,
-  display: "flex",
-  flexDirection: "column" as const,
-  gap: "8px",
-};
-
-const timelineStyle = {
-  maxWidth: "560px",
-  background: "#fff",
-  borderRadius: "28px",
-  padding: "30px",
-  marginTop: "34px",
-  marginBottom: "34px",
-  border: "1px solid rgba(0,0,0,.06)",
-  boxShadow: "0 20px 60px rgba(0,0,0,.06)",
-};
-
-const timelineTitleStyle = {
-  fontSize: "24px",
-  fontWeight: 900,
-  marginBottom: "26px",
-};
-
-const timelineItemStyle = {
-  display: "flex",
-  alignItems: "flex-start",
-  gap: "18px",
-  padding: "16px 0",
-  borderBottom: "1px solid rgba(0,0,0,.06)",
-};
-
-const trustStripStyle = {
-  maxWidth: "560px",
-  display: "grid",
-  gridTemplateColumns: "repeat(2,1fr)",
-  gap: "12px",
-  marginTop: "24px",
-  marginBottom: "32px",
-};
-
-const trustStripItemStyle = {
-  background: "#fff",
-  border: "1px solid rgba(0,0,0,.06)",
-  borderRadius: "18px",
-  padding: "16px",
-  display: "flex",
-  alignItems: "center",
-  gap: "12px",
-  fontWeight: 800,
-  fontSize: "14px",
-  boxShadow: "0 10px 30px rgba(0,0,0,.04)",
 };

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import type { MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 
 type ProductGalleryProps = {
   title: string;
@@ -17,6 +17,7 @@ type ProductGalleryProps = {
   onSelectImage: (image: string) => void;
   onToggleFavorite: () => void;
   onImageMove: (event: MouseEvent<HTMLDivElement>) => void;
+  onMouseLeave: () => void;
 };
 
 export default function ProductGallery({
@@ -28,8 +29,9 @@ export default function ProductGallery({
   isFavorite,
   mousePosition,
   onSelectImage,
-  onToggleFavorite,
-  onImageMove,
+onToggleFavorite,
+onImageMove,
+onMouseLeave,
 }: ProductGalleryProps) {
   const safeImage = (src?: string) => {
     return src?.startsWith("http") || src?.startsWith("/")
@@ -37,12 +39,72 @@ export default function ProductGallery({
       : "/logo.png";
   };
 
+  const [fullscreen, setFullscreen] = useState(false);
+
+  const currentIndex = images.findIndex(
+  (image) => image === selectedImage
+);
+
+
+useEffect(() => {
+  images.forEach((image) => {
+    const img = new window.Image();
+    img.src = safeImage(image);
+  });
+}, [images]);
+
+const goToPrevious = () => {
+  const index =
+    currentIndex <= 0 ? images.length - 1 : currentIndex - 1;
+
+  onSelectImage(images[index]);
+};
+
+const goToNext = () => {
+  const index =
+    currentIndex >= images.length - 1 ? 0 : currentIndex + 1;
+
+  onSelectImage(images[index]);
+};
+
+useEffect(() => {
+  if (!fullscreen) return;
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    switch (event.key) {
+      case "Escape":
+        setFullscreen(false);
+        break;
+
+      case "ArrowLeft":
+        goToPrevious();
+        break;
+
+      case "ArrowRight":
+        goToNext();
+        break;
+    }
+  };
+
+  window.addEventListener("keydown", handleKeyDown);
+
+  return () => {
+    window.removeEventListener("keydown", handleKeyDown);
+  };
+}, [fullscreen, currentIndex]);
+
   return (
     <div className="product-gallery">
-      <div
-        className="product-gallery-main"
-        onMouseMove={onImageMove}
-      >
+<div
+  className="product-gallery-main"
+  onMouseMove={onImageMove}
+  onMouseLeave={onMouseLeave}
+  onClick={() => setFullscreen(true)}
+  style={{
+    "--glow-x": `${mousePosition.x}%`,
+    "--glow-y": `${mousePosition.y}%`,
+  } as React.CSSProperties}
+>
         <div className="product-gallery-badges">
           <span className="product-gallery-condition">
             {conditionLabel}
@@ -53,6 +115,11 @@ export default function ProductGallery({
               Selección ATHMOV
             </span>
           )}
+          {images.length > 1 && (
+  <div className="gallery-counter">
+    {currentIndex + 1} / {images.length}
+  </div>
+)}
         </div>
 
         <button
@@ -75,14 +142,21 @@ export default function ProductGallery({
 
         <div className="product-gallery-glow" />
 
-        <img
-          src={safeImage(selectedImage)}
-          alt={title || "Producto ATHMOV"}
-          className="product-gallery-image"
-          style={{
-            objectPosition: `${mousePosition.x}% ${mousePosition.y}%`,
-          }}
-        />
+      <img
+  key={selectedImage}
+  src={safeImage(selectedImage)}
+  alt={title || "Producto ATHMOV"}
+  className="product-gallery-image product-gallery-image-fade"
+style={{
+  objectPosition: `${mousePosition.x}% ${mousePosition.y}%`,
+  transform: `
+    perspective(1400px)
+    rotateY(${(mousePosition.x - 50) / 12}deg)
+    rotateX(${-(mousePosition.y - 50) / 12}deg)
+    scale(1.03)
+  `,
+}}
+/>
       </div>
 
       {images.length > 1 && (
@@ -116,7 +190,69 @@ export default function ProductGallery({
         </div>
       )}
 
+      {fullscreen && (
+  <div
+    className="gallery-fullscreen"
+    onClick={() => setFullscreen(false)}
+  >
+   {images.length > 1 && (
+  <>
+    <button
+      type="button"
+      className="gallery-arrow gallery-arrow-left"
+      onClick={(event) => {
+        event.stopPropagation();
+        goToPrevious();
+      }}
+      aria-label="Imagen anterior"
+    >
+      ‹
+    </button>
+
+    <button
+      type="button"
+      className="gallery-arrow gallery-arrow-right"
+      onClick={(event) => {
+        event.stopPropagation();
+        goToNext();
+      }}
+      aria-label="Imagen siguiente"
+    >
+      ›
+    </button>
+  </>
+)}
+
+    <img
+      src={safeImage(selectedImage)}
+      alt={title}
+      className="gallery-fullscreen-image"
+    />
+  </div>
+)}
+
       <style jsx>{`
+
+      .gallery-counter{
+  position:absolute;
+  bottom:22px;
+  right:22px;
+  z-index:5;
+
+  padding:10px 16px;
+
+  border-radius:999px;
+
+  background:rgba(17,17,17,.72);
+  color:#fff;
+
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+
+  font-size:13px;
+  font-weight:600;
+  letter-spacing:.04em;
+}
         .product-gallery {
           min-width: 0;
         }
@@ -221,19 +357,24 @@ export default function ProductGallery({
           fill: currentColor;
         }
 
-        .product-gallery-glow {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          z-index: 1;
-          width: 560px;
-          height: 560px;
-          border-radius: 50%;
-          background: rgba(255, 255, 255, 0.76);
-          filter: blur(125px);
-          pointer-events: none;
-          transform: translate(-50%, -50%);
-        }
+  .product-gallery-glow {
+  position: absolute;
+  z-index: 1;
+  width: 560px;
+  height: 560px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.76);
+  filter: blur(125px);
+  pointer-events: none;
+
+  left: var(--glow-x, 50%);
+  top: var(--glow-y, 50%);
+
+  transform: translate(-50%, -50%);
+  transition:
+    left .18s ease,
+    top .18s ease;
+}
 
         .product-gallery-image {
           position: relative;
@@ -244,13 +385,10 @@ export default function ProductGallery({
           object-fit: contain;
           filter: drop-shadow(0 45px 75px rgba(0, 0, 0, 0.19));
           transform: scale(1);
-          transition:
-            transform 500ms cubic-bezier(0.22, 1, 0.36, 1),
-            object-position 140ms ease;
-        }
-
-        .product-gallery-main:hover .product-gallery-image {
-          transform: scale(1.09);
+transition:
+  transform 180ms ease-out,
+  object-position 180ms ease-out,
+  filter 250ms ease;
         }
 
         .product-gallery-thumbs {
@@ -288,10 +426,92 @@ export default function ProductGallery({
             0 18px 50px rgba(0, 0, 0, 0.08);
         }
 
+        .gallery-fullscreen{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.96);
+  z-index:9999;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  animation:fadeIn .25s ease;
+}
+
+.gallery-fullscreen-image{
+  max-width:92vw;
+  max-height:90vh;
+  object-fit:contain;
+}
+
+.gallery-close{
+  position:absolute;
+  top:26px;
+  right:26px;
+
+  width:54px;
+  height:54px;
+
+  border:none;
+  border-radius:50%;
+
+  background:rgba(255,255,255,.12);
+  color:#fff;
+
+  font-size:24px;
+  cursor:pointer;
+}
+  .gallery-arrow{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+
+  width:62px;
+  height:62px;
+
+  border:none;
+  border-radius:50%;
+
+  background:rgba(255,255,255,.12);
+  color:white;
+
+  font-size:42px;
+  cursor:pointer;
+
+  transition:all .25s ease;
+}
+
+.gallery-arrow:hover{
+  background:rgba(255,255,255,.22);
+  transform:translateY(-50%) scale(1.08);
+}
+
+.gallery-arrow-left{
+  left:32px;
+}
+
+.gallery-arrow-right{
+  right:32px;
+}
+
+@keyframes fadeIn{
+  from{
+    opacity:0;
+  }
+
+  to{
+    opacity:1;
+  }
+}
+
         @media (max-width: 1000px) {
           .product-gallery-main {
             min-height: 560px;
           }
+            .product-gallery-main:hover .product-gallery-image {
+  filter: drop-shadow(0 55px 90px rgba(0, 0, 0, 0.24));
+}
 
           .product-gallery-image {
             height: 560px;
@@ -352,6 +572,20 @@ export default function ProductGallery({
             transition: none;
           }
         }
+          .product-gallery-image-fade{
+  animation: imageFade .35s ease;
+}
+
+@keyframes imageFade{
+  from{
+    opacity:0;
+    transform:scale(.97);
+  }
+
+  to{
+    opacity:1;
+    transform:scale(1);
+  }
       `}</style>
     </div>
   );

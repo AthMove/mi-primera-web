@@ -1,5 +1,10 @@
 "use client";
 
+import PremiumButton from "@/components/ui/PremiumButton";
+import PremiumBadge from "@/components/ui/PremiumBadge";
+import InfoCard from "@/components/ui/InfoCard";
+import GlassCard from "@/components/ui/GlassCard";
+
 type ProductPurchasePanelProps = {
   brand?: string;
   title: string;
@@ -55,35 +60,49 @@ export default function ProductPurchasePanel({
     maximumFractionDigits: 0,
   }).format(Number(price) || 0);
 
-  return (
-    <aside className="purchase-panel">
+return (
+  <aside className="purchase-panel">
+ <GlassCard padding="large" hover={false}>
       <div className="purchase-heading">
-        <p className="purchase-brand">
-          {brand || "ATHMOV"}
-        </p>
+        <p className="purchase-brand">{brand || "ATHMOV"}</p>
 
         <h1>{title}</h1>
 
-        <div className="purchase-price">
-          {formattedPrice}
+        <div className="purchase-price">{formattedPrice}</div>
+
+        <p className="purchase-price-caption">
+          IVA incluido · Pago 100% seguro
+        </p>
+
+        <div className="purchase-trust-strip">
+          <div>🔒 Pago seguro</div>
+          <div>✓ Vendedor verificado</div>
+          <div>📦 Envío protegido</div>
         </div>
+
+   <InfoCard
+  icon="🚚"
+  title="Entrega estimada"
+  description="Entre 24 y 72 horas desde que el vendedor envía el pedido."
+  variant="accent"
+/>
       </div>
 
-      <div className="purchase-badges">
-        <span className="purchase-badge primary">
-          {condition}
-        </span>
+  <div className="purchase-badges">
+  <PremiumBadge variant="dark" size="small">
+    {condition}
+  </PremiumBadge>
 
-        <span className="purchase-badge">
-          Pago protegido
-        </span>
+  <PremiumBadge variant="light" size="small">
+    Pago protegido
+  </PremiumBadge>
 
-        {sellerVerified && (
-          <span className="purchase-badge">
-            Vendedor verificado
-          </span>
-        )}
-      </div>
+  {sellerVerified && (
+    <PremiumBadge variant="success" size="small">
+      Vendedor verificado
+    </PremiumBadge>
+  )}
+</div>
 
       <div className="purchase-location">
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -93,6 +112,13 @@ export default function ProductPurchasePanel({
 
         <span>{location || "España"}</span>
       </div>
+
+ <InfoCard
+  icon="✓"
+  title="Disponible"
+  description="Producto único. Una vez vendido dejará de estar disponible."
+  variant="success"
+/>
 
       <div className="purchase-trust-card">
         <div className="purchase-trust-heading">
@@ -105,6 +131,7 @@ export default function ProductPurchasePanel({
 
           <div>
             <strong>Compra protegida por ATHMOV</strong>
+
             <p>
               Te acompañamos durante el pago y la entrega.
             </p>
@@ -118,34 +145,24 @@ export default function ProductPurchasePanel({
         </div>
       </div>
 
-      <div className="purchase-main-actions">
-        <button
-          type="button"
-          className="purchase-buy-button"
-          onClick={onBuyNow}
-          disabled={checkoutLoading}
-        >
-          <span>
-            {checkoutLoading
-              ? redirectingLabel
-              : buyNowLabel}
-          </span>
+<div className="purchase-main-actions">
+  <PremiumButton
+    variant="dark"
+    fullWidth
+    onClick={onBuyNow}
+    disabled={checkoutLoading}
+  >
+    {checkoutLoading ? redirectingLabel : buyNowLabel}
+  </PremiumButton>
 
-          {!checkoutLoading && (
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M5 12h14M13 6l6 6-6 6" />
-            </svg>
-          )}
-        </button>
-
-        <button
-          type="button"
-          className="purchase-cart-button"
-          onClick={onAddToCart}
-        >
-          {addToCartLabel}
-        </button>
-      </div>
+  <PremiumButton
+    variant="outline"
+    fullWidth
+    onClick={onAddToCart}
+  >
+    {addToCartLabel}
+  </PremiumButton>
+</div>
 
       <div className="purchase-secondary-actions">
         <button type="button" onClick={onMakeOffer}>
@@ -158,16 +175,17 @@ export default function ProductPurchasePanel({
 
         <button
           type="button"
-          className={isFavorite ? "is-favorite" : ""}
+          className={`purchase-favorite-action ${
+            isFavorite ? "is-favorite" : ""
+          }`}
           onClick={onToggleFavorite}
+          aria-pressed={isFavorite}
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M12 20.5S4 16 4 9.8C4 6.6 6.2 5 8.4 5c1.5 0 2.9.8 3.6 2 0 0 1.3-2 3.6-2C17.8 5 20 6.6 20 9.8c0 6.2-8 10.7-8 10.7Z" />
           </svg>
 
-          {isFavorite
-            ? inFavoritesLabel
-            : addToFavoritesLabel}
+          {isFavorite ? inFavoritesLabel : addToFavoritesLabel}
         </button>
       </div>
 
@@ -175,27 +193,17 @@ export default function ProductPurchasePanel({
         <span className="purchase-note-dot" />
 
         <p>
-          No se realiza ningún cargo hasta acceder al pago
-          seguro.
+          No se realiza ningún cargo hasta acceder al pago seguro.
         </p>
       </div>
 
       <style jsx>{`
-        .purchase-panel {
-          position: sticky;
-          top: 118px;
-          align-self: flex-start;
-          min-width: 0;
-          padding: 42px;
-          border: 1px solid rgba(17, 17, 17, 0.07);
-          border-radius: 38px;
-          background: rgba(255, 255, 255, 0.94);
-          box-shadow:
-            0 2px 5px rgba(0, 0, 0, 0.025),
-            0 35px 110px rgba(0, 0, 0, 0.09);
-          backdrop-filter: blur(28px);
-          -webkit-backdrop-filter: blur(28px);
-        }
+ .purchase-panel {
+    position: sticky;
+    top: 118px;
+    align-self: flex-start;
+    min-width: 0;
+}
 
         .purchase-heading {
           min-width: 0;
@@ -204,7 +212,7 @@ export default function ProductPurchasePanel({
         .purchase-brand {
           margin: 0 0 15px;
           overflow: hidden;
-          color: #777777;
+          color: #777;
           font-size: 10px;
           font-weight: 750;
           letter-spacing: 0.22em;
@@ -215,7 +223,7 @@ export default function ProductPurchasePanel({
 
         h1 {
           margin: 0;
-          color: #111111;
+          color: #111;
           font-size: clamp(42px, 4.2vw, 66px);
           font-weight: 470;
           line-height: 0.97;
@@ -225,11 +233,36 @@ export default function ProductPurchasePanel({
 
         .purchase-price {
           margin-top: 29px;
-          color: #111111;
+          color: #111;
           font-size: clamp(48px, 5vw, 72px);
           font-weight: 600;
           line-height: 1;
           letter-spacing: -0.062em;
+        }
+
+        .purchase-price-caption {
+          margin: 10px 0 0;
+          color: #7d7d7d;
+          font-size: 12px;
+          font-weight: 500;
+          letter-spacing: 0.02em;
+        }
+
+        .purchase-trust-strip {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+          margin: 18px 0 24px;
+        }
+
+        .purchase-trust-strip div {
+          padding: 8px 14px;
+          border: 1px solid rgba(17, 17, 17, 0.06);
+          border-radius: 999px;
+          background: #f5f5f3;
+          color: #333;
+          font-size: 12px;
+          font-weight: 600;
         }
 
         .purchase-badges {
@@ -239,33 +272,12 @@ export default function ProductPurchasePanel({
           margin-top: 27px;
         }
 
-        .purchase-badge {
-          display: inline-flex;
-          min-height: 34px;
-          align-items: center;
-          padding: 0 13px;
-          border: 1px solid rgba(17, 17, 17, 0.08);
-          border-radius: 999px;
-          background: #f4f4f1;
-          color: #4d4d4d;
-          font-size: 10px;
-          font-weight: 700;
-          letter-spacing: 0.05em;
-          text-transform: uppercase;
-        }
-
-        .purchase-badge.primary {
-          border-color: #171717;
-          background: #171717;
-          color: #ffffff;
-        }
-
         .purchase-location {
           display: flex;
           align-items: center;
           gap: 8px;
           margin-top: 21px;
-          color: #777777;
+          color: #777;
           font-size: 13px;
           font-weight: 500;
         }
@@ -285,12 +297,7 @@ export default function ProductPurchasePanel({
           padding: 23px;
           border: 1px solid rgba(17, 17, 17, 0.065);
           border-radius: 25px;
-          background:
-            linear-gradient(
-              145deg,
-              #f8f8f5 0%,
-              #f1f1ed 100%
-            );
+          background: linear-gradient(145deg, #f8f8f5 0%, #f1f1ed 100%);
         }
 
         .purchase-trust-heading {
@@ -307,7 +314,7 @@ export default function ProductPurchasePanel({
           place-items: center;
           border-radius: 50%;
           background: #171717;
-          color: #ffffff;
+          color: #fff;
         }
 
         .purchase-shield svg {
@@ -330,7 +337,7 @@ export default function ProductPurchasePanel({
 
         .purchase-trust-heading p {
           margin: 6px 0 0;
-          color: #777777;
+          color: #777;
           font-size: 12px;
           line-height: 1.5;
         }
@@ -369,96 +376,9 @@ export default function ProductPurchasePanel({
           margin-top: 27px;
         }
 
-        .purchase-buy-button,
-        .purchase-cart-button {
-          display: flex;
-          width: 100%;
-          min-height: 62px;
-          align-items: center;
-          justify-content: center;
-          gap: 13px;
-          padding: 0 25px;
-          border-radius: 999px;
-          cursor: pointer;
-          font-family: inherit;
-          font-size: 14px;
-          font-weight: 680;
-          transition:
-            transform 280ms ease,
-            box-shadow 280ms ease,
-            background 280ms ease,
-            color 280ms ease;
-        }
-
-        .purchase-buy-button {
-          position: relative;
-          overflow: hidden;
-          border: 1px solid #111111;
-          background: #111111;
-          color: #ffffff;
-          box-shadow: 0 18px 44px rgba(0, 0, 0, 0.2);
-        }
-
-        .purchase-buy-button::before {
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 55%;
-          height: 100%;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255, 255, 255, 0.24),
-            transparent
-          );
-          content: "";
-          transition: left 650ms ease;
-        }
-
-        .purchase-buy-button:hover:not(:disabled)::before {
-          left: 140%;
-        }
-
-        .purchase-buy-button:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 23px 55px rgba(0, 0, 0, 0.26);
-        }
-
-        .purchase-buy-button:disabled {
-          cursor: wait;
-          opacity: 0.65;
-        }
-
-        .purchase-buy-button span,
-        .purchase-buy-button svg {
-          position: relative;
-          z-index: 2;
-        }
-
-        .purchase-buy-button svg {
-          width: 18px;
-          height: 18px;
-          fill: none;
-          stroke: currentColor;
-          stroke-width: 1.6;
-          stroke-linecap: round;
-          stroke-linejoin: round;
-        }
-
-        .purchase-cart-button {
-          border: 1px solid rgba(17, 17, 17, 0.13);
-          background: #ffffff;
-          color: #171717;
-        }
-
-        .purchase-cart-button:hover {
-          background: #f4f4f1;
-          transform: translateY(-2px);
-        }
-
         .purchase-secondary-actions {
           display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
+          grid-template-columns: repeat(2, minmax(0, 1fr));
           gap: 8px;
           margin-top: 10px;
         }
@@ -487,15 +407,19 @@ export default function ProductPurchasePanel({
             transform 230ms ease;
         }
 
+        .purchase-secondary-actions .purchase-favorite-action {
+          grid-column: 1 / -1;
+        }
+
         .purchase-secondary-actions button:hover {
-          background: #171717;
-          color: #ffffff;
           transform: translateY(-2px);
+          background: #171717;
+          color: #fff;
         }
 
         .purchase-secondary-actions button.is-favorite {
           background: #171717;
-          color: #ffffff;
+          color: #fff;
         }
 
         .purchase-secondary-actions svg {
@@ -555,7 +479,8 @@ export default function ProductPurchasePanel({
           }
 
           .purchase-price {
-            font-size: 48px;
+            margin-top: 24px;
+            font-size: clamp(58px, 14vw, 76px);
           }
 
           .purchase-secondary-actions {
@@ -570,17 +495,13 @@ export default function ProductPurchasePanel({
         }
 
         @media (prefers-reduced-motion: reduce) {
-          .purchase-buy-button,
-          .purchase-cart-button,
-          .purchase-secondary-actions button {
-            transition: none;
-          }
-
-          .purchase-buy-button::before {
-            display: none;
-          }
+  .purchase-secondary-actions button {
+    transition: none;
+  }
+}
         }
       `}</style>
-    </aside>
+       </GlassCard>
+  </aside>
   );
 }
