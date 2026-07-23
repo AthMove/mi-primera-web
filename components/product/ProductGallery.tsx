@@ -1,7 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState, type MouseEvent } from "react";
+import {
+  useEffect,
+  useState,
+  type CSSProperties,
+  type MouseEvent,
+} from "react";
+
 
 type ProductGalleryProps = {
   title: string;
@@ -33,6 +39,7 @@ onToggleFavorite,
 onImageMove,
 onMouseLeave,
 }: ProductGalleryProps) {
+  const [imageLoaded, setImageLoaded] = useState(false);
   const safeImage = (src?: string) => {
     return src?.startsWith("http") || src?.startsWith("/")
       ? src
@@ -86,6 +93,10 @@ useEffect(() => {
     }
   };
 
+  useEffect(() => {
+  setImageLoaded(false);
+}, [selectedImage]);
+
   window.addEventListener("keydown", handleKeyDown);
 
   return () => {
@@ -103,7 +114,7 @@ useEffect(() => {
   style={{
     "--glow-x": `${mousePosition.x}%`,
     "--glow-y": `${mousePosition.y}%`,
-  } as React.CSSProperties}
+  } as CSSProperties}
 >
         <div className="product-gallery-badges">
           <span className="product-gallery-condition">
@@ -127,7 +138,10 @@ useEffect(() => {
           className={`product-gallery-favorite ${
             isFavorite ? "is-active" : ""
           }`}
-          onClick={onToggleFavorite}
+         onClick={(event) => {
+  event.stopPropagation();
+  onToggleFavorite();
+}}
           aria-label={
             isFavorite
               ? "Eliminar de favoritos"
@@ -142,20 +156,30 @@ useEffect(() => {
 
         <div className="product-gallery-glow" />
 
-      <img
+{!imageLoaded && (
+  <div className="product-gallery-skeleton">
+    <div className="product-gallery-skeleton-shine" />
+  </div>
+)}
+
+<img
   key={selectedImage}
   src={safeImage(selectedImage)}
   alt={title || "Producto ATHMOV"}
-  className="product-gallery-image product-gallery-image-fade"
-style={{
-  objectPosition: `${mousePosition.x}% ${mousePosition.y}%`,
-  transform: `
-    perspective(1400px)
-    rotateY(${(mousePosition.x - 50) / 12}deg)
-    rotateX(${-(mousePosition.y - 50) / 12}deg)
-    scale(1.03)
-  `,
-}}
+  className={`product-gallery-image product-gallery-image-fade ${
+    imageLoaded ? "is-loaded" : "is-loading"
+  }`}
+  onLoad={() => setImageLoaded(true)}
+  onError={() => setImageLoaded(true)}
+  style={{
+    objectPosition: `${mousePosition.x}% ${mousePosition.y}%`,
+    transform: `
+      perspective(1400px)
+      rotateY(${(mousePosition.x - 50) / 12}deg)
+      rotateX(${-(mousePosition.y - 50) / 12}deg)
+      scale(1.03)
+    `,
+  }}
 />
       </div>
 
@@ -175,6 +199,7 @@ style={{
                 aria-label={`Ver imagen ${index + 1}`}
               >
                 <Image
+                className="product-gallery-thumb-image"
                   src={safeImage(image)}
                   alt={`${title} ${index + 1}`}
                   fill
@@ -376,6 +401,41 @@ style={{
     top .18s ease;
 }
 
+.product-gallery-skeleton {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      circle at 50% 35%,
+      rgba(255, 255, 255, 0.95),
+      rgba(243, 243, 239, 0.9) 48%,
+      rgba(232, 232, 227, 0.95) 100%
+    );
+}
+
+.product-gallery-skeleton-shine {
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    105deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.7) 45%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(255, 255, 255, 0.7) 55%,
+    transparent 80%
+  );
+  animation: gallerySkeletonShine 1.35s ease-in-out infinite;
+}
+
+@keyframes gallerySkeletonShine {
+  to {
+    transform: translateX(100%);
+  }
+}
+
         .product-gallery-image {
           position: relative;
           z-index: 2;
@@ -389,7 +449,16 @@ transition:
   transform 180ms ease-out,
   object-position 180ms ease-out,
   filter 250ms ease;
+  opacity: 1;
         }
+
+        .product-gallery-image.is-loading {
+  opacity: 0;
+}
+
+.product-gallery-image.is-loaded {
+  opacity: 1;
+}
 
         .product-gallery-thumbs {
           display: grid;
@@ -413,18 +482,35 @@ transition:
             box-shadow 280ms ease,
             border-color 280ms ease;
         }
+.product-gallery-thumb:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow:
+    0 26px 60px rgba(0,0,0,.12),
+    0 0 0 1px rgba(17,17,17,.08);
+}
 
-        .product-gallery-thumb:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 20px 55px rgba(0, 0, 0, 0.09);
-        }
+     .product-gallery-thumb.is-selected {
+  border-color:#111;
+  transform:translateY(-4px);
 
-        .product-gallery-thumb.is-selected {
-          border-color: #111111;
-          box-shadow:
-            0 0 0 1px #111111,
-            0 18px 50px rgba(0, 0, 0, 0.08);
-        }
+  box-shadow:
+    0 0 0 1px #111,
+    0 28px 70px rgba(0,0,0,.14);
+}
+
+.product-gallery-thumb.is-selected::after{
+  content:"";
+
+  position:absolute;
+  inset:0;
+
+  border-radius:inherit;
+
+  box-shadow:
+    inset 0 0 0 2px rgba(255,255,255,.45);
+
+  pointer-events:none;
+}
 
         .gallery-fullscreen{
   position:fixed;
@@ -563,6 +649,15 @@ transition:
             height: 88px;
             border-radius: 16px;
           }
+            .product-gallery-thumb-image {
+  transition:
+    transform .35s ease,
+    opacity .25s ease;
+}
+
+.product-gallery-thumb:hover .product-gallery-thumb-image {
+  transform: scale(1.06);
+}
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -570,22 +665,24 @@ transition:
           .product-gallery-favorite,
           .product-gallery-thumb {
             transition: none;
+            .product-gallery-skeleton-shine {
+  animation: none;
+}
           }
         }
-          .product-gallery-image-fade{
-  animation: imageFade .35s ease;
-}
+        .product-gallery-image-fade {
+          animation: imageFade 0.35s ease;
+        }
 
-@keyframes imageFade{
-  from{
-    opacity:0;
-    transform:scale(.97);
-  }
+        @keyframes imageFade {
+          from {
+            opacity: 0;
+          }
 
-  to{
-    opacity:1;
-    transform:scale(1);
-  }
+          to {
+            opacity: 1;
+          }
+        }
       `}</style>
     </div>
   );

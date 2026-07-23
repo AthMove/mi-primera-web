@@ -1,6 +1,12 @@
 "use client";
 
 import Image from "next/image";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import { useRouter } from "next/navigation";
 
 type FollowedSellersSectionProps = {
@@ -14,6 +20,34 @@ export default function FollowedSellersSection({
 }: FollowedSellersSectionProps) {
   const router = useRouter();
 
+  const sectionRef = useRef<HTMLElement | null>(null);
+const [isVisible, setIsVisible] = useState(false);
+
+useEffect(() => {
+  const section = sectionRef.current;
+
+  if (!section) return;
+
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      if (entry.isIntersecting) {
+        setIsVisible(true);
+        observer.disconnect();
+      }
+    },
+    {
+      threshold: 0.12,
+      rootMargin: "0px 0px -60px 0px",
+    }
+  );
+
+  observer.observe(section);
+
+  return () => {
+    observer.disconnect();
+  };
+}, []);
+
   const safeImage = (src?: string) => {
     return src?.startsWith("http") || src?.startsWith("/")
       ? src
@@ -25,11 +59,11 @@ export default function FollowedSellersSection({
   return (
     <>
       <section
-        className={`followed-sellers-section fade-up ${
-          isMobile ? "is-mobile" : ""
-        }`}
-        data-delay="175"
-      >
+  ref={sectionRef}
+  className={`followed-sellers-section ${
+    isMobile ? "is-mobile" : ""
+  } ${isVisible ? "is-visible" : ""}`}
+>
         <div className="followed-sellers-header">
           <div>
             <div className="followed-sellers-eyebrow-row">
@@ -64,7 +98,7 @@ export default function FollowedSellersSection({
         </div>
 
         <div className="followed-sellers-grid">
-          {sellers.map((seller) => {
+          {sellers.map((seller, index) => {
             const sellerName =
               seller.full_name ||
               seller.username ||
@@ -94,6 +128,11 @@ export default function FollowedSellersSection({
               <article
                 key={seller.id}
                 className="followed-seller-card"
+                style={
+  {
+    "--seller-delay": `${index * 100}ms`,
+  } as CSSProperties
+}
                 role="link"
                 tabIndex={0}
                 aria-label={`Ver perfil de ${sellerName}`}
@@ -243,7 +282,18 @@ export default function FollowedSellersSection({
           justify-content: space-between;
           gap: 40px;
           margin-bottom: 44px;
+          opacity: 0;
+transform: translateY(24px);
+transition:
+  opacity 750ms cubic-bezier(0.22, 1, 0.36, 1),
+  transform 750ms cubic-bezier(0.22, 1, 0.36, 1);
         }
+
+        .followed-sellers-section.is-visible
+  .followed-sellers-header {
+  opacity: 1;
+  transform: translateY(0);
+}
 
         .followed-sellers-eyebrow-row {
           display: flex;
@@ -354,12 +404,21 @@ export default function FollowedSellersSection({
             0 22px 65px rgba(0, 0, 0, 0.15);
           cursor: pointer;
           outline: none;
-          transform: translateY(0);
-          transition:
-            transform 450ms cubic-bezier(0.22, 1, 0.36, 1),
-            box-shadow 450ms cubic-bezier(0.22, 1, 0.36, 1),
-            border-color 450ms ease;
+          opacity: 0;
+transform: translateY(28px);
+         transition:
+  opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+  transform 700ms cubic-bezier(0.22, 1, 0.36, 1),
+  box-shadow 450ms cubic-bezier(0.22, 1, 0.36, 1),
+  border-color 450ms ease;
+transition-delay: var(--seller-delay);
         }
+
+        .followed-sellers-section.is-visible
+  .followed-seller-card {
+  opacity: 1;
+  transform: translateY(0);
+}
 
         .followed-seller-card:hover {
           transform: translateY(-8px);
@@ -645,13 +704,17 @@ export default function FollowedSellersSection({
         }
 
         @media (prefers-reduced-motion: reduce) {
-          .followed-seller-card,
-          .followed-seller-glow,
-          .followed-seller-arrow,
-          .followed-sellers-view-all,
-          .followed-sellers-view-all svg {
-            transition: none;
-          }
+        .followed-sellers-header,
+.followed-seller-card,
+.followed-seller-glow,
+.followed-seller-arrow,
+.followed-sellers-view-all,
+.followed-sellers-view-all svg {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+        
         }
       `}</style>
     </>

@@ -2,7 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 import { supabase } from "@/lib/supabase";
 import { useLanguage } from "./LanguageProvider";
 
@@ -118,7 +124,7 @@ const { data: orders } = await supabase
     window.location.href = "/";
   };
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = (e: FormEvent<HTMLFormElement>) => {
   e.preventDefault();
 
   const query = searchQuery.trim();
@@ -246,7 +252,11 @@ return () => window.removeEventListener("scroll", onScroll);
   🛍️ MARKETPLACE
 </p>
 
-    <Link href="/products" style={drawerLinkStyle}>
+<Link
+  href="/products"
+  style={drawerLinkStyle}
+  onClick={() => setMenuOpen(false)}
+>
   COMPRAR
 </Link>
 
@@ -288,13 +298,6 @@ return () => window.removeEventListener("scroll", onScroll);
           PEDIDOS{badge(ordersCount)}
         </Link>
 
-<Link
-  href="/notifications"
-  style={drawerLinkStyle}
-  onClick={() => setMenuOpen(false)}
->
-  NOTIFICACIONES{badge(notificationsCount)}
-</Link>
 
         <Link href="/offers" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
           OFERTAS{badge(offersCount)}
@@ -555,9 +558,13 @@ return () => window.removeEventListener("scroll", onScroll);
   </button>
 </form>
 
-    <Link href="/products" style={drawerHeroButtonStyle}>
-      Explorar Marketplace →
-    </Link>
+   <Link
+  href="/products"
+  style={drawerHeroButtonStyle}
+  onClick={() => setMenuOpen(false)}
+>
+  Explorar Marketplace →
+</Link>
   <div style={{ marginTop: 24 }}>
   <div style={drawerSectionTitleStyle}>
     IDIOMA
@@ -921,14 +928,4 @@ const drawerHeroButtonStyle = {
   borderRadius: "999px",
   padding: "12px 18px",
   fontWeight: 900,
-};
-
-const languageSelectStyle = {
-  border: "1px solid rgba(0,0,0,.12)",
-  background: "#fff",
-  borderRadius: "999px",
-  padding: "10px 12px",
-  fontSize: "11px",
-  fontWeight: 800,
-  cursor: "pointer",
 };

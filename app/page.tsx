@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { useEffect } from "react";
 import HeroSection from "@/components/home/HeroSection";
 import EditorialSection from "@/components/home/EditorialSection";
 import LatestDropsSection from "@/components/home/LatestDropsSection";

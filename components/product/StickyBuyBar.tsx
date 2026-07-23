@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import GlassCard from "@/components/ui/GlassCard";
+import PremiumButton from "@/components/ui/PremiumButton";
 
 type StickyBuyBarProps = {
   title: string;
@@ -47,144 +49,132 @@ export default function StickyBuyBar({
 if (!visible) return null;
 
 return (
-  <>
-    <div className="sticky-buy-bar">
-      <div className="sticky-buy-info">
-        <p>{title}</p>
+ <>
+  <div className="sticky-buy-wrapper">
+    <GlassCard padding="small" hover={false}>
+      <div className="sticky-buy-content">
+        <div className="sticky-buy-info">
+          <p>{title}</p>
 
-        <strong>
-          {new Intl.NumberFormat("es-ES", {
-            style: "currency",
-            currency: "EUR",
-            maximumFractionDigits: 0,
-          }).format(price)}
-        </strong>
+          <strong>
+            {new Intl.NumberFormat("es-ES", {
+              style: "currency",
+              currency: "EUR",
+              maximumFractionDigits: 0,
+            }).format(price)}
+          </strong>
+
+          <span className="sticky-buy-trust">
+            ✓ Compra protegida
+          </span>
+        </div>
+
+        <PremiumButton
+          onClick={onBuyNow}
+          disabled={checkoutLoading}
+        >
+          {checkoutLoading
+            ? redirectingLabel
+            : buyNowLabel}
+        </PremiumButton>
       </div>
+    </GlassCard>
+  </div>
 
-      <button
-        type="button"
-        onClick={onBuyNow}
-        disabled={checkoutLoading}
-      >
-        {checkoutLoading
-          ? redirectingLabel
-          : buyNowLabel}
-      </button>
-    </div>
+ <style jsx>{`
+  .sticky-buy-wrapper {
+    position: fixed;
+    left: 50%;
+    bottom: 22px;
+    width: min(920px, calc(100vw - 32px));
+    transform: translateX(-50%);
+    z-index: 9998;
+  }
 
-    <style jsx>{`
-      .sticky-buy-bar {
-        position: fixed;
-        left: 50%;
-        bottom: 22px;
-        transform: translateX(-50%);
+  .sticky-buy-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    animation: stickyAppear 0.35s ease;
+  }
 
-        width: min(900px, calc(100vw - 32px));
+  .sticky-buy-info {
+    min-width: 0;
+  }
 
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 18px;
+  .sticky-buy-info p {
+    margin: 0;
+    color: #111111;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
-        padding: 18px 22px;
+  .sticky-buy-info strong {
+    display: block;
+    margin-top: 4px;
+    color: #111111;
+    font-size: 22px;
+    font-weight: 700;
+  }
 
-        border: 1px solid rgba(255,255,255,.12);
-        border-radius: 22px;
+  .sticky-buy-trust {
+    display: block;
+    margin-top: 6px;
+    color: #6b7280;
+    font-size: 13px;
+    font-weight: 500;
+  }
 
-        background: rgba(18,18,18,.92);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+  @media (max-width: 700px) {
+    .sticky-buy-wrapper {
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      transform: none;
+      padding: 12px;
+    }
 
-        box-shadow:
-          0 24px 70px rgba(0,0,0,.35);
+    .sticky-buy-content {
+      gap: 14px;
+    }
 
-        z-index: 9998;
-      }
+    .sticky-buy-info p {
+      max-width: 145px;
+      font-size: 12px;
+    }
 
-      .sticky-buy-info{
-        min-width:0;
-      }
+    .sticky-buy-info strong {
+      font-size: 18px;
+    }
 
-      .sticky-buy-info p{
-        margin:0;
+    .sticky-buy-trust {
+      font-size: 11px;
+    }
+  }
 
-        color:#ffffff;
+  @keyframes stickyAppear {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
 
-        font-size:14px;
-        font-weight:600;
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
-        white-space:nowrap;
-        overflow:hidden;
-        text-overflow:ellipsis;
-      }
-
-      .sticky-buy-info strong{
-        display:block;
-        margin-top:4px;
-
-        color:white;
-
-        font-size:22px;
-        font-weight:700;
-      }
-
-      button{
-        height:52px;
-
-        padding:0 28px;
-
-        border:none;
-        border-radius:999px;
-
-        background:white;
-        color:#111;
-
-        font-size:14px;
-        font-weight:700;
-
-        cursor:pointer;
-
-        transition:.25s;
-      }
-
-      button:hover:not(:disabled){
-        transform:translateY(-2px);
-      }
-
-      button:disabled{
-        opacity:.6;
-        cursor:wait;
-      }
-
-      @media(max-width:700px){
-
-        .sticky-buy-bar{
-          left:0;
-          right:0;
-          bottom:0;
-
-          width:100%;
-
-          transform:none;
-
-          border-radius:22px 22px 0 0;
-
-          padding:16px;
-        }
-
-        .sticky-buy-info p{
-          font-size:12px;
-        }
-
-        .sticky-buy-info strong{
-          font-size:18px;
-        }
-
-        button{
-          padding:0 22px;
-        }
-      }
-    `}</style>
+  @media (prefers-reduced-motion: reduce) {
+    .sticky-buy-content {
+      animation: none;
+    }
+  }
+`}</style>
   </>
 );
 }

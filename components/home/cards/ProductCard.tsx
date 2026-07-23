@@ -2,7 +2,12 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { KeyboardEvent, MouseEvent, useState } from "react";
+import {
+  useState,
+  type KeyboardEvent,
+  type MouseEvent,
+} from "react";
+import { supabase } from "@/lib/supabase";
 
 interface ProductCardProps {
   product: any;
@@ -20,7 +25,10 @@ export default function ProductCard({
   compact = false,
 }: ProductCardProps) {
   const router = useRouter();
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(
+  Boolean(product?.is_favorite || product?.isFavorite)
+);
+  const [imageError, setImageError] = useState(false);
 
   const productUrl = `/products/${product?.id}`;
 
@@ -69,24 +77,79 @@ const reviewsCount =
     }
   };
 
-  const handleMouseMove = (event: MouseEvent<HTMLElement>) => {
-    const rect = event.currentTarget.getBoundingClientRect();
+const normalizedRating = Math.min(5, Math.max(0, rating));
+const roundedRating = Math.round(normalizedRating);
 
-    event.currentTarget.style.setProperty(
-      "--pointer-x",
-      `${event.clientX - rect.left}px`
-    );
+const ratingStars =
+  "★".repeat(roundedRating) +
+  "☆".repeat(5 - roundedRating);
 
-    event.currentTarget.style.setProperty(
-      "--pointer-y",
-      `${event.clientY - rect.top}px`
-    );
-  };
+const handleMouseMove = (event: MouseEvent<HTMLElement>) => {
+  const rect = event.currentTarget.getBoundingClientRect();
+
+  event.currentTarget.style.setProperty(
+    "--pointer-x",
+    `${event.clientX - rect.left}px`
+  );
+
+  event.currentTarget.style.setProperty(
+    "--pointer-y",
+    `${event.clientY - rect.top}px`
+  );
+};
+
+const toggleFavorite = async (
+  event: MouseEvent<HTMLButtonElement>
+) => {
+  event.stopPropagation();
+
+  if (!product?.id) return;
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    router.push("/auth");
+    return;
+  }
+
+  if (isFavorite) {
+    const { error } = await supabase
+      .from("favorites")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("product_id", product.id);
+
+    if (error) {
+      console.log("Error eliminando favorito:", error);
+      return;
+    }
+
+    setIsFavorite(false);
+    return;
+  }
+
+  const { error } = await supabase
+    .from("favorites")
+    .insert({
+      user_id: user.id,
+      product_id: product.id,
+      user_email: user.email,
+    });
+
+  if (error) {
+    console.log("Error añadiendo favorito:", error);
+    return;
+  }
+
+  setIsFavorite(true);
+};
 
   return (
     <>
       <article
-        className={`athmov-product-card fade-up ${
+className={`athmov-product-card ${
   compact ? "is-compact" : ""
 }`}
         role="link"
@@ -140,10 +203,7 @@ const reviewsCount =
                   : "Añadir a favoritos"
               }
               aria-pressed={isFavorite}
-              onClick={(event) => {
-                event.stopPropagation();
-                setIsFavorite((current) => !current);
-              }}
+              onClick={toggleFavorite}
             >
               <svg
                 viewBox="0 0 24 24"
@@ -156,7 +216,7 @@ const reviewsCount =
           )}
 
           <Image
-            src={safeImage(productImage)}
+            src={imageError ? "/logo.png" : safeImage(productImage)}
             alt={product?.title || "Producto ATHMOV"}
             fill
             sizes={
@@ -165,6 +225,7 @@ const reviewsCount =
                 : "(max-width: 900px) 50vw, 33vw"
             }
             className="athmov-product-image"
+            onError={() => setImageError(true)}
             style={{
               objectFit: "contain",
               padding: isMobile ? "26px" : "38px",
@@ -211,19 +272,27 @@ const reviewsCount =
             {product?.title || "Producto deportivo premium"}
           </h3>
 
-          {showRating && (
+{showRating && (
   <div className="athmov-product-rating">
-    <span className="athmov-rating-stars">
-      {rating > 0 ? "★★★★★" : "☆☆☆☆☆"}
+    <span
+      className="athmov-rating-stars"
+      aria-hidden="true"
+    >
+      {ratingStars}
     </span>
 
     <span>
       {rating > 0
-        ? `${rating.toFixed(1)}${
+        ? `${normalizedRating.toFixed(1)}${
             reviewsCount > 0 ? ` · ${reviewsCount}` : ""
           }`
         : "Sin reseñas"}
     </span>
+    <span className="athmov-sr-only">
+  {rating > 0
+    ? `Valoración de ${rating.toFixed(1)} sobre 5`
+    : "Producto sin valoraciones"}
+</span>
   </div>
 )}
 
@@ -265,19 +334,26 @@ const reviewsCount =
     </span>
   </div>
 
-  <span className="athmov-product-link">
-    <span className="athmov-link-short">Ver</span>
-    <span className="athmov-link-long">Ver producto</span>
+<span className="athmov-product-link">
+  Ver producto
 
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M5 12h14M13 6l6 6-6 6" />
-    </svg>
-  </span>
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M5 12h14M13 6l6 6-6 6" />
+  </svg>
+</span>
 </div>
         </div>
       </article>
 
       <style jsx>{`
+.athmov-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
 
       .athmov-product-badge.is-verified {
   border-color: rgba(17, 17, 17, 0.86);
@@ -329,18 +405,6 @@ const reviewsCount =
   stroke-linecap: round;
   stroke-linejoin: round;
   transition: transform 250ms ease;
-}
-
-.athmov-link-long {
-  display: none;
-}
-
-.athmov-product-card:hover .athmov-link-short {
-  display: none;
-}
-
-.athmov-product-card:hover .athmov-link-long {
-  display: inline;
 }
 
 .athmov-product-card:hover .athmov-product-link svg {
@@ -481,10 +545,29 @@ const reviewsCount =
           background: #ffffff;
         }
 
-        .athmov-favorite-button.is-active {
-          color: #111111;
-          background: #ffffff;
-        }
+      .athmov-favorite-button.is-active {
+  color: #111111;
+  background: #ffffff;
+  transform: scale(1.04);
+}
+.athmov-favorite-button.is-active .athmov-heart-icon {
+  fill: currentColor;
+  animation: favoritePop 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes favoritePop {
+  0% {
+    transform: scale(0.75);
+  }
+
+  60% {
+    transform: scale(1.18);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
 
         .athmov-heart-icon {
           width: 19px;
@@ -496,10 +579,6 @@ const reviewsCount =
           stroke-linecap: round;
           stroke-linejoin: round;
           transition: fill 250ms ease;
-        }
-
-        .athmov-favorite-button.is-active .athmov-heart-icon {
-          fill: currentColor;
         }
 
         .athmov-product-image {
@@ -747,14 +826,6 @@ const reviewsCount =
   .athmov-card-shine {
     display: none;
   }
-
-  .athmov-link-short {
-    display: none;
-  }
-
-  .athmov-link-long {
-    display: inline;
-  }
 }
 
         @media (prefers-reduced-motion: reduce) {
@@ -764,6 +835,9 @@ const reviewsCount =
           .athmov-favorite-button {
             transition: none;
           }
+            .athmov-favorite-button.is-active .athmov-heart-icon {
+  animation: none;
+}
         }
       `}</style>
     </>
