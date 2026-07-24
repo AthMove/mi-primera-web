@@ -9,6 +9,7 @@ type ProductPurchasePanelProps = {
   brand?: string;
   title: string;
   price: number | string;
+  originalPrice?: number | string;
   condition: string;
   location?: string;
   sellerVerified?: boolean;
@@ -34,6 +35,7 @@ export default function ProductPurchasePanel({
   brand,
   title,
   price,
+  originalPrice,
   condition,
   location,
   sellerVerified = false,
@@ -60,25 +62,97 @@ export default function ProductPurchasePanel({
     maximumFractionDigits: 0,
   }).format(Number(price) || 0);
 
+  const currentPrice = Number(price) || 0;
+const newPrice = Number(originalPrice) || 0;
+
+const hasSaving =
+  newPrice > 0 &&
+  currentPrice > 0 &&
+  newPrice > currentPrice;
+
+const savingAmount = hasSaving
+  ? newPrice - currentPrice
+  : 0;
+
+const savingPercentage = hasSaving
+  ? Math.round((savingAmount / newPrice) * 100)
+  : 0;
+
+const formattedOriginalPrice = new Intl.NumberFormat("es-ES", {
+  style: "currency",
+  currency: "EUR",
+  maximumFractionDigits: 0,
+}).format(newPrice);
+
+const formattedSaving = new Intl.NumberFormat("es-ES", {
+  style: "currency",
+  currency: "EUR",
+  maximumFractionDigits: 0,
+}).format(savingAmount);
+
 return (
   <aside className="purchase-panel">
  <GlassCard padding="large" hover={false}>
       <div className="purchase-heading">
-        <p className="purchase-brand">{brand || "ATHMOV"}</p>
+<p className="purchase-brand">{brand || "ATHMOV"}</p>
 
-        <h1>{title}</h1>
+<div className="purchase-price premium-price">{formattedPrice}</div>
 
-        <div className="purchase-price">{formattedPrice}</div>
+<p className="purchase-product-name">
+  {title}
+</p>
 
         <p className="purchase-price-caption">
           IVA incluido · Pago 100% seguro
         </p>
 
-        <div className="purchase-trust-strip">
-          <div>🔒 Pago seguro</div>
-          <div>✓ Vendedor verificado</div>
-          <div>📦 Envío protegido</div>
-        </div>
+        {hasSaving && (
+  <div className="purchase-saving-card">
+    <div className="purchase-saving-column">
+      <span>Precio nuevo</span>
+
+      <strong className="purchase-original-price">
+        {formattedOriginalPrice}
+      </strong>
+    </div>
+
+    <div className="purchase-saving-divider" />
+
+    <div className="purchase-saving-column">
+      <span>Precio ATHMOV</span>
+
+      <strong>{formattedPrice}</strong>
+    </div>
+
+    <div className="purchase-saving-result">
+      <span>Ahorras</span>
+
+      <strong>
+        {formattedSaving}
+        <small>−{savingPercentage}%</small>
+      </strong>
+    </div>
+  </div>
+)}
+
+   <div className="purchase-trust-strip">
+  <div>
+    <span className="trust-icon">✓</span>
+    Pago seguro
+  </div>
+
+  {sellerVerified && (
+    <div>
+      <span className="trust-icon">✓</span>
+      Vendedor verificado
+    </div>
+  )}
+
+  <div>
+    <span className="trust-icon">✓</span>
+    Envío protegido
+  </div>
+</div>
 
    <InfoCard
   icon="🚚"
@@ -130,20 +204,35 @@ return (
           </span>
 
           <div>
-            <strong>Compra protegida por ATHMOV</strong>
+        <strong>Protección ATHMOV</strong>
 
-            <p>
-              Te acompañamos durante el pago y la entrega.
-            </p>
+<p>
+  Tu dinero permanece protegido hasta que recibes el pedido.
+</p>
           </div>
         </div>
 
-        <div className="purchase-trust-list">
-          <span>Pago seguro mediante Stripe</span>
-          <span>Envío con seguimiento</span>
-          <span>Soporte hasta completar la entrega</span>
-        </div>
+ <div className="purchase-trust-list">
+  <div className="trust-item">
+    <strong>Pago seguro</strong>
+    <span>Procesado mediante Stripe.</span>
+  </div>
+
+  <div className="trust-item">
+    <strong>Seguimiento</strong>
+    <span>Con número de tracking cuando el vendedor envía el pedido.</span>
+  </div>
+
+  <div className="trust-item">
+    <strong>Protección</strong>
+    <span>ATHMOV te acompaña hasta la entrega.</span>
+  </div>
+</div>
       </div>
+
+      <div className="purchase-stock">
+  Solo hay una unidad disponible
+</div>
 
 <div className="purchase-main-actions">
   <PremiumButton
@@ -221,18 +310,18 @@ return (
           white-space: nowrap;
         }
 
-        h1 {
-          margin: 0;
-          color: #111;
-          font-size: clamp(42px, 4.2vw, 66px);
-          font-weight: 470;
-          line-height: 0.97;
-          letter-spacing: -0.058em;
-          overflow-wrap: anywhere;
-        }
+.purchase-product-name {
+  margin: 14px 0 0;
+  color: #4f4f4f;
+  font-size: 15px;
+  font-weight: 550;
+  line-height: 1.45;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
 
         .purchase-price {
-          margin-top: 29px;
+  margin-top: 10px;
           color: #111;
           font-size: clamp(48px, 5vw, 72px);
           font-weight: 600;
@@ -248,6 +337,91 @@ return (
           letter-spacing: 0.02em;
         }
 
+        .purchase-saving-card {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  gap: 18px;
+  margin-top: 24px;
+  padding: 21px;
+  border: 1px solid rgba(17, 17, 17, 0.07);
+  border-radius:26px;
+ background:linear-gradient(
+180deg,
+#fafaf8 0%,
+#f3f3ef 100%
+);
+box-shadow:
+0 15px 40px rgba(0,0,0,.04);
+}
+
+.purchase-saving-column {
+  display: grid;
+  align-content: center;
+  gap: 7px;
+}
+
+.purchase-saving-column span,
+.purchase-saving-result > span {
+  color: #898989;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.purchase-saving-column strong {
+  color: #171717;
+  font-size: 19px;
+  font-weight: 650;
+  letter-spacing: -0.035em;
+}
+
+.purchase-original-price {
+  color: #929292 !important;
+  font-weight: 500 !important;
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+.purchase-saving-divider {
+  width: 1px;
+  min-height: 43px;
+  background: rgba(17, 17, 17, 0.09);
+}
+
+.purchase-saving-result {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding-top: 17px;
+  border-top: 1px solid rgba(17, 17, 17, 0.08);
+}
+
+.purchase-saving-result strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #171717;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.purchase-saving-result small {
+  display: inline-flex;
+  min-height: 25px;
+  align-items: center;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: #171717;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+}
+
         .purchase-trust-strip {
           display: flex;
           flex-wrap: wrap;
@@ -256,14 +430,46 @@ return (
         }
 
         .purchase-trust-strip div {
-          padding: 8px 14px;
-          border: 1px solid rgba(17, 17, 17, 0.06);
-          border-radius: 999px;
-          background: #f5f5f3;
-          color: #333;
-          font-size: 12px;
-          font-weight: 600;
-        }
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border: 1px solid rgba(17, 17, 17, 0.06);
+  border-radius: 999px;
+  background: #f5f5f3;
+  color: #333;
+  font-size: 12px;
+  font-weight: 600;
+}
+  .premium-price {
+  animation: premiumPrice .65s ease;
+}
+
+@keyframes premiumPrice {
+
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+}
+
+.trust-icon {
+  display: grid;
+  width: 17px;
+  height: 17px;
+  place-items: center;
+  border-radius: 50%;
+  background: #171717;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+}
 
         .purchase-badges {
           display: flex;
@@ -350,31 +556,57 @@ return (
           border-top: 1px solid rgba(17, 17, 17, 0.08);
         }
 
-        .purchase-trust-list span {
-          position: relative;
-          padding-left: 17px;
-          color: #5e5e5e;
-          font-size: 12px;
-          font-weight: 500;
-          line-height: 1.45;
-        }
+      .purchase-trust-list {
+  display: grid;
+  gap: 16px;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(17,17,17,.08);
+}
 
-        .purchase-trust-list span::before {
-          position: absolute;
-          top: 0.42em;
-          left: 0;
-          width: 5px;
-          height: 5px;
-          border-radius: 50%;
-          background: #171717;
-          content: "";
-        }
+.trust-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
 
-        .purchase-main-actions {
-          display: grid;
-          gap: 11px;
-          margin-top: 27px;
-        }
+.trust-item strong {
+  color: #171717;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.trust-item span {
+  color: #777;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+        .purchase-stock {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 24px;
+  color: #222;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.purchase-stock::before {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #228b45;
+  box-shadow: 0 0 0 5px rgba(34, 139, 69, 0.1);
+  content: "";
+}
+
+       .purchase-main-actions {
+  display: grid;
+  gap: 11px;
+  margin-top: 18px;
+}
 
         .purchase-secondary-actions {
           display: grid;
@@ -468,15 +700,21 @@ return (
         }
 
         @media (max-width: 700px) {
-          .purchase-panel {
-            width: 100%;
-            padding: 27px 20px;
-            border-radius: 29px;
-          }
+         .purchase-panel {
+  width: 100%;
+}
+            .purchase-saving-card {
+  gap: 14px;
+  padding: 18px;
+}
 
-          h1 {
-            font-size: 43px;
-          }
+.purchase-saving-column strong {
+  font-size: 17px;
+}
+
+.purchase-saving-result strong {
+  font-size: 19px;
+}
 
           .purchase-price {
             margin-top: 24px;
@@ -498,7 +736,6 @@ return (
   .purchase-secondary-actions button {
     transition: none;
   }
-}
         }
       `}</style>
        </GlassCard>

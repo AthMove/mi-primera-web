@@ -256,16 +256,12 @@ const { data: otherUser } = await supabase
 </h2>
 
 <div style={productChipStyle}>
-  <Image
-    src={safeImage(product?.image)}
-    alt={product?.title}
-    width={44}
-    height={44}
-    style={{
-      borderRadius: 12,
-      objectFit: "cover",
-    }}
-  />
+<Image
+  src={safeImage(product?.image)}
+  alt={`Producto ${product?.title || "ATHMOV"}`}
+  width={44}
+  height={44}
+/>
 
   <div style={{ flex: 1 }}>
     <div style={productNameStyle}>

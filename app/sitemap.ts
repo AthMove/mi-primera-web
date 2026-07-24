@@ -8,6 +8,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${baseUrl}`,
       lastModified: new Date(),
     },
+    {
+  url: `${baseUrl}`,
+  lastModified: new Date(),
+  changeFrequency: "daily",
+  priority: 1,
+},
 
     {
       url: `${baseUrl}/blog`,
@@ -19,6 +25,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${baseUrl}/blog/golf`,
       lastModified: new Date(),
     },
+    {
+  url: `${baseUrl}/blog/golf`,
+  lastModified: new Date(),
+  changeFrequency: "weekly",
+  priority: 0.9,
+},
     {
       url: `${baseUrl}/blog/padel`,
       lastModified: new Date(),
@@ -45,10 +57,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${baseUrl}/blog/como-verificar-palos-golf-originales`,
       lastModified: new Date(),
     },
-    {
-  url: `${baseUrl}/blog/que-revisar-hierros-golf-segunda-mano`,
-  lastModified: new Date(),
-},
 {
   url: `${baseUrl}/blog/que-revisar-putter-golf-segunda-mano`,
   lastModified: new Date(),
@@ -102,6 +110,60 @@ export default function sitemap(): MetadataRoute.Sitemap {
     {
   url: `${baseUrl}/blog/que-revisar-driver-golf-segunda-mano`,
   lastModified: new Date(),
+},
+{
+  url: `${baseUrl}/blog/cuando-comprar-vender-palos-golf-segunda-mano`,
+  lastModified: new Date(),
+  changeFrequency: "monthly",
+  priority: 0.8,
+},
+{
+  url: `${baseUrl}/products`,
+  lastModified: new Date(),
+  changeFrequency: "daily",
+  priority: 0.95,
+},
+{
+  url: `${baseUrl}/sell`,
+  lastModified: new Date(),
+  changeFrequency: "weekly",
+  priority: 0.95,
+},
+{
+  url: `${baseUrl}/how-it-works`,
+  lastModified: new Date(),
+  changeFrequency: "monthly",
+  priority: 0.8,
+},
+{
+  url: `${baseUrl}/buyer-guide`,
+  lastModified: new Date(),
+  changeFrequency: "monthly",
+  priority: 0.8,
+},
+{
+  url: `${baseUrl}/golf`,
+  lastModified: new Date(),
+  changeFrequency: "daily",
+  priority: 0.9,
+},
+{
+  url: `${baseUrl}/padel`,
+  lastModified: new Date(),
+  changeFrequency: "daily",
+  priority: 0.9,
+},
+{
+  url: `${baseUrl}/tenis`,
+  lastModified: new Date(),
+  changeFrequency: "daily",
+  priority: 0.9,
+},
+{
+  url: `${baseUrl}/running`,
+  lastModified: new Date(),
+  changeFrequency: "daily",
+  priority: 0.9,
 },
   ];
 }

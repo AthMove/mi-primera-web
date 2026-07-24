@@ -1,133 +1,102 @@
-"use client";
+import type { Metadata } from "next";
+import HomeClient from "@/components/home/HomeClient";
+import "./home.css";
 
-import { useEffect } from "react";
-import HeroSection from "@/components/home/HeroSection";
-import EditorialSection from "@/components/home/EditorialSection";
-import LatestDropsSection from "@/components/home/LatestDropsSection";
-import FollowedSellersSection from "@/components/home/FollowedSellersSection";
-import FollowedSellerProductsSection from "@/components/home/sections/FollowedSellerProductsSection";
-import WhyAthmovSection from "@/components/home/sections/WhyAthmovSection";
-import CategoriesSection from "@/components/home/sections/CategoriesSection";
-import PopularBrandsSection from "@/components/home/sections/PopularBrandsSection";
-import SoldProductsSection from "@/components/home/sections/SoldProductsSection";
-import BlogSection from "@/components/home/sections/BlogSection";
-import SellerCTASection from "@/components/home/sections/SellerCTASection";
-import FooterSection from "@/components/home/sections/FooterSection";
-import { useHomeData } from "@/components/home/hooks/useHomeData";
-import { useIsMobile } from "@/components/home/hooks/useIsMobile";
-import { useScrollY } from "@/components/home/hooks/useScrollY";
-import "./home.css"
+export const metadata: Metadata = {
+  title:
+    "Marketplace de material deportivo premium de segunda mano",
 
+  description:
+    "Compra y vende palas de pádel, palos de golf, raquetas de tenis y material de running premium de segunda mano con pagos seguros y vendedores verificados.",
 
+  alternates: {
+    canonical: "https://athmov.com",
+  },
+
+  openGraph: {
+    title:
+      "ATHMOV | Material deportivo premium de segunda mano",
+
+    description:
+      "Compra y vende material de pádel, golf, tenis y running premium de segunda mano.",
+
+    url: "https://athmov.com",
+
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "ATHMOV, marketplace de material deportivo premium",
+      },
+    ],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+
+    title:
+      "ATHMOV | Material deportivo premium de segunda mano",
+
+    description:
+      "Compra y vende material de pádel, golf, tenis y running premium de segunda mano.",
+
+    images: ["/og-image.jpg"],
+  },
+};
+
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "ATHMOV",
+  url: "https://athmov.com",
+  logo: "https://athmov.com/logo.png",
+  description:
+    "Marketplace de material deportivo premium de segunda mano.",
+  contactPoint: {
+    "@type": "ContactPoint",
+    email: "contact@athmov.com",
+    contactType: "customer service",
+    availableLanguage: ["Spanish", "English"],
+  },
+};
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "ATHMOV",
+  url: "https://athmov.com",
+  description:
+    "Marketplace de material deportivo premium de segunda mano.",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: {
+      "@type": "EntryPoint",
+      urlTemplate:
+        "https://athmov.com/products?search={search_term_string}",
+    },
+    "query-input": "required name=search_term_string",
+  },
+};
 
 export default function Home() {
-
-const {
-  loadingHome,
-  newDrops,
-  soldProducts,
-  followedSellers,
-  followedSellerProducts,
-} = useHomeData();
-
-  const isMobile = useIsMobile();
- const scrollY = useScrollY();
-
-
-useEffect(() => {
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-         const originalDelay =
-  Number(entry.target.getAttribute("data-delay")) || 0;
-
-const delay = window.innerWidth <= 768
-  ? Math.min(originalDelay, 80)
-  : originalDelay;
-
-          setTimeout(() => {
-            entry.target.classList.add("visible");
-          }, delay);
-
-          observer.unobserve(entry.target);
-        }
-      });
-    },
-    {
-      threshold: 0.15,
-    }
-  );
-
-  document.querySelectorAll(".fade-up").forEach((el) => observer.observe(el));
-
-  return () => observer.disconnect();
-}, []);
-
   return (
-    <main style={pageStyle} className="home-page">
-      <div className="ambient-light" />
-    
-    <HeroSection
-  isMobile={isMobile}
-  scrollY={scrollY}
-/>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(organizationSchema),
+        }}
+      />
 
-<EditorialSection
-  isMobile={isMobile}
-/>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(websiteSchema),
+        }}
+      />
 
-<LatestDropsSection
-  isMobile={isMobile}
-  products={newDrops}
-  loading={loadingHome}
-/>
-
-<FollowedSellerProductsSection
-  isMobile={isMobile}
-  products={followedSellerProducts}
-/>
-
-<FollowedSellersSection
-  isMobile={isMobile}
-  sellers={followedSellers}
-/>
-
-<WhyAthmovSection
-  isMobile={isMobile}
-/>
-
-<CategoriesSection
-  isMobile={isMobile}
-/>
-
- <PopularBrandsSection isMobile={isMobile} />
-
-    <SoldProductsSection
-  isMobile={isMobile}
-  soldProducts={soldProducts}
-/>
-
-   <BlogSection isMobile={isMobile} />
-
-<SellerCTASection
-  isMobile={isMobile}
-/>
-
-<FooterSection isMobile={isMobile} />
-
-    </main>
+      <HomeClient />
+    </>
   );
 }
-
-const pageStyle = {
-  minHeight: "100vh",
-  background: `
-radial-gradient(circle at 15% 15%, rgba(201,175,92,.08), transparent 28%),
-radial-gradient(circle at 85% 30%, rgba(255,255,255,.35), transparent 26%),
-radial-gradient(circle at 40% 85%, rgba(220,220,220,.22), transparent 30%),
-linear-gradient(to bottom,#f8f8f4,#eeeeea)
-`,
-  fontFamily: "Inter, sans-serif",
-  color: "#111",
-};

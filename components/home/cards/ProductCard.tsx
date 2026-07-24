@@ -30,7 +30,9 @@ export default function ProductCard({
 );
   const [imageError, setImageError] = useState(false);
 
-  const productUrl = `/products/${product?.id}`;
+ const productUrl = product?.slug
+  ? `/p/${product.slug}`
+  : `/products/${product?.id}`;
 
   const safeImage = (src?: string) => {
     if (src?.startsWith("http") || src?.startsWith("/")) {
@@ -46,11 +48,24 @@ export default function ProductCard({
     product?.image_url ||
     product?.photo_url;
 
-  const formattedPrice = new Intl.NumberFormat("es-ES", {
-    style: "currency",
-    currency: "EUR",
-    maximumFractionDigits: 0,
-  }).format(Number(product?.price) || 0);
+const currentPrice = Number(product?.price) || 0;
+const originalPrice = Number(product?.original_price) || 0;
+
+const hasSaving =
+  originalPrice > currentPrice &&
+  currentPrice > 0;
+
+const savingPercentage = hasSaving
+  ? Math.round(
+      ((originalPrice - currentPrice) / originalPrice) * 100
+    )
+  : 0;
+
+const formattedPrice = new Intl.NumberFormat("es-ES", {
+  style: "currency",
+  currency: "EUR",
+  maximumFractionDigits: 0,
+}).format(currentPrice);
 
   const rating = Number(
   product?.rating ??
@@ -65,10 +80,11 @@ const reviewsCount =
   product?.review_count ??
   0;
 
-  const openProduct = () => {
-    if (!product?.id) return;
-    router.push(productUrl);
-  };
+const openProduct = () => {
+  if (!product?.slug && !product?.id) return;
+
+  router.push(productUrl);
+};
 
   const handleKeyboard = (event: KeyboardEvent<HTMLElement>) => {
     if (event.key === "Enter" || event.key === " ") {
@@ -187,8 +203,8 @@ className={`athmov-product-card ${
             {product?.featured
   ? "Destacado"
   : product?.seller_verified
-    ? "ATHMOV Verified"
-    : "Recién añadido"}
+    ? "Verificado"
+    : "Nuevo"}
           </span>
 
           {showFavorite && (
@@ -235,7 +251,7 @@ className={`athmov-product-card ${
           <div className="athmov-image-overlay" />
 
           <span className="athmov-view-product">
-            Ver producto
+            Descubrir
 
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M5 12h14M13 6l6 6-6 6" />
@@ -252,15 +268,40 @@ className={`athmov-product-card ${
           }}
         >
           <div className="athmov-product-topline">
-            <p className="athmov-product-brand">
-              {product?.brand || "ATHMOV"}
-            </p>
+        <p
+  className="athmov-product-brand"
+  onClick={(e) => {
+    e.stopPropagation();
 
-            {product?.category && (
-              <span className="athmov-product-category">
-                {product.category}
-              </span>
-            )}
+    if (!product?.brand) return;
+
+    router.push(
+      `/brand/${String(product.brand)
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")}`
+    );
+  }}
+>
+  {product?.brand || "ATHMOV"}
+</p>
+
+{product?.category && (
+  <span
+    className="athmov-product-category"
+    onClick={(e) => {
+      e.stopPropagation();
+
+      router.push(
+        `/${String(product.category).toLowerCase()}`
+      );
+    }}
+  >
+    {product.category}
+  </span>
+)}
           </div>
 
           <h3
@@ -297,27 +338,31 @@ className={`athmov-product-card ${
 )}
 
           <div className="athmov-price-row">
-            <p
-              className="athmov-product-price"
-              style={{
-                fontSize: isMobile ? "27px" : "31px",
-              }}
-            >
-              {formattedPrice}
-            </p>
+  <p
+    className="athmov-product-price"
+    style={{
+      fontSize: isMobile ? "27px" : "31px",
+    }}
+  >
+    {formattedPrice}
+  </p>
 
-            {product?.original_price &&
-              Number(product.original_price) >
-                Number(product.price) && (
-                <p className="athmov-original-price">
-                  {new Intl.NumberFormat("es-ES", {
-                    style: "currency",
-                    currency: "EUR",
-                    maximumFractionDigits: 0,
-                  }).format(Number(product.original_price))}
-                </p>
-              )}
-          </div>
+  {hasSaving && (
+    <div className="athmov-price-saving">
+      <p className="athmov-original-price">
+        {new Intl.NumberFormat("es-ES", {
+          style: "currency",
+          currency: "EUR",
+          maximumFractionDigits: 0,
+        }).format(originalPrice)}
+      </p>
+
+      <span className="athmov-saving-badge">
+        −{savingPercentage}%
+      </span>
+    </div>
+  )}
+</div>
 
           <div className="athmov-product-divider" />
 
@@ -434,7 +479,9 @@ className={`athmov-product-card ${
         }
 
         .athmov-product-card:hover {
-          transform: translateY(-8px);
+          transform:
+translateY(-10px)
+scale(1.01);
           border-color: rgba(17, 17, 17, 0.12);
           box-shadow:
             0 2px 4px rgba(0, 0, 0, 0.02),
@@ -505,6 +552,8 @@ className={`athmov-product-card ${
           border-color: rgba(24, 24, 24, 0.8);
           background: rgba(20, 20, 20, 0.92);
           color: #ffffff;
+          outline:
+2px solid rgba(0,0,0,.05);
         }
 
         .athmov-badge-dot {
@@ -554,6 +603,33 @@ className={`athmov-product-card ${
   fill: currentColor;
   animation: favoritePop 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
+  .athmov-price-saving{
+display:flex;
+align-items:center;
+gap:8px;
+}
+
+.athmov-saving-badge{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+
+height:20px;
+
+padding:0 8px;
+
+border-radius:999px;
+
+background:#111;
+
+color:#fff;
+
+font-size:9px;
+
+font-weight:700;
+
+letter-spacing:.05em;
+}
 
 @keyframes favoritePop {
   0% {
@@ -589,7 +665,9 @@ className={`athmov-product-card ${
         }
 
         .athmov-product-card:hover .athmov-product-image {
-         transform: scale(1.06);
+        transform:
+scale(1.08)
+rotate(-1deg);
         }
 
         .athmov-image-overlay {
@@ -702,7 +780,22 @@ className={`athmov-product-card ${
           font-weight: 630;
           line-height: 1;
           letter-spacing: -0.055em;
+          animation:
+priceReveal .6s ease;
         }
+@keyframes priceReveal{
+
+from{
+opacity:0;
+transform:translateY(12px);
+}
+
+to{
+opacity:1;
+transform:translateY(0);
+}
+
+}
 
         .athmov-original-price {
           margin: 0;

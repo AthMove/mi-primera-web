@@ -369,14 +369,19 @@ const trustLabel =
   reviews={reviews}
 />
 
-<section style={sectionStyle}>
-  <SellerTabs
-    activeTab={activeTab}
-    activeCount={activeCount}
-    soldCount={soldCount}
-    totalReviews={totalReviews}
-    onChange={setActiveTab}
-  />
+<section
+  style={sectionStyle}
+  className="seller-tabs-section"
+>
+  <div className="seller-tabs-sticky">
+    <SellerTabs
+      activeTab={activeTab}
+      activeCount={activeCount}
+      soldCount={soldCount}
+      totalReviews={totalReviews}
+      onChange={setActiveTab}
+    />
+  </div>
 </section>
 
 {activeTab === "active" && (
@@ -413,9 +418,26 @@ const trustLabel =
 )}
 
       <style>{`
+      .seller-tabs-section {
+  position: relative;
+  z-index: 20;
+}
+
+.seller-tabs-sticky {
+  position: sticky;
+  top: 92px;
+  z-index: 20;
+  padding: 10px;
+  border: 1px solid rgba(17, 17, 17, 0.07);
+  border-radius: 28px;
+  background: rgba(250, 250, 248, 0.86);
+  box-shadow: 0 20px 65px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
 
 @media (max-width:700px) {
-}
+
       .seller-breadcrumb {
   display: flex;
   align-items: center;
@@ -424,6 +446,11 @@ const trustLabel =
   margin: 0 auto 20px;
   font-size: 13px;
   color: #777;
+}
+  .seller-tabs-sticky {
+  top: 76px;
+  padding: 7px;
+  border-radius: 22px;
 }
 
 .seller-breadcrumb span:not(.seller-breadcrumb-separator) {
@@ -575,31 +602,7 @@ linear-gradient(
 
 const sectionStyle = {
   maxWidth: "1280px",
- margin: "90px auto 0",
-};
-
-const sectionHeaderStyle = {
-  marginBottom: "26px",
-};
-
-const sectionEyebrowStyle = {
-  fontSize: "11px",
-  letterSpacing: "3px",
-  opacity: 0.5,
-  marginBottom: "8px",
-};
-
-const sectionTitleStyle = {
-  fontSize: "48px",
-  letterSpacing: "-2px",
-  margin: 0,
-};
-
-const emptyStyle = {
-  background: "#fff",
-  borderRadius: "30px",
-  padding: "30px",
-  color: "#666",
+  margin: "64px auto 0",
 };
 
 const floatingStatsStyle = {

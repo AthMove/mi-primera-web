@@ -54,6 +54,82 @@ export default function SellerPremiumCard({
       ? Math.max(0, Math.min(5, Math.round(averageRating)))
       : 0;
 
+      const positiveReviews = reviews.filter(
+  (review) => Number(review.rating) >= 4
+).length;
+
+const positivePercentage = reviews.length
+  ? Math.round((positiveReviews / reviews.length) * 100)
+  : null;
+
+const verificationPoints = seller?.seller_verified ? 2 : 0;
+
+const ratingPoints =
+  averageRating !== null
+    ? Math.min(2, (averageRating / 5) * 2)
+    : 0;
+
+const salesPoints =
+  sales >= 100
+    ? 2
+    : sales >= 50
+      ? 1.6
+      : sales >= 20
+        ? 1.2
+        : sales >= 5
+          ? 0.7
+          : sales > 0
+            ? 0.3
+            : 0;
+
+const responseText = responseTime.toLowerCase();
+
+const responsePoints =
+  responseText.includes("min") ||
+  responseText.includes("< 1") ||
+  responseText.includes("menos de 1")
+    ? 2
+    : responseText.includes("hora")
+      ? 1.4
+      : responseText.includes("día") ||
+          responseText.includes("dia")
+        ? 0.7
+        : 0.4;
+
+const reviewPoints =
+  positivePercentage !== null
+    ? positivePercentage >= 98
+      ? 2
+      : positivePercentage >= 90
+        ? 1.6
+        : positivePercentage >= 80
+          ? 1.1
+          : positivePercentage >= 70
+            ? 0.6
+            : 0.3
+    : 0.5;
+
+const trustScore = Math.min(
+  10,
+  verificationPoints +
+    ratingPoints +
+    salesPoints +
+    responsePoints +
+    reviewPoints
+);
+
+const trustScoreFormatted = trustScore.toFixed(1);
+const trustPercentage = Math.round(trustScore * 10);
+
+const trustLabel =
+  trustScore >= 9
+    ? "Confianza excelente"
+    : trustScore >= 7.5
+      ? "Confianza alta"
+      : trustScore >= 6
+        ? "Confianza sólida"
+        : "Vendedor en crecimiento";
+
   const goToSellerProfile = () => {
     if (!seller?.id) return;
 
@@ -188,6 +264,51 @@ export default function SellerPremiumCard({
             <span>Miembro desde</span>
           </div>
         </div>
+
+        <div className="seller-trust-score">
+  <div className="seller-trust-score-heading">
+    <div>
+      <span className="seller-trust-score-eyebrow">
+        ATHMOV TRUST SCORE
+      </span>
+
+      <strong>{trustLabel}</strong>
+    </div>
+
+    <div className="seller-trust-score-value">
+      <strong>{trustScoreFormatted}</strong>
+      <span>/ 10</span>
+    </div>
+  </div>
+
+  <div
+    className="seller-trust-score-track"
+    role="progressbar"
+    aria-label={`Trust Score ${trustScoreFormatted} sobre 10`}
+    aria-valuemin={0}
+    aria-valuemax={10}
+    aria-valuenow={trustScore}
+  >
+    <span
+      className="seller-trust-score-progress"
+      style={{ width: `${trustPercentage}%` }}
+    />
+  </div>
+
+  <div className="seller-trust-score-details">
+    <span>
+      {seller?.seller_verified
+        ? "Identidad verificada"
+        : "Identidad pendiente"}
+    </span>
+
+    <span>
+      {positivePercentage !== null
+        ? `${positivePercentage}% reseñas positivas`
+        : "Sin reseñas todavía"}
+    </span>
+  </div>
+</div>
 
         <div className="seller-last-active">
           <span className="seller-online-dot" />
@@ -514,6 +635,98 @@ export default function SellerPremiumCard({
           letter-spacing: 0.7px;
         }
 
+        .seller-trust-score {
+  margin-top: 16px;
+  padding: 23px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 22px;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.09),
+      rgba(255, 255, 255, 0.035)
+    );
+}
+
+.seller-trust-score-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.seller-trust-score-heading > div:first-child {
+  display: grid;
+  gap: 7px;
+}
+
+.seller-trust-score-eyebrow {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.seller-trust-score-heading > div:first-child strong {
+  color: #fff;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.seller-trust-score-value {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.seller-trust-score-value strong {
+  color: #fff;
+  font-size: 36px;
+  font-weight: 550;
+  line-height: 0.9;
+  letter-spacing: -0.055em;
+}
+
+.seller-trust-score-value span {
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.seller-trust-score-track {
+  position: relative;
+  height: 8px;
+  margin-top: 22px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.seller-trust-score-progress {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.62),
+    #ffffff
+  );
+  box-shadow: 0 0 22px rgba(255, 255, 255, 0.25);
+  transition: width 850ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.seller-trust-score-details {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 13px;
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 10px;
+  font-weight: 550;
+}
+
         .seller-last-active {
           display: flex;
           align-items: center;
@@ -631,6 +844,20 @@ export default function SellerPremiumCard({
           .seller-section-header h2 {
             font-size: 28px;
           }
+
+          .seller-trust-score {
+  padding: 19px;
+}
+
+.seller-trust-score-value strong {
+  font-size: 31px;
+}
+
+.seller-trust-score-details {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 6px;
+}
 
           .seller-premium-card {
             padding: 27px 18px;

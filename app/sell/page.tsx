@@ -15,6 +15,15 @@ const PREMIUM_BRANDS: Record<string, string[]> = {
 const SPORTS = ["PADEL", "GOLF", "TENNIS", "RUNNING"];
 const GENDERS = ["MEN", "WOMEN", "UNISEX", "JUNIOR"];
 
+function generateSlug(title: string) {
+  return title
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export default function SellPage() {
   const router = useRouter();
 
@@ -140,11 +149,17 @@ export default function SellPage() {
         imageUrl = data.publicUrl;
       }
 
-     const { data, error } = await supabase
+const productId = crypto.randomUUID();
+
+const productSlug = `${generateSlug(title.trim())}-${productId.slice(0, 8)}`;
+
+const { data, error } = await supabase
   .from("products")
   .insert([
     {
+      id: productId,
       title: title.trim(),
+      slug: productSlug,
       brand,
       category,
       sport: category,
@@ -158,7 +173,7 @@ export default function SellPage() {
       seller_email: user.email,
       sold: false,
       moderation_status: "approved",
-approved_at: new Date().toISOString(),
+      approved_at: new Date().toISOString(),
     },
   ])
   .select()

@@ -26,7 +26,13 @@ export default function RelatedProducts({
           <div
             key={item.id}
             style={relatedCardStyle}
-            onClick={() => router.push(`/products/${item.id}`)}
+            onClick={() =>
+  router.push(
+    item.slug
+      ? `/p/${item.slug}`
+      : `/products/${item.id}`
+  )
+}
           >
             <div style={relatedImageStyle}>
               <Image

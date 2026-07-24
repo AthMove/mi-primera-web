@@ -39,7 +39,7 @@ onToggleFavorite,
 onImageMove,
 onMouseLeave,
 }: ProductGalleryProps) {
-  const [imageLoaded, setImageLoaded] = useState(false);
+ const [loadedImage, setLoadedImage] = useState("");
   const safeImage = (src?: string) => {
     return src?.startsWith("http") || src?.startsWith("/")
       ? src
@@ -52,6 +52,8 @@ onMouseLeave,
   (image) => image === selectedImage
 );
 
+const imageLoaded = loadedImage === selectedImage;
+
 
 useEffect(() => {
   images.forEach((image) => {
@@ -61,6 +63,8 @@ useEffect(() => {
 }, [images]);
 
 const goToPrevious = () => {
+  if (images.length === 0) return;
+
   const index =
     currentIndex <= 0 ? images.length - 1 : currentIndex - 1;
 
@@ -68,6 +72,8 @@ const goToPrevious = () => {
 };
 
 const goToNext = () => {
+  if (images.length === 0) return;
+
   const index =
     currentIndex >= images.length - 1 ? 0 : currentIndex + 1;
 
@@ -93,16 +99,13 @@ useEffect(() => {
     }
   };
 
-  useEffect(() => {
-  setImageLoaded(false);
-}, [selectedImage]);
-
   window.addEventListener("keydown", handleKeyDown);
 
   return () => {
     window.removeEventListener("keydown", handleKeyDown);
   };
-}, [fullscreen, currentIndex]);
+}, [fullscreen, currentIndex, images]);
+
 
   return (
     <div className="product-gallery">
@@ -169,8 +172,8 @@ useEffect(() => {
   className={`product-gallery-image product-gallery-image-fade ${
     imageLoaded ? "is-loaded" : "is-loading"
   }`}
-  onLoad={() => setImageLoaded(true)}
-  onError={() => setImageLoaded(true)}
+  onLoad={() => setLoadedImage(selectedImage)}
+onError={() => setLoadedImage(selectedImage)}
   style={{
     objectPosition: `${mousePosition.x}% ${mousePosition.y}%`,
     transform: `
@@ -659,17 +662,17 @@ transition:
   transform: scale(1.06);
 }
         }
+@media (prefers-reduced-motion: reduce) {
+  .product-gallery-image,
+  .product-gallery-favorite,
+  .product-gallery-thumb {
+    transition: none;
+  }
 
-        @media (prefers-reduced-motion: reduce) {
-          .product-gallery-image,
-          .product-gallery-favorite,
-          .product-gallery-thumb {
-            transition: none;
-            .product-gallery-skeleton-shine {
-  animation: none;
+  .product-gallery-skeleton-shine {
+    animation: none;
+  }
 }
-          }
-        }
         .product-gallery-image-fade {
           animation: imageFade 0.35s ease;
         }

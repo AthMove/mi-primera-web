@@ -8,11 +8,20 @@ import { useLanguage } from "@/components/LanguageProvider";
 import ProductCard from "@/components/home/cards/ProductCard";
 import FeaturedProducts from "@/components/home/FeaturedProducts";
 
-export default function ProductsClient() {
+interface ProductsClientProps {
+  fixedCategory?: string;
+  fixedBrand?: string;
+}
+
+export default function ProductsClient({
+  fixedCategory,
+  fixedBrand,
+}: ProductsClientProps) {
   const router = useRouter();
   const { t } = useLanguage();
   const searchParams = useSearchParams();
-  const categoryFilter = searchParams.get("category");
+ const categoryFilter =
+  fixedCategory || searchParams.get("category");
 
   const [productos, setProductos] = useState<any[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
@@ -59,7 +68,7 @@ export default function ProductsClient() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [categoryFilter]);
+ }, [categoryFilter, fixedBrand]);
 
   async function loadMarketplace() {
     try {
@@ -72,9 +81,13 @@ export default function ProductsClient() {
         .eq("sold", false)
         .eq("moderation_status", "approved");
 
-      if (categoryFilter) {
-        query = query.eq("category", categoryFilter);
-      }
+  if (categoryFilter) {
+  query = query.eq("category", categoryFilter);
+}
+
+if (fixedBrand) {
+  query = query.eq("brand", fixedBrand);
+}
 
       const { data, error } = await query.order("created_at", {
         ascending: false,
@@ -87,14 +100,24 @@ export default function ProductsClient() {
         return;
       }
 
-      const { data: featured } = await supabase
-        .from("products")
-        .select("*")
-        .eq("sold", false)
-        .eq("moderation_status", "approved")
-        .eq("featured", true)
-        .order("created_at", { ascending: false })
-        .limit(3);
+   let featuredQuery = supabase
+  .from("products")
+  .select("*")
+  .eq("sold", false)
+  .eq("moderation_status", "approved")
+  .eq("featured", true);
+
+if (categoryFilter) {
+  featuredQuery = featuredQuery.eq("category", categoryFilter);
+}
+
+if (fixedBrand) {
+  featuredQuery = featuredQuery.eq("brand", fixedBrand);
+}
+
+const { data: featured } = await featuredQuery
+  .order("created_at", { ascending: false })
+  .limit(3);
 
       const { data: posts } = await supabase
         .from("feed_posts")
@@ -214,13 +237,25 @@ export default function ProductsClient() {
             return (
               <button
                 key={category.label}
-                onClick={() => {
-                  if (category.value) {
-                    router.push(`/products?category=${category.value}`);
-                  } else {
-                    router.push("/products");
-                  }
-                }}
+               onClick={() => {
+  const categoryRoutes: Record<string, string> = {
+    Golf: "/golf",
+    Pádel: "/padel",
+    Tenis: "/tenis",
+    Running: "/running",
+    Fitness: "/products?category=Fitness",
+  };
+
+  if (!category.value) {
+    router.push("/products");
+    return;
+  }
+
+  router.push(
+    categoryRoutes[category.value] ||
+      `/products?category=${encodeURIComponent(category.value)}`
+  );
+}}
                 style={{
                   ...categoryButtonStyle,
                   ...(active ? activeCategoryButtonStyle : {}),
@@ -261,9 +296,13 @@ export default function ProductsClient() {
           <div>
             <p style={eyebrowStyle}>MARKETPLACE</p>
 
-            <h2 style={sectionTitleStyle}>
-              {categoryFilter ? categoryFilter : t.allProducts}
-            </h2>
+         <h2 style={sectionTitleStyle}>
+  {fixedBrand
+    ? fixedBrand
+    : categoryFilter
+      ? categoryFilter
+      : t.allProducts}
+</h2>
           </div>
 
           <p style={countStyle}>
@@ -278,7 +317,9 @@ export default function ProductsClient() {
           <div style={emptyStyle}>{t.productsLoading}</div>
         ) : filteredProducts.length === 0 ? (
           <div style={emptyStyle}>
-            {t.noProducts}
+            {fixedBrand
+  ? `Todavía no hay productos ${fixedBrand} disponibles.`
+  : t.noProducts}
           </div>
         ) : (
           <div style={gridStyle}>
