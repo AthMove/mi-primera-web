@@ -4,199 +4,393 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
+interface ProfileState {
+  username: string;
+  full_name: string;
+  bio: string;
+  location: string;
+  avatar_url: string;
+  email: string;
+  stripe_account_id: string;
+  stripe_onboarding_complete: boolean;
+  stripe_charges_enabled: boolean;
+  stripe_payouts_enabled: boolean;
+}
+
+interface StripeStatusResponse {
+  connected?: boolean;
+  accountId?: string;
+  onboardingComplete?: boolean;
+  chargesEnabled?: boolean;
+  payoutsEnabled?: boolean;
+  transfersActive?: boolean;
+  transfersCapability?: string | null;
+  disabledReason?: string | null;
+  requirementsCurrentlyDue?: string[];
+  requirementsPastDue?: string[];
+  requirementsEventuallyDue?: string[];
+  error?: string;
+}
+
+const emptyProfile: ProfileState = {
+  username: "",
+  full_name: "",
+  bio: "",
+  location: "",
+  avatar_url: "",
+  email: "",
+  stripe_account_id: "",
+  stripe_onboarding_complete: false,
+  stripe_charges_enabled: false,
+  stripe_payouts_enabled: false,
+};
+
 export default function AccountPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [checkingStripe, setCheckingStripe] = useState(false);
+  const [connectingStripe, setConnectingStripe] = useState(false);
+  const [userId, setUserId] = useState("");
 
-  const [profile, setProfile] = useState({
-    username: "",
-    full_name: "",
-    bio: "",
-    location: "",
-    avatar_url: "",
-    email: "",
-    stripe_account_id: "",
-    stripe_onboarding_complete: false,
-    stripe_charges_enabled: false,
-    stripe_payouts_enabled: false,
-  });
+  const [profile, setProfile] =
+    useState<ProfileState>(emptyProfile);
 
   useEffect(() => {
-    loadProfile();
+    void loadProfile();
   }, []);
 
-  const syncStripeStatus = async (userId: string) => {
+  const syncStripeStatus = async (
+    currentUserId: string
+  ): Promise<StripeStatusResponse | null> => {
     try {
       setCheckingStripe(true);
 
-      await fetch("/api/stripe/connect/status", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userId }),
-      });
+      const response = await fetch(
+        "/api/stripe/connect/status",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: currentUserId,
+          }),
+          cache: "no-store",
+        }
+      );
+
+      const data: StripeStatusResponse =
+        await response.json();
+
+      console.log("ESTADO REAL DE STRIPE:", data);
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ||
+            "No se pudo comprobar el estado de Stripe"
+        );
+      }
+
+      return data;
     } catch (error) {
-      console.log("ERROR AL SINCRONIZAR STRIPE:", error);
+      console.error(
+        "ERROR AL SINCRONIZAR STRIPE:",
+        error
+      );
+
+      return null;
     } finally {
       setCheckingStripe(false);
     }
   };
 
   const loadProfile = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    try {
+      setLoading(true);
 
-    if (!user) {
-      window.location.href = "/auth";
-      return;
-    }
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
 
-    await syncStripeStatus(user.id);
+      if (userError) {
+        console.error(
+          "ERROR OBTENIENDO USUARIO:",
+          userError
+        );
+        return;
+      }
 
-    const { data } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .maybeSingle();
+      if (!user) {
+        console.error("USUARIO NO AUTENTICADO");
+        return;
+      }
 
-    if (!data) {
-      await supabase.from("profiles").insert([
-        {
-          id: user.id,
-          email: user.email,
-        },
-      ]);
+      setUserId(user.id);
+
+      const {
+        data: profileData,
+        error: profileError,
+      } = await supabase
+        .from("profiles")
+        .select(
+          `
+          username,
+          full_name,
+          bio,
+          location,
+          avatar_url,
+          email,
+          stripe_account_id,
+          stripe_onboarding_complete,
+          stripe_charges_enabled,
+          stripe_payouts_enabled
+          `
+        )
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (profileError) {
+        console.error(
+          "ERROR AL CARGAR PERFIL:",
+          profileError
+        );
+        return;
+      }
+
+      /*
+        Consultamos Stripe después de obtener el perfil.
+
+        La respuesta directa de Stripe tiene prioridad sobre
+        los valores guardados en Supabase.
+      */
+      const stripeStatus =
+        await syncStripeStatus(user.id);
+
+      console.log(
+        "STRIPE SINCRONIZADO:",
+        stripeStatus
+      );
+
+      const stripeConnected =
+        stripeStatus?.connected === true;
 
       setProfile({
-        username: "",
-        full_name: "",
-        bio: "",
-        location: "",
-        avatar_url: "",
-        email: user.email || "",
-        stripe_account_id: "",
-        stripe_onboarding_complete: false,
-        stripe_charges_enabled: false,
-        stripe_payouts_enabled: false,
+        username: profileData?.username || "",
+        full_name: profileData?.full_name || "",
+        bio: profileData?.bio || "",
+        location: profileData?.location || "",
+        avatar_url: profileData?.avatar_url || "",
+        email:
+          profileData?.email ||
+          user.email ||
+          "",
+
+        stripe_account_id:
+          stripeStatus?.accountId ||
+          profileData?.stripe_account_id ||
+          "",
+
+        stripe_onboarding_complete:
+          stripeConnected
+            ? stripeStatus?.onboardingComplete === true
+            : profileData?.stripe_onboarding_complete ===
+              true,
+
+        stripe_charges_enabled:
+          stripeConnected
+            ? stripeStatus?.chargesEnabled === true
+            : profileData?.stripe_charges_enabled === true,
+
+        stripe_payouts_enabled:
+          stripeConnected
+            ? stripeStatus?.payoutsEnabled === true
+            : profileData?.stripe_payouts_enabled === true,
       });
-
+    } catch (error) {
+      console.error(
+        "ERROR GENERAL AL CARGAR PERFIL:",
+        error
+      );
+    } finally {
       setLoading(false);
-      return;
     }
-
-    setProfile({
-      username: data.username || "",
-      full_name: data.full_name || "",
-      bio: data.bio || "",
-      location: data.location || "",
-      avatar_url: data.avatar_url || "",
-      email: data.email || user.email || "",
-      stripe_account_id: data.stripe_account_id || "",
-      stripe_onboarding_complete: data.stripe_onboarding_complete || false,
-      stripe_charges_enabled: data.stripe_charges_enabled || false,
-      stripe_payouts_enabled: data.stripe_payouts_enabled || false,
-    });
-
-    setLoading(false);
   };
 
   const startStripeOnboarding = async () => {
     try {
+      setConnectingStripe(true);
+
       const {
         data: { user },
+        error: userError,
       } = await supabase.auth.getUser();
 
+      if (userError) {
+        throw new Error(userError.message);
+      }
+
       if (!user) {
-        window.location.href = "/auth";
+        alert(
+          "Debes iniciar sesión para conectar Stripe"
+        );
         return;
       }
 
-      const response = await fetch("/api/connect/create-account", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          email: user.email,
-          origin: window.location.origin,
-        }),
-      });
+      const response = await fetch(
+        "/api/stripe/connect/create-account",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: user.id,
+            email: user.email,
+          }),
+        }
+      );
 
       const data = await response.json();
+
+      console.log(
+        "RESPUESTA ONBOARDING STRIPE:",
+        data
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ||
+            "No se pudo iniciar la conexión con Stripe"
+        );
+      }
 
       if (data.url) {
         window.location.href = data.url;
         return;
       }
 
-      alert(data.error || "No se pudo iniciar la conexión con Stripe");
+      throw new Error(
+        data.error ||
+          "Stripe no devolvió un enlace de configuración"
+      );
     } catch (error) {
-      console.log(error);
-      alert("No se pudo conectar Stripe");
+      console.error(
+        "ERROR CONECTANDO STRIPE:",
+        error
+      );
+
+      alert(
+        error instanceof Error
+          ? error.message
+          : "No se pudo conectar Stripe"
+      );
+    } finally {
+      setConnectingStripe(false);
     }
   };
 
   const saveProfile = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) return;
-
     try {
       setSaving(true);
 
-      const { error } = await supabase.from("profiles").upsert(
-        {
-          id: user.id,
-          email: user.email,
-          username: profile.username.trim(),
-          full_name: profile.full_name.trim(),
-          bio: profile.bio.trim(),
-          location: profile.location.trim(),
-          avatar_url: profile.avatar_url.trim(),
-        },
-        {
-          onConflict: "id",
-        }
-      );
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError) {
+        alert(userError.message);
+        return;
+      }
+
+      if (!user) {
+        alert("Debes iniciar sesión");
+        return;
+      }
+
+      const { error } = await supabase
+        .from("profiles")
+        .upsert(
+          {
+            id: user.id,
+            email: user.email,
+            username: profile.username.trim(),
+            full_name: profile.full_name.trim(),
+            bio: profile.bio.trim(),
+            location: profile.location.trim(),
+            avatar_url:
+              profile.avatar_url.trim(),
+          },
+          {
+            onConflict: "id",
+          }
+        );
 
       if (error) {
         alert(error.message);
         return;
       }
 
-      alert("Perfil actualizado correctamente");
+      alert(
+        "Perfil actualizado correctamente"
+      );
+
       await loadProfile();
+    } catch (error) {
+      console.error(
+        "ERROR GUARDANDO PERFIL:",
+        error
+      );
+
+      alert(
+        "No se pudo actualizar el perfil"
+      );
     } finally {
       setSaving(false);
     }
   };
 
   const safeAvatar = (src: string) => {
-    return src?.startsWith("http") || src?.startsWith("/") ? src : "/logo.png";
+    if (
+      src?.startsWith("http") ||
+      src?.startsWith("/")
+    ) {
+      return src;
+    }
+
+    return "/logo.png";
   };
 
-  const stripeReady =
+  const stripeReady = Boolean(
     profile.stripe_account_id &&
-    profile.stripe_onboarding_complete &&
-    profile.stripe_charges_enabled &&
-    profile.stripe_payouts_enabled;
+      profile.stripe_onboarding_complete &&
+      profile.stripe_charges_enabled &&
+      profile.stripe_payouts_enabled
+  );
 
   if (loading) {
-    return <main style={loadingStyle}>Cargando perfil...</main>;
+    return (
+      <main style={loadingStyle}>
+        Cargando perfil...
+      </main>
+    );
   }
 
   return (
-    <main style={pageStyle} className="account-page">
+    <main
+      style={pageStyle}
+      className="account-page"
+    >
       <section style={heroStyle}>
-        <p style={eyebrowStyle}>PERFIL ATHMOV</p>
+        <p style={eyebrowStyle}>
+          PERFIL ATHMOV
+        </p>
 
-        <h1 style={titleStyle} className="account-title">
+        <h1
+          style={titleStyle}
+          className="account-title"
+        >
           Tu cuenta
         </h1>
 
@@ -205,58 +399,103 @@ export default function AccountPage() {
         </p>
       </section>
 
-      <section style={layoutStyle} className="account-layout">
+      <section
+        style={layoutStyle}
+        className="account-layout"
+      >
         <div style={avatarCardStyle}>
           <div style={avatarWrapperStyle}>
             <Image
-              src={safeAvatar(profile.avatar_url)}
+              src={safeAvatar(
+                profile.avatar_url
+              )}
               alt="Avatar"
               fill
               sizes="220px"
-              style={{ objectFit: "cover" }}
+              style={{
+                objectFit: "cover",
+              }}
             />
           </div>
 
           <input
             value={profile.avatar_url}
-            onChange={(e) =>
-              setProfile({
-                ...profile,
-                avatar_url: e.target.value,
-              })
+            onChange={(event) =>
+              setProfile((currentProfile) => ({
+                ...currentProfile,
+                avatar_url:
+                  event.target.value,
+              }))
             }
             placeholder="URL de imagen de perfil"
             style={inputStyle}
           />
 
           <p style={helperStyle}>
-            Pega una URL de imagen para tu foto de perfil.
+            Pega una URL de imagen para tu foto
+            de perfil.
           </p>
 
           <div style={stripeBoxStyle}>
-            <p style={stripeTitleStyle}>Estado de Stripe</p>
+            <p style={stripeTitleStyle}>
+              Estado de Stripe
+            </p>
 
             {stripeReady ? (
-              <p style={stripeOkStyle}>Pagos activos ✓</p>
+              <p style={stripeOkStyle}>
+                Pagos activos ✓
+              </p>
             ) : profile.stripe_account_id ? (
-              <p style={stripePendingStyle}>Configuración pendiente</p>
+              <p style={stripePendingStyle}>
+                Configuración pendiente
+              </p>
             ) : (
-              <p style={stripePendingStyle}>Stripe no conectado</p>
+              <p style={stripePendingStyle}>
+                Stripe no conectado
+              </p>
+            )}
+
+            {profile.stripe_account_id && (
+              <div style={stripeDetailsStyle}>
+                <span>
+                  Formulario:{" "}
+                  {profile.stripe_onboarding_complete
+                    ? "completado"
+                    : "pendiente"}
+                </span>
+
+                <span>
+                  Cobros:{" "}
+                  {profile.stripe_charges_enabled
+                    ? "activos"
+                    : "pendientes"}
+                </span>
+
+                <span>
+                  Pagos al vendedor:{" "}
+                  {profile.stripe_payouts_enabled
+                    ? "activos"
+                    : "pendientes"}
+                </span>
+              </div>
             )}
           </div>
         </div>
 
         <div style={formCardStyle}>
           <div style={fieldStyle}>
-            <label style={labelStyle}>Usuario</label>
+            <label style={labelStyle}>
+              Usuario
+            </label>
 
             <input
               value={profile.username}
-              onChange={(e) =>
-                setProfile({
-                  ...profile,
-                  username: e.target.value,
-                })
+              onChange={(event) =>
+                setProfile((currentProfile) => ({
+                  ...currentProfile,
+                  username:
+                    event.target.value,
+                }))
               }
               placeholder="@usuario"
               style={inputStyle}
@@ -264,15 +503,18 @@ export default function AccountPage() {
           </div>
 
           <div style={fieldStyle}>
-            <label style={labelStyle}>Nombre completo</label>
+            <label style={labelStyle}>
+              Nombre completo
+            </label>
 
             <input
               value={profile.full_name}
-              onChange={(e) =>
-                setProfile({
-                  ...profile,
-                  full_name: e.target.value,
-                })
+              onChange={(event) =>
+                setProfile((currentProfile) => ({
+                  ...currentProfile,
+                  full_name:
+                    event.target.value,
+                }))
               }
               placeholder="Tu nombre completo"
               style={inputStyle}
@@ -280,15 +522,18 @@ export default function AccountPage() {
           </div>
 
           <div style={fieldStyle}>
-            <label style={labelStyle}>Ubicación</label>
+            <label style={labelStyle}>
+              Ubicación
+            </label>
 
             <input
               value={profile.location}
-              onChange={(e) =>
-                setProfile({
-                  ...profile,
-                  location: e.target.value,
-                })
+              onChange={(event) =>
+                setProfile((currentProfile) => ({
+                  ...currentProfile,
+                  location:
+                    event.target.value,
+                }))
               }
               placeholder="Madrid, España"
               style={inputStyle}
@@ -296,15 +541,17 @@ export default function AccountPage() {
           </div>
 
           <div style={fieldStyle}>
-            <label style={labelStyle}>Biografía</label>
+            <label style={labelStyle}>
+              Biografía
+            </label>
 
             <textarea
               value={profile.bio}
-              onChange={(e) =>
-                setProfile({
-                  ...profile,
-                  bio: e.target.value,
-                })
+              onChange={(event) =>
+                setProfile((currentProfile) => ({
+                  ...currentProfile,
+                  bio: event.target.value,
+                }))
               }
               placeholder="Cuéntale a los compradores quién eres..."
               style={textareaStyle}
@@ -312,28 +559,70 @@ export default function AccountPage() {
           </div>
 
           <div style={buttonsRowStyle}>
-            <button onClick={saveProfile} style={buttonStyle}>
-              {saving ? "Guardando..." : "Guardar perfil"}
+            <button
+              type="button"
+              onClick={saveProfile}
+              style={buttonStyle}
+              disabled={saving}
+            >
+              {saving
+                ? "Guardando..."
+                : "Guardar perfil"}
             </button>
 
             {!profile.stripe_account_id ? (
-              <button onClick={startStripeOnboarding} style={connectButtonStyle}>
-                Conectar pagos de Stripe
+              <button
+                type="button"
+                onClick={
+                  startStripeOnboarding
+                }
+                style={connectButtonStyle}
+                disabled={connectingStripe}
+              >
+                {connectingStripe
+                  ? "Conectando..."
+                  : "Conectar pagos de Stripe"}
               </button>
             ) : stripeReady ? (
               <div style={stripeConnectedStyle}>
                 Pagos de Stripe activos ✓
               </div>
             ) : (
-              <button onClick={startStripeOnboarding} style={connectButtonStyle}>
-                Completar configuración de Stripe
+              <button
+                type="button"
+                onClick={
+                  startStripeOnboarding
+                }
+                style={connectButtonStyle}
+                disabled={connectingStripe}
+              >
+                {connectingStripe
+                  ? "Abriendo Stripe..."
+                  : "Completar configuración de Stripe"}
               </button>
             )}
 
-            <button onClick={loadProfile} style={refreshButtonStyle}>
-              {checkingStripe ? "Comprobando..." : "Actualizar estado de Stripe"}
+            <button
+              type="button"
+              onClick={loadProfile}
+              style={refreshButtonStyle}
+              disabled={
+                checkingStripe || loading
+              }
+            >
+              {checkingStripe
+                ? "Comprobando..."
+                : "Actualizar estado de Stripe"}
             </button>
           </div>
+
+          {userId && (
+            <p style={statusHelperStyle}>
+              El estado se consulta directamente
+              en Stripe y se sincroniza con tu
+              perfil de ATHMOV.
+            </p>
+          )}
         </div>
       </section>
 
@@ -352,6 +641,11 @@ export default function AccountPage() {
             grid-template-columns: 1fr !important;
           }
         }
+
+        button:disabled {
+          opacity: 0.55;
+          cursor: not-allowed !important;
+        }
       `}</style>
     </main>
   );
@@ -368,7 +662,8 @@ const loadingStyle = {
 
 const pageStyle = {
   minHeight: "100vh",
-  background: "linear-gradient(to bottom, #f8f8f4, #eeeeea)",
+  background:
+    "linear-gradient(to bottom, #f8f8f4, #eeeeea)",
   padding: "70px 60px",
   fontFamily: "Inter, sans-serif",
 };
@@ -407,7 +702,8 @@ const avatarCardStyle = {
   background: "#fff",
   borderRadius: "32px",
   padding: "28px",
-  border: "1px solid rgba(0,0,0,0.06)",
+  border:
+    "1px solid rgba(0,0,0,0.06)",
   height: "fit-content",
 };
 
@@ -431,7 +727,8 @@ const helperStyle = {
 const stripeBoxStyle = {
   marginTop: "20px",
   background: "#f7f7f3",
-  border: "1px solid rgba(0,0,0,0.06)",
+  border:
+    "1px solid rgba(0,0,0,0.06)",
   borderRadius: "22px",
   padding: "16px",
 };
@@ -457,11 +754,22 @@ const stripePendingStyle = {
   fontWeight: 900,
 };
 
+const stripeDetailsStyle = {
+  marginTop: "12px",
+  display: "flex",
+  flexDirection: "column" as const,
+  gap: "5px",
+  color: "#666",
+  fontSize: "12px",
+  lineHeight: 1.5,
+};
+
 const formCardStyle = {
   background: "#fff",
   borderRadius: "32px",
   padding: "34px",
-  border: "1px solid rgba(0,0,0,0.06)",
+  border:
+    "1px solid rgba(0,0,0,0.06)",
 };
 
 const fieldStyle = {
@@ -479,7 +787,8 @@ const labelStyle = {
 
 const inputStyle = {
   width: "100%",
-  border: "1px solid rgba(0,0,0,0.1)",
+  border:
+    "1px solid rgba(0,0,0,0.1)",
   borderRadius: "18px",
   padding: "16px",
   fontSize: "15px",
@@ -514,7 +823,8 @@ const buttonStyle = {
 const connectButtonStyle = {
   background: "#fff",
   color: "#111",
-  border: "1px solid rgba(0,0,0,0.12)",
+  border:
+    "1px solid rgba(0,0,0,0.12)",
   borderRadius: "999px",
   padding: "18px 26px",
   fontWeight: 800,
@@ -525,7 +835,8 @@ const connectButtonStyle = {
 const refreshButtonStyle = {
   background: "#f5f5f2",
   color: "#111",
-  border: "1px solid rgba(0,0,0,0.08)",
+  border:
+    "1px solid rgba(0,0,0,0.08)",
   borderRadius: "999px",
   padding: "18px 22px",
   fontWeight: 800,
@@ -540,4 +851,12 @@ const stripeConnectedStyle = {
   color: "#16a34a",
   fontWeight: 800,
   width: "fit-content",
+};
+
+const statusHelperStyle = {
+  marginTop: "18px",
+  marginBottom: 0,
+  color: "#777",
+  fontSize: "12px",
+  lineHeight: 1.6,
 };

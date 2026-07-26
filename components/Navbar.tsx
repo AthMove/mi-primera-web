@@ -145,7 +145,7 @@ const searchProducts = async (value: string) => {
 
  const { data } = await supabase
   .from("products")
-  .select("id,title,brand,image,price")
+ .select("id,title,brand,image,price,slug")
   .eq("moderation_status", "approved")
   .or(
     `title.ilike.%${value}%,brand.ilike.%${value}%,category.ilike.%${value}%`
@@ -260,7 +260,19 @@ return () => window.removeEventListener("scroll", onScroll);
   COMPRAR
 </Link>
 
-<Link href="/blog" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
+<Link
+  href="/brands"
+  style={drawerLinkStyle}
+  onClick={() => setMenuOpen(false)}
+>
+  MARCAS
+</Link>
+
+<Link
+  href="/blog"
+  style={drawerLinkStyle}
+  onClick={() => setMenuOpen(false)}
+>
   BLOG
 </Link>
 
@@ -381,8 +393,12 @@ return () => window.removeEventListener("scroll", onScroll);
           <Link href="/cart" style={cartLinkStyle}>
             CARRITO ({cartCount})
           </Link>
-          <Link href="/products" style={navMainLinkStyle}>
+     <Link href="/products" style={navMainLinkStyle}>
   {t.buy}
+</Link>
+
+<Link href="/brands" style={navMainLinkStyle}>
+  MARCAS
 </Link>
 
 <Link href="/sell" style={navMainLinkStyle}>
@@ -418,7 +434,11 @@ return () => window.removeEventListener("scroll", onScroll);
       {searchResults.map((product) => (
         <Link
           key={product.id}
-          href={`/products/${product.id}`}
+          href={
+  product.slug
+    ? `/p/${product.slug}`
+    : `/products/${product.id}`
+}
           style={searchItemStyle}
           onClick={() => setShowResults(false)}
         >

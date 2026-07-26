@@ -294,9 +294,14 @@ className={`athmov-product-card ${
     onClick={(e) => {
       e.stopPropagation();
 
-      router.push(
-        `/${String(product.category).toLowerCase()}`
-      );
+      const categorySlug = String(product.category)
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+
+      router.push(`/${categorySlug}`);
     }}
   >
     {product.category}
@@ -754,6 +759,11 @@ rotate(-1deg);
           text-overflow: ellipsis;
           white-space: nowrap;
         }
+
+        .athmov-product-brand,
+.athmov-product-category {
+  cursor: pointer;
+}
 
         .athmov-product-title {
           display: -webkit-box;

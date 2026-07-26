@@ -11,11 +11,13 @@ import FeaturedProducts from "@/components/home/FeaturedProducts";
 interface ProductsClientProps {
   fixedCategory?: string;
   fixedBrand?: string;
+  embedded?: boolean;
 }
 
 export default function ProductsClient({
   fixedCategory,
   fixedBrand,
+  embedded = false,
 }: ProductsClientProps) {
   const router = useRouter();
   const { t } = useLanguage();
@@ -86,7 +88,7 @@ export default function ProductsClient({
 }
 
 if (fixedBrand) {
-  query = query.eq("brand", fixedBrand);
+  query = query.ilike("brand", fixedBrand.trim());
 }
 
       const { data, error } = await query.order("created_at", {
@@ -112,7 +114,10 @@ if (categoryFilter) {
 }
 
 if (fixedBrand) {
-  featuredQuery = featuredQuery.eq("brand", fixedBrand);
+  featuredQuery = featuredQuery.ilike(
+    "brand",
+    fixedBrand.trim()
+  );
 }
 
 const { data: featured } = await featuredQuery
@@ -176,96 +181,103 @@ const { data: featured } = await featuredQuery
     { label: "Fitness", value: "Fitness" },
   ];
 
-  return (
-    <main style={pageStyle} className="marketplace-page">
-      <section style={heroStyle}>
-        <div>
-          <p style={eyebrowStyle}>{t.marketplaceEyebrow}</p>
+ return (
+  <div
+    style={embedded ? embeddedPageStyle : pageStyle}
+    className={embedded ? "marketplace-embedded" : "marketplace-page"}
+  >
+     {!embedded && (
+  <section style={heroStyle}>
+    <div>
+      <p style={eyebrowStyle}>{t.marketplaceEyebrow}</p>
 
-          <h1 style={titleStyle} className="marketplace-title">
-          {t.marketplaceTitle1}
-<br />
-{t.marketplaceTitle2}
-          </h1>
+      <h1 style={titleStyle} className="marketplace-title">
+        {t.marketplaceTitle1}
+        <br />
+        {t.marketplaceTitle2}
+      </h1>
 
-          <p style={subtitleStyle}>
-            {t.marketplaceSubtitle}
-          </p>
+      <p style={subtitleStyle}>{t.marketplaceSubtitle}</p>
 
-          <div style={heroActionsStyle}>
-            <button
-              onClick={() => router.push("/sell")}
-              style={primaryButtonStyle}
-            >
-              {t.sellProduct}
-            </button>
+      <div style={heroActionsStyle}>
+        <button
+          onClick={() => router.push("/sell")}
+          style={primaryButtonStyle}
+        >
+          {t.sellProduct}
+        </button>
 
-            <button
-              onClick={() => router.push("/buyer-guide")}
-              style={secondaryButtonStyle}
-            >
-              {t.buyerGuide}
-            </button>
-          </div>
-        </div>
+        <button
+          onClick={() => router.push("/buyer-guide")}
+          style={secondaryButtonStyle}
+        >
+          {t.buyerGuide}
+        </button>
+      </div>
+    </div>
 
-        <div style={heroCardStyle}>
-         <p style={heroCardEyebrowStyle}>{t.protectionEyebrow}</p>
-          <h2 style={heroCardTitleStyle}>{t.buyWithConfidence}</h2>
+    <div style={heroCardStyle}>
+      <p style={heroCardEyebrowStyle}>{t.protectionEyebrow}</p>
+      <h2 style={heroCardTitleStyle}>{t.buyWithConfidence}</h2>
 
-          <div style={trustGridStyle}>
-            <span>✓ {t.securePayment}</span>
-<span>✓ {t.buyerProtection}</span>
-<span>✓ {t.verifiedSellers}</span>
-<span>✓ {t.selectedMarketplace}</span>
-          </div>
-        </div>
-      </section>
+      <div style={trustGridStyle}>
+        <span>✓ {t.securePayment}</span>
+        <span>✓ {t.buyerProtection}</span>
+        <span>✓ {t.verifiedSellers}</span>
+        <span>✓ {t.selectedMarketplace}</span>
+      </div>
+    </div>
+  </section>
+)}
 
-      <FeaturedProducts
-  featuredProducts={featuredProducts}
-  isMobile={isMobile}
-/>
+{featuredProducts.length > 0 && (
+  <FeaturedProducts
+    featuredProducts={featuredProducts}
+    isMobile={isMobile}
+  />
+)}
 
       <section style={filtersSectionStyle}>
-        <div style={categoryRowStyle}>
-          {categories.map((category) => {
-            const active =
-              (!categoryFilter && category.value === "") ||
-              categoryFilter === category.value;
+  {!embedded && (
+  <div style={categoryRowStyle}>
+    {categories.map((category) => {
+      const active =
+        (!categoryFilter && category.value === "") ||
+        categoryFilter === category.value;
 
-            return (
-              <button
-                key={category.label}
-               onClick={() => {
-  const categoryRoutes: Record<string, string> = {
-    Golf: "/golf",
-    Pádel: "/padel",
-    Tenis: "/tenis",
-    Running: "/running",
-    Fitness: "/products?category=Fitness",
-  };
+      return (
+        <button
+          key={category.label}
+          onClick={() => {
+            const categoryRoutes: Record<string, string> = {
+              Golf: "/golf",
+              Pádel: "/padel",
+              Tenis: "/tenis",
+              Running: "/running",
+              Fitness: "/products?category=Fitness",
+            };
 
-  if (!category.value) {
-    router.push("/products");
-    return;
-  }
+            if (!category.value) {
+              router.push("/products");
+              return;
+            }
 
-  router.push(
-    categoryRoutes[category.value] ||
-      `/products?category=${encodeURIComponent(category.value)}`
-  );
-}}
-                style={{
-                  ...categoryButtonStyle,
-                  ...(active ? activeCategoryButtonStyle : {}),
-                }}
-              >
-                {category.label}
-              </button>
+            router.push(
+              categoryRoutes[category.value] ||
+                `/products?category=${encodeURIComponent(category.value)}`
             );
-          })}
-        </div>
+          }}
+          style={{
+            ...categoryButtonStyle,
+            ...(active ? activeCategoryButtonStyle : {}),
+          }}
+        >
+          {category.label}
+        </button>
+      );
+    })}
+  </div>
+)}
 
         <div style={searchSortRowStyle}>
           <input
@@ -292,26 +304,33 @@ const { data: featured } = await featuredQuery
       {debug && <p style={debugStyle}>{debug}</p>}
 
       <section style={productsSectionStyle}>
-        <div style={sectionHeaderStyle}>
-          <div>
-            <p style={eyebrowStyle}>MARKETPLACE</p>
+     <div
+  style={{
+    ...sectionHeaderStyle,
+    ...(embedded ? embeddedSectionHeaderStyle : {}),
+  }}
+>
+  {!embedded && (
+    <div>
+      <p style={eyebrowStyle}>MARKETPLACE</p>
 
-         <h2 style={sectionTitleStyle}>
-  {fixedBrand
-    ? fixedBrand
-    : categoryFilter
-      ? categoryFilter
-      : t.allProducts}
-</h2>
-          </div>
+      <h2 style={sectionTitleStyle}>
+        {fixedBrand
+          ? fixedBrand
+          : categoryFilter
+            ? categoryFilter
+            : t.allProducts}
+      </h2>
+    </div>
+  )}
 
-          <p style={countStyle}>
-            {filteredProducts.length}{" "}
-{filteredProducts.length === 1
-  ? t.productCountSingular
-  : t.productCountPlural}
-          </p>
-        </div>
+  <p style={countStyle}>
+    {filteredProducts.length}{" "}
+    {filteredProducts.length === 1
+      ? t.productCountSingular
+      : t.productCountPlural}
+  </p>
+</div>
 
         {loading ? (
           <div style={emptyStyle}>{t.productsLoading}</div>
@@ -336,7 +355,7 @@ const { data: featured } = await featuredQuery
         )}
       </section>
 
-      {feedPosts.length > 0 && (
+      {!embedded && feedPosts.length > 0 && (
         <section style={feedSectionStyle}>
           <div style={sectionHeaderStyle}>
             <div>
@@ -418,7 +437,7 @@ const { data: featured } = await featuredQuery
           }
         }
       `}</style>
-    </main>
+    </div>
   );
 }
 
@@ -427,6 +446,18 @@ const pageStyle = {
   background: "linear-gradient(to bottom, #f8f8f4, #eeeeea)",
   padding: "70px 60px",
   fontFamily: "Inter, sans-serif",
+};
+
+const embeddedPageStyle = {
+  width: "100%",
+  background: "transparent",
+  padding: 0,
+  fontFamily: "Inter, sans-serif",
+};
+
+const embeddedSectionHeaderStyle = {
+  justifyContent: "flex-end",
+  marginBottom: "20px",
 };
 
 const heroStyle = {

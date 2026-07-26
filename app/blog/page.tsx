@@ -10,11 +10,13 @@ const heroTags = [
 ];
 
 const featuredArticle = {
-  category: "RUNNING · GUÍA",
-  title: "Qué revisar antes de comprar unas zapatillas de running de segunda mano",
-  text: "Suela, mediasuela, talón y kilómetros: lo que debes comprobar antes de comprar.",
-  href: "/blog/que-revisar-zapatillas-running-segunda-mano",
-  reading: "6 min",
+  category: "PÁDEL · GUÍA DE COMPRA",
+  title:
+    "Bullpadel Vertex 04 de segunda mano: guía completa para comprar con seguridad",
+  text:
+    "Qué revisar, cuánto pagar y cómo reducir el riesgo de falsificaciones antes de comprar una Bullpadel Vertex 04 usada.",
+  href: "/blog/bullpadel-vertex-04-segunda-mano",
+  reading: "8 min",
 };
 
 const sports = [
@@ -45,6 +47,13 @@ const sports = [
 ];
 
 const allArticles = [
+  {
+  category: "PÁDEL · GUÍA DE COMPRA",
+  title:
+    "Bullpadel Vertex 04 de segunda mano: guía completa para comprar con seguridad",
+  href: "/blog/bullpadel-vertex-04-segunda-mano",
+  reading: "8 min",
+},
   {
     category: "GOLF · AUTENTICIDAD",
     title: "Cómo verificar unos palos de golf originales",

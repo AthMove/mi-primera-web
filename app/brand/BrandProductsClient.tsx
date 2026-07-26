@@ -6,12 +6,11 @@ interface Props {
   brand: string;
 }
 
-export default function BrandProductsClient({
-  brand,
-}: Props) {
+export default function BrandProductsClient({ brand }: Props) {
   return (
     <ProductsClient
       fixedBrand={brand}
+      embedded
     />
   );
 }
