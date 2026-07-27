@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 export default function PadelPage() {
   return (
     <Suspense fallback={<main>Cargando productos de pádel...</main>}>
-      <ProductsClient fixedCategory="Pádel" />
+     <ProductsClient fixedCategory="PADEL" />
     </Suspense>
   );
 }

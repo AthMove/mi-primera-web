@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 export default function RunningPage() {
   return (
     <Suspense fallback={<main>Cargando productos de running...</main>}>
-      <ProductsClient fixedCategory="Running" />
+     <ProductsClient fixedCategory="RUNNING" />
     </Suspense>
   );
 }

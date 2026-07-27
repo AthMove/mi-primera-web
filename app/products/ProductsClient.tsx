@@ -2,11 +2,16 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import {
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
+
 import { supabase } from "@/lib/supabase";
 import { useLanguage } from "@/components/LanguageProvider";
 import ProductCard from "@/components/home/cards/ProductCard";
 import FeaturedProducts from "@/components/home/FeaturedProducts";
+import LaunchNoticeModal from "@/components/LaunchNoticeModal";
 
 interface ProductsClientProps {
   fixedCategory?: string;
@@ -14,414 +19,916 @@ interface ProductsClientProps {
   embedded?: boolean;
 }
 
+type SortOption =
+  | "latest"
+  | "price_low"
+  | "price_high";
+
+const normalizeCategory = (
+  value?: string | null
+) => {
+  const normalized = String(value || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+  const aliases: Record<string, string> = {
+    padel: "padel",
+    paddle: "padel",
+    pala: "padel",
+    palas: "padel",
+
+    tenis: "tenis",
+    tennis: "tenis",
+    raqueta: "tenis",
+    raquetas: "tenis",
+
+    golf: "golf",
+    palos: "golf",
+
+    running: "running",
+    correr: "running",
+    zapatillas: "running",
+
+    fitness: "fitness",
+    gimnasio: "fitness",
+  };
+
+  return aliases[normalized] || normalized;
+};
+
+const normalizeSearchText = (
+  value?: string | null
+) => {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+};
+
 export default function ProductsClient({
   fixedCategory,
   fixedBrand,
   embedded = false,
 }: ProductsClientProps) {
   const router = useRouter();
-  const { t } = useLanguage();
   const searchParams = useSearchParams();
- const categoryFilter =
-  fixedCategory || searchParams.get("category");
+  const { t } = useLanguage();
+  const [showLaunchModal, setShowLaunchModal] = useState(false);
 
-  const [productos, setProductos] = useState<any[]>([]);
-  const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
-  const [feedPosts, setFeedPosts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
-  const [debug, setDebug] = useState("");
-  const [search, setSearch] = useState("");
-  const [sort, setSort] = useState<"latest" | "price_low" | "price_high">(
-    "latest"
-  );
+  const categoryFilter =
+    fixedCategory ||
+    searchParams.get("category") ||
+    "";
+
+  const [productos, setProductos] =
+    useState<any[]>([]);
+
+  const [
+    featuredProducts,
+    setFeaturedProducts,
+  ] = useState<any[]>([]);
+
+  const [feedPosts, setFeedPosts] =
+    useState<any[]>([]);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [isMobile, setIsMobile] =
+    useState(false);
+
+  const [debug, setDebug] =
+    useState("");
+
+  const [search, setSearch] =
+    useState("");
+
+  const [sort, setSort] =
+    useState<SortOption>("latest");
 
   useEffect(() => {
-  const checkMobile = () => {
-    setIsMobile(window.innerWidth <= 700);
-  };
+    const checkMobile = () => {
+      setIsMobile(
+        window.innerWidth <= 700
+      );
+    };
 
-  checkMobile();
+    checkMobile();
 
-  window.addEventListener("resize", checkMobile);
+    window.addEventListener(
+      "resize",
+      checkMobile
+    );
 
-  return () => {
-    window.removeEventListener("resize", checkMobile);
-  };
-}, []);
+    return () => {
+      window.removeEventListener(
+        "resize",
+        checkMobile
+      );
+    };
+  }, []);
 
   useEffect(() => {
-    loadMarketplace();
+    void loadMarketplace();
 
     const channel = supabase
-      .channel("products-marketplace-realtime")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "products" },
-        () => loadMarketplace()
+      .channel(
+        "products-marketplace-realtime"
       )
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "feed_posts" },
-        () => loadMarketplace()
+        {
+          event: "*",
+          schema: "public",
+          table: "products",
+        },
+        () => {
+          void loadMarketplace();
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "feed_posts",
+        },
+        () => {
+          void loadMarketplace();
+        }
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      void supabase.removeChannel(
+        channel
+      );
     };
- }, [categoryFilter, fixedBrand]);
+  }, [fixedBrand]);
 
   async function loadMarketplace() {
     try {
       setLoading(true);
       setDebug("");
 
-      let query = supabase
+      let productsQuery = supabase
         .from("products")
         .select("*")
         .eq("sold", false)
-        .eq("moderation_status", "approved");
+        .eq(
+          "moderation_status",
+          "approved"
+        );
 
-  if (categoryFilter) {
-  query = query.eq("category", categoryFilter);
-}
+      if (fixedBrand) {
+        productsQuery =
+          productsQuery.ilike(
+            "brand",
+            fixedBrand.trim()
+          );
+      }
 
-if (fixedBrand) {
-  query = query.ilike("brand", fixedBrand.trim());
-}
+      const {
+        data: productsData,
+        error: productsError,
+      } = await productsQuery.order(
+        "created_at",
+        {
+          ascending: false,
+        }
+      );
 
-      const { data, error } = await query.order("created_at", {
-        ascending: false,
-      });
+      if (productsError) {
+        console.error(
+          "ERROR CARGANDO PRODUCTOS:",
+          productsError
+        );
 
-      if (error) {
-        console.error(error);
-        setDebug(error.message);
+        setDebug(
+          productsError.message
+        );
+
         setProductos([]);
         return;
       }
 
-   let featuredQuery = supabase
-  .from("products")
-  .select("*")
-  .eq("sold", false)
-  .eq("moderation_status", "approved")
-  .eq("featured", true);
+      let featuredQuery = supabase
+        .from("products")
+        .select("*")
+        .eq("sold", false)
+        .eq(
+          "moderation_status",
+          "approved"
+        )
+        .eq("featured", true);
 
-if (categoryFilter) {
-  featuredQuery = featuredQuery.eq("category", categoryFilter);
-}
+      if (fixedBrand) {
+        featuredQuery =
+          featuredQuery.ilike(
+            "brand",
+            fixedBrand.trim()
+          );
+      }
 
-if (fixedBrand) {
-  featuredQuery = featuredQuery.ilike(
-    "brand",
-    fixedBrand.trim()
-  );
-}
+      const {
+        data: featuredData,
+        error: featuredError,
+      } = await featuredQuery
+        .order("created_at", {
+          ascending: false,
+        })
+        .limit(12);
 
-const { data: featured } = await featuredQuery
-  .order("created_at", { ascending: false })
-  .limit(3);
+      if (featuredError) {
+        console.error(
+          "ERROR CARGANDO DESTACADOS:",
+          featuredError
+        );
+      }
 
-      const { data: posts } = await supabase
+      const {
+        data: postsData,
+        error: postsError,
+      } = await supabase
         .from("feed_posts")
         .select("*")
-        .order("created_at", { ascending: false })
+        .order("created_at", {
+          ascending: false,
+        })
         .limit(4);
 
-      setProductos(data || []);
-      setFeaturedProducts(featured || []);
-      setFeedPosts(posts || []);
-    } catch (e: any) {
-      console.error(e);
-      setDebug(e.message || "Error al cargar productos");
+      if (postsError) {
+        console.error(
+          "ERROR CARGANDO FEED:",
+          postsError
+        );
+      }
+
+      /*
+       * Guardamos todos los productos.
+       *
+       * El filtro por categoría se aplica
+       * después mediante useMemo.
+       */
+      setProductos(
+        productsData || []
+      );
+
+      setFeaturedProducts(
+        featuredData || []
+      );
+
+      setFeedPosts(
+        postsData || []
+      );
+    } catch (error: unknown) {
+      console.error(
+        "ERROR GENERAL DEL MARKETPLACE:",
+        error
+      );
+
+      setDebug(
+        error instanceof Error
+          ? error.message
+          : "Error al cargar productos"
+      );
+
+      setProductos([]);
+      setFeaturedProducts([]);
+      setFeedPosts([]);
     } finally {
       setLoading(false);
     }
   }
 
-  const safeImage = (src?: string) => {
-    return src?.startsWith("http") || src?.startsWith("/") ? src : "/logo.png";
+  const safeImage = (
+    src?: string
+  ) => {
+    if (
+      src?.startsWith("http") ||
+      src?.startsWith("/")
+    ) {
+      return src;
+    }
+
+    return "/logo.png";
   };
 
-  const filteredProducts = useMemo(() => {
-    let result = [...productos];
+  const filteredProducts =
+    useMemo(() => {
+      let result = [...productos];
 
-    if (search.trim()) {
-      const value = search.toLowerCase().trim();
-
-      result = result.filter((product: any) => {
-        return (
-          String(product.title || "").toLowerCase().includes(value) ||
-          String(product.brand || "").toLowerCase().includes(value) ||
-          String(product.category || "").toLowerCase().includes(value) ||
-          String(product.sport || "").toLowerCase().includes(value)
+      const normalizedFilter =
+        normalizeCategory(
+          categoryFilter
         );
-      });
-    }
 
-    if (sort === "price_low") {
-      result.sort((a, b) => Number(a.price || 0) - Number(b.price || 0));
-    }
+      /*
+       * Filtro por categoría.
+       *
+       * Valores equivalentes:
+       *
+       * PADEL / Pádel / padel
+       * TENNIS / Tenis / tenis
+       * GOLF / Golf / golf
+       */
+      if (normalizedFilter) {
+        result = result.filter(
+          (product: any) => {
+            const productCategory =
+              normalizeCategory(
+                product.category
+              );
 
-    if (sort === "price_high") {
-      result.sort((a, b) => Number(b.price || 0) - Number(a.price || 0));
-    }
+            const productSport =
+              normalizeCategory(
+                product.sport
+              );
 
-    return result;
-  }, [productos, search, sort]);
+            return (
+              productCategory ===
+                normalizedFilter ||
+              productSport ===
+                normalizedFilter
+            );
+          }
+        );
+      }
 
-  const categories = [
-    { label: "Todo", value: "" },
-    { label: "Pádel", value: "Pádel" },
-    { label: "Tenis", value: "Tenis" },
-    { label: "Golf", value: "Golf" },
-    { label: "Running", value: "Running" },
-    { label: "Fitness", value: "Fitness" },
-  ];
+      if (search.trim()) {
+        const searchValue =
+          normalizeSearchText(
+            search
+          );
 
- return (
-  <div
-    style={embedded ? embeddedPageStyle : pageStyle}
-    className={embedded ? "marketplace-embedded" : "marketplace-page"}
-  >
-     {!embedded && (
-  <section style={heroStyle}>
-    <div>
-      <p style={eyebrowStyle}>{t.marketplaceEyebrow}</p>
+        result = result.filter(
+          (product: any) => {
+            const searchableText = [
+              product.title,
+              product.brand,
+              product.category,
+              product.sport,
+              product.description,
+            ]
+              .map((item) =>
+                normalizeSearchText(
+                  item
+                )
+              )
+              .join(" ");
 
-      <h1 style={titleStyle} className="marketplace-title">
-        {t.marketplaceTitle1}
-        <br />
-        {t.marketplaceTitle2}
-      </h1>
+            return searchableText.includes(
+              searchValue
+            );
+          }
+        );
+      }
 
-      <p style={subtitleStyle}>{t.marketplaceSubtitle}</p>
+      if (
+        sort === "price_low"
+      ) {
+        result.sort(
+          (a, b) =>
+            Number(a.price || 0) -
+            Number(b.price || 0)
+        );
+      }
 
-      <div style={heroActionsStyle}>
-        <button
-          onClick={() => router.push("/sell")}
-          style={primaryButtonStyle}
-        >
-          {t.sellProduct}
-        </button>
+      if (
+        sort === "price_high"
+      ) {
+        result.sort(
+          (a, b) =>
+            Number(b.price || 0) -
+            Number(a.price || 0)
+        );
+      }
 
-        <button
-          onClick={() => router.push("/buyer-guide")}
-          style={secondaryButtonStyle}
-        >
-          {t.buyerGuide}
-        </button>
-      </div>
-    </div>
+      if (sort === "latest") {
+        result.sort((a, b) => {
+          const dateA = new Date(
+            a.created_at || 0
+          ).getTime();
 
-    <div style={heroCardStyle}>
-      <p style={heroCardEyebrowStyle}>{t.protectionEyebrow}</p>
-      <h2 style={heroCardTitleStyle}>{t.buyWithConfidence}</h2>
+          const dateB = new Date(
+            b.created_at || 0
+          ).getTime();
 
-      <div style={trustGridStyle}>
-        <span>✓ {t.securePayment}</span>
-        <span>✓ {t.buyerProtection}</span>
-        <span>✓ {t.verifiedSellers}</span>
-        <span>✓ {t.selectedMarketplace}</span>
-      </div>
-    </div>
-  </section>
-)}
+          return dateB - dateA;
+        });
+      }
 
-{featuredProducts.length > 0 && (
-  <FeaturedProducts
-    featuredProducts={featuredProducts}
-    isMobile={isMobile}
-  />
-)}
+      return result;
+    }, [
+      productos,
+      categoryFilter,
+      search,
+      sort,
+    ]);
 
-      <section style={filtersSectionStyle}>
-  {!embedded && (
-  <div style={categoryRowStyle}>
-    {categories.map((category) => {
-      const active =
-        (!categoryFilter && category.value === "") ||
-        categoryFilter === category.value;
+  const filteredFeaturedProducts =
+    useMemo(() => {
+      const normalizedFilter =
+        normalizeCategory(
+          categoryFilter
+        );
 
-      return (
-        <button
-          key={category.label}
-          onClick={() => {
-            const categoryRoutes: Record<string, string> = {
-              Golf: "/golf",
-              Pádel: "/padel",
-              Tenis: "/tenis",
-              Running: "/running",
-              Fitness: "/products?category=Fitness",
-            };
-
-            if (!category.value) {
-              router.push("/products");
-              return;
+      const result =
+        featuredProducts.filter(
+          (product: any) => {
+            if (
+              !normalizedFilter
+            ) {
+              return true;
             }
 
-            router.push(
-              categoryRoutes[category.value] ||
-                `/products?category=${encodeURIComponent(category.value)}`
+            const productCategory =
+              normalizeCategory(
+                product.category
+              );
+
+            const productSport =
+              normalizeCategory(
+                product.sport
+              );
+
+            return (
+              productCategory ===
+                normalizedFilter ||
+              productSport ===
+                normalizedFilter
             );
-          }}
-          style={{
-            ...categoryButtonStyle,
-            ...(active ? activeCategoryButtonStyle : {}),
-          }}
-        >
-          {category.label}
-        </button>
+          }
+        );
+
+      return result.slice(0, 3);
+    }, [
+      featuredProducts,
+      categoryFilter,
+    ]);
+
+  const categories = [
+    {
+      label: "Todo",
+      value: "",
+      route: "/products",
+    },
+    {
+      label: "Pádel",
+      value: "PADEL",
+      route: "/padel",
+    },
+    {
+      label: "Tenis",
+      value: "TENNIS",
+      route: "/tenis",
+    },
+    {
+      label: "Golf",
+      value: "GOLF",
+      route: "/golf",
+    },
+    {
+      label: "Running",
+      value: "RUNNING",
+      route: "/running",
+    },
+    {
+      label: "Fitness",
+      value: "FITNESS",
+      route:
+        "/products?category=FITNESS",
+    },
+  ];
+
+  const visibleCategoryTitle =
+    (() => {
+      if (fixedBrand) {
+        return fixedBrand;
+      }
+
+      if (!categoryFilter) {
+        return t.allProducts;
+      }
+
+      const normalized =
+        normalizeCategory(
+          categoryFilter
+        );
+
+      const labels: Record<
+        string,
+        string
+      > = {
+        padel: "Pádel",
+        tenis: "Tenis",
+        golf: "Golf",
+        running: "Running",
+        fitness: "Fitness",
+      };
+
+      return (
+        labels[normalized] ||
+        categoryFilter
       );
-    })}
-  </div>
-)}
+    })();
+
+      return (
+    <div
+      style={
+        embedded
+          ? embeddedPageStyle
+          : pageStyle
+      }
+      className={
+        embedded
+          ? "marketplace-embedded"
+          : "marketplace-page"
+      }
+    >
+      {!embedded && (
+        <section style={heroStyle}>
+          <div>
+            <p style={eyebrowStyle}>
+              {t.marketplaceEyebrow}
+            </p>
+
+            <h1
+              style={titleStyle}
+              className="marketplace-title"
+            >
+              {t.marketplaceTitle1}
+              <br />
+              {t.marketplaceTitle2}
+            </h1>
+
+            <p style={subtitleStyle}>
+              {t.marketplaceSubtitle}
+            </p>
+
+            <div style={heroActionsStyle}>
+             <button
+  type="button"
+  onClick={() =>
+    setShowLaunchModal(true)
+  }
+  style={primaryButtonStyle}
+>
+  {t.sellProduct}
+</button>
+
+              <button
+                type="button"
+                onClick={() =>
+                  router.push(
+                    "/buyer-guide"
+                  )
+                }
+                style={
+                  secondaryButtonStyle
+                }
+              >
+                {t.buyerGuide}
+              </button>
+            </div>
+          </div>
+
+          <div style={heroCardStyle}>
+            <p
+              style={
+                heroCardEyebrowStyle
+              }
+            >
+              {t.protectionEyebrow}
+            </p>
+
+            <h2
+              style={heroCardTitleStyle}
+            >
+              {t.buyWithConfidence}
+            </h2>
+
+            <div style={trustGridStyle}>
+              <span>
+                ✓ {t.securePayment}
+              </span>
+
+              <span>
+                ✓ {t.buyerProtection}
+              </span>
+
+              <span>
+                ✓ {t.verifiedSellers}
+              </span>
+
+              <span>
+                ✓ {t.selectedMarketplace}
+              </span>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {filteredFeaturedProducts.length >
+        0 && (
+        <FeaturedProducts
+          featuredProducts={
+            filteredFeaturedProducts
+          }
+          isMobile={isMobile}
+        />
+      )}
+
+      <section style={filtersSectionStyle}>
+        {!embedded && (
+          <div style={categoryRowStyle}>
+            {categories.map(
+              (category) => {
+                const active =
+                  (!categoryFilter &&
+                    category.value ===
+                      "") ||
+                  normalizeCategory(
+                    categoryFilter
+                  ) ===
+                    normalizeCategory(
+                      category.value
+                    );
+
+                return (
+                  <button
+                    type="button"
+                    key={category.label}
+                    onClick={() =>
+                      router.push(
+                        category.route
+                      )
+                    }
+                    style={{
+                      ...categoryButtonStyle,
+                      ...(active
+                        ? activeCategoryButtonStyle
+                        : {}),
+                    }}
+                  >
+                    {category.label}
+                  </button>
+                );
+              }
+            )}
+          </div>
+        )}
 
         <div style={searchSortRowStyle}>
           <input
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={t.searchMarketplace}
+            onChange={(event) =>
+              setSearch(
+                event.target.value
+              )
+            }
+            placeholder={
+              t.searchMarketplace
+            }
             style={searchInputStyle}
           />
 
           <select
             value={sort}
-            onChange={(e) =>
-              setSort(e.target.value as "latest" | "price_low" | "price_high")
+            onChange={(event) =>
+              setSort(
+                event.target.value as SortOption
+              )
             }
             style={sortSelectStyle}
           >
-            <option value="latest">{t.sortLatest}</option>
-<option value="price_low">{t.sortPriceLow}</option>
-<option value="price_high">{t.sortPriceHigh}</option>
+            <option value="latest">
+              {t.sortLatest}
+            </option>
+
+            <option value="price_low">
+              {t.sortPriceLow}
+            </option>
+
+            <option value="price_high">
+              {t.sortPriceHigh}
+            </option>
           </select>
         </div>
       </section>
 
-      {debug && <p style={debugStyle}>{debug}</p>}
+      {debug && (
+        <p style={debugStyle}>
+          {debug}
+        </p>
+      )}
 
       <section style={productsSectionStyle}>
-     <div
-  style={{
-    ...sectionHeaderStyle,
-    ...(embedded ? embeddedSectionHeaderStyle : {}),
-  }}
->
-  {!embedded && (
-    <div>
-      <p style={eyebrowStyle}>MARKETPLACE</p>
+        <div
+          style={{
+            ...sectionHeaderStyle,
+            ...(embedded
+              ? embeddedSectionHeaderStyle
+              : {}),
+          }}
+        >
+          {!embedded && (
+            <div>
+              <p style={eyebrowStyle}>
+                MARKETPLACE
+              </p>
 
-      <h2 style={sectionTitleStyle}>
-        {fixedBrand
-          ? fixedBrand
-          : categoryFilter
-            ? categoryFilter
-            : t.allProducts}
-      </h2>
-    </div>
-  )}
+              <h2
+                style={sectionTitleStyle}
+              >
+                {visibleCategoryTitle}
+              </h2>
+            </div>
+          )}
 
-  <p style={countStyle}>
-    {filteredProducts.length}{" "}
-    {filteredProducts.length === 1
-      ? t.productCountSingular
-      : t.productCountPlural}
-  </p>
-</div>
+          <p style={countStyle}>
+            {filteredProducts.length}{" "}
+            {filteredProducts.length === 1
+              ? t.productCountSingular
+              : t.productCountPlural}
+          </p>
+        </div>
 
         {loading ? (
-          <div style={emptyStyle}>{t.productsLoading}</div>
-        ) : filteredProducts.length === 0 ? (
+          <div style={emptyStyle}>
+            {t.productsLoading}
+          </div>
+        ) : filteredProducts.length ===
+          0 ? (
           <div style={emptyStyle}>
             {fixedBrand
-  ? `Todavía no hay productos ${fixedBrand} disponibles.`
-  : t.noProducts}
+              ? `Todavía no hay productos ${fixedBrand} disponibles.`
+              : t.noProducts}
           </div>
         ) : (
           <div style={gridStyle}>
-            {filteredProducts.map((product: any) => (
-  <ProductCard
-    key={product.id}
-    product={product}
-    compact
-    showFavorite
-    showRating
-  />
-))}
+            {filteredProducts.map(
+              (product: any) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  compact
+                  showFavorite
+                  showRating
+                />
+              )
+            )}
           </div>
         )}
       </section>
 
-      {!embedded && feedPosts.length > 0 && (
-        <section style={feedSectionStyle}>
-          <div style={sectionHeaderStyle}>
-            <div>
-              <p style={eyebrowStyle}>{t.communityEyebrow}</p>
-<h2 style={sectionTitleStyle}>{t.communityTitle}</h2>
+      {!embedded &&
+        feedPosts.length > 0 && (
+          <section style={feedSectionStyle}>
+            <div style={sectionHeaderStyle}>
+              <div>
+                <p style={eyebrowStyle}>
+                  {t.communityEyebrow}
+                </p>
+
+                <h2
+                  style={sectionTitleStyle}
+                >
+                  {t.communityTitle}
+                </h2>
+              </div>
+
+              <button
+                type="button"
+                onClick={() =>
+                  router.push("/feed")
+                }
+                style={smallButtonStyle}
+              >
+                {t.openFeed}
+              </button>
             </div>
 
-            <button
-              onClick={() => router.push("/feed")}
-              style={smallButtonStyle}
-            >
-              {t.openFeed}
-            </button>
-          </div>
+            <div style={feedGridStyle}>
+              {feedPosts.map(
+                (post: any) => (
+                  <article
+                    key={post.id}
+                    style={feedCardStyle}
+                  >
+                    <div
+                      style={feedHeaderStyle}
+                    >
+                      <div
+                        style={
+                          feedAvatarStyle
+                        }
+                      >
+                        {post.user_email
+                          ?.charAt(0)
+                          .toUpperCase() ||
+                          "A"}
+                      </div>
 
-          <div style={feedGridStyle}>
-            {feedPosts.map((post: any) => (
-              <article key={post.id} style={feedCardStyle}>
-                <div style={feedHeaderStyle}>
-                  <div style={feedAvatarStyle}>
-                    {post.user_email?.charAt(0).toUpperCase() || "A"}
-                  </div>
+                      <div>
+                        <p
+                          style={
+                            feedEmailStyle
+                          }
+                        >
+                          {post.user_email ||
+                            "ATHMOV user"}
+                        </p>
 
-                  <div>
-                    <p style={feedEmailStyle}>
-                      {post.user_email || "ATHMOV user"}
+                        <p
+                          style={
+                            feedDateStyle
+                          }
+                        >
+                          {post.created_at
+                            ? new Date(
+                                post.created_at
+                              ).toLocaleDateString(
+                                "es-ES"
+                              )
+                            : ""}
+                        </p>
+                      </div>
+                    </div>
+
+                    {post.content && (
+                      <p
+                        style={
+                          feedContentStyle
+                        }
+                      >
+                        {post.content}
+                      </p>
+                    )}
+
+                    {post.image && (
+                      <div
+                        style={
+                          feedImageStyle
+                        }
+                      >
+                        <Image
+                          src={safeImage(
+                            post.image
+                          )}
+                          alt="Feed"
+                          fill
+                          sizes="300px"
+                          style={{
+                            objectFit:
+                              "cover",
+                          }}
+                        />
+                      </div>
+                    )}
+
+                    <p
+                      style={
+                        feedLikesStyle
+                      }
+                    >
+                      ♥️ {post.likes || 0}
                     </p>
+                  </article>
+                )
+              )}
+            </div>
+          </section>
+        )}
 
-                    <p style={feedDateStyle}>
-                      {post.created_at
-                        ? new Date(post.created_at).toLocaleDateString()
-                        : ""}
-                    </p>
-                  </div>
-                </div>
+        {showLaunchModal && (
+  <LaunchNoticeModal
+    type="sell"
+    onClose={() =>
+      setShowLaunchModal(false)
+    }
+    onContinue={() => {
+      setShowLaunchModal(false);
+      router.push("/sell");
+    }}
+  />
+)}
 
-                {post.content && (
-                  <p style={feedContentStyle}>{post.content}</p>
-                )}
-
-                {post.image && (
-                  <div style={feedImageStyle}>
-                    <Image
-                      src={safeImage(post.image)}
-                      alt="Feed"
-                      fill
-                      sizes="300px"
-                      style={{ objectFit: "cover" }}
-                    />
-                  </div>
-                )}
-
-                <p style={feedLikesStyle}>♥ {post.likes || 0}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-      )}
-            <style>{`
+      <style>{`
         .marketplace-card {
-          transition: transform 0.22s ease, box-shadow 0.22s ease;
+          transition:
+            transform 0.22s ease,
+            box-shadow 0.22s ease;
         }
 
         .marketplace-card:hover {
           transform: translateY(-5px);
-          box-shadow: 0 30px 90px rgba(0,0,0,0.08);
+          box-shadow:
+            0 30px 90px
+            rgba(0, 0, 0, 0.08);
         }
 
         @media (max-width: 1000px) {
@@ -433,7 +940,20 @@ const { data: featured } = await featuredQuery
 
         @media (max-width: 800px) {
           .marketplace-page {
-            padding: 120px 18px 40px !important;
+            padding:
+              120px 18px 40px !important;
+          }
+        }
+
+        @media (max-width: 650px) {
+          .marketplace-page {
+            padding:
+              110px 14px 34px !important;
+          }
+
+          .marketplace-title {
+            font-size: 44px !important;
+            letter-spacing: -2px !important;
           }
         }
       `}</style>
@@ -544,10 +1064,6 @@ const trustGridStyle = {
   color: "rgba(255,255,255,0.72)",
 };
 
-const featuredSectionStyle = {
-  maxWidth: "1400px",
-  margin: "0 auto 60px",
-};
 
 const sectionHeaderStyle = {
   display: "flex",
@@ -572,48 +1088,6 @@ const smallButtonStyle = {
   padding: "12px 18px",
   fontWeight: 900,
   cursor: "pointer",
-};
-
-const featuredGridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(3, 1fr)",
-  gap: "24px",
-};
-
-const featuredCardStyle = {
-  position: "relative" as const,
-  height: "430px",
-  borderRadius: "36px",
-  overflow: "hidden",
-  background: "#111",
-  cursor: "pointer",
-};
-
-const featuredOverlayStyle = {
-  position: "absolute" as const,
-  inset: 0,
-  display: "flex",
-  flexDirection: "column" as const,
-  justifyContent: "flex-end",
-  padding: "28px",
-  background: "linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.05))",
-  color: "#fff",
-};
-
-const featuredBrandStyle = {
-  fontSize: "11px",
-  letterSpacing: "2px",
-  opacity: 0.75,
-};
-
-const featuredTitleStyle = {
-  fontSize: "30px",
-  margin: "8px 0 10px",
-};
-
-const featuredPriceStyle = {
-  fontSize: "26px",
-  fontWeight: 900,
 };
 
 const filtersSectionStyle = {
@@ -656,6 +1130,7 @@ const searchInputStyle = {
   padding: "16px 20px",
   outline: "none",
   fontSize: "15px",
+  boxSizing: "border-box" as const,
 };
 
 const sortSelectStyle = {
@@ -694,64 +1169,6 @@ const gridStyle = {
   gridTemplateColumns: "repeat(auto-fill, minmax(300px, 340px))",
   justifyContent: "center",
   gap: "36px",
-};
-
-const cardStyle = {
-  background: "#fff",
-  borderRadius: "32px",
-  overflow: "hidden",
-  cursor: "pointer",
-  border: "1px solid rgba(0,0,0,0.06)",
-};
-
-const imageWrapperStyle = {
-  position: "relative" as const,
-  height: "320px",
-  background: "#eee",
-};
-
-const featuredBadgeStyle = {
-  position: "absolute" as const,
-  top: "16px",
-  left: "16px",
-  background: "#111",
-  color: "#fff",
-  borderRadius: "999px",
-  padding: "8px 12px",
-  fontSize: "10px",
-  fontWeight: 900,
-};
-
-const cardContentStyle = {
-  padding: "24px",
-};
-
-const brandStyle = {
-  fontSize: "11px",
-  letterSpacing: "2px",
-  opacity: 0.45,
-  textTransform: "uppercase" as const,
-};
-
-const productTitleStyle = {
-  fontSize: "24px",
-  margin: "10px 0 18px",
-};
-
-const cardBottomStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-};
-
-const priceStyle = {
-  fontSize: "26px",
-};
-
-const openStyle = {
-  fontSize: "13px",
-  fontWeight: 900,
-  opacity: 0.55,
 };
 
 const feedSectionStyle = {

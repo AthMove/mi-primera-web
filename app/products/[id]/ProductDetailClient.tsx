@@ -13,6 +13,7 @@ import ProductBuyerGuide from "@/components/product/ProductBuyerGuide";
 import SellerPremiumCard from "@/components/product/SellerPremiumCard";
 import StickyBuyBar from "@/components/product/StickyBuyBar";
 import RelatedProducts from "@/components/product/RelatedProducts";
+import LaunchNoticeModal from "@/components/LaunchNoticeModal";
 
 interface ProductDetailProps {
   productId?: string;
@@ -41,6 +42,7 @@ console.log("ID UTILIZADO:", id);
   const [sellerProfile, setSellerProfile] = useState<any>(null);
   const [sellerReviews, setSellerReviews] = useState<any[]>([]);
   const [sellerProducts, setSellerProducts] = useState<any[]>([]);
+  const [showLaunchModal, setShowLaunchModal] = useState(false);
  
 
   useEffect(() => {
@@ -256,7 +258,10 @@ setRelated(relatedProducts || []);
     };
   };
 
- const buyNow = async () => {
+const buyNow = async () => {
+  setShowLaunchModal(true);
+  return;
+
   if (!producto) return;
 
   if (producto.sold) {
@@ -856,6 +861,13 @@ return (
     safeImage={safeImage}
   />
 </div>
+
+{showLaunchModal && (
+  <LaunchNoticeModal
+    type="buy"
+    onClose={() => setShowLaunchModal(false)}
+  />
+)}
 
       <style>{`
 

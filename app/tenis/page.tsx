@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 export default function TenisPage() {
   return (
     <Suspense fallback={<main>Cargando productos de tenis...</main>}>
-      <ProductsClient fixedCategory="Tenis" />
+     <ProductsClient fixedCategory="TENNIS" />
     </Suspense>
   );
 }
