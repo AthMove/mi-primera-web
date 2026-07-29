@@ -54,14 +54,6 @@ onMouseLeave,
 
 const imageLoaded = loadedImage === selectedImage;
 
-
-useEffect(() => {
-  images.forEach((image) => {
-    const img = new window.Image();
-    img.src = safeImage(image);
-  });
-}, [images]);
-
 const goToPrevious = () => {
   if (images.length === 0) return;
 
@@ -106,6 +98,14 @@ useEffect(() => {
   };
 }, [fullscreen, currentIndex, images]);
 
+const openFullscreen = () => {
+  if (window.matchMedia("(max-width: 700px)").matches) {
+    return;
+  }
+
+  setFullscreen(true);
+};
+
 
   return (
     <div className="product-gallery">
@@ -113,7 +113,7 @@ useEffect(() => {
   className="product-gallery-main"
   onMouseMove={onImageMove}
   onMouseLeave={onMouseLeave}
-  onClick={() => setFullscreen(true)}
+  onClick={openFullscreen}
   style={{
     "--glow-x": `${mousePosition.x}%`,
     "--glow-y": `${mousePosition.y}%`,
@@ -173,7 +173,7 @@ useEffect(() => {
     imageLoaded ? "is-loaded" : "is-loading"
   }`}
   onLoad={() => setLoadedImage(selectedImage)}
-onError={() => setLoadedImage(selectedImage)}
+  onError={() => setLoadedImage(selectedImage)}
   style={{
     objectPosition: `${mousePosition.x}% ${mousePosition.y}%`,
     transform: `
@@ -206,7 +206,8 @@ onError={() => setLoadedImage(selectedImage)}
                   src={safeImage(image)}
                   alt={`${title} ${index + 1}`}
                   fill
-                  sizes="180px"
+                  loading={index === 0 ? "eager" : "lazy"}
+                  sizes="(max-width: 700px) 30vw, 180px"
                   style={{
                     objectFit: "contain",
                     padding: "14px",
@@ -251,11 +252,18 @@ onError={() => setLoadedImage(selectedImage)}
   </>
 )}
 
-    <img
-      src={safeImage(selectedImage)}
-      alt={title}
-      className="gallery-fullscreen-image"
-    />
+    <div className="gallery-fullscreen-image-wrapper">
+  <Image
+    src={safeImage(selectedImage)}
+    alt={title}
+    fill
+    sizes="92vw"
+    className="gallery-fullscreen-image"
+    style={{
+      objectFit: "contain",
+    }}
+  />
+</div>
   </div>
 )}
 
@@ -439,21 +447,20 @@ onError={() => setLoadedImage(selectedImage)}
   }
 }
 
-        .product-gallery-image {
-          position: relative;
-          z-index: 2;
-          width: 100%;
-          height: 720px;
-          padding: 56px;
-          object-fit: contain;
-          filter: drop-shadow(0 45px 75px rgba(0, 0, 0, 0.19));
-          transform: scale(1);
-transition:
-  transform 180ms ease-out,
-  object-position 180ms ease-out,
-  filter 250ms ease;
+.product-gallery-image {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 720px;
+  padding: 56px;
+  object-fit: contain;
+  filter: drop-shadow(0 45px 75px rgba(0, 0, 0, 0.19));
+  transition:
+    transform 180ms ease-out,
+    object-position 180ms ease-out,
+    filter 250ms ease;
   opacity: 1;
-        }
+}
 
         .product-gallery-image.is-loading {
   opacity: 0;
@@ -528,10 +535,14 @@ transition:
   animation:fadeIn .25s ease;
 }
 
-.gallery-fullscreen-image{
-  max-width:92vw;
-  max-height:90vh;
-  object-fit:contain;
+.gallery-fullscreen-image-wrapper {
+  position: relative;
+  width: 92vw;
+  height: 90vh;
+}
+
+.gallery-fullscreen-image {
+  object-fit: contain;
 }
 
 .gallery-close{
@@ -602,9 +613,6 @@ transition:
   filter: drop-shadow(0 55px 90px rgba(0, 0, 0, 0.24));
 }
 
-          .product-gallery-image {
-            height: 560px;
-          }
         }
 
         @media (max-width: 700px) {
@@ -614,12 +622,11 @@ transition:
             cursor: default;
           }
 
-          .product-gallery-image {
-            height: 420px;
-            padding: 28px;
-            object-position: center !important;
-            transform: none !important;
-          }
+        .product-gallery-image {
+  padding: 28px !important;
+  object-position: center !important;
+  transform: none !important;
+}
 
           .product-gallery-main:hover .product-gallery-image {
             transform: none;

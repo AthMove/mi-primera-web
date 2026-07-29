@@ -195,14 +195,15 @@ export default function HeroSection({
           filter: blur(150px);
         }
 
-        .hero-content {
-          position: relative;
-          z-index: 3;
-          width: 100%;
-          max-width: 860px;
-          color: #ffffff;
-          will-change: transform;
-        }
+     .hero-content {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  max-width: 860px;
+  min-width: 0;
+  color: #ffffff;
+  will-change: transform;
+}
 
         .hero-eyebrow-row {
           display: flex;
@@ -227,18 +228,19 @@ export default function HeroSection({
           letter-spacing: 0.3em;
         }
 
-        .hero-title {
-          display: flex;
-          flex-direction: column;
-          margin: 0;
-          color: #ffffff;
-          font-size: clamp(68px, 8.5vw, 128px);
-          font-weight: 800;
-          line-height: 0.86;
-          letter-spacing: -0.075em;
-          text-wrap: balance;
-          text-shadow: 0 24px 70px rgba(0, 0, 0, 0.4);
-        }
+       .hero-title {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0;
+  padding-left: 4px;
+  color: #ffffff;
+  font-size: clamp(64px, 7.5vw, 118px);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.055em;
+  text-shadow: 0 24px 70px rgba(0, 0, 0, 0.4);
+}
 
         .hero-title span {
           display: block;
@@ -416,21 +418,23 @@ export default function HeroSection({
           }
         }
 
-        @media (max-width: 900px) {
-          .hero-section {
-            min-height: 780px;
-            padding: 130px 48px 70px;
-            border-radius: 0 0 46px 46px;
-          }
+ @media (max-width: 900px) {
+  .hero-section {
+    min-height: 780px;
+    padding: 130px 36px 70px;
+    border-radius: 0 0 46px 46px;
+  }
 
-          .hero-title {
-            font-size: clamp(66px, 11vw, 94px);
-          }
+  .hero-title {
+    font-size: clamp(56px, 10vw, 86px);
+    line-height: 0.94;
+    letter-spacing: -0.05em;
+  }
 
-          .hero-scroll-indicator {
-            display: none;
-          }
-        }
+  .hero-scroll-indicator {
+    display: none;
+  }
+}
 
         @media (max-width: 700px) {
           .hero-section {

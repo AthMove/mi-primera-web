@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import {
   useRouter,
@@ -103,8 +104,13 @@ export default function ProductsClient({
   const [debug, setDebug] =
     useState("");
 
-  const [search, setSearch] =
-    useState("");
+const [search, setSearch] = useState(
+  searchParams.get("search") || ""
+);
+
+useEffect(() => {
+  setSearch(searchParams.get("search") || "");
+}, [searchParams]);
 
   const [sort, setSort] =
     useState<SortOption>("latest");
@@ -504,6 +510,12 @@ export default function ProductsClient({
     },
   ];
 
+  const isGolfCategory =
+  !embedded &&
+  !fixedBrand &&
+  normalizeCategory(categoryFilter) ===
+    "golf";
+
   const visibleCategoryTitle =
     (() => {
       if (fixedBrand) {
@@ -785,6 +797,279 @@ export default function ProductsClient({
         )}
       </section>
 
+            {isGolfCategory && (
+        <section
+          style={golfSeoSectionStyle}
+          aria-labelledby="golf-seo-title"
+        >
+          <div style={golfSeoIntroStyle}>
+            <p style={eyebrowStyle}>
+              GUÍA DE COMPRA
+            </p>
+
+            <h2
+              id="golf-seo-title"
+              style={golfSeoTitleStyle}
+            >
+              Palos de golf de segunda mano:
+              compra material premium con
+              confianza
+            </h2>
+
+            <p style={golfSeoLeadStyle}>
+              Comprar palos de golf de segunda
+              mano permite acceder a material de
+              marcas premium por un precio más
+              competitivo. En ATHMOV puedes
+              encontrar drivers, hierros, wedges,
+              putters, híbridos y bolsas de golf
+              publicados por otros jugadores.
+            </p>
+          </div>
+
+          <div style={golfSeoContentGridStyle}>
+            <article style={golfSeoCardStyle}>
+              <h3 style={golfSeoCardTitleStyle}>
+                Qué revisar antes de comprar
+              </h3>
+
+              <p style={golfSeoParagraphStyle}>
+                Antes de comprar un palo de golf
+                usado, revisa el estado de la
+                cabeza, la varilla y el grip. Las
+                marcas normales de uso no suelen
+                afectar al rendimiento, pero es
+                importante comprobar que no
+                existan grietas, golpes profundos
+                o daños estructurales.
+              </p>
+
+              <p style={golfSeoParagraphStyle}>
+                También debes comprobar que la
+                flexibilidad, longitud y peso de
+                la varilla se adapten a tu nivel
+                de juego y velocidad de swing.
+                Una buena elección puede mejorar
+                la consistencia y ayudarte a
+                aprovechar mejor cada golpe.
+              </p>
+            </article>
+
+            <article style={golfSeoCardStyle}>
+              <h3 style={golfSeoCardTitleStyle}>
+                Material premium por menos
+              </h3>
+
+              <p style={golfSeoParagraphStyle}>
+                Muchos jugadores renuevan su
+                material aunque sus palos
+                anteriores continúen en excelentes
+                condiciones. Esto permite
+                encontrar modelos de TaylorMade,
+                Callaway, Ping, Titleist, Cobra,
+                Mizuno y otras marcas reconocidas
+                a precios inferiores a los de un
+                producto nuevo.
+              </p>
+
+              <p style={golfSeoParagraphStyle}>
+                La segunda mano también es una
+                buena opción para probar un tipo
+                de palo diferente, completar un
+                juego o sustituir una unidad
+                concreta sin tener que comprar un
+                set completo.
+              </p>
+            </article>
+          </div>
+
+          <div style={golfLinksBlockStyle}>
+            <div>
+              <p style={golfLinksEyebrowStyle}>
+                EXPLORA EL MARKETPLACE
+              </p>
+
+              <h3 style={golfLinksTitleStyle}>
+                Encuentra el material que necesita
+                tu juego
+              </h3>
+            </div>
+
+            <nav
+              style={golfLinksStyle}
+              aria-label="Tipos de material de golf"
+            >
+              <Link
+                href="/golf?search=driver"
+                style={golfSeoLinkStyle}
+              >
+                Drivers
+              </Link>
+
+              <Link
+                href="/golf?search=hierros"
+                style={golfSeoLinkStyle}
+              >
+                Hierros
+              </Link>
+
+              <Link
+                href="/golf?search=wedge"
+                style={golfSeoLinkStyle}
+              >
+                Wedges
+              </Link>
+
+              <Link
+                href="/golf?search=putter"
+                style={golfSeoLinkStyle}
+              >
+                Putters
+              </Link>
+
+              <Link
+                href="/golf?search=bolsa"
+                style={golfSeoLinkStyle}
+              >
+                Bolsas de golf
+              </Link>
+
+              <Link
+                href="/buyer-guide"
+                style={golfSeoLinkStyle}
+              >
+                Guía del comprador
+              </Link>
+            </nav>
+          </div>
+
+          <div
+  style={golfFaqStyle}
+  className="golf-seo-faq"
+>
+            <div style={golfFaqHeaderStyle}>
+              <p style={eyebrowStyle}>
+                PREGUNTAS FRECUENTES
+              </p>
+
+              <h2 style={golfFaqTitleStyle}>
+                Comprar y vender material de golf
+                usado
+              </h2>
+            </div>
+
+            <div style={golfFaqListStyle}>
+              <details style={golfFaqItemStyle}>
+                <summary
+                  style={golfFaqSummaryStyle}
+                >
+                  ¿Merece la pena comprar palos de
+                  golf de segunda mano?
+                </summary>
+
+                <p style={golfFaqAnswerStyle}>
+                  Sí. Un palo de golf bien cuidado
+                  puede conservar su rendimiento
+                  durante años. Comprar de segunda
+                  mano permite acceder a modelos
+                  premium por un precio inferior,
+                  siempre que se compruebe su
+                  estado y sus especificaciones.
+                </p>
+              </details>
+
+              <details style={golfFaqItemStyle}>
+                <summary
+                  style={golfFaqSummaryStyle}
+                >
+                  ¿Qué debo comprobar antes de
+                  comprar un driver usado?
+                </summary>
+
+                <p style={golfFaqAnswerStyle}>
+                  Revisa la cara y la corona del
+                  driver, la unión entre la cabeza
+                  y la varilla, el grip, el loft y
+                  la flexibilidad de la varilla.
+                  También es recomendable
+                  comprobar que no haya grietas ni
+                  sonidos internos extraños.
+                </p>
+              </details>
+
+              <details style={golfFaqItemStyle}>
+                <summary
+                  style={golfFaqSummaryStyle}
+                >
+                  ¿Qué marcas de golf puedo
+                  encontrar en ATHMOV?
+                </summary>
+
+                <p style={golfFaqAnswerStyle}>
+                  La disponibilidad depende de los
+                  anuncios publicados. Puedes
+                  encontrar material de marcas
+                  como TaylorMade, Callaway, Ping,
+                  Titleist, Cobra, Mizuno,
+                  Cleveland y otras firmas
+                  especializadas.
+                </p>
+              </details>
+
+              <details style={golfFaqItemStyle}>
+                <summary
+                  style={golfFaqSummaryStyle}
+                >
+                  ¿Puedo vender mis antiguos palos
+                  de golf?
+                </summary>
+
+                <p style={golfFaqAnswerStyle}>
+                  Sí. Puedes publicar drivers,
+                  hierros, wedges, putters,
+                  híbridos, bolsas y otros
+                  accesorios que ya no utilices,
+                  indicando su estado,
+                  características y precio.
+                </p>
+              </details>
+            </div>
+          </div>
+
+          <div style={golfCtaStyle}>
+            <div>
+              <p style={golfCtaEyebrowStyle}>
+                THE GAME CONTINUES
+              </p>
+
+              <h2 style={golfCtaTitleStyle}>
+                Tu próximo palo puede estar aquí.
+                El que ya no usas también.
+              </h2>
+            </div>
+
+            <div style={golfCtaActionsStyle}>
+              <Link
+                href="/golf"
+                style={golfCtaPrimaryStyle}
+              >
+                Ver productos
+              </Link>
+
+              <button
+                type="button"
+                onClick={() =>
+                  setShowLaunchModal(true)
+                }
+                style={golfCtaSecondaryStyle}
+              >
+                Vender material
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
+
       {!embedded &&
         feedPosts.length > 0 && (
           <section style={feedSectionStyle}>
@@ -938,12 +1223,15 @@ export default function ProductsClient({
           }
         }
 
-        @media (max-width: 800px) {
-          .marketplace-page {
-            padding:
-              120px 18px 40px !important;
-          }
-        }
+  @media (max-width: 800px) {
+  .marketplace-page {
+    padding: 120px 18px 40px !important;
+  }
+
+  .golf-seo-faq {
+    grid-template-columns: 1fr !important;
+  }
+}
 
         @media (max-width: 650px) {
           .marketplace-page {
@@ -955,6 +1243,13 @@ export default function ProductsClient({
             font-size: 44px !important;
             letter-spacing: -2px !important;
           }
+.golf-seo-faq {
+  gap: 28px !important;
+}
+
+.golf-seo-faq > div:first-child {
+  position: static !important;
+}
         }
       `}</style>
     </div>
@@ -1233,4 +1528,209 @@ const feedImageStyle = {
 
 const feedLikesStyle = {
   fontWeight: 900,
+};
+
+const golfSeoSectionStyle = {
+  maxWidth: "1400px",
+  margin: "0 auto 80px",
+};
+
+const golfSeoIntroStyle = {
+  maxWidth: "900px",
+  marginBottom: "40px",
+};
+
+const golfSeoTitleStyle = {
+  margin: 0,
+  maxWidth: "900px",
+  fontSize: "clamp(38px, 5vw, 68px)",
+  lineHeight: 0.98,
+  letterSpacing: "-3px",
+};
+
+const golfSeoLeadStyle = {
+  maxWidth: "820px",
+  marginTop: "26px",
+  marginBottom: 0,
+  color: "#555",
+  fontSize: "18px",
+  lineHeight: 1.8,
+};
+
+const golfSeoContentGridStyle = {
+  display: "grid",
+  gridTemplateColumns:
+    "repeat(auto-fit, minmax(280px, 1fr))",
+  gap: "20px",
+};
+
+const golfSeoCardStyle = {
+  background: "#fff",
+  border: "1px solid rgba(0,0,0,0.06)",
+  borderRadius: "30px",
+  padding: "clamp(26px, 4vw, 44px)",
+};
+
+const golfSeoCardTitleStyle = {
+  margin: "0 0 20px",
+  fontSize: "28px",
+  lineHeight: 1.1,
+  letterSpacing: "-1px",
+};
+
+const golfSeoParagraphStyle = {
+  margin: "0 0 18px",
+  color: "#595959",
+  fontSize: "16px",
+  lineHeight: 1.8,
+};
+
+const golfLinksBlockStyle = {
+  marginTop: "20px",
+  padding: "clamp(28px, 5vw, 52px)",
+  background: "#111",
+  color: "#fff",
+  borderRadius: "32px",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: "30px",
+  flexWrap: "wrap" as const,
+};
+
+const golfLinksEyebrowStyle = {
+  margin: "0 0 12px",
+  fontSize: "11px",
+  letterSpacing: "3px",
+  color: "rgba(255,255,255,0.5)",
+};
+
+const golfLinksTitleStyle = {
+  maxWidth: "530px",
+  margin: 0,
+  fontSize: "clamp(28px, 4vw, 42px)",
+  lineHeight: 1.05,
+  letterSpacing: "-2px",
+};
+
+const golfLinksStyle = {
+  display: "flex",
+  flexWrap: "wrap" as const,
+  justifyContent: "flex-end",
+  gap: "10px",
+  maxWidth: "570px",
+};
+
+const golfSeoLinkStyle = {
+  padding: "12px 18px",
+  border: "1px solid rgba(255,255,255,0.18)",
+  borderRadius: "999px",
+  color: "#fff",
+  textDecoration: "none",
+  fontSize: "14px",
+  fontWeight: 800,
+};
+
+const golfFaqStyle = {
+  marginTop: "70px",
+  display: "grid",
+  gridTemplateColumns:
+    "minmax(260px, 0.7fr) minmax(300px, 1.3fr)",
+  gap: "50px",
+  alignItems: "start",
+};
+
+const golfFaqHeaderStyle = {
+  position: "sticky" as const,
+  top: "120px",
+};
+
+const golfFaqTitleStyle = {
+  margin: 0,
+  fontSize: "clamp(34px, 4vw, 54px)",
+  lineHeight: 1,
+  letterSpacing: "-2px",
+};
+
+const golfFaqListStyle = {
+  display: "grid",
+  gap: "12px",
+};
+
+const golfFaqItemStyle = {
+  background: "#fff",
+  border: "1px solid rgba(0,0,0,0.07)",
+  borderRadius: "22px",
+  padding: "0 22px",
+};
+
+const golfFaqSummaryStyle = {
+  padding: "22px 0",
+  cursor: "pointer",
+  fontSize: "17px",
+  fontWeight: 900,
+  lineHeight: 1.4,
+};
+
+const golfFaqAnswerStyle = {
+  margin: "0 0 24px",
+  paddingRight: "20px",
+  color: "#5b5b5b",
+  fontSize: "15px",
+  lineHeight: 1.8,
+};
+
+const golfCtaStyle = {
+  marginTop: "70px",
+  padding: "clamp(30px, 5vw, 60px)",
+  background: "#dfff00",
+  borderRadius: "36px",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: "30px",
+  flexWrap: "wrap" as const,
+};
+
+const golfCtaEyebrowStyle = {
+  margin: "0 0 14px",
+  fontSize: "11px",
+  letterSpacing: "3px",
+  fontWeight: 900,
+};
+
+const golfCtaTitleStyle = {
+  maxWidth: "720px",
+  margin: 0,
+  fontSize: "clamp(34px, 5vw, 58px)",
+  lineHeight: 0.98,
+  letterSpacing: "-3px",
+};
+
+const golfCtaActionsStyle = {
+  display: "flex",
+  flexWrap: "wrap" as const,
+  gap: "12px",
+};
+
+const golfCtaPrimaryStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: "#111",
+  color: "#fff",
+  borderRadius: "999px",
+  padding: "16px 24px",
+  textDecoration: "none",
+  fontWeight: 900,
+};
+
+const golfCtaSecondaryStyle = {
+  background: "transparent",
+  color: "#111",
+  border: "1px solid rgba(0,0,0,0.25)",
+  borderRadius: "999px",
+  padding: "16px 24px",
+  fontWeight: 900,
+  cursor: "pointer",
 };

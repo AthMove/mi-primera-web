@@ -25,6 +25,7 @@ export default function Navbar() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
 const [showResults, setShowResults] = useState(false);
 const [scrolled, setScrolled] = useState(false);
+const [compactNav, setCompactNav] = useState(false);
 
 const searchRef = useRef<HTMLDivElement>(null);
 
@@ -181,6 +182,19 @@ useEffect(() => {
 onScroll();
 
 return () => window.removeEventListener("scroll", onScroll);
+}, []);
+
+useEffect(() => {
+  const updateNavbar = () => {
+   setCompactNav(window.innerWidth <= 1500);
+  };
+
+  updateNavbar();
+  window.addEventListener("resize", updateNavbar);
+
+  return () => {
+    window.removeEventListener("resize", updateNavbar);
+  };
 }, []);
 
  useEffect(() => {
@@ -363,154 +377,151 @@ return () => window.removeEventListener("scroll", onScroll);
 
   return (
     <>
-      <nav
- style={{
-  ...navStyle,
-  padding: scrolled ? "0 24px" : "0 30px",
-  height: scrolled ? 68 : 74,
-  transition: "all .28s ease",
-}}
+<nav
+  style={{
+    ...navStyle,
+    width: compactNav
+      ? "calc(100% - 28px)"
+      : "calc(100% - 48px)",
+    top: compactNav ? "12px" : "18px",
+    height: compactNav ? 74 : scrolled ? 68 : 74,
+    padding: compactNav
+      ? "0 18px"
+      : scrolled
+        ? "0 24px"
+        : "0 30px",
+    borderRadius: compactNav ? "28px" : "999px",
+  }}
   className="athmov-navbar"
 >
-<Link href="/" style={logoStyle}>
-<Image
-  src="/logo.png"
-  alt="ATHMOV"
-  width={150}
-  height={70}
-  priority
-  className="navbar-logo"
-  style={{
-    display: "block",
-    objectFit: "contain",
-  }}
-/>
-</Link>
-
-        <div style={rightLinksStyle} className="desktop-only">
- 
-
-          <Link href="/cart" style={cartLinkStyle}>
-            CARRITO ({cartCount})
-          </Link>
-     <Link href="/products" style={navMainLinkStyle}>
-  {t.buy}
-</Link>
-
-<Link href="/brands" style={navMainLinkStyle}>
-  MARCAS
-</Link>
-
-<Link href="/sell" style={navMainLinkStyle}>
-  {t.sell}
-</Link>
-
-<Link href="/blog" style={navMainLinkStyle}>
-  {t.blog}
-</Link>
-
-<div
-  ref={searchRef}
-  style={searchWrapperStyle}
->
-  <form onSubmit={handleSearch} style={searchFormStyle}>
-    <input
-      value={searchQuery}
-      onChange={(e) => searchProducts(e.target.value)}
-      onFocus={() => {
-        if (searchResults.length > 0) setShowResults(true);
+  <Link href="/" style={logoStyle}>
+    <Image
+      src="/logo.png"
+      alt="ATHMOV"
+      width={150}
+      height={70}
+      priority
+      className="navbar-logo"
+      style={{
+        display: "block",
+        objectFit: "contain",
       }}
-      placeholder={t.searchPlaceholder}
-      style={searchInputStyle}
     />
+  </Link>
 
-    <button type="submit" style={searchButtonStyle}>
-  {t.searchButton}
-</button>
-  </form>
+  {!compactNav ? (
+   <div style={rightLinksStyle} className="navbar-content">
+      <Link href="/cart" style={cartLinkStyle}>
+        CARRITO ({cartCount})
+      </Link>
 
-  {showResults && searchResults.length > 0 && (
-    <div style={searchDropdownStyle}>
-      {searchResults.map((product) => (
-        <Link
-          key={product.id}
-          href={
-  product.slug
-    ? `/p/${product.slug}`
-    : `/products/${product.id}`
-}
-          style={searchItemStyle}
-          onClick={() => setShowResults(false)}
-        >
-          <Image
-            src={safeImage(product.image)}
-            alt={product.title}
-            width={56}
-            height={56}
-            style={{
-              borderRadius: 12,
-              objectFit: "cover",
+      <Link href="/products" style={navMainLinkStyle}>
+        {t.buy}
+      </Link>
+
+      <Link href="/brands" style={navMainLinkStyle}>
+        MARCAS
+      </Link>
+
+      <Link href="/sell" style={navMainLinkStyle}>
+        {t.sell}
+      </Link>
+
+      <Link href="/blog" style={navMainLinkStyle}>
+        {t.blog}
+      </Link>
+
+      <div ref={searchRef} style={searchWrapperStyle}>
+        <form onSubmit={handleSearch} style={searchFormStyle}>
+          <input
+            value={searchQuery}
+            onChange={(e) => searchProducts(e.target.value)}
+            onFocus={() => {
+              if (searchResults.length > 0) {
+                setShowResults(true);
+              }
             }}
+            placeholder={t.searchPlaceholder}
+            style={searchInputStyle}
           />
 
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 800 }}>
-              {product.title}
-            </div>
-
-            <div
-              style={{
-                fontSize: 13,
-                color: "#666",
-              }}
-            >
-              {product.brand}
-            </div>
-          </div>
-
-          <strong>€{product.price}</strong>
-        </Link>
-      ))}
-    </div>
-  )}
-</div>
-
-          {userEmail ? (
-  <>
-
-    <Link href="/account" style={signInStyle}>
-      {t.account}
-    </Link>
-  </>
-) : (
-            <>
-              <Link href="/auth" style={signInStyle}>
-               {t.login}
-              </Link>
-
-              <Link href="/auth" style={registerStyle}>
-                {t.register}
-              </Link>
-            </>
-          )}
-
-          <button
-            onClick={() => setMenuOpen(true)}
-            style={menuButtonStyle}
-          >
-            MENÚ
+          <button type="submit" style={searchButtonStyle}>
+            {t.searchButton}
           </button>
-        </div>
+        </form>
 
-        <button
-          onClick={() => setMenuOpen(true)}
-          style={menuButtonStyle}
-          className="mobile-only"
-        >
-          MENÚ
-        </button>
-      </nav>
+        {showResults && searchResults.length > 0 && (
+          <div style={searchDropdownStyle}>
+            {searchResults.map((product) => (
+              <Link
+                key={product.id}
+                href={
+                  product.slug
+                    ? `/p/${product.slug}`
+                    : `/products/${product.id}`
+                }
+                style={searchItemStyle}
+                onClick={() => setShowResults(false)}
+              >
+                <Image
+                  src={safeImage(product.image)}
+                  alt={product.title}
+                  width={56}
+                  height={56}
+                  style={{
+                    borderRadius: 12,
+                    objectFit: "cover",
+                  }}
+                />
 
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 800 }}>
+                    {product.title}
+                  </div>
+
+                  <div
+                    style={{
+                      fontSize: 13,
+                      color: "#666",
+                    }}
+                  >
+                    {product.brand}
+                  </div>
+                </div>
+
+                <strong>€{product.price}</strong>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {userEmail ? (
+        <Link href="/account" style={signInStyle}>
+          {t.account}
+        </Link>
+      ) : (
+        <>
+          <Link href="/auth" style={signInStyle}>
+            {t.login}
+          </Link>
+
+          <Link href="/auth" style={registerStyle}>
+            {t.register}
+          </Link>
+        </>
+      )}
+    </div>
+  ) : (
+    <button
+      type="button"
+      onClick={() => setMenuOpen(true)}
+      style={menuButtonStyle}
+    >
+      MENÚ
+    </button>
+  )}
+</nav>
       {menuOpen && (
         <div style={overlayStyle} onClick={() => setMenuOpen(false)}>
           <aside style={drawerStyle} onClick={(e) => e.stopPropagation()}>
@@ -618,53 +629,70 @@ return () => window.removeEventListener("scroll", onScroll);
         </div>
       )}
 
-      <style>{`
-  .mobile-only {
-    display: none !important;
-  }
-
+<style>{`
   .athmov-navbar {
-    transition: all .28s ease;
+    box-sizing: border-box;
+    align-items: center !important;
   }
 
-  @media (max-width: 1100px) {
-    .desktop-only {
-      display: none !important;
-    }
+  .athmov-navbar > a,
+  .athmov-navbar > button,
+  .navbar-content {
+    align-self: center !important;
+  }
 
-    .mobile-only {
-      display: flex !important;
-      align-items: center;
-      justify-content: center;
-    }
+  .navbar-content {
+    display: flex !important;
+    height: 100% !important;
+    align-items: center !important;
+  }
 
-    .athmov-navbar {
-      height: 74px !important;
-      width: calc(100% - 28px) !important;
-      padding: 0 18px !important;
-      top: 12px !important;
-      border-radius: 28px !important;
-    }
+  .navbar-content > a {
+    display: inline-flex !important;
+    height: 46px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
 
-    .navbar-logo {
-      width: 132px !important;
-      height: auto !important;
-    }
+  .navbar-content form {
+    display: flex !important;
+    height: 46px !important;
+    align-items: center !important;
+    margin: 0 !important;
+  }
+
+  .navbar-content input {
+    height: 38px !important;
+    line-height: 38px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .navbar-content button {
+    display: inline-flex !important;
+    height: 38px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    margin: 0 !important;
   }
 
   @media (max-width: 700px) {
     .athmov-navbar {
-      height: 70px !important;
       width: calc(100% - 20px) !important;
+      height: 70px !important;
       padding: 0 16px !important;
       top: 10px !important;
       border-radius: 26px !important;
-      background: rgba(255,255,255,.92) !important;
-      box-shadow: 0 18px 50px rgba(0,0,0,.10) !important;
     }
 
     .navbar-logo {
       width: 126px !important;
+      height: auto !important;
     }
   }
 `}</style>
@@ -678,65 +706,91 @@ const navStyle = {
   left: "50%",
   transform: "translateX(-50%)",
   zIndex: 100,
+
   width: "calc(100% - 48px)",
   maxWidth: "1500px",
   height: 74,
   padding: "0 30px",
-  display: "flex",
+
+  display: "grid",
+  gridTemplateColumns: "180px minmax(0, 1fr)",
   alignItems: "center",
-  justifyContent: "space-between",
-  gap: "18px",
+  columnGap: "28px",
+
   borderRadius: "999px",
   background: "rgba(255,255,255,0.88)",
   backdropFilter: "blur(36px)",
   WebkitBackdropFilter: "blur(36px)",
   border: "1px solid rgba(255,255,255,0.55)",
-boxShadow: "0 24px 70px rgba(0,0,0,.08)",
+  boxShadow: "0 24px 70px rgba(0,0,0,.08)",
 };
 
 const logoStyle = {
   display: "flex",
   alignItems: "center",
-   height: "100%",
+  justifyContent: "flex-start",
+  width: "180px",
+  height: "100%",
   flexShrink: 0,
   textDecoration: "none",
 };
 
 const rightLinksStyle = {
   display: "flex",
-  justifyContent: "flex-end",
+  flex: 1,
+  minWidth: 0,
+  height: "100%",
   alignItems: "center",
+  justifyContent: "flex-end",
   gap: "18px",
-  flexWrap: "wrap" as const,
+  flexWrap: "nowrap" as const,
 };
 
 const cartLinkStyle = {
+  display: "inline-flex",
+  height: "46px",
+  alignItems: "center",
+  justifyContent: "center",
   textDecoration: "none",
   color: "#111",
   fontSize: "12px",
   fontWeight: 800,
+  lineHeight: 1,
+  whiteSpace: "nowrap" as const,
   letterSpacing: "1.3px",
   border: "1px solid rgba(0,0,0,0.12)",
   borderRadius: "999px",
-  padding: "10px 14px",
+  padding: "0 14px",
 };
 
 const signInStyle = {
+  display: "inline-flex",
+  height: "46px",
+  alignItems: "center",
+  justifyContent: "center",
   textDecoration: "none",
   color: "#111",
   fontSize: "11px",
   fontWeight: 700,
+  lineHeight: 1,
+  whiteSpace: "nowrap" as const,
   letterSpacing: "1.6px",
 };
 
 const registerStyle = {
+  display: "inline-flex",
+  height: "46px",
+  alignItems: "center",
+  justifyContent: "center",
   textDecoration: "none",
   background: "#111",
   color: "#fff",
   borderRadius: "999px",
-  padding: "12px 18px",
+  padding: "0 18px",
   fontSize: "11px",
   fontWeight: 800,
+  lineHeight: 1,
+  whiteSpace: "nowrap" as const,
   letterSpacing: "1.5px",
 };
 
@@ -854,22 +908,30 @@ const drawerSectionTitleStyle = {
 };
 
 const navMainLinkStyle = {
+  display: "inline-flex",
+  height: "46px",
+  alignItems: "center",
+  justifyContent: "center",
   textDecoration: "none",
   color: "#111",
- fontSize: "13px",
+  fontSize: "13px",
   fontWeight: 900,
+  lineHeight: 1,
   letterSpacing: "1.8px",
   textTransform: "uppercase" as const,
+  whiteSpace: "nowrap" as const,
 };
 
 const searchFormStyle = {
   display: "flex",
   alignItems: "center",
+  width: "100%",
+  height: "46px",
+  minWidth: 0,
   background: "rgba(255,255,255,0.82)",
   border: "1px solid rgba(0,0,0,0.06)",
   borderRadius: "999px",
-  padding: "5px",
-  minWidth: "460px",
+  padding: "4px",
   boxShadow: "inset 0 1px 0 rgba(255,255,255,0.7)",
 };
 
@@ -883,18 +945,26 @@ const searchInputStyle = {
 };
 
 const searchButtonStyle = {
+  display: "inline-flex",
+  height: "38px",
+  alignItems: "center",
+  justifyContent: "center",
   border: "none",
   background: "#111",
   color: "#fff",
   borderRadius: "999px",
- padding: "10px 18px",
+  padding: "0 18px",
   fontSize: "11px",
   fontWeight: 900,
+  lineHeight: 1,
   cursor: "pointer",
-};
+};;
 
 const searchWrapperStyle = {
   position: "relative" as const,
+  flex: 1,
+  minWidth: 0,
+  maxWidth: "360px",
 };
 
 const searchDropdownStyle = {

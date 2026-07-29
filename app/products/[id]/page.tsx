@@ -22,23 +22,28 @@ const supabase = createClient(
 async function getProduct(id: string) {
   const { data, error } = await supabase
     .from("products")
-    .select(
-      `
-        id,
-        title,
-        description,
-        price,
-        original_price,
-        brand,
-        category,
-        condition,
-        image,
-        images,
-        location,
-        sold,
-        moderation_status
-      `
-    )
+.select(
+  `
+    id,
+    title,
+    description,
+    price,
+    original_price,
+    brand,
+    category,
+    condition,
+    image,
+    images,
+    location,
+    sold,
+    moderation_status,
+    seller_id,
+    created_at,
+    views,
+    favorites_count,
+    featured
+  `
+)
     .eq("id", id)
     .eq("moderation_status", "approved")
     .maybeSingle();
@@ -90,6 +95,15 @@ function getProductImage(product: any) {
 
   return `https://athmov.com${firstImage}`;
 }
+function getValidPrice(price: unknown) {
+  const parsedPrice = Number(price);
+
+  if (!Number.isFinite(parsedPrice) || parsedPrice < 0) {
+    return null;
+  }
+
+  return parsedPrice.toFixed(2);
+}
 
 export async function generateMetadata({
   params,
@@ -99,7 +113,7 @@ export async function generateMetadata({
 
   if (!product) {
     return {
-      title: "Producto no encontrado | ATHMOV",
+      title: "Producto no encontrado",
       description:
         "Este producto ya no está disponible en el marketplace de ATHMOV.",
       robots: {
@@ -109,7 +123,11 @@ export async function generateMetadata({
     };
   }
 
-  const title = `${product.title} de segunda mano | ATHMOV`;
+const title =
+  `${product.title} de segunda mano`;
+
+const socialTitle =
+  `${product.title} de segunda mano | ATHMOV`;
 
   const description =
     product.description?.slice(0, 155) ||
@@ -118,40 +136,41 @@ export async function generateMetadata({
   const canonical = `https://athmov.com/products/${product.id}`;
   const image = getProductImage(product);
 
-  return {
-    title,
+ return {
+  title,
+  description,
+
+  alternates: {
+    canonical,
+  },
+
+  openGraph: {
+    title: socialTitle,
     description,
+    url: canonical,
+    siteName: "ATHMOV",
+    type: "website",
+    locale: "es_ES",
+    images: [
+      {
+        url: image,
+        alt: product.title,
+      },
+    ],
+  },
 
-    alternates: {
-      canonical,
-    },
+  twitter: {
+    card: "summary_large_image",
+    title: socialTitle,
+    description,
+    images: [image],
+  },
 
-    openGraph: {
-      title,
-      description,
-      url: canonical,
-      siteName: "ATHMOV",
-      type: "website",
-      images: [
-        {
-          url: image,
-          alt: product.title,
-        },
-      ],
-    },
-
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [image],
-    },
-
-    robots: {
-      index: !product.sold,
-      follow: true,
-    },
-  };
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
 }
 
 export default async function ProductPage({
@@ -162,38 +181,59 @@ export default async function ProductPage({
 
   const canonicalUrl = `https://athmov.com/products/${id}`;
 
-  const productSchema = product
-    ? {
-        "@context": "https://schema.org",
-        "@type": "Product",
-        name: product.title,
-        description:
-          product.description ||
-          `${product.title} disponible en ATHMOV.`,
-        image: [getProductImage(product)],
-        sku: product.id,
+  const schemaPrice = product
+  ? getValidPrice(product.price)
+  : null;
 
-        brand: product.brand
-          ? {
-              "@type": "Brand",
-              name: product.brand,
-            }
-          : undefined,
+ const productSchema = product
+  ? {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: product.title,
 
-        itemCondition: getSchemaCondition(product.condition),
+      description:
+        product.description ||
+        `${product.title} disponible en ATHMOV.`,
 
-        offers: {
-          "@type": "Offer",
-          url: canonicalUrl,
-          priceCurrency: "EUR",
-          price: Number(product.price).toFixed(2),
-          availability: product.sold
-            ? "https://schema.org/OutOfStock"
-            : "https://schema.org/InStock",
-          itemCondition: getSchemaCondition(product.condition),
-        },
-      }
-    : null;
+      image: [getProductImage(product)],
+
+      sku: product.id,
+
+      brand: product.brand
+        ? {
+            "@type": "Brand",
+            name: product.brand,
+          }
+        : undefined,
+
+      itemCondition: getSchemaCondition(
+        product.condition
+      ),
+
+      offers: schemaPrice
+        ? {
+            "@type": "Offer",
+            url: canonicalUrl,
+            priceCurrency: "EUR",
+            price: schemaPrice,
+
+            availability: product.sold
+              ? "https://schema.org/OutOfStock"
+              : "https://schema.org/InStock",
+
+            itemCondition: getSchemaCondition(
+              product.condition
+            ),
+
+            seller: {
+              "@type": "Organization",
+              name: "ATHMOV",
+              url: "https://athmov.com",
+            },
+          }
+        : undefined,
+    }
+  : null;
 
   const categoryUrl = product
     ? getCategoryUrl(product.category)
@@ -246,7 +286,10 @@ export default async function ProductPage({
         />
       )}
 
-      <ProductDetailClient />
+      <ProductDetailClient
+  productId={id}
+  initialProduct={product}
+/>
     </>
   );
 }

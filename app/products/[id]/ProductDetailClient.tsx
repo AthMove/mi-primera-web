@@ -1,47 +1,80 @@
 "use client";
 
-import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useLanguage } from "@/components/LanguageProvider";
 import ProductGallery from "@/components/product/ProductGallery";
 import ProductPurchasePanel from "@/components/product/ProductPurchasePanel";
-import ProductFeatureGrid from "@/components/product/ProductFeatureGrid";
-import ProductTimeline from "@/components/product/ProductTimeline";
-import ProductBuyerGuide from "@/components/product/ProductBuyerGuide";
-import SellerPremiumCard from "@/components/product/SellerPremiumCard";
 import StickyBuyBar from "@/components/product/StickyBuyBar";
-import RelatedProducts from "@/components/product/RelatedProducts";
-import LaunchNoticeModal from "@/components/LaunchNoticeModal";
+import dynamic from "next/dynamic";
+
+const ProductFeatureGrid = dynamic(
+  () => import("@/components/product/ProductFeatureGrid")
+);
+
+const ProductTimeline = dynamic(
+  () => import("@/components/product/ProductTimeline")
+);
+
+const ProductBuyerGuide = dynamic(
+  () => import("@/components/product/ProductBuyerGuide")
+);
+
+const SellerPremiumCard = dynamic(
+  () => import("@/components/product/SellerPremiumCard")
+);
+
+const RelatedProducts = dynamic(
+  () => import("@/components/product/RelatedProducts")
+);
+
+const LaunchNoticeModal = dynamic(
+  () => import("@/components/LaunchNoticeModal"),
+  {
+    ssr: false,
+  }
+);
 
 interface ProductDetailProps {
   productId?: string;
+  initialProduct?: any;
 }
-
 export default function ProductDetail({
   productId,
+  initialProduct,
 }: ProductDetailProps) {
   const params = useParams();
   const router = useRouter();
   const { t } = useLanguage();
 
   const id = productId || String(params.id || "");
-  console.log("PRODUCT ID RECIBIDO:", productId);
-console.log("PARAMS CLIENTE:", params);
-console.log("ID UTILIZADO:", id);
 
   const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
-  const [producto, setProducto] = useState<any>(null);
+  const [producto, setProducto] = useState<any>(
+  initialProduct || null
+);
   const [related, setRelated] = useState<any[]>([]);
-  const [selectedImage, setSelectedImage] = useState("");
+ const [selectedImage, setSelectedImage] = useState(() => {
+  if (
+    Array.isArray(initialProduct?.images) &&
+    initialProduct.images.length > 0
+  ) {
+    return initialProduct.images[0];
+  }
+
+  return initialProduct?.image || "/logo.png";
+});
   const [isFavorite, setIsFavorite] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [notFound, setNotFound] = useState(false);
+  const [loading, setLoading] = useState(
+  !initialProduct
+);
+  const [notFound, setNotFound] = useState(
+  !initialProduct
+);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [sellerProfile, setSellerProfile] = useState<any>(null);
   const [sellerReviews, setSellerReviews] = useState<any[]>([]);
-  const [sellerProducts, setSellerProducts] = useState<any[]>([]);
   const [showLaunchModal, setShowLaunchModal] = useState(false);
  
 
@@ -52,27 +85,51 @@ console.log("ID UTILIZADO:", id);
       return;
     }
 
-    const getProduct = async () => {
-      try {
-        setLoading(true);
-        setNotFound(false);
+const getProduct = async () => {
+  try {
+    setLoading(!initialProduct);
+    setNotFound(false);
 
-        const { data, error } = await supabase
-          .from("products")
-          .select("*")
-          .eq("id", id)
-          .maybeSingle();
+    let data = initialProduct;
 
-          console.log("PRODUCTO CLIENTE:", data);
-console.log("ERROR PRODUCTO CLIENTE:", error);
+    if (!data) {
+      const { data: fetchedProduct, error } = await supabase
+        .from("products")
+        .select(
+          `
+            id,
+            title,
+            description,
+            price,
+            original_price,
+            brand,
+            category,
+            condition,
+            image,
+            images,
+            location,
+            sold,
+            moderation_status,
+            seller_id,
+            created_at,
+            views,
+            favorites_count,
+            featured
+          `
+        )
+        .eq("id", id)
+        .eq("moderation_status", "approved")
+        .maybeSingle();
 
-        if (error || !data) {
-          setProducto(null);
-          setNotFound(true);
-          return;
-        }
+      if (error || !fetchedProduct) {
+        setProducto(null);
+        setNotFound(true);
+        return;
+      }
 
-        setProducto(data);
+      data = fetchedProduct;
+      setProducto(fetchedProduct);
+    }
 
   const { data: sellerData } = await supabase
   .from("profiles")
@@ -152,7 +209,7 @@ setRelated(relatedProducts || []);
     };
 
     getProduct();
-  }, [id]);
+ }, [id, initialProduct]);
 
   const safeImage = (src?: string) => {
     return src?.startsWith("http") || src?.startsWith("/") ? src : "/logo.png";

@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 export const revalidate = 300;
 
 type ProductSitemapRow = {
+  id: string;
   slug: string | null;
   brand: string | null;
   category: string | null;
@@ -20,19 +21,19 @@ function slugify(text: string) {
 }
 
 function categoryToUrl(category: string) {
-  const normalized = category.trim().toUpperCase();
+  const normalized = slugify(category);
 
   const categoryMap: Record<string, string> = {
-    PADEL: "padel",
-    GOLF: "golf",
-    TENNIS: "tenis",
-    RUNNING: "running",
-    FITNESS: "fitness",
+    padel: "padel",
+    golf: "golf",
+    tennis: "tenis",
+    tenis: "tenis",
+    running: "running",
+    fitness: "fitness",
   };
 
-  return categoryMap[normalized] || slugify(category);
+  return categoryMap[normalized] || normalized;
 }
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://athmov.com";
   const now = new Date();
@@ -156,7 +157,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
  const { data, error } = await supabase
   .from("products")
-  .select("slug,brand,category,created_at")
+  .select("id,slug,brand,category,created_at")
   .eq("moderation_status", "approved");
 
   if (error) {
@@ -167,16 +168,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const products = (data || []) as ProductSitemapRow[];
 
-  const productPages: MetadataRoute.Sitemap = products
-    .filter((product) => product.slug)
-    .map((product) => ({
-      url: `${baseUrl}/p/${product.slug}`,
-      lastModified: product.created_at
-  ? new Date(product.created_at)
-  : now,
-      changeFrequency: "daily" as const,
-      priority: 0.8,
-    }));
+const productPages: MetadataRoute.Sitemap = products.map(
+  (product) => ({
+    url: `${baseUrl}/products/${product.id}`,
+    lastModified: product.created_at
+      ? new Date(product.created_at)
+      : now,
+    changeFrequency: "daily" as const,
+    priority: 0.8,
+  })
+);
 
   const brandMap = new Map<string, string>();
   const categoryBrandMap = new Map<
