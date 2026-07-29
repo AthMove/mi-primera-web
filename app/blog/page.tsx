@@ -10,12 +10,11 @@ const heroTags = [
 ];
 
 const featuredArticle = {
-  category: "PÁDEL · GUÍA DE COMPRA",
-  title:
-    "Bullpadel Vertex 04 de segunda mano: guía completa para comprar con seguridad",
+  category: "GOLF · CAMPOS",
+  title: "Los mejores campos de golf de España",
   text:
-    "Qué revisar, cuánto pagar y cómo reducir el riesgo de falsificaciones antes de comprar una Bullpadel Vertex 04 usada.",
-  href: "/blog/bullpadel-vertex-04-segunda-mano",
+    "Descubre algunos de los campos de golf más espectaculares de España, desde recorridos junto al mar hasta diseños de referencia internacional.",
+  href: "/blog/mejores-campos-golf-espana",
   reading: "8 min",
 };
 
@@ -72,6 +71,12 @@ const allArticles = [
     href: "/blog/cuando-comprar-vender-palos-golf-segunda-mano",
     reading: "6 min",
   },
+  {
+  category: "GOLF · CAMPOS",
+  title: "Los mejores campos de golf de España",
+  href: "/blog/mejores-campos-golf-espana",
+  reading: "8 min",
+},
   {
     category: "PÁDEL · AUTENTICIDAD",
     title: "Cómo detectar una pala de pádel falsa",
