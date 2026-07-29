@@ -6,7 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 const PREMIUM_BRANDS: Record<string, string[]> = {
-  PADEL: ["NOX", "Bullpadel", "Siux", "Babolat", "Wilson", "Head"],
+  PADEL: ["NOX", "Bullpadel", "Siux", "Babolat", "Wilson", "Head", "Asics"],
   GOLF: ["Titleist", "TaylorMade", "Callaway", "PXG", "Scotty Cameron", "Ping"],
   TENNIS: ["Nike", "Wilson", "Yonex", "Lacoste", "Babolat", "Head"],
   RUNNING: ["Nike", "Hoka", "On", "ASICS", "New Balance", "Salomon"],

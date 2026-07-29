@@ -40,7 +40,7 @@ const brands = [
   "ASICS",
   "New Balance",
   "Salomon",
-];
+  ];
 
 export default function Filters({
   selectedCategory,
