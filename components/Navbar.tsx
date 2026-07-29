@@ -714,7 +714,7 @@ const navStyle = {
   padding: "0 30px",
 
   display: "grid",
-  gridTemplateColumns: "180px minmax(0, 1fr)",
+  gridTemplateColumns: "180px minmax(0, 1fr) auto",
   alignItems: "center",
   columnGap: "28px",
 
