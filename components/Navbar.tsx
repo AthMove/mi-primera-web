@@ -395,18 +395,18 @@ useEffect(() => {
   className="athmov-navbar"
 >
   <Link href="/" style={logoStyle}>
-    <Image
-      src="/logo.png"
-      alt="ATHMOV"
-      width={150}
-      height={70}
-      priority
-      className="navbar-logo"
-      style={{
-        display: "block",
-        objectFit: "contain",
-      }}
-    />
+ <Image
+  src="/logo.png"
+  alt="ATHMOV"
+  width={180}
+height={84}
+  priority
+  className="navbar-logo"
+  style={{
+    display: "block",
+    objectFit: "contain",
+  }}
+/>
   </Link>
 
   {!compactNav ? (
@@ -729,7 +729,7 @@ const logoStyle = {
   display: "flex",
   alignItems: "center",
   justifyContent: "flex-start",
-  width: "180px",
+  width: "200px",
   height: "100%",
   flexShrink: 0,
   textDecoration: "none",
