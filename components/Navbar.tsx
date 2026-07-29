@@ -409,8 +409,8 @@ height={84}
 />
   </Link>
 
-  {!compactNav ? (
-   <div style={rightLinksStyle} className="navbar-content">
+ {!compactNav && (
+  <div style={rightLinksStyle}>
       <Link href="/cart" style={cartLinkStyle}>
         CARRITO ({cartCount})
       </Link>
@@ -512,15 +512,16 @@ height={84}
         </>
       )}
     </div>
-  ) : (
-    <button
-      type="button"
-      onClick={() => setMenuOpen(true)}
-      style={menuButtonStyle}
-    >
-      MENÚ
-    </button>
-  )}
+)}
+
+<button
+  type="button"
+  onClick={() => setMenuOpen(true)}
+  style={menuButtonStyle}
+>
+  MENÚ
+</button>
+  
 </nav>
       {menuOpen && (
         <div style={overlayStyle} onClick={() => setMenuOpen(false)}>
@@ -793,26 +794,26 @@ const registerStyle = {
   whiteSpace: "nowrap" as const,
   letterSpacing: "1.5px",
 };
+
 const menuButtonStyle = {
-  display: "flex",
+  display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
-
   justifySelf: "end",
   alignSelf: "center",
+  flexShrink: 0,
   width: "auto",
-
+  minWidth: "86px",
+  height: "46px",
+  padding: "0 20px",
   background: "#111",
   color: "#fff",
   border: "none",
   borderRadius: "999px",
-  padding: "13px 20px",
   fontSize: "11px",
   fontWeight: 900,
   letterSpacing: "1.8px",
   cursor: "pointer",
-  minWidth: "86px",
-  height: "46px",
 };
 
 const overlayStyle = {
