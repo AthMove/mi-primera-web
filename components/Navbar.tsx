@@ -339,39 +339,39 @@ useEffect(() => {
       CARRITO ({cartCount})
     </Link>
 
-    {userEmail ? (
-      <>
-        <Link href="/favorites" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-          FAVORITOS
-        </Link>
+   {userEmail ? (
+  <>
+    <Link href="/messages" style={desktopIconLinkStyle}>
+      MENSAJES{badge(messagesCount)}
+    </Link>
 
-        <Link href="/messages" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-          MENSAJES{badge(messagesCount)}
-        </Link>
+    <Link href="/offers" style={desktopIconLinkStyle}>
+      OFERTAS{badge(offersCount)}
+    </Link>
 
-        <Link href="/notifications" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-          NOTIFICACIONES{badge(notificationsCount)}
-        </Link>
+    <Link href="/orders" style={desktopIconLinkStyle}>
+      PEDIDOS{badge(ordersCount)}
+    </Link>
 
-        <Link href="/account" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-          CUENTA
-        </Link>
+    <Link href="/notifications" style={desktopIconLinkStyle}>
+      AVISOS{badge(notificationsCount)}
+    </Link>
 
-        <button onClick={handleLogout} style={drawerButtonStyle}>
-          CERRAR SESIÓN
-        </button>
-      </>
-    ) : (
-      <>
-        <Link href="/auth" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-          INICIAR SESIÓN
-        </Link>
+    <Link href="/account" style={registerStyle}>
+      CUENTA
+    </Link>
+  </>
+) : (
+  <>
+    <Link href="/auth" style={signInStyle}>
+      {t.login}
+    </Link>
 
-        <Link href="/auth" style={drawerButtonStyle} onClick={() => setMenuOpen(false)}>
-         REGISTRARSE
-        </Link>
-      </>
-    )}
+    <Link href="/auth" style={registerStyle}>
+      {t.register}
+    </Link>
+  </>
+)}
   </>
 );
 
@@ -1022,4 +1022,18 @@ const drawerHeroButtonStyle = {
   borderRadius: "999px",
   padding: "12px 18px",
   fontWeight: 900,
+};
+
+const desktopIconLinkStyle = {
+  display: "inline-flex",
+  height: "46px",
+  alignItems: "center",
+  justifyContent: "center",
+  textDecoration: "none",
+  color: "#111",
+  fontSize: "10px",
+  fontWeight: 800,
+  lineHeight: 1,
+  whiteSpace: "nowrap" as const,
+  letterSpacing: "1.1px",
 };
