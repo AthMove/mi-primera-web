@@ -523,15 +523,13 @@ height={84}
     </div>
 )}
 
-{compactNav && (
-  <button
-    type="button"
-    onClick={() => setMenuOpen(true)}
-    style={menuButtonStyle}
-  >
-    MENÚ
-  </button>
-)}
+<button
+  type="button"
+  onClick={() => setMenuOpen(true)}
+  style={menuButtonStyle}
+>
+  MENÚ
+</button>
   
 </nav>
       {menuOpen && (
