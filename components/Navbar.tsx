@@ -793,11 +793,15 @@ const registerStyle = {
   whiteSpace: "nowrap" as const,
   letterSpacing: "1.5px",
 };
-
 const menuButtonStyle = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
+
+  justifySelf: "end",
+  alignSelf: "center",
+  width: "auto",
+
   background: "#111",
   color: "#fff",
   border: "none",
