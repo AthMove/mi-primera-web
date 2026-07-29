@@ -144,6 +144,37 @@ const websiteSchema = {
     <Navbar />
     {children}
   </LanguageProvider>
+
+  <script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify([
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: "ATHMOV",
+        url: "https://athmov.com",
+        logo: "https://athmov.com/logo.png",
+        description:
+          "Marketplace de material deportivo premium de segunda mano.",
+        sameAs: [
+          "https://www.instagram.com/athmov"
+        ]
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: "ATHMOV",
+        url: "https://athmov.com",
+        potentialAction: {
+          "@type": "SearchAction",
+          target: "https://athmov.com/products?search={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    ]),
+  }}
+/>
 </body>
     </html>
   );

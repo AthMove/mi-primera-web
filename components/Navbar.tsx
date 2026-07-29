@@ -290,6 +290,14 @@ useEffect(() => {
   BLOG
 </Link>
 
+<Link
+  href="/about"
+  style={drawerLinkStyle}
+  onClick={() => setMenuOpen(false)}
+>
+  SOBRE ATHMOV
+</Link>
+
     <Link href="/products?category=PADEL" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
       PÁDEL
     </Link>
