@@ -186,7 +186,7 @@ return () => window.removeEventListener("scroll", onScroll);
 
 useEffect(() => {
   const updateNavbar = () => {
-   setCompactNav(window.innerWidth <= 1500);
+  setCompactNav(window.innerWidth <= 1100);
   };
 
   updateNavbar();
