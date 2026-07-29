@@ -360,6 +360,15 @@ useEffect(() => {
     <Link href="/account" style={registerStyle}>
       CUENTA
     </Link>
+    <button
+  onClick={() => {
+    setMenuOpen(false);
+    handleLogout();
+  }}
+  style={drawerButtonStyle}
+>
+  CERRAR SESIÓN
+</button>
   </>
 ) : (
   <>
@@ -514,13 +523,15 @@ height={84}
     </div>
 )}
 
-<button
-  type="button"
-  onClick={() => setMenuOpen(true)}
-  style={menuButtonStyle}
->
-  MENÚ
-</button>
+{compactNav && (
+  <button
+    type="button"
+    onClick={() => setMenuOpen(true)}
+    style={menuButtonStyle}
+  >
+    MENÚ
+  </button>
+)}
   
 </nav>
       {menuOpen && (
