@@ -276,7 +276,7 @@ className={`athmov-product-card ${
     if (!product?.brand) return;
 
     router.push(
-      `/brand/${String(product.brand)
+      `/brands/${String(product.brand)
         .toLowerCase()
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")

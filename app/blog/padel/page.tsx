@@ -290,7 +290,7 @@ export default function PadelBlogPage() {
             </p>
           </Link>
 
-          <Link href="/brand/bullpadel" className="seo-link-card">
+          <Link href="/brands/bullpadel" className="seo-link-card">
             <span>MARCA</span>
             <h3>Bullpadel de segunda mano</h3>
             <p>

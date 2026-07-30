@@ -265,7 +265,7 @@ function getBrand(slug: string): BrandConfig {
   return {
     ...defaultBrand,
     name: formatBrandName(normalizedSlug),
-    categoryBrandHref: `/brand/${normalizedSlug}`,
+    categoryBrandHref: `/brands/${normalizedSlug}`,
   };
 }
 
@@ -275,7 +275,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const normalizedSlug = slug.toLowerCase();
   const brand = getBrand(normalizedSlug);
-  const canonical = `https://athmov.com/brand/${normalizedSlug}`;
+  const canonical = `https://athmov.com/brands/${normalizedSlug}`;
   const title = `${brand.name} de segunda mano | ATHMOV`;
 
   return {
@@ -308,7 +308,7 @@ export default async function BrandPage({
   const { slug } = await params;
   const normalizedSlug = slug.toLowerCase();
   const brand = getBrand(normalizedSlug);
-  const pageUrl = `https://athmov.com/brand/${normalizedSlug}`;
+ const pageUrl = `https://athmov.com/brands/${normalizedSlug}`;
 
   const breadcrumbSchema = {
     "@context": "https://schema.org",

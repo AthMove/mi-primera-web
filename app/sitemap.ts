@@ -218,7 +218,7 @@ const productPages: MetadataRoute.Sitemap = products.map(
   const brandPages: MetadataRoute.Sitemap = Array.from(
     brandMap.keys()
   ).map((brandSlug) => ({
-    url: `${baseUrl}/brand/${brandSlug}`,
+   url: `${baseUrl}/brands/${brandSlug}`,
     lastModified: now,
     changeFrequency: "daily" as const,
     priority: 0.85,

@@ -757,7 +757,7 @@ return (
       <span
         onClick={() =>
           router.push(
-            `/brand/${String(producto.brand)
+            `/brands/${String(producto.brand)
               .toLowerCase()
               .normalize("NFD")
               .replace(/[\u0300-\u036f]/g, "")

@@ -270,7 +270,7 @@ export default function BullpadelVertex04Article() {
             <p>
               La{" "}
               <Link
-                href="/brand/bullpadel"
+               href="/brands/bullpadel"
                 className="article-link"
               >
                 Bullpadel Vertex 04

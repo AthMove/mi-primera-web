@@ -1,7 +1,10 @@
+import type { CSSProperties } from "react";
+import type { Metadata } from "next";
+
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Marcas deportivas de segunda mano | ATHMOV",
   description:
     "Explora las marcas premium disponibles en ATHMOV. Material de pádel, golf, tenis y running de segunda mano.",
@@ -69,11 +72,15 @@ async function getBrands(): Promise<BrandItem[]> {
     }
   }
 
-  return Array.from(brandMap.values()).sort((a, b) =>
-    a.name.localeCompare(b.name, "es", {
+  return Array.from(brandMap.values()).sort((a, b) => {
+    if (b.count !== a.count) {
+      return b.count - a.count;
+    }
+
+    return a.name.localeCompare(b.name, "es", {
       sensitivity: "base",
-    })
-  );
+    });
+  });
 }
 
 export default async function BrandsPage() {
@@ -87,11 +94,19 @@ export default async function BrandsPage() {
         <h1 style={titleStyle}>Marcas deportivas</h1>
 
         <p style={descriptionStyle}>
-          Explora las marcas premium disponibles en ATHMOV y
-          encuentra material deportivo de segunda mano en
-          pádel, golf, tenis y running.
+          Explora las marcas premium disponibles en ATHMOV y encuentra material
+          deportivo de segunda mano en pádel, golf, tenis y running.
         </p>
       </header>
+
+      <div style={sectionHeadingStyle}>
+        <h2 style={sectionTitleStyle}>Explora por marca</h2>
+
+        <p style={sectionDescriptionStyle}>
+          Descubre todas las marcas disponibles en ATHMOV y accede a sus
+          productos, guías de compra y artículos relacionados.
+        </p>
+      </div>
 
       {brands.length > 0 ? (
         <section
@@ -101,16 +116,18 @@ export default async function BrandsPage() {
           {brands.map((brand) => (
             <Link
               key={slugify(brand.name)}
-              href={`/brand/${slugify(brand.name)}`}
+              href={`/brands/${slugify(brand.name)}`}
               style={brandCardStyle}
             >
-              <span style={brandNameStyle}>{brand.name}</span>
+              <span>
+                <span style={brandNameStyle}>{brand.name}</span>
 
-              <span style={brandCountStyle}>
-                {brand.count}{" "}
-                {brand.count === 1
-                  ? "producto disponible"
-                  : "productos disponibles"}
+                <span style={brandCountStyle}>
+                  {brand.count}{" "}
+                  {brand.count === 1
+                    ? "producto disponible"
+                    : "productos disponibles"}
+                </span>
               </span>
 
               <span style={brandLinkStyle}>
@@ -122,9 +139,7 @@ export default async function BrandsPage() {
         </section>
       ) : (
         <section style={emptyStateStyle}>
-          <h2 style={emptyTitleStyle}>
-            Próximamente nuevas marcas
-          </h2>
+          <h2 style={emptyTitleStyle}>Próximamente nuevas marcas</h2>
 
           <p style={emptyTextStyle}>
             En este momento no hay productos disponibles.
@@ -139,7 +154,7 @@ export default async function BrandsPage() {
   );
 }
 
-const mainStyle: React.CSSProperties = {
+const mainStyle: CSSProperties = {
   width: "100%",
   maxWidth: 1240,
   minHeight: "70vh",
@@ -147,12 +162,12 @@ const mainStyle: React.CSSProperties = {
   padding: "150px 24px 100px",
 };
 
-const headerStyle: React.CSSProperties = {
+const headerStyle: CSSProperties = {
   maxWidth: 760,
   marginBottom: 56,
 };
 
-const eyebrowStyle: React.CSSProperties = {
+const eyebrowStyle: CSSProperties = {
   margin: "0 0 16px",
   color: "#8a8a8a",
   fontSize: 11,
@@ -160,7 +175,7 @@ const eyebrowStyle: React.CSSProperties = {
   letterSpacing: "0.18em",
 };
 
-const titleStyle: React.CSSProperties = {
+const titleStyle: CSSProperties = {
   margin: "0 0 20px",
   color: "#111111",
   fontSize: "clamp(42px, 7vw, 72px)",
@@ -169,7 +184,7 @@ const titleStyle: React.CSSProperties = {
   letterSpacing: "-0.055em",
 };
 
-const descriptionStyle: React.CSSProperties = {
+const descriptionStyle: CSSProperties = {
   maxWidth: 680,
   margin: 0,
   color: "#686868",
@@ -177,14 +192,32 @@ const descriptionStyle: React.CSSProperties = {
   lineHeight: 1.75,
 };
 
-const gridStyle: React.CSSProperties = {
+const sectionHeadingStyle: CSSProperties = {
+  marginBottom: 40,
+};
+
+const sectionTitleStyle: CSSProperties = {
+  margin: "0 0 12px",
+  color: "#111111",
+  fontSize: 34,
+  fontWeight: 600,
+  letterSpacing: "-0.03em",
+};
+
+const sectionDescriptionStyle: CSSProperties = {
+  maxWidth: 650,
+  margin: 0,
+  color: "#666666",
+  lineHeight: 1.7,
+};
+
+const gridStyle: CSSProperties = {
   display: "grid",
-  gridTemplateColumns:
-    "repeat(auto-fill, minmax(250px, 1fr))",
+  gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
   gap: 18,
 };
 
-const brandCardStyle: React.CSSProperties = {
+const brandCardStyle: CSSProperties = {
   display: "flex",
   minHeight: 210,
   flexDirection: "column",
@@ -198,7 +231,7 @@ const brandCardStyle: React.CSSProperties = {
   textDecoration: "none",
 };
 
-const brandNameStyle: React.CSSProperties = {
+const brandNameStyle: CSSProperties = {
   display: "block",
   fontSize: 25,
   fontWeight: 600,
@@ -206,7 +239,7 @@ const brandNameStyle: React.CSSProperties = {
   letterSpacing: "-0.035em",
 };
 
-const brandCountStyle: React.CSSProperties = {
+const brandCountStyle: CSSProperties = {
   display: "block",
   marginTop: 18,
   color: "#7c7c7c",
@@ -214,7 +247,7 @@ const brandCountStyle: React.CSSProperties = {
   lineHeight: 1.5,
 };
 
-const brandLinkStyle: React.CSSProperties = {
+const brandLinkStyle: CSSProperties = {
   display: "block",
   marginTop: 32,
   color: "#111111",
@@ -223,7 +256,7 @@ const brandLinkStyle: React.CSSProperties = {
   letterSpacing: "0.04em",
 };
 
-const emptyStateStyle: React.CSSProperties = {
+const emptyStateStyle: CSSProperties = {
   padding: "56px 28px",
   border: "1px solid rgba(17, 17, 17, 0.08)",
   borderRadius: 24,
@@ -231,18 +264,18 @@ const emptyStateStyle: React.CSSProperties = {
   textAlign: "center",
 };
 
-const emptyTitleStyle: React.CSSProperties = {
+const emptyTitleStyle: CSSProperties = {
   margin: "0 0 12px",
   fontSize: 28,
   fontWeight: 600,
 };
 
-const emptyTextStyle: React.CSSProperties = {
+const emptyTextStyle: CSSProperties = {
   margin: "0 0 26px",
   color: "#707070",
 };
 
-const emptyLinkStyle: React.CSSProperties = {
+const emptyLinkStyle: CSSProperties = {
   display: "inline-flex",
   padding: "13px 20px",
   borderRadius: 999,
