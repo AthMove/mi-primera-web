@@ -98,9 +98,12 @@ export default function FooterSection({
             {t.buyerGuide}
           </button>
 
-          <button style={footerLinkStyle}>
-            {t.buyerProtection}
-          </button>
+          <button
+  onClick={() => router.push("/buyer-protection")}
+  style={footerLinkStyle}
+>
+  {t.buyerProtection}
+</button>
         </div>
 
         <div style={footerColumnStyle}>
