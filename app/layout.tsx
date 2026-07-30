@@ -100,82 +100,56 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const organizationSchema = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  name: "ATHMOV",
-  url: "https://athmov.com",
-  logo: "https://athmov.com/logo.png",
-  email: "contact@athmov.com",
-  sameAs: [
-    "https://www.instagram.com/athmovofficial",
-  ],
-};
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": "https://athmov.com/#organization",
+    name: "ATHMOV",
+    url: "https://athmov.com",
+    logo: {
+      "@type": "ImageObject",
+      url: "https://athmov.com/logo.png",
+    },
+    description:
+      "Marketplace de material deportivo premium de segunda mano para pádel, golf, tenis y running.",
+    email: "contact@athmov.com",
+    sameAs: ["https://www.instagram.com/athmovofficial"],
+  };
 
-const websiteSchema = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  name: "ATHMOV",
-  url: "https://athmov.com",
-  inLanguage: ["es", "en"],
-  potentialAction: {
-    "@type": "SearchAction",
-    target: "https://athmov.com/products?search={search_term_string}",
-    "query-input": "required name=search_term_string",
-  },
-};
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": "https://athmov.com/#website",
+    name: "ATHMOV",
+    alternateName: "Athmov",
+    url: "https://athmov.com",
+    inLanguage: ["es", "en"],
+    publisher: {
+      "@id": "https://athmov.com/#organization",
+    },
+  };
+
   return (
     <html lang="es">
-   <body>
-  <script
-    type="application/ld+json"
-    dangerouslySetInnerHTML={{
-      __html: JSON.stringify(organizationSchema),
-    }}
-  />
+      <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationSchema),
+          }}
+        />
 
-  <script
-    type="application/ld+json"
-    dangerouslySetInnerHTML={{
-      __html: JSON.stringify(websiteSchema),
-    }}
-  />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(websiteSchema),
+          }}
+        />
 
-  <LanguageProvider>
-    <Navbar />
-    {children}
-  </LanguageProvider>
-
-  <script
-  type="application/ld+json"
-  dangerouslySetInnerHTML={{
-    __html: JSON.stringify([
-      {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        name: "ATHMOV",
-        url: "https://athmov.com",
-        logo: "https://athmov.com/logo.png",
-        description:
-          "Marketplace de material deportivo premium de segunda mano.",
-        sameAs: [
-          "https://www.instagram.com/athmov"
-        ]
-      },
-      {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        name: "ATHMOV",
-        url: "https://athmov.com",
-        potentialAction: {
-          "@type": "SearchAction",
-          target: "https://athmov.com/products?search={search_term_string}",
-          "query-input": "required name=search_term_string"
-        }
-      }
-    ]),
-  }}
-/>
-</body>
+        <LanguageProvider>
+          <Navbar />
+          {children}
+        </LanguageProvider>
+      </body>
     </html>
   );
 }
