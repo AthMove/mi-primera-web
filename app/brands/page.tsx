@@ -17,11 +17,13 @@ export const revalidate = 300;
 
 type ProductBrand = {
   brand: string | null;
+  category: string | null;
 };
 
 type BrandItem = {
   name: string;
   count: number;
+  category: string;
 };
 
 function slugify(text: string) {
@@ -36,7 +38,7 @@ function slugify(text: string) {
 async function getBrands(): Promise<BrandItem[]> {
   const { data, error } = await supabase
     .from("products")
-    .select("brand")
+    .select("brand,category")
     .eq("moderation_status", "approved")
     .eq("sold", false)
     .not("brand", "is", null);
@@ -46,31 +48,34 @@ async function getBrands(): Promise<BrandItem[]> {
     return [];
   }
 
-  const brandMap = new Map<
-    string,
-    {
-      name: string;
-      count: number;
-    }
-  >();
-
-  for (const product of (data || []) as ProductBrand[]) {
-    const brand = product.brand?.trim();
-
-    if (!brand) continue;
-
-    const normalizedBrand = slugify(brand);
-    const existingBrand = brandMap.get(normalizedBrand);
-
-    if (existingBrand) {
-      existingBrand.count += 1;
-    } else {
-      brandMap.set(normalizedBrand, {
-        name: brand,
-        count: 1,
-      });
-    }
+const brandMap = new Map<
+  string,
+  {
+    name: string;
+    count: number;
+    category: string;
   }
+>();
+
+for (const product of (data || []) as ProductBrand[]) {
+  const brand = product.brand?.trim();
+  const category = product.category?.trim() || "OTROS";
+
+  if (!brand) continue;
+
+  const normalizedBrand = `${category}-${slugify(brand)}`;
+  const existingBrand = brandMap.get(normalizedBrand);
+
+  if (existingBrand) {
+    existingBrand.count += 1;
+  } else {
+    brandMap.set(normalizedBrand, {
+      name: brand,
+      count: 1,
+      category: category,
+    });
+  }
+}
 
   return Array.from(brandMap.values()).sort((a, b) => {
     if (b.count !== a.count) {
@@ -85,6 +90,13 @@ async function getBrands(): Promise<BrandItem[]> {
 
 export default async function BrandsPage() {
   const brands = await getBrands();
+
+  const groupedBrands = {
+  PADEL: brands.filter((b) => b.category === "PADEL"),
+  GOLF: brands.filter((b) => b.category === "GOLF"),
+  TENIS: brands.filter((b) => b.category === "TENIS"),
+  RUNNING: brands.filter((b) => b.category === "RUNNING"),
+};
 
   return (
     <main style={mainStyle}>
@@ -108,48 +120,62 @@ export default async function BrandsPage() {
         </p>
       </div>
 
-      {brands.length > 0 ? (
-        <section
-          aria-label="Listado de marcas deportivas"
-          style={gridStyle}
-        >
-          {brands.map((brand) => (
-            <Link
-              key={slugify(brand.name)}
-              href={`/brands/${slugify(brand.name)}`}
-              style={brandCardStyle}
-            >
-              <span>
-                <span style={brandNameStyle}>{brand.name}</span>
+{brands.length > 0 ? (
+  <>
+    {Object.entries(groupedBrands).map(([category, items]) =>
+      items.length > 0 ? (
+        <section key={category} style={{ marginBottom: 70 }}>
+          <h2
+            style={{
+              fontSize: 34,
+              marginBottom: 28,
+              letterSpacing: "-1px",
+            }}
+          >
+            {category}
+          </h2>
 
-                <span style={brandCountStyle}>
-                  {brand.count}{" "}
-                  {brand.count === 1
-                    ? "producto disponible"
-                    : "productos disponibles"}
+          <div style={gridStyle}>
+            {items.map((brand) => (
+              <Link
+                key={`${category}-${slugify(brand.name)}`}
+                href={`/brands/${slugify(brand.name)}`}
+                style={brandCardStyle}
+              >
+                <span>
+                  <span style={brandNameStyle}>{brand.name}</span>
+
+                  <span style={brandCountStyle}>
+                    {brand.count}{" "}
+                    {brand.count === 1
+                      ? "producto disponible"
+                      : "productos disponibles"}
+                  </span>
                 </span>
-              </span>
 
-              <span style={brandLinkStyle}>
-                Ver productos
-                <span aria-hidden="true"> →</span>
-              </span>
-            </Link>
-          ))}
+                <span style={brandLinkStyle}>
+                  Ver productos →
+                </span>
+              </Link>
+            ))}
+          </div>
         </section>
-      ) : (
-        <section style={emptyStateStyle}>
-          <h2 style={emptyTitleStyle}>Próximamente nuevas marcas</h2>
+      ) : null
+    )}
+  </>
+) : (
+  <section style={emptyStateStyle}>
+    <h2 style={emptyTitleStyle}>Próximamente nuevas marcas</h2>
 
-          <p style={emptyTextStyle}>
-            En este momento no hay productos disponibles.
-          </p>
+    <p style={emptyTextStyle}>
+      En este momento no hay productos disponibles.
+    </p>
 
-          <Link href="/products" style={emptyLinkStyle}>
-            Explorar el marketplace
-          </Link>
-        </section>
-      )}
+    <Link href="/products" style={emptyLinkStyle}>
+      Explorar el marketplace
+    </Link>
+  </section>
+)}
     </main>
   );
 }
