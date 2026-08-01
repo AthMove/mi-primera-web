@@ -82,60 +82,37 @@ export default function FooterSection({
         </div>
 
         <div style={footerColumnStyle}>
-          <p style={footerTitleStyle}>{t.support}</p>
+  <div style={footerColumnStyle}>
+  <p style={footerTitleStyle}>Categorías</p>
 
-          <button
-            onClick={() => router.push("/how-it-works")}
-            style={footerLinkStyle}
-          >
-            {t.howWorks}
-          </button>
+  <button
+    onClick={() => router.push("/padel")}
+    style={footerLinkStyle}
+  >
+    PÁDEL
+  </button>
 
-          <button
-            onClick={() => router.push("/buyer-guide")}
-            style={footerLinkStyle}
-          >
-            {t.buyerGuide}
-          </button>
+  <button
+    onClick={() => router.push("/golf")}
+    style={footerLinkStyle}
+  >
+    GOLF
+  </button>
 
-          <button
-  onClick={() => router.push("/buyer-protection")}
-  style={footerLinkStyle}
->
-  {t.buyerProtection}
-</button>
-        </div>
+  <button
+    onClick={() => router.push("/tenis")}
+    style={footerLinkStyle}
+  >
+    TENIS
+  </button>
 
-        <div style={footerColumnStyle}>
-          <p style={footerTitleStyle}>Categorías</p>
-
-          <button
-            onClick={() => router.push("/products?category=PADEL")}
-            style={footerLinkStyle}
-          >
-            PADEL
-          </button>
-
-          <button
-            onClick={() => router.push("/products?category=GOLF")}
-            style={footerLinkStyle}
-          >
-            GOLF
-          </button>
-
-          <button
-            onClick={() => router.push("/products?category=TENIS")}
-            style={footerLinkStyle}
-          >
-            TENIS
-          </button>
-
-          <button
-            onClick={() => router.push("/products?category=RUNNING")}
-            style={footerLinkStyle}
-          >
-            RUNNING
-          </button>
+  <button
+    onClick={() => router.push("/running")}
+    style={footerLinkStyle}
+  >
+    RUNNING
+  </button>
+</div>
         </div>
       </div>
 
