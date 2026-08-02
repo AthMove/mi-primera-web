@@ -7,6 +7,7 @@ type ProductSitemapRow = {
   id: string;
   slug: string | null;
   brand: string | null;
+  model: string | null;
   category: string | null;
   created_at: string | null;
 };
@@ -157,7 +158,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
  const { data, error } = await supabase
   .from("products")
-  .select("id,slug,brand,category,created_at")
+  .select("id,slug,brand,model,category,created_at")
   .eq("moderation_status", "approved");
 
   if (error) {
@@ -180,6 +181,13 @@ const productPages: MetadataRoute.Sitemap = products.map(
 );
 
   const brandMap = new Map<string, string>();
+  const modelMap = new Map<
+  string,
+  {
+    brand: string;
+    model: string;
+  }
+>();
   const categoryBrandMap = new Map<
     string,
     {
@@ -192,6 +200,8 @@ const productPages: MetadataRoute.Sitemap = products.map(
     const brand = product.brand?.trim();
     const category = product.category?.trim();
 
+    const model = product.model?.trim();
+
     if (brand) {
       const brandSlug = slugify(brand);
 
@@ -199,6 +209,17 @@ const productPages: MetadataRoute.Sitemap = products.map(
         brandMap.set(brandSlug, brand);
       }
     }
+
+    if (brand && model) {
+  const modelSlug = slugify(`${brand} ${model}`);
+
+  if (modelSlug) {
+    modelMap.set(modelSlug, {
+      brand,
+      model,
+    });
+  }
+}
 
     if (brand && category) {
       const brandSlug = slugify(brand);
@@ -233,11 +254,21 @@ const productPages: MetadataRoute.Sitemap = products.map(
     priority: 0.85,
   }));
 
-  return [
-    ...staticPages,
-    ...blogPages,
-    ...brandPages,
-    ...categoryBrandPages,
-    ...productPages,
-  ];
+  const modelPages: MetadataRoute.Sitemap = Array.from(
+  modelMap.keys()
+).map((modelSlug) => ({
+  url: `${baseUrl}/model/${modelSlug}`,
+  lastModified: now,
+  changeFrequency: "daily" as const,
+  priority: 0.82,
+}));
+
+return [
+  ...staticPages,
+  ...blogPages,
+  ...brandPages,
+  ...modelPages,
+  ...categoryBrandPages,
+  ...productPages,
+];
 }
