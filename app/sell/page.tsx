@@ -4,15 +4,13 @@ import Image from "next/image";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import {
+  getBrandsByCategory,
+  getModelsByBrand,
+} from "@/lib/sportsCatalog";
 
-const PREMIUM_BRANDS: Record<string, string[]> = {
-  PADEL: ["NOX", "Bullpadel", "Siux", "Babolat", "Wilson", "Head", "Asics"],
-  GOLF: ["Titleist", "TaylorMade", "Callaway", "PXG", "Scotty Cameron", "Ping"],
-  TENNIS: ["Nike", "Wilson", "Yonex", "Lacoste", "Babolat", "Head"],
-  RUNNING: ["Nike", "Hoka", "On", "ASICS", "New Balance", "Salomon"],
-};
 
-const SPORTS = ["PADEL", "GOLF", "TENNIS", "RUNNING"];
+const SPORTS = ["PADEL", "GOLF", "TENIS", "RUNNING"];
 const GENDERS = ["MEN", "WOMEN", "UNISEX", "JUNIOR"];
 
 function generateSlug(title: string) {
@@ -28,7 +26,7 @@ export default function SellPage() {
   const router = useRouter();
 
   const [title, setTitle] = useState("");
-  const [brand, setBrand] = useState(PREMIUM_BRANDS.PADEL[0]);
+  const [brand, setBrand] = useState("");
   const [category, setCategory] = useState("PADEL");
   const [gender, setGender] = useState("UNISEX");
   const [condition, setCondition] = useState("Excellent");
@@ -37,15 +35,24 @@ export default function SellPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [preview, setPreview] = useState("");
   const [loading, setLoading] = useState(false);
+  const [model, setModel] = useState("");
+const [customModel, setCustomModel] = useState("");
 
-  const availableBrands = useMemo(() => {
-    return PREMIUM_BRANDS[category] || [];
-  }, [category]);
 
-  const handleCategoryChange = (value: string) => {
-    setCategory(value);
-    setBrand(PREMIUM_BRANDS[value]?.[0] || "");
-  };
+const availableBrands = useMemo(() => {
+  return getBrandsByCategory(category as any);
+}, [category]);
+
+const availableModels = useMemo(() => {
+  return getModelsByBrand(category as any, brand);
+}, [category, brand]);
+
+const handleCategoryChange = (newCategory: string) => {
+  setCategory(newCategory);
+  setBrand("");
+  setModel("");
+  setCustomModel("");
+};
 
   const handleImage = (file: File | null) => {
     if (!file) return;
@@ -55,17 +62,6 @@ export default function SellPage() {
   };
 
   const publishProduct = async () => {
-    if (
-      !title.trim() ||
-      !brand.trim() ||
-      !category.trim() ||
-      !gender.trim() ||
-      !price.trim() ||
-      !description.trim()
-    ) {
-      alert("Completa todos los campos");
-      return;
-    }
 
     const numericPrice = Number(price);
 
@@ -151,16 +147,40 @@ export default function SellPage() {
 
 const productId = crypto.randomUUID();
 
-const productSlug = `${generateSlug(title.trim())}-${productId.slice(0, 8)}`;
+const finalModel =
+  model === "OTRO" ? customModel.trim() : model.trim();
+
+if (!category) {
+  alert("Selecciona un deporte");
+  return;
+}
+
+if (!brand) {
+  alert("Selecciona una marca");
+  return;
+}
+
+if (!finalModel) {
+  alert("Selecciona o escribe el modelo");
+  return;
+}
+
+const seoTitle =
+  title.trim() || `${brand} ${finalModel} de segunda mano`;
+
+const productSlug = generateSlug(
+  `${brand} ${finalModel} segunda mano`
+);
 
 const { data, error } = await supabase
   .from("products")
   .insert([
     {
       id: productId,
-      title: title.trim(),
+      title: seoTitle,
       slug: productSlug,
       brand,
+      model: finalModel,
       category,
       sport: category,
       gender,
@@ -237,37 +257,78 @@ const { data, error } = await supabase
 
         <div style={formStyle}>
           <input
-            placeholder="Título del producto"
+           placeholder="Título personalizado (opcional)"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             style={inputStyle}
           />
 
           <div style={rowStyle}>
-            <select
-              value={category}
-              onChange={(e) => handleCategoryChange(e.target.value)}
-              style={inputStyle}
-            >
-              {SPORTS.map((sport) => (
-                <option key={sport} value={sport}>
-                  {sport}
-                </option>
-              ))}
-            </select>
+  <select
+    value={category}
+    onChange={(e) => handleCategoryChange(e.target.value)}
+    style={inputStyle}
+  >
+    <option value="">Selecciona un deporte</option>
 
-            <select
-              value={brand}
-              onChange={(e) => setBrand(e.target.value)}
-              style={inputStyle}
-            >
-              {availableBrands.map((item) => (
-                <option key={item} value={item}>
-                  {item}
-                </option>
-              ))}
-            </select>
-          </div>
+    {SPORTS.map((sport) => (
+      <option key={sport} value={sport}>
+        {sport}
+      </option>
+    ))}
+  </select>
+
+  <select
+    value={brand}
+    onChange={(e) => {
+      setBrand(e.target.value);
+      setModel("");
+    }}
+    style={inputStyle}
+    disabled={!category}
+  >
+    <option value="">Selecciona una marca</option>
+
+    {availableBrands.map((item) => (
+      <option key={item} value={item}>
+        {item}
+      </option>
+    ))}
+  </select>
+</div>
+
+<div style={rowStyle}>
+  <select
+    value={model}
+    onChange={(e) => {
+      setModel(e.target.value);
+      setCustomModel("");
+    }}
+    style={inputStyle}
+    disabled={!brand}
+  >
+    <option value="">Selecciona un modelo</option>
+
+    {availableModels.map((item) => (
+      <option key={item} value={item}>
+        {item}
+      </option>
+    ))}
+
+    <option value="OTRO">Otro modelo</option>
+  </select>
+
+  {model === "OTRO" ? (
+    <input
+      value={customModel}
+      placeholder="Escribe el modelo"
+      onChange={(e) => setCustomModel(e.target.value)}
+      style={inputStyle}
+    />
+  ) : (
+    <div />
+  )}
+</div>
 
           <div style={rowStyle}>
             <select
@@ -310,7 +371,7 @@ const { data, error } = await supabase
           />
 
  <div style={noticeStyle}>
-  <strong>Publicación inmediata:</strong> tu se publicará directamente
+<strong>Publicación inmediata:</strong> tu producto se publicará directamente
   en ATHMOV.
 </div>
 
