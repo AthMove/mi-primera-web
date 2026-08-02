@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import BrandProductsClient from "../BrandProductsClient";
+import { supabase } from "@/lib/supabase";
 
 interface BrandPageProps {
   params: Promise<{
@@ -254,6 +255,54 @@ function formatBrandName(slug: string) {
     .join(" ");
 }
 
+type BrandModelRow = {
+  model: string | null;
+};
+
+function slugify(text: string) {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+async function getAvailableModels(brandName: string): Promise<string[]> {
+  const { data, error } = await supabase
+    .from("products")
+    .select("model")
+    .eq("moderation_status", "approved")
+    .eq("sold", false)
+    .ilike("brand", brandName)
+    .not("model", "is", null);
+
+  if (error) {
+    console.error("Error cargando modelos de la marca:", error);
+    return [];
+  }
+
+  const uniqueModels = new Map<string, string>();
+
+  for (const item of (data || []) as BrandModelRow[]) {
+    const model = item.model?.trim();
+
+    if (!model) continue;
+
+    const normalizedModel = slugify(model);
+
+    if (!uniqueModels.has(normalizedModel)) {
+      uniqueModels.set(normalizedModel, model);
+    }
+  }
+
+  return Array.from(uniqueModels.values()).sort((a, b) =>
+    a.localeCompare(b, "es", {
+      sensitivity: "base",
+    })
+  );
+}
+
 function getBrand(slug: string): BrandConfig {
   const normalizedSlug = slug.toLowerCase();
   const brand = brands[normalizedSlug];
@@ -309,6 +358,7 @@ export default async function BrandPage({
   const normalizedSlug = slug.toLowerCase();
   const brand = getBrand(normalizedSlug);
  const pageUrl = `https://athmov.com/brands/${normalizedSlug}`;
+ const availableModels = await getAvailableModels(brand.name);
 
   const breadcrumbSchema = {
     "@context": "https://schema.org",
@@ -450,23 +500,35 @@ export default async function BrandPage({
         </Suspense>
       </section>
 
-      {brand.models.length > 0 && (
-        <section className="models-section">
-          <div className="section-heading">
-            <p className="eyebrow">MODELOS POPULARES</p>
-            <h2>Modelos {brand.name} más buscados</h2>
-          </div>
+    {availableModels.length > 0 && (
+  <section className="models-section">
+    <div className="section-heading">
+      <p className="eyebrow">MODELOS DISPONIBLES</p>
 
-          <div className="models-grid">
-            {brand.models.map((model) => (
-              <div key={model} className="model-card">
-                <span>{brand.name}</span>
-                <h3>{model}</h3>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      <h2>
+        Modelos {brand.name} publicados en ATHMOV
+      </h2>
+    </div>
+
+    <div className="models-grid">
+      {availableModels.map((model) => {
+        const modelSlug = slugify(`${brand.name} ${model}`);
+
+        return (
+          <Link
+            key={modelSlug}
+            href={`/model/${modelSlug}`}
+            className="model-card"
+          >
+            <span>{brand.name}</span>
+            <h3>{model}</h3>
+            <strong>Ver productos →</strong>
+          </Link>
+        );
+      })}
+    </div>
+  </section>
+)}
 
       <section className="tips-section">
         <div className="section-heading">
@@ -738,12 +800,30 @@ export default async function BrandPage({
         }
 
         .model-card {
-          min-height: 145px;
-          padding: 26px;
-          border: 1px solid rgba(0, 0, 0, 0.08);
-          border-radius: 26px;
-          background: #fff;
-        }
+  display: flex;
+  min-height: 145px;
+  flex-direction: column;
+  padding: 26px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 26px;
+  background: #fff;
+  color: #111;
+  text-decoration: none;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.model-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.08);
+}
+
+.model-card strong {
+  margin-top: auto;
+  padding-top: 24px;
+  font-size: 12px;
+}
 
         .model-card span,
         .guide-card span {
