@@ -73,15 +73,25 @@ export default async function ProductSeoPage({
 }: Props) {
   const { slug } = await params;
 
-  const { data: product } = await supabase
+  const { data: product, error } = await supabase
     .from("products")
-    .select("id")
+    .select("*")
     .eq("slug", slug)
+    .eq("moderation_status", "approved")
     .maybeSingle();
+
+  if (error) {
+    console.error("Error cargando el producto por slug:", error);
+  }
 
   if (!product) {
     notFound();
   }
 
-  return <ProductDetailClient productId={product.id} />;
+  return (
+    <ProductDetailClient
+      productId={product.id}
+      initialProduct={product}
+    />
+  );
 }

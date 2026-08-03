@@ -69,9 +69,7 @@ export default function ProductDetail({
   const [loading, setLoading] = useState(
   !initialProduct
 );
-  const [notFound, setNotFound] = useState(
-  !initialProduct
-);
+const [notFound, setNotFound] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [sellerProfile, setSellerProfile] = useState<any>(null);
   const [sellerReviews, setSellerReviews] = useState<any[]>([]);
@@ -79,20 +77,30 @@ export default function ProductDetail({
  
 
   useEffect(() => {
-    if (!id || id === "undefined") {
-      setLoading(false);
-      setNotFound(true);
-      return;
-    }
+  if (initialProduct) {
+    setProducto(initialProduct);
+    setNotFound(false);
+  }
+
+  if ((!id || id === "undefined") && !initialProduct) {
+    setLoading(false);
+    setNotFound(true);
+    return;
+  }
 
 const getProduct = async () => {
   try {
     setLoading(!initialProduct);
     setNotFound(false);
 
-    let data = initialProduct;
+  let data = initialProduct;
 
-    if (!data) {
+if (data) {
+  setProducto(data);
+  setNotFound(false);
+}
+
+if (!data) {
       const { data: fetchedProduct, error } = await supabase
         .from("products")
         .select(
@@ -201,11 +209,15 @@ const { data: relatedProducts } = await relatedQuery
   .limit(8);
 
 setRelated(relatedProducts || []);
-      } catch {
-        setNotFound(true);
-      } finally {
-        setLoading(false);
-      }
+    } catch (error) {
+  console.error("Error cargando detalles secundarios:", error);
+
+  if (!initialProduct) {
+    setNotFound(true);
+  }
+} finally {
+  setLoading(false);
+}
     };
 
     getProduct();
