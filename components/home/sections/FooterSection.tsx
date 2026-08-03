@@ -81,8 +81,7 @@ export default function FooterSection({
           </button>
         </div>
 
-        <div style={footerColumnStyle}>
-  <div style={footerColumnStyle}>
+       <div style={footerColumnStyle}>
   <p style={footerTitleStyle}>Categorías</p>
 
   <button
@@ -113,7 +112,39 @@ export default function FooterSection({
     RUNNING
   </button>
 </div>
-        </div>
+
+<div style={footerColumnStyle}>
+  <p style={footerTitleStyle}>ATHMOV</p>
+
+  <button
+    onClick={() => router.push("/about")}
+    style={footerLinkStyle}
+  >
+    Sobre ATHMOV
+  </button>
+
+  <button
+    onClick={() => router.push("/how-it-works")}
+    style={footerLinkStyle}
+  >
+    Cómo funciona
+  </button>
+
+  <button
+    onClick={() => router.push("/buyer-guide")}
+    style={footerLinkStyle}
+  >
+    Guía del comprador
+  </button>
+
+  <button
+    onClick={() => router.push("/buyer-protection")}
+    style={footerLinkStyle}
+  >
+    Protección al comprador
+  </button>
+</div>
+        
       </div>
 
       <div
