@@ -167,6 +167,218 @@ export default function AboutPage() {
         </div>
       </section>
 
+      <section style={transparencySectionStyle}>
+  <div style={sectionHeaderStyle}>
+    <p style={sectionEyebrowStyle}>QUIÉN ESTÁ DETRÁS</p>
+
+    <h2 style={sectionTitleStyle}>
+      Un proyecto deportivo y tecnológico desarrollado en España.
+    </h2>
+  </div>
+
+  <div style={transparencyGridStyle} className="about-transparency-grid">
+    <article style={transparencyCardStyle}>
+      <span style={valueNumberStyle}>01</span>
+
+      <h3 style={valueTitleStyle}>El proyecto</h3>
+
+      <p style={valueTextStyle}>
+        ATHMOV es una plataforma especializada en material deportivo premium
+        de segunda mano, inicialmente centrada en pádel, golf, tenis y
+        running.
+      </p>
+    </article>
+
+    <article style={transparencyCardStyle}>
+      <span style={valueNumberStyle}>02</span>
+
+      <h3 style={valueTitleStyle}>El equipo</h3>
+
+      <p style={valueTextStyle}>
+        La plataforma reúne trabajo en estrategia, tecnología, producto,
+        operaciones, marketing y comunidad deportiva. ATHMOV se encuentra
+        actualmente en una fase inicial de crecimiento.
+      </p>
+    </article>
+
+    <article style={transparencyCardStyle}>
+      <span style={valueNumberStyle}>03</span>
+
+      <h3 style={valueTitleStyle}>Ubicación</h3>
+
+      <p style={valueTextStyle}>
+        ATHMOV se desarrolla y gestiona desde España, con vocación de crear
+        una comunidad europea de compraventa deportiva.
+      </p>
+    </article>
+  </div>
+</section>
+
+<section
+  style={independenceSectionStyle}
+  className="about-independence"
+>
+  <div>
+    <p style={ctaEyebrowStyle}>FINANCIACIÓN</p>
+
+    <h2 style={independenceTitleStyle}>
+      Un proyecto independiente.
+    </h2>
+  </div>
+
+  <div style={independenceTextStyle}>
+    <p>
+      ATHMOV se encuentra en una fase inicial y se está desarrollando como
+      un proyecto independiente.
+    </p>
+
+    <p>
+      Si en el futuro se incorporan socios, inversión externa, aceleradoras
+      u otras formas de financiación relevantes, esta información se
+      actualizará para mantener una comunicación transparente.
+    </p>
+  </div>
+</section>
+
+<section style={businessSectionStyle}>
+  <div style={sectionHeaderStyle}>
+    <p style={sectionEyebrowStyle}>MODELO DE NEGOCIO</p>
+
+    <h2 style={sectionTitleStyle}>
+      Cómo se financia ATHMOV.
+    </h2>
+
+    <p style={businessIntroStyle}>
+      Queremos que compradores y vendedores sepan desde el principio cómo
+      funciona la plataforma y qué costes se aplican.
+    </p>
+  </div>
+
+  <div style={pricingGridStyle} className="about-pricing-grid">
+    <article style={pricingCardStyle}>
+      <p style={pricingLabelStyle}>PUBLICACIÓN</p>
+
+      <strong style={pricingPriceStyle}>0 €</strong>
+
+      <h3 style={pricingTitleStyle}>Publicar es gratuito</h3>
+
+      <p style={pricingTextStyle}>
+        El vendedor puede publicar su material deportivo sin pagar una
+        cuota inicial.
+      </p>
+    </article>
+
+    <article style={featuredPricingCardStyle}>
+      <p style={featuredPricingLabelStyle}>COMISIÓN ATHMOV</p>
+
+      <strong style={featuredPricingPriceStyle}>8 %</strong>
+
+      <h3 style={featuredPricingTitleStyle}>
+        Solo cuando se vende
+      </h3>
+
+      <p style={featuredPricingTextStyle}>
+        ATHMOV aplica una comisión del 8 % sobre el precio del producto
+        cuando la operación se completa correctamente.
+      </p>
+    </article>
+
+    <article style={pricingCardStyle}>
+      <p style={pricingLabelStyle}>SUSCRIPCIÓN</p>
+
+      <strong style={pricingPriceStyle}>0 €</strong>
+
+      <h3 style={pricingTitleStyle}>Sin cuota mensual</h3>
+
+      <p style={pricingTextStyle}>
+        Actualmente no es necesario contratar una suscripción para comprar
+        o publicar productos.
+      </p>
+    </article>
+  </div>
+</section>
+
+<section style={exampleSectionStyle}>
+  <div style={sectionHeaderStyle}>
+    <p style={sectionEyebrowStyle}>EJEMPLO DE VENTA</p>
+
+    <h2 style={sectionTitleStyle}>
+      Una operación de 200 €.
+    </h2>
+  </div>
+
+  <div style={calculationCardStyle}>
+    <div style={calculationRowStyle}>
+      <span>Precio del producto</span>
+      <strong>200,00 €</strong>
+    </div>
+
+    <div style={calculationRowStyle}>
+      <span>Comisión ATHMOV (8 %)</span>
+      <strong>−16,00 €</strong>
+    </div>
+
+    <div style={calculationRowStyle}>
+      <span>Procesamiento de pago estimado</span>
+      <strong>−3,25 €</strong>
+    </div>
+
+    <div style={calculationTotalStyle}>
+      <span>Importe estimado para el vendedor</span>
+      <strong>180,75 €</strong>
+    </div>
+  </div>
+
+  <p style={calculationNoteStyle}>
+    El coste de procesamiento es una estimación y puede variar según el
+    método de pago, el país y las condiciones del proveedor de pagos. El
+    desglose definitivo debe mostrarse antes de confirmar la operación.
+  </p>
+</section>
+
+<section style={legalSectionStyle} className="about-legal">
+  <div>
+    <p style={sectionEyebrowStyle}>INFORMACIÓN CORPORATIVA</p>
+
+    <h2 style={sectionTitleStyle}>
+      Datos legales y contacto.
+    </h2>
+  </div>
+
+  <div>
+    <div style={legalCardStyle}>
+      <div style={legalRowStyle}>
+        <span style={legalLabelStyle}>Nombre comercial</span>
+        <strong>ATHMOV</strong>
+      </div>
+
+      <div style={legalRowStyle}>
+        <span style={legalLabelStyle}>Actividad</span>
+        <strong>Marketplace de material deportivo</strong>
+      </div>
+
+      <div style={legalRowStyle}>
+        <span style={legalLabelStyle}>País de gestión</span>
+        <strong>España</strong>
+      </div>
+
+      <div style={legalLastRowStyle}>
+        <span style={legalLabelStyle}>Correo electrónico</span>
+
+        <a href="mailto:contact@athmov.com" style={legalLinkStyle}>
+          contact@athmov.com
+        </a>
+      </div>
+    </div>
+
+    <p style={legalNoteStyle}>
+      La razón social, identificación fiscal y domicilio social se
+      incorporarán a esta página y al aviso legal cuando correspondan a la
+      entidad responsable de la plataforma.
+    </p>
+  </div>
+</section>
+
       <section style={ctaStyle} className="about-cta">
         <p style={ctaEyebrowStyle}>THE GAME CONTINUES.</p>
 
@@ -202,6 +414,16 @@ export default function AboutPage() {
         }
 
         @media (max-width: 850px) {
+        .about-transparency-grid,
+.about-pricing-grid {
+  grid-template-columns: 1fr !important;
+}
+
+.about-independence,
+.about-legal {
+  grid-template-columns: 1fr !important;
+  padding: 30px !important;
+}
           .about-page {
             padding: 120px 20px 60px !important;
           }
@@ -428,6 +650,214 @@ const sportCardStyle = {
   fontSize: "14px",
   fontWeight: 900,
   letterSpacing: "1.5px",
+} as const;
+
+const transparencySectionStyle = {
+  maxWidth: "1200px",
+  margin: "0 auto 100px",
+} as const;
+
+const transparencyGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+  gap: "18px",
+} as const;
+
+const transparencyCardStyle = {
+  minHeight: "260px",
+  padding: "30px",
+  borderRadius: "28px",
+  background: "#fff",
+  border: "1px solid rgba(0,0,0,0.07)",
+} as const;
+
+const independenceSectionStyle = {
+  maxWidth: "1200px",
+  margin: "0 auto 100px",
+  padding: "55px",
+  borderRadius: "38px",
+  background: "#111",
+  color: "#fff",
+  display: "grid",
+  gridTemplateColumns: "0.9fr 1.1fr",
+  gap: "60px",
+} as const;
+
+const independenceTitleStyle = {
+  margin: "18px 0 0",
+  fontSize: "48px",
+  lineHeight: 1.05,
+  letterSpacing: "-2.5px",
+} as const;
+
+const independenceTextStyle = {
+  color: "rgba(255,255,255,0.65)",
+  fontSize: "17px",
+  lineHeight: 1.8,
+} as const;
+
+const businessSectionStyle = {
+  maxWidth: "1200px",
+  margin: "0 auto 100px",
+} as const;
+
+const businessIntroStyle = {
+  maxWidth: "720px",
+  marginTop: "20px",
+  color: "#666",
+  lineHeight: 1.8,
+} as const;
+
+const pricingGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+  gap: "18px",
+} as const;
+
+const pricingCardStyle = {
+  minHeight: "310px",
+  padding: "30px",
+  borderRadius: "28px",
+  background: "#fff",
+  border: "1px solid rgba(0,0,0,0.08)",
+} as const;
+
+const featuredPricingCardStyle = {
+  ...pricingCardStyle,
+  background: "#111",
+  color: "#fff",
+} as const;
+
+const pricingLabelStyle = {
+  margin: 0,
+  color: "#a58d5a",
+  fontSize: "10px",
+  fontWeight: 900,
+  letterSpacing: "2px",
+} as const;
+
+const featuredPricingLabelStyle = {
+  ...pricingLabelStyle,
+  color: "#c9b896",
+} as const;
+
+const pricingPriceStyle = {
+  display: "block",
+  marginTop: "28px",
+  fontSize: "58px",
+  lineHeight: 1,
+  letterSpacing: "-3px",
+} as const;
+
+const featuredPricingPriceStyle = {
+  ...pricingPriceStyle,
+  color: "#fff",
+} as const;
+
+const pricingTitleStyle = {
+  margin: "28px 0 12px",
+  fontSize: "24px",
+} as const;
+
+const featuredPricingTitleStyle = {
+  ...pricingTitleStyle,
+  color: "#fff",
+} as const;
+
+const pricingTextStyle = {
+  margin: 0,
+  color: "#666",
+  lineHeight: 1.75,
+} as const;
+
+const featuredPricingTextStyle = {
+  ...pricingTextStyle,
+  color: "rgba(255,255,255,0.65)",
+} as const;
+
+const exampleSectionStyle = {
+  maxWidth: "1200px",
+  margin: "0 auto 100px",
+} as const;
+
+const calculationCardStyle = {
+  overflow: "hidden",
+  borderRadius: "30px",
+  background: "#fff",
+  border: "1px solid rgba(0,0,0,0.08)",
+} as const;
+
+const calculationRowStyle = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: "30px",
+  padding: "24px 30px",
+  borderBottom: "1px solid rgba(0,0,0,0.07)",
+} as const;
+
+const calculationTotalStyle = {
+  ...calculationRowStyle,
+  borderBottom: "none",
+  background: "#111",
+  color: "#fff",
+} as const;
+
+const calculationNoteStyle = {
+  maxWidth: "850px",
+  margin: "20px 0 0",
+  color: "#777",
+  fontSize: "13px",
+  lineHeight: 1.75,
+} as const;
+
+const legalSectionStyle = {
+  maxWidth: "1200px",
+  margin: "0 auto 100px",
+  display: "grid",
+  gridTemplateColumns: "0.8fr 1.2fr",
+  gap: "55px",
+} as const;
+
+const legalCardStyle = {
+  overflow: "hidden",
+  borderRadius: "28px",
+  background: "#fff",
+  border: "1px solid rgba(0,0,0,0.08)",
+} as const;
+
+const legalRowStyle = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: "25px",
+  padding: "22px 26px",
+  borderBottom: "1px solid rgba(0,0,0,0.07)",
+} as const;
+
+const legalLastRowStyle = {
+  ...legalRowStyle,
+  borderBottom: "none",
+} as const;
+
+const legalLabelStyle = {
+  color: "#777",
+  fontSize: "13px",
+} as const;
+
+const legalLinkStyle = {
+  color: "#111",
+  fontSize: "14px",
+  fontWeight: 800,
+  textDecoration: "none",
+} as const;
+
+const legalNoteStyle = {
+  maxWidth: "850px",
+  margin: "20px 0 0",
+  color: "#777",
+  fontSize: "13px",
+  lineHeight: 1.75,
 } as const;
 
 const ctaStyle = {
