@@ -1,22 +1,26 @@
 "use client";
 
+import { useLanguage } from "@/components/LanguageProvider";
+
 export default function ProductFeatureGrid() {
+  const { t } = useLanguage();
+
   const features = [
     {
       icon: "📦",
-      label: "En stock",
+      label: t.featureInStock,
     },
     {
       icon: "🚚",
-      label: "24-72 h",
+      label: t.featureDeliveryTime,
     },
     {
       icon: "🛡",
-      label: "Protegido",
+      label: t.featureProtected,
     },
     {
       icon: "💳",
-      label: "Stripe",
+      label: t.featureStripe,
     },
   ];
 

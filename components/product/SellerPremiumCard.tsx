@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/components/LanguageProvider";
 
 interface Seller {
   id?: string;
@@ -42,6 +43,7 @@ export default function SellerPremiumCard({
   sellerLabel,
 }: Props) {
   const router = useRouter();
+  const { t } = useLanguage();
 
   const sellerName =
     seller?.full_name ||
@@ -123,12 +125,12 @@ const trustPercentage = Math.round(trustScore * 10);
 
 const trustLabel =
   trustScore >= 9
-    ? "Confianza excelente"
+    ? t.trustExcellent
     : trustScore >= 7.5
-      ? "Confianza alta"
+      ? t.trustHigh
       : trustScore >= 6
-        ? "Confianza sólida"
-        : "Vendedor en crecimiento";
+        ? t.trustSolid
+        : t.trustGrowingSeller;
 
   const goToSellerProfile = () => {
     if (!seller?.id) return;
@@ -141,10 +143,10 @@ const trustLabel =
       <div className="seller-section-header">
         <div>
           <p className="seller-section-eyebrow">
-            VENDEDORES ATHMOV
+            {t.athmovSellersEyebrow}
           </p>
 
-          <h2>Compra con confianza</h2>
+          <h2>{t.buyWithConfidenceShort}</h2>
         </div>
 
         {seller?.seller_verified && (
@@ -180,7 +182,7 @@ const trustLabel =
               src={safeImage(seller?.avatar_url)}
               fill
               sizes="96px"
-              alt={`Perfil de ${sellerName}`}
+              alt={`${t.sellerProfileImageAlt} ${sellerName}`}
               style={{ objectFit: "cover" }}
             />
 
@@ -191,9 +193,9 @@ const trustLabel =
 
           <div className="seller-premium-identity">
             <p className="seller-verified-text">
-              {seller?.seller_verified
-                ? "ATHMOV VERIFIED SELLER"
-                : "ATHMOV SELLER"}
+             {seller?.seller_verified
+  ? t.verifiedAthmovSeller
+  : t.athmovSeller.toUpperCase()}
             </p>
 
             <h3 className="seller-premium-name">
@@ -210,13 +212,13 @@ const trustLabel =
               </span>
 
               <span className="seller-rating-copy">
-                {averageRating !== null
-                  ? `${averageRating.toFixed(1)} · ${reviews.length} ${
-                      reviews.length === 1
-                        ? "reseña"
-                        : "reseñas"
-                    }`
-                  : "Vendedor nuevo"}
+              {averageRating !== null
+  ? `${averageRating.toFixed(1)} · ${reviews.length} ${
+      reviews.length === 1
+        ? t.reviewSingular
+        : t.reviewPlural
+    }`
+  : t.newSeller}
               </span>
             </div>
           </div>
@@ -225,43 +227,43 @@ const trustLabel =
         <div className="seller-trust-row">
           <div>
             <span className="seller-trust-icon">✓</span>
-            Identidad revisada
+           {t.identityReviewed}
           </div>
 
           <div>
             <span className="seller-trust-icon">✓</span>
-            Pago protegido
+           {t.protectedPaymentLabel}
           </div>
 
           <div>
             <span className="seller-trust-icon">✓</span>
-            Perfil trazable
+            {t.traceableProfile}
           </div>
         </div>
 
         <div className="seller-stats-grid">
           <div>
             <strong>{sales}</strong>
-            <span>Ventas</span>
+           <span>{t.salesLabel}</span>
           </div>
 
           <div>
             <strong>
               {averageRating !== null
                 ? averageRating.toFixed(1)
-                : "Nuevo"}
+                : t.newSeller}
             </strong>
-            <span>Valoración</span>
+           <span>{t.ratingLabel}</span>
           </div>
 
           <div>
             <strong>{responseTime}</strong>
-            <span>Respuesta</span>
+           <span>{t.responseLabel}</span>
           </div>
 
           <div>
             <strong>{memberSince}</strong>
-            <span>Miembro desde</span>
+            <span>{t.memberSince}</span>
           </div>
         </div>
 
@@ -269,7 +271,7 @@ const trustLabel =
   <div className="seller-trust-score-heading">
     <div>
       <span className="seller-trust-score-eyebrow">
-        ATHMOV TRUST SCORE
+        {t.trustScore}
       </span>
 
       <strong>{trustLabel}</strong>
@@ -284,7 +286,7 @@ const trustLabel =
   <div
     className="seller-trust-score-track"
     role="progressbar"
-    aria-label={`Trust Score ${trustScoreFormatted} sobre 10`}
+    aria-label={`${t.trustScore} ${trustScoreFormatted} ${t.outOfTen}`}
     aria-valuemin={0}
     aria-valuemax={10}
     aria-valuenow={trustScore}
@@ -298,14 +300,14 @@ const trustLabel =
   <div className="seller-trust-score-details">
     <span>
       {seller?.seller_verified
-        ? "Identidad verificada"
-        : "Identidad pendiente"}
+  ? t.verifiedIdentity
+  : t.identityPending}
     </span>
 
     <span>
-      {positivePercentage !== null
-        ? `${positivePercentage}% reseñas positivas`
-        : "Sin reseñas todavía"}
+     {positivePercentage !== null
+  ? `${positivePercentage}% ${t.positiveReviews}`
+  : t.noReviewsYet}
     </span>
   </div>
 </div>
@@ -314,10 +316,8 @@ const trustLabel =
           <span className="seller-online-dot" />
 
           <div>
-            <strong>Vendedor activo</strong>
-            <span>
-              Actividad reciente en ATHMOV
-            </span>
+           <strong>{t.activeSeller}</strong>
+<span>{t.recentAthmovActivity}</span>
           </div>
         </div>
 
@@ -327,8 +327,8 @@ const trustLabel =
             onClick={(event) => event.stopPropagation()}
           >
             <div className="seller-reviews-header">
-              <span>Últimas reseñas</span>
-              <span>{reviews.length} en total</span>
+             <span>{t.latestReviews}</span>
+<span>{reviews.length} {t.totalReviews}</span>
             </div>
 
             {reviews.slice(0, 2).map((review) => {
@@ -365,7 +365,7 @@ const trustLabel =
               goToSellerProfile();
             }}
           >
-            Ver perfil completo
+            {t.viewFullProfile}
             <span>→</span>
           </button>
         )}

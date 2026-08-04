@@ -1,5 +1,7 @@
 "use client";
 
+import { useLanguage } from "@/components/LanguageProvider";
+
 interface Props {
   createdAt: string;
   views?: number;
@@ -13,44 +15,55 @@ export default function ProductTimeline({
   favorites,
   location,
 }: Props) {
+  const { lang, t } = useLanguage();
+
+  const locale =
+    lang === "en"
+      ? "en-GB"
+      : lang === "pt"
+        ? "pt-PT"
+        : "es-ES";
+
   return (
     <div style={timelineStyle}>
-      <h3 style={timelineTitleStyle}>Historial del producto</h3>
+      <h3 style={timelineTitleStyle}>
+        {t.productHistory}
+      </h3>
 
       <TimelineItem
         icon="📅"
-        title="Publicado"
-        value={new Date(createdAt).toLocaleDateString("es-ES")}
+        title={t.published}
+        value={new Date(createdAt).toLocaleDateString(locale)}
       />
 
       <TimelineItem
         icon="👁"
-        title="Visualizaciones"
+        title={t.views}
         value={String(views || 0)}
       />
 
       <TimelineItem
         icon="❤"
-        title="Favoritos"
+        title={t.favorites}
         value={String(favorites || 0)}
       />
 
       <TimelineItem
         icon="📍"
-        title="Ubicación"
-        value={location || "España"}
+        title={t.location}
+        value={location || t.countryFallbackLabel}
       />
 
       <TimelineItem
         icon="🚚"
-        title="Entrega estimada"
-        value="24-72 horas"
+        title={t.estimatedDeliveryLabel}
+        value={t.deliveryTimeValue}
       />
 
       <TimelineItem
         icon="🛡"
-        title="Estado"
-        value="Verificado por ATHMOV"
+        title={t.statusLabel}
+        value={t.verifiedByAthmov}
       />
     </div>
   );
