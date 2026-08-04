@@ -664,7 +664,7 @@ const buyNow = async () => {
         color: "#111",
       }}
     >
-      Cargando producto...
+      {t.loadingProduct}
     </div>
   );
 }
@@ -678,7 +678,7 @@ if (notFound || !producto) {
         color: "#111",
       }}
     >
-      Producto no encontrado en el componente cliente.
+     {t.productNotFound}
     </div>
   );
 }
@@ -749,7 +749,7 @@ return (
   aria-label="Breadcrumb"
 >
   <span onClick={() => router.push("/")}>
-    Inicio
+   {t.home}
   </span>
 
   <span className="breadcrumb-separator">›</span>
@@ -810,14 +810,14 @@ return (
       <span>
         {averageRating !== null
           ? averageRating.toFixed(1)
-          : "Nuevo"}
+          : t.newSeller}
       </span>
 
     </div>
 
     <span className="product-meta-dot" />
 
-    <span>{producto.location || "España"}</span>
+    <span>{producto.location || t.sellerLocationFallback}</span>
 
     {sellerProfile?.seller_verified && (
       <>
@@ -862,6 +862,29 @@ return (
       sellerVerified={Boolean(sellerProfile?.seller_verified)}
       checkoutLoading={checkoutLoading}
       isFavorite={isFavorite}
+        vatSecurePaymentLabel={t.vatSecurePaymentLabel}
+  newPriceLabel={t.newPriceLabel}
+  athmovPriceLabel={t.athmovPriceLabel}
+  youSaveLabel={t.youSaveLabel}
+  securePaymentLabel={t.securePaymentLabel}
+  verifiedSellerLabel={t.verifiedSellerLabel}
+  protectedShippingLabel={t.protectedShippingLabel}
+  estimatedDeliveryLabel={t.estimatedDeliveryLabel}
+  estimatedDeliveryText={t.estimatedDeliveryText}
+  protectedPaymentLabel={t.protectedPaymentLabel}
+  availableLabel={t.availableLabel}
+  availableDescription={t.availableDescription}
+  athmovProtectionLabel={t.athmovProtectionLabel}
+  athmovProtectionText={t.athmovProtectionText}
+  stripePaymentLabel={t.stripePaymentLabel}
+  stripePaymentText={t.stripePaymentText}
+  trackingLabel={t.trackingLabel}
+  trackingText={t.trackingText}
+  protectionLabel={t.protectionLabel}
+  protectionText={t.protectionText}
+  singleUnitLabel={t.singleUnitLabel}
+  paymentNoteLabel={t.paymentNoteLabel}
+  countryFallbackLabel={t.countryFallbackLabel}
       buyNowLabel={t.buyNow}
       redirectingLabel={t.redirecting}
       addToCartLabel={t.addToCart}

@@ -23,6 +23,29 @@ type ProductPurchasePanelProps = {
   messageSellerLabel: string;
   addToFavoritesLabel: string;
   inFavoritesLabel: string;
+  vatSecurePaymentLabel: string;
+newPriceLabel: string;
+athmovPriceLabel: string;
+youSaveLabel: string;
+securePaymentLabel: string;
+verifiedSellerLabel: string;
+protectedShippingLabel: string;
+estimatedDeliveryLabel: string;
+estimatedDeliveryText: string;
+protectedPaymentLabel: string;
+availableLabel: string;
+availableDescription: string;
+athmovProtectionLabel: string;
+athmovProtectionText: string;
+stripePaymentLabel: string;
+stripePaymentText: string;
+trackingLabel: string;
+trackingText: string;
+protectionLabel: string;
+protectionText: string;
+singleUnitLabel: string;
+paymentNoteLabel: string;
+countryFallbackLabel: string;
 
   onBuyNow: () => void;
   onAddToCart: () => void;
@@ -49,6 +72,30 @@ export default function ProductPurchasePanel({
   messageSellerLabel,
   addToFavoritesLabel,
   inFavoritesLabel,
+
+  vatSecurePaymentLabel,
+newPriceLabel,
+athmovPriceLabel,
+youSaveLabel,
+securePaymentLabel,
+verifiedSellerLabel,
+protectedShippingLabel,
+estimatedDeliveryLabel,
+estimatedDeliveryText,
+protectedPaymentLabel,
+availableLabel,
+availableDescription,
+athmovProtectionLabel,
+athmovProtectionText,
+stripePaymentLabel,
+stripePaymentText,
+trackingLabel,
+trackingText,
+protectionLabel,
+protectionText,
+singleUnitLabel,
+paymentNoteLabel,
+countryFallbackLabel,
 
   onBuyNow,
   onAddToCart,
@@ -103,13 +150,13 @@ return (
 </p>
 
         <p className="purchase-price-caption">
-          IVA incluido · Pago 100% seguro
+          {vatSecurePaymentLabel}
         </p>
 
         {hasSaving && (
   <div className="purchase-saving-card">
     <div className="purchase-saving-column">
-      <span>Precio nuevo</span>
+      <span>{newPriceLabel}</span>
 
       <strong className="purchase-original-price">
         {formattedOriginalPrice}
@@ -119,13 +166,13 @@ return (
     <div className="purchase-saving-divider" />
 
     <div className="purchase-saving-column">
-      <span>Precio ATHMOV</span>
+      <span>{athmovPriceLabel}</span>
 
       <strong>{formattedPrice}</strong>
     </div>
 
     <div className="purchase-saving-result">
-      <span>Ahorras</span>
+      <span>{youSaveLabel}</span>
 
       <strong>
         {formattedSaving}
@@ -137,43 +184,43 @@ return (
 
    <div className="purchase-trust-strip">
   <div>
-    <span className="trust-icon">✓</span>
-    Pago seguro
-  </div>
-
-  {sellerVerified && (
-    <div>
-      <span className="trust-icon">✓</span>
-      Vendedor verificado
-    </div>
-  )}
-
-  <div>
-    <span className="trust-icon">✓</span>
-    Envío protegido
-  </div>
+  <span className="trust-icon">✓</span>
+  {securePaymentLabel}
 </div>
 
-   <InfoCard
+{sellerVerified && (
+  <div>
+    <span className="trust-icon">✓</span>
+    {verifiedSellerLabel}
+  </div>
+)}
+
+<div>
+  <span className="trust-icon">✓</span>
+  {protectedShippingLabel}
+</div>
+</div>
+
+ <InfoCard
   icon="🚚"
-  title="Entrega estimada"
-  description="Entre 24 y 72 horas desde que el vendedor envía el pedido."
+  title={estimatedDeliveryLabel}
+  description={estimatedDeliveryText}
   variant="accent"
 />
       </div>
 
-  <div className="purchase-badges">
+<div className="purchase-badges">
   <PremiumBadge variant="dark" size="small">
     {condition}
   </PremiumBadge>
 
   <PremiumBadge variant="light" size="small">
-    Pago protegido
+    {protectedPaymentLabel}
   </PremiumBadge>
 
   {sellerVerified && (
     <PremiumBadge variant="success" size="small">
-      Vendedor verificado
+      {verifiedSellerLabel}
     </PremiumBadge>
   )}
 </div>
@@ -184,13 +231,13 @@ return (
           <circle cx="12" cy="10" r="2.2" />
         </svg>
 
-        <span>{location || "España"}</span>
+       <span>{location || countryFallbackLabel}</span>
       </div>
 
  <InfoCard
   icon="✓"
-  title="Disponible"
-  description="Producto único. Una vez vendido dejará de estar disponible."
+  title={availableLabel}
+  description={availableDescription}
   variant="success"
 />
 
@@ -204,34 +251,31 @@ return (
           </span>
 
           <div>
-        <strong>Protección ATHMOV</strong>
-
-<p>
-  Tu dinero permanece protegido hasta que recibes el pedido.
-</p>
+<strong>{athmovProtectionLabel}</strong>
+<p>{athmovProtectionText}</p>
           </div>
         </div>
 
- <div className="purchase-trust-list">
+<div className="purchase-trust-list">
   <div className="trust-item">
-    <strong>Pago seguro</strong>
-    <span>Procesado mediante Stripe.</span>
+    <strong>{stripePaymentLabel}</strong>
+    <span>{stripePaymentText}</span>
   </div>
 
   <div className="trust-item">
-    <strong>Seguimiento</strong>
-    <span>Con número de tracking cuando el vendedor envía el pedido.</span>
+    <strong>{trackingLabel}</strong>
+    <span>{trackingText}</span>
   </div>
 
   <div className="trust-item">
-    <strong>Protección</strong>
-    <span>ATHMOV te acompaña hasta la entrega.</span>
+    <strong>{protectionLabel}</strong>
+    <span>{protectionText}</span>
   </div>
 </div>
       </div>
 
-      <div className="purchase-stock">
-  Solo hay una unidad disponible
+<div className="purchase-stock">
+  {singleUnitLabel}
 </div>
 
 <div className="purchase-main-actions">
@@ -281,9 +325,7 @@ return (
       <div className="purchase-note">
         <span className="purchase-note-dot" />
 
-        <p>
-          No se realiza ningún cargo hasta acceder al pago seguro.
-        </p>
+      <p>{paymentNoteLabel}</p>
       </div>
 
       <style jsx>{`

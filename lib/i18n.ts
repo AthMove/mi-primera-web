@@ -291,7 +291,41 @@ conversationStarted: "Conversación iniciada",
 athmovOffer: "Oferta ATHMOV",
 releasePaymentError: "No se pudo liberar el pago",
 estimatedAfterShipping: "Estimado tras el envío",
+// Español
+home: "Inicio",
+newSeller: "Nuevo",
+sellerLocationFallback: "España",
+verificationRequestMessage: "Hola, ¿podrías enviarme un vídeo de verificación de este producto mostrando números de serie, estado y detalles de la marca?",
+vatSecurePaymentLabel: "IVA incluido · Pago 100% seguro",
+newPriceLabel: "Precio nuevo",
+athmovPriceLabel: "Precio ATHMOV",
+youSaveLabel: "Ahorras",
+securePaymentLabel: "Pago seguro",
+verifiedSellerLabel: "Vendedor verificado",
+protectedShippingLabel: "Envío protegido",
+estimatedDeliveryLabel: "Entrega estimada",
+estimatedDeliveryText:
+  "Entre 24 y 72 horas desde que el vendedor envía el pedido.",
+protectedPaymentLabel: "Pago protegido",
+availableLabel: "Disponible",
+availableDescription:
+  "Producto único. Una vez vendido dejará de estar disponible.",
+athmovProtectionLabel: "Protección ATHMOV",
+athmovProtectionText:
+  "Tu dinero permanece protegido hasta que recibes el pedido.",
+stripePaymentLabel: "Pago seguro",
+stripePaymentText: "Procesado mediante Stripe.",
+trackingLabel: "Seguimiento",
+trackingText:
+  "Con número de tracking cuando el vendedor envía el pedido.",
+protectionLabel: "Protección",
+protectionText: "ATHMOV te acompaña hasta la entrega.",
+singleUnitLabel: "Solo hay una unidad disponible",
+paymentNoteLabel:
+  "No se realiza ningún cargo hasta acceder al pago seguro.",
+countryFallbackLabel: "España",
   },
+
 
   en: {
     buy: "Buy",
@@ -585,6 +619,39 @@ conversationStarted: "Conversation started",
 athmovOffer: "ATHMOV offer",
 releasePaymentError: "Payment could not be released",
 estimatedAfterShipping: "Estimated after shipping",
+// Inglés
+home: "Home",
+newSeller: "New",
+sellerLocationFallback: "Spain",
+verificationRequestMessage: "Hello, could you send me a verification video of this product showing its serial numbers, condition and brand details?",
+vatSecurePaymentLabel: "VAT included · 100% secure payment",
+newPriceLabel: "New price",
+athmovPriceLabel: "ATHMOV price",
+youSaveLabel: "You save",
+securePaymentLabel: "Secure payment",
+verifiedSellerLabel: "Verified seller",
+protectedShippingLabel: "Protected shipping",
+estimatedDeliveryLabel: "Estimated delivery",
+estimatedDeliveryText:
+  "Between 24 and 72 hours after the seller ships the order.",
+protectedPaymentLabel: "Protected payment",
+availableLabel: "Available",
+availableDescription:
+  "Unique product. Once sold, it will no longer be available.",
+athmovProtectionLabel: "ATHMOV Protection",
+athmovProtectionText:
+  "Your money remains protected until you receive the order.",
+stripePaymentLabel: "Secure payment",
+stripePaymentText: "Processed through Stripe.",
+trackingLabel: "Tracking",
+trackingText:
+  "A tracking number is provided when the seller ships the order.",
+protectionLabel: "Protection",
+protectionText: "ATHMOV supports you until delivery.",
+singleUnitLabel: "Only one unit available",
+paymentNoteLabel:
+  "No charge is made until you proceed to secure payment.",
+countryFallbackLabel: "Spain",
   },
 
   pt: {
@@ -879,5 +946,38 @@ conversationStarted: "Conversa iniciada",
 athmovOffer: "Oferta ATHMOV",
 releasePaymentError: "Não foi possível libertar o pagamento",
 estimatedAfterShipping: "Estimado após o envio",
+// Portugués
+home: "Início",
+newSeller: "Novo",
+sellerLocationFallback: "Espanha",
+verificationRequestMessage: "Olá, poderia enviar-me um vídeo de verificação deste produto mostrando os números de série, o estado e os detalhes da marca?",
+vatSecurePaymentLabel: "IVA incluído · Pagamento 100% seguro",
+newPriceLabel: "Preço novo",
+athmovPriceLabel: "Preço ATHMOV",
+youSaveLabel: "Poupa",
+securePaymentLabel: "Pagamento seguro",
+verifiedSellerLabel: "Vendedor verificado",
+protectedShippingLabel: "Envio protegido",
+estimatedDeliveryLabel: "Entrega estimada",
+estimatedDeliveryText:
+  "Entre 24 e 72 horas após o vendedor enviar a encomenda.",
+protectedPaymentLabel: "Pagamento protegido",
+availableLabel: "Disponível",
+availableDescription:
+  "Produto único. Depois de vendido, deixará de estar disponível.",
+athmovProtectionLabel: "Proteção ATHMOV",
+athmovProtectionText:
+  "O seu dinheiro permanece protegido até receber a encomenda.",
+stripePaymentLabel: "Pagamento seguro",
+stripePaymentText: "Processado através da Stripe.",
+trackingLabel: "Seguimento",
+trackingText:
+  "Com número de seguimento quando o vendedor envia a encomenda.",
+protectionLabel: "Proteção",
+protectionText: "A ATHMOV acompanha-o até à entrega.",
+singleUnitLabel: "Só existe uma unidade disponível",
+paymentNoteLabel:
+  "Não é efetuada qualquer cobrança até avançar para o pagamento seguro.",
+countryFallbackLabel: "Espanha",
   },
 };
