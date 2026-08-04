@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/components/LanguageProvider";
 
 type RelatedProductsProps = {
   products: any[];
@@ -13,61 +14,77 @@ export default function RelatedProducts({
   safeImage,
 }: RelatedProductsProps) {
   const router = useRouter();
+  const { t } = useLanguage();
+
   return (
     <section style={relatedSectionStyle}>
-      <p style={relatedEyebrowStyle}>SELECCIÓN ATHMOV</p>
+      <p style={relatedEyebrowStyle}>
+        {t.relatedProductsEyebrow}
+      </p>
 
       <h2 style={relatedTitleStyle}>
-        También te puede gustar
+        {t.relatedProductsTitle}
       </h2>
 
-      <div style={relatedGridStyle}>
-        {products.map((item) => (
-          <div
-            key={item.id}
-            style={relatedCardStyle}
-            onClick={() =>
-  router.push(
-    item.slug
-      ? `/p/${item.slug}`
-      : `/products/${item.id}`
-  )
-}
-          >
-            <div style={relatedImageStyle}>
-              <Image
-                src={safeImage(item.image)}
-                alt={item.title || "Producto"}
-                fill
-                sizes="33vw"
-                style={{
-                  objectFit: "contain",
-                  objectPosition: "center",
-                  padding: "42px",
-                }}
-              />
-            </div>
+      {products.length === 0 ? (
+        <p style={relatedEmptyStyle}>
+          {t.relatedProductsEmpty}
+        </p>
+      ) : (
+        <div style={relatedGridStyle}>
+          {products.map((item) => (
+            <div
+              key={item.id}
+              style={relatedCardStyle}
+              onClick={() =>
+                router.push(
+                  item.slug
+                    ? `/p/${item.slug}`
+                    : `/products/${item.id}`
+                )
+              }
+            >
+              <div style={relatedImageStyle}>
+                <Image
+                  src={safeImage(item.image)}
+                  alt={item.title || t.productFallback}
+                  fill
+                  sizes="33vw"
+                  style={{
+                    objectFit: "contain",
+                    objectPosition: "center",
+                    padding: "42px",
+                  }}
+                />
+              </div>
 
-            <div style={relatedContentStyle}>
-              <p style={relatedBrandStyle}>{item.brand}</p>
+              <div style={relatedContentStyle}>
+                <p style={relatedBrandStyle}>
+                  {item.brand}
+                </p>
 
-              <h3 style={relatedProductTitleStyle}>
-                {item.title}
-              </h3>
+                <h3 style={relatedProductTitleStyle}>
+                  {item.title}
+                </h3>
 
-              <p style={relatedSubtitleStyle}>
-                Excelente estado · Vendedor verificado
-              </p>
+                <p style={relatedSubtitleStyle}>
+                  {t.relatedProductSubtitle}
+                </p>
 
-              <div style={relatedFooterStyle}>
-                <p style={relatedPriceStyle}>€{item.price}</p>
+                <div style={relatedFooterStyle}>
+                  <p style={relatedPriceStyle}>
+                    €{item.price}
+                  </p>
 
-                <span style={relatedViewStyle}>Ver</span>
+                  <span style={relatedViewStyle}>
+                    {t.relatedView}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 }
@@ -92,6 +109,13 @@ const relatedTitleStyle: React.CSSProperties = {
   fontWeight: 500,
   letterSpacing: "-0.04em",
   color: "#111111",
+};
+
+const relatedEmptyStyle: React.CSSProperties = {
+  margin: 0,
+  color: "#777777",
+  fontSize: "15px",
+  lineHeight: 1.6,
 };
 
 const relatedGridStyle: React.CSSProperties = {

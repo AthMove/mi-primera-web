@@ -8,6 +8,7 @@ import {
   getBrandsByCategory,
   getModelsByBrand,
 } from "@/lib/sportsCatalog";
+import { useLanguage } from "@/components/LanguageProvider";
 
 
 const SPORTS = ["PADEL", "GOLF", "TENIS", "RUNNING"];
@@ -24,6 +25,7 @@ function generateSlug(title: string) {
 
 export default function SellPage() {
   const router = useRouter();
+  const { t } = useLanguage();
 
   const [title, setTitle] = useState("");
   const [brand, setBrand] = useState("");
@@ -66,22 +68,22 @@ const handleCategoryChange = (newCategory: string) => {
     const numericPrice = Number(price);
 
     if (!numericPrice || numericPrice <= 0) {
-      alert("Introduce un precio válido");
+      alert(t.sellInvalidPrice);
       return;
     }
 
     if (!SPORTS.includes(category)) {
-      alert("Categoría no permitida");
+      alert(t.sellInvalidCategory);
       return;
     }
 
     if (!GENDERS.includes(gender)) {
-      alert("Género no permitido");
+      alert(t.sellInvalidGender);
       return;
     }
 
     if (!availableBrands.includes(brand)) {
-      alert("Marca no permitida para esta categoría");
+      alert(t.sellInvalidBrand);
       return;
     }
 
@@ -90,7 +92,7 @@ const handleCategoryChange = (newCategory: string) => {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      alert("Debes iniciar sesión para vender");
+      alert(t.sellLoginRequired);
       router.push("/auth");
       return;
     }
@@ -104,7 +106,7 @@ const handleCategoryChange = (newCategory: string) => {
       .maybeSingle();
 
     if (profileError || !profile) {
-      alert("No se pudo comprobar tu perfil de vendedor");
+      alert(t.sellProfileError);
       return;
     }
 
@@ -115,7 +117,7 @@ const handleCategoryChange = (newCategory: string) => {
       profile.stripe_payouts_enabled;
 
     if (!stripeReady) {
-      alert("Debes conectar Stripe payouts antes de vender.");
+     alert(t.sellStripeRequired);
       router.push("/account");
       return;
     }
@@ -151,22 +153,23 @@ const finalModel =
   model === "OTRO" ? customModel.trim() : model.trim();
 
 if (!category) {
-  alert("Selecciona un deporte");
+ alert(t.sellSelectSportAlert);
   return;
 }
 
 if (!brand) {
-  alert("Selecciona una marca");
+  alert(t.sellSelectBrandAlert);
   return;
 }
 
 if (!finalModel) {
-  alert("Selecciona o escribe el modelo");
+  alert(t.sellSelectModelAlert);
   return;
 }
 
 const seoTitle =
-  title.trim() || `${brand} ${finalModel} de segunda mano`;
+  title.trim() ||
+  `${brand} ${finalModel} ${t.sellSecondHandSuffix}`;
 
 const productSlug = generateSlug(
   `${brand} ${finalModel} segunda mano`
@@ -204,7 +207,7 @@ const { data, error } = await supabase
         return;
       }
 
-     alert("Producto publicado correctamente");
+     alert(t.sellPublishedSuccess);
       router.push(`/products/${data.id}`);
     } finally {
       setLoading(false);
@@ -214,17 +217,16 @@ const { data, error } = await supabase
   return (
     <main style={pageStyle} className="sell-page">
       <section style={heroStyle}>
-        <p style={heroEyebrowStyle}>MARKETPLACE SELECCIONADO ATHMOV</p>
+        <p style={heroEyebrowStyle}>{t.sellHeroEyebrow}</p>
 
-       <h1 style={heroTitleStyle} className="sell-title">
-  Vende Material
+<h1 style={heroTitleStyle} className="sell-title">
+  {t.sellHeroTitle1}
   <br />
-  Deportivo Premium
+  {t.sellHeroTitle2}
 </h1>
 
 <p style={heroTextStyle}>
-  Solo se aceptan marcas premium seleccionadas de pádel, golf, tenis y
-  running.
+  {t.sellHeroText}
 </p>
       </section>
 
@@ -233,16 +235,16 @@ const { data, error } = await supabase
           {preview ? (
             <Image
               src={preview}
-              alt="Vista previa del producto"
+              alt={t.sellPreviewAlt}
               fill
               style={{ objectFit: "cover" }}
             />
           ) : (
             <div style={emptyUploadStyle}>
               <div style={uploadIconStyle}>＋</div>
-              <p style={uploadTitleStyle}>Imagen del producto</p>
-              <span style={uploadTextStyle}>
-  Sube una fotografía clara del producto
+              <p style={uploadTitleStyle}>{t.sellProductImage}</p>
+<span style={uploadTextStyle}>
+  {t.sellUploadImageText}
 </span>
             </div>
           )}
@@ -257,7 +259,7 @@ const { data, error } = await supabase
 
         <div style={formStyle}>
           <input
-           placeholder="Título personalizado (opcional)"
+           placeholder={t.sellCustomTitlePlaceholder}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             style={inputStyle}
@@ -269,7 +271,7 @@ const { data, error } = await supabase
     onChange={(e) => handleCategoryChange(e.target.value)}
     style={inputStyle}
   >
-    <option value="">Selecciona un deporte</option>
+   <option value="">{t.sellSelectSport}</option>
 
     {SPORTS.map((sport) => (
       <option key={sport} value={sport}>
@@ -287,7 +289,7 @@ const { data, error } = await supabase
     style={inputStyle}
     disabled={!category}
   >
-    <option value="">Selecciona una marca</option>
+    <option value="">{t.sellSelectBrand}</option>
 
     {availableBrands.map((item) => (
       <option key={item} value={item}>
@@ -307,7 +309,7 @@ const { data, error } = await supabase
     style={inputStyle}
     disabled={!brand}
   >
-    <option value="">Selecciona un modelo</option>
+   <option value="">{t.sellSelectModel}</option>
 
     {availableModels.map((item) => (
       <option key={item} value={item}>
@@ -315,13 +317,13 @@ const { data, error } = await supabase
       </option>
     ))}
 
-    <option value="OTRO">Otro modelo</option>
+   <option value="OTRO">{t.sellOtherModel}</option>
   </select>
 
   {model === "OTRO" ? (
     <input
       value={customModel}
-      placeholder="Escribe el modelo"
+      placeholder={t.sellWriteModel}
       onChange={(e) => setCustomModel(e.target.value)}
       style={inputStyle}
     />
@@ -336,10 +338,10 @@ const { data, error } = await supabase
               onChange={(e) => setGender(e.target.value)}
               style={inputStyle}
             >
-              <option value="MEN">HOMBRE</option>
-<option value="WOMEN">MUJER</option>
-<option value="UNISEX">UNISEX</option>
-<option value="JUNIOR">JUNIOR</option>
+<option value="MEN">{t.genderMen}</option>
+<option value="WOMEN">{t.genderWomen}</option>
+<option value="UNISEX">{t.genderUnisex}</option>
+<option value="JUNIOR">{t.genderJunior}</option>
             </select>
 
             <select
@@ -347,16 +349,16 @@ const { data, error } = await supabase
               onChange={(e) => setCondition(e.target.value)}
               style={inputStyle}
             >
-             <option value="New">Nuevo</option>
-<option value="Like new">Como nuevo</option>
-<option value="Excellent">Excelente</option>
-<option value="Good">Buen estado</option>
-<option value="Used">Usado</option>
+<option value="New">{t.conditionNew}</option>
+<option value="Like new">{t.conditionLikeNew}</option>
+<option value="Excellent">{t.conditionExcellent}</option>
+<option value="Good">{t.conditionGood}</option>
+<option value="Used">{t.conditionUsed}</option>
             </select>
           </div>
 
           <input
-            placeholder="Precio (€)"
+           placeholder={t.sellPricePlaceholder}
             type="number"
             value={price}
             onChange={(e) => setPrice(e.target.value)}
@@ -364,21 +366,29 @@ const { data, error } = await supabase
           />
 
           <textarea
-           placeholder="Describe el estado, uso, número de serie y disponibilidad de factura..."
+           placeholder={t.sellDescriptionPlaceholder}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             style={textareaStyle}
           />
 
- <div style={noticeStyle}>
-<strong>Publicación inmediata:</strong> tu producto se publicará directamente
-  en ATHMOV.
+<div style={noticeStyle}>
+  <strong>{t.sellImmediateTitle}</strong>{" "}
+  {t.sellImmediateText}
 </div>
 
           <div style={trustRowStyle}>
-<div style={trustBadgeStyle}>✓ SOLO MARCAS PREMIUM</div>
-<div style={trustBadgeStyle}>✓ PROTECCIÓN AL COMPRADOR</div>
-<div style={trustBadgeStyle}>✓ PUBLICACIÓN INMEDIATA</div>
+<div style={trustBadgeStyle}>
+  ✓ {t.sellPremiumBrandsBadge}
+</div>
+
+<div style={trustBadgeStyle}>
+  ✓ {t.sellBuyerProtectionBadge}
+</div>
+
+<div style={trustBadgeStyle}>
+  ✓ {t.sellImmediateBadge}
+</div>
           </div>
 
           <button
@@ -390,7 +400,7 @@ const { data, error } = await supabase
     cursor: loading ? "not-allowed" : "pointer",
   }}
 >
-  {loading ? "Publicando..." : "Publicar producto"}
+  {loading ? t.sellPublishing : t.sellPublishProduct}
 </button>
         </div>
       </section>

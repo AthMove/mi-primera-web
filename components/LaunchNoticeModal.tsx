@@ -1,5 +1,7 @@
 "use client";
 
+import { useLanguage } from "@/components/LanguageProvider";
+
 interface LaunchNoticeModalProps {
   type: "buy" | "sell";
   onClose: () => void;
@@ -12,6 +14,7 @@ export default function LaunchNoticeModal({
   onContinue,
 }: LaunchNoticeModalProps) {
   const isBuy = type === "buy";
+  const { t } = useLanguage();
 
   return (
     <div
@@ -28,34 +31,31 @@ export default function LaunchNoticeModal({
           type="button"
           className="launch-modal-close"
           onClick={onClose}
-          aria-label="Cerrar aviso"
+         aria-label={t.closeNotice}
         >
           ×
         </button>
 
         <p className="launch-modal-eyebrow">
-          ATHMOV · LANZAMIENTO
+         {t.launchEyebrow}
         </p>
 
-        <h2 className="launch-modal-title">
-          {isBuy
-            ? "Las compras estarán disponibles muy pronto"
-            : "Ya puedes preparar tus productos para el lanzamiento"}
-        </h2>
+       <h2 className="launch-modal-title">
+  {isBuy
+    ? t.launchBuyTitle
+    : t.launchSellTitle}
+</h2>
 
         <p className="launch-modal-description">
-          {isBuy
-            ? "Estamos terminando de preparar ATHMOV para ofrecerte pagos seguros, protección al comprador y vendedores verificados."
-            : "ATHMOV se encuentra en fase de lanzamiento. Ya puedes crear tu cuenta y publicar tus productos de forma gratuita para que estén preparados desde el primer día."}
-        </p>
+  {isBuy
+    ? t.launchBuyDescription
+    : t.launchSellDescription}
+</p>
 
         <div className="launch-modal-highlight">
           <span className="launch-modal-dot" />
 
-          <p>
-            Lanzamiento previsto en las próximas
-            semanas.
-          </p>
+          <p>{t.launchExpected}</p>
         </div>
 
         <div className="launch-modal-actions">
@@ -65,7 +65,7 @@ export default function LaunchNoticeModal({
               className="launch-modal-primary"
               onClick={onContinue}
             >
-              Subir un producto
+             {t.uploadProduct}
             </button>
           )}
 
@@ -79,8 +79,8 @@ export default function LaunchNoticeModal({
             onClick={onClose}
           >
             {isBuy
-              ? "Seguir explorando"
-              : "Más tarde"}
+  ? t.keepExploring
+  : t.later}
           </button>
         </div>
       </div>

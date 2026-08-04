@@ -7,6 +7,7 @@ import {
   type CSSProperties,
   type MouseEvent,
 } from "react";
+import { useLanguage } from "@/components/LanguageProvider";
 
 
 type ProductGalleryProps = {
@@ -39,6 +40,7 @@ onToggleFavorite,
 onImageMove,
 onMouseLeave,
 }: ProductGalleryProps) {
+  const { t } = useLanguage();
  const [loadedImage, setLoadedImage] = useState("");
   const safeImage = (src?: string) => {
     return src?.startsWith("http") || src?.startsWith("/")
@@ -126,7 +128,7 @@ const openFullscreen = () => {
 
           {featured && (
             <span className="product-gallery-featured">
-              Selección ATHMOV
+              {t.galleryFeatured}
             </span>
           )}
           {images.length > 1 && (
@@ -145,11 +147,11 @@ const openFullscreen = () => {
   event.stopPropagation();
   onToggleFavorite();
 }}
-          aria-label={
-            isFavorite
-              ? "Eliminar de favoritos"
-              : "Añadir a favoritos"
-          }
+         aria-label={
+  isFavorite
+    ? t.removeFromFavorites
+    : t.addToFavoritesPlain
+}
           aria-pressed={isFavorite}
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -168,7 +170,7 @@ const openFullscreen = () => {
 <img
   key={selectedImage}
   src={safeImage(selectedImage)}
-  alt={title || "Producto ATHMOV"}
+ alt={title || t.athmovProductAlt}
   className={`product-gallery-image product-gallery-image-fade ${
     imageLoaded ? "is-loaded" : "is-loading"
   }`}
@@ -199,7 +201,7 @@ const openFullscreen = () => {
                   selected ? "is-selected" : ""
                 }`}
                 onClick={() => onSelectImage(image)}
-                aria-label={`Ver imagen ${index + 1}`}
+                aria-label={`${t.viewImage} ${index + 1}`}
               >
                 <Image
                 className="product-gallery-thumb-image"
@@ -233,7 +235,7 @@ const openFullscreen = () => {
         event.stopPropagation();
         goToPrevious();
       }}
-      aria-label="Imagen anterior"
+      aria-label={t.previousImage}
     >
       ‹
     </button>
@@ -245,7 +247,7 @@ const openFullscreen = () => {
         event.stopPropagation();
         goToNext();
       }}
-      aria-label="Imagen siguiente"
+      aria-label={t.nextImage}
     >
       ›
     </button>

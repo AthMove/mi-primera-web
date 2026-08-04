@@ -1,5 +1,7 @@
 "use client";
 
+import { useLanguage } from "@/components/LanguageProvider";
+
 interface BuyerGuide {
   sport: string;
   title: string;
@@ -15,53 +17,60 @@ export default function ProductBuyerGuide({
   guide,
   eyebrow,
 }: Props) {
+  const { t } = useLanguage();
+
+  const cardTitles = [
+    t.authenticityMarks,
+    t.askExtraProof,
+    t.compareCondition,
+  ];
+
+  const icons = ["🔍", "🎥", "📋"];
+
   return (
     <section style={buyerGuideStyle}>
       <div style={buyerGuideHeaderStyle}>
         <div>
-          <p style={buyerGuideEyebrowStyle}>{eyebrow}</p>
-          <h2 style={buyerGuideTitleStyle}>{guide.title}</h2>
+          <p style={buyerGuideEyebrowStyle}>
+            {eyebrow}
+          </p>
+
+          <h2 style={buyerGuideTitleStyle}>
+            {guide.title}
+          </h2>
         </div>
 
-        <div style={buyerGuideBadgeStyle}>{guide.sport}</div>
+        <div style={buyerGuideBadgeStyle}>
+          {guide.sport}
+        </div>
       </div>
 
       <p style={buyerGuideTextStyle}>
-        Aprende cómo verificar este producto antes de comprarlo. Recomendamos
-        comprobar números de serie, pedir vídeos y comparar detalles con el
-        catálogo oficial de la marca.
+        {t.buyerGuideText}
       </p>
 
       <div style={buyerGuideCardsStyle}>
-        {guide.tips.map((tip, index) => {
-          const icons = ["🔍", "🎥", "📋"];
-
-          return (
-            <div key={tip} style={buyerGuideCardStyle}>
-              <div style={buyerGuideIconStyle}>
-                {icons[index] || "✓"}
-              </div>
-
-              <div>
-                <h4 style={buyerGuideCardTitleStyle}>
-                  {index === 0
-                    ? "Revisa marcas de autenticidad"
-                    : index === 1
-                      ? "Pide pruebas adicionales"
-                      : "Compara el estado"}
-                </h4>
-
-                <p style={buyerGuideCardTextStyle}>{tip}</p>
-              </div>
+        {guide.tips.map((tip, index) => (
+          <div key={`${index}-${tip}`} style={buyerGuideCardStyle}>
+            <div style={buyerGuideIconStyle}>
+              {icons[index] || "✓"}
             </div>
-          );
-        })}
+
+            <div>
+              <h4 style={buyerGuideCardTitleStyle}>
+                {cardTitles[index] || t.compareCondition}
+              </h4>
+
+              <p style={buyerGuideCardTextStyle}>
+                {tip}
+              </p>
+            </div>
+          </div>
+        ))}
       </div>
 
       <div style={buyerGuideFooterStyle}>
-        ATHMOV está actualmente en beta. Las herramientas de verificación son
-        educativas y están diseñadas para ayudar a los compradores a tomar
-        decisiones más seguras.
+        {t.buyerGuideFooter}
       </div>
     </section>
   );

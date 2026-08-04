@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import GlassCard from "@/components/ui/GlassCard";
 import PremiumButton from "@/components/ui/PremiumButton";
+import { useLanguage } from "@/components/LanguageProvider";
 
 type StickyBuyBarProps = {
   title: string;
@@ -21,7 +22,14 @@ export default function StickyBuyBar({
   redirectingLabel,
   onBuyNow,
 }: StickyBuyBarProps) {
+  const { lang, t } = useLanguage();
   const [visible, setVisible] = useState(false);
+  const locale =
+  lang === "en"
+    ? "en-GB"
+    : lang === "pt"
+      ? "pt-PT"
+      : "es-ES";
 
   useEffect(() => {
    const onScroll = () => {
@@ -57,16 +65,16 @@ return (
           <p>{title}</p>
 
           <strong>
-            {new Intl.NumberFormat("es-ES", {
-              style: "currency",
-              currency: "EUR",
-              maximumFractionDigits: 0,
-            }).format(price)}
+           {new Intl.NumberFormat(locale, {
+  style: "currency",
+  currency: "EUR",
+  maximumFractionDigits: 0,
+}).format(price)}
           </strong>
 
-          <span className="sticky-buy-trust">
-            ✓ Compra protegida
-          </span>
+        <span className="sticky-buy-trust">
+  ✓ {t.protectedPurchase}
+</span>
         </div>
 
         <PremiumButton
