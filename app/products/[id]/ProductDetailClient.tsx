@@ -236,14 +236,15 @@ setRelated(relatedProducts || []);
   });
 };
 
-  const getConditionLabel = (condition?: string) => {
-    if (condition === "New") return "Nuevo";
-    if (condition === "Like new") return "Como nuevo";
-    if (condition === "Excellent") return "Excelente";
-    if (condition === "Good") return "Buen estado";
-    if (condition === "Used") return "Usado";
-    return condition || "Excelente";
-  };
+const getConditionLabel = (condition?: string) => {
+  if (condition === "New") return t.conditionNew;
+  if (condition === "Like new") return t.conditionLikeNew;
+  if (condition === "Excellent") return t.conditionExcellent;
+  if (condition === "Good") return t.conditionGood;
+  if (condition === "Used") return t.conditionUsed;
+
+  return condition || t.conditionExcellent;
+};
 
   const getCategoryRoute = (category?: string) => {
   const normalizedCategory = String(category || "")
@@ -275,57 +276,59 @@ setRelated(relatedProducts || []);
   return `/products?category=${encodeURIComponent(category || "")}`;
 };
 
-  const getBuyerGuide = () => {
-    const category = String(producto?.category || producto?.brand || "")
-      .toLowerCase()
-      .trim();
+ const getBuyerGuide = () => {
+  const category = String(
+    producto?.category || producto?.brand || ""
+  )
+    .toLowerCase()
+    .trim();
 
-    if (category.includes("padel") || category.includes("pádel")) {
-      return {
-        sport: "Pádel",
-        title: "Cómo revisar una pala antes de comprar",
-        tips: [
-          "Pide foto clara del QR, holograma o número de serie.",
-          "Comprueba el peso: normalmente debe estar entre 350 y 390 g.",
-          "Revisa bordes, serigrafía, grietas y acabado del marco.",
-        ],
-      };
-    }
-
-    if (category.includes("tennis") || category.includes("tenis")) {
-      return {
-        sport: "Tenis",
-        title: "Cómo revisar una raqueta antes de comprar",
-        tips: [
-          "Pide vídeo mostrando el código del mástil.",
-          "Compara medidas y modelo con la ficha oficial de la marca.",
-          "Revisa grip, encordado, marco y posibles fisuras.",
-        ],
-      };
-    }
-
-    if (category.includes("golf")) {
-      return {
-        sport: "Golf",
-        title: "Cómo revisar palos de golf antes de comprar",
-        tips: [
-          "Pide foto del serial grabado en el hosel.",
-          "Revisa soldaduras, cromado, face y shaft.",
-          "Si dudas, llévalo a una tienda de golf antes de aceptarlo.",
-        ],
-      };
-    }
-
+  if (category.includes("padel") || category.includes("pádel")) {
     return {
-      sport: "Guía del comprador",
-      title: "Qué revisar antes de comprar",
+      sport: t.buyerGuidePadelSport,
+      title: t.buyerGuidePadelTitle,
       tips: [
-        "Pide fotos reales del producto, serial y detalles de desgaste.",
-        "Compara el modelo con la web oficial de la marca.",
-        "Solicita ticket, factura o prueba de compra si es posible.",
+        t.buyerGuidePadelTip1,
+        t.buyerGuidePadelTip2,
+        t.buyerGuidePadelTip3,
       ],
     };
+  }
+
+  if (category.includes("tennis") || category.includes("tenis")) {
+    return {
+      sport: t.buyerGuideTennisSport,
+      title: t.buyerGuideTennisTitle,
+      tips: [
+        t.buyerGuideTennisTip1,
+        t.buyerGuideTennisTip2,
+        t.buyerGuideTennisTip3,
+      ],
+    };
+  }
+
+  if (category.includes("golf")) {
+    return {
+      sport: t.buyerGuideGolfSport,
+      title: t.buyerGuideGolfTitle,
+      tips: [
+        t.buyerGuideGolfTip1,
+        t.buyerGuideGolfTip2,
+        t.buyerGuideGolfTip3,
+      ],
+    };
+  }
+
+  return {
+    sport: t.buyerGuideGenericSport,
+    title: t.buyerGuideGenericTitle,
+    tips: [
+      t.buyerGuideGenericTip1,
+      t.buyerGuideGenericTip2,
+      t.buyerGuideGenericTip3,
+    ],
   };
+};
 
 const buyNow = async () => {
   setShowLaunchModal(true);
@@ -597,7 +600,7 @@ const buyNow = async () => {
       conversationId = newConversation.id;
     }
 
-    const firstMessage = `Hola, ¿podrías enviarme un vídeo de verificación de "${producto.title}" mostrando números de serie, estado y detalles de la marca?`;
+   const firstMessage = `${t.verificationRequestMessage} "${producto.title}"`;
 
     const { error: messageError } = await supabase
       .from("conversation_messages")
@@ -737,7 +740,7 @@ if (producto.sold) {
     : "2025";
 
 const responseTime =
-  sellerProfile?.response_time || "< 1 hora";
+  sellerProfile?.response_time || t.defaultResponseTime;
 
 const sales =
   sellerProfile?.total_sales || 0;
@@ -822,7 +825,7 @@ return (
     {sellerProfile?.seller_verified && (
       <>
         <span className="product-meta-dot" />
-        <span>✔ Vendedor verificado</span>
+       <span>✔ {t.verifiedSellerLabel}</span>
       </>
     )}
 
@@ -858,7 +861,7 @@ return (
       price={producto.price}
       originalPrice={producto.original_price}
       condition={getConditionLabel(producto.condition)}
-      location={producto.location || "España"}
+      location={producto.location || t.countryFallbackLabel}
       sellerVerified={Boolean(sellerProfile?.seller_verified)}
       checkoutLoading={checkoutLoading}
       isFavorite={isFavorite}

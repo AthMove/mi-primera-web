@@ -324,6 +324,50 @@ singleUnitLabel: "Solo hay una unidad disponible",
 paymentNoteLabel:
   "No se realiza ningún cargo hasta acceder al pago seguro.",
 countryFallbackLabel: "España",
+conditionNew: "Nuevo",
+conditionLikeNew: "Como nuevo",
+conditionExcellent: "Excelente",
+conditionGood: "Buen estado",
+conditionUsed: "Usado",
+buyerGuidePadelSport: "Pádel",
+buyerGuidePadelTitle: "Cómo revisar una pala antes de comprar",
+buyerGuidePadelTip1:
+  "Pide foto clara del QR, holograma o número de serie.",
+buyerGuidePadelTip2:
+  "Comprueba el peso: normalmente debe estar entre 350 y 390 g.",
+buyerGuidePadelTip3:
+  "Revisa bordes, serigrafía, grietas y acabado del marco.",
+
+buyerGuideTennisSport: "Tenis",
+buyerGuideTennisTitle:
+  "Cómo revisar una raqueta antes de comprar",
+buyerGuideTennisTip1:
+  "Pide vídeo mostrando el código del mástil.",
+buyerGuideTennisTip2:
+  "Compara medidas y modelo con la ficha oficial de la marca.",
+buyerGuideTennisTip3:
+  "Revisa grip, encordado, marco y posibles fisuras.",
+
+buyerGuideGolfSport: "Golf",
+buyerGuideGolfTitle:
+  "Cómo revisar palos de golf antes de comprar",
+buyerGuideGolfTip1:
+  "Pide foto del número de serie grabado en el hosel.",
+buyerGuideGolfTip2:
+  "Revisa soldaduras, cromado, cara del palo y shaft.",
+buyerGuideGolfTip3:
+  "Si dudas, llévalo a una tienda de golf antes de aceptarlo.",
+
+buyerGuideGenericSport: "Guía del comprador",
+buyerGuideGenericTitle: "Qué revisar antes de comprar",
+buyerGuideGenericTip1:
+  "Pide fotos reales del producto, número de serie y detalles de desgaste.",
+buyerGuideGenericTip2:
+  "Compara el modelo con la web oficial de la marca.",
+buyerGuideGenericTip3:
+  "Solicita ticket, factura o prueba de compra si es posible.",
+  // es
+defaultResponseTime: "< 1 hora",
   },
 
 
@@ -652,6 +696,51 @@ singleUnitLabel: "Only one unit available",
 paymentNoteLabel:
   "No charge is made until you proceed to secure payment.",
 countryFallbackLabel: "Spain",
+conditionNew: "New",
+conditionLikeNew: "Like new",
+conditionExcellent: "Excellent",
+conditionGood: "Good condition",
+conditionUsed: "Used",
+buyerGuidePadelSport: "Padel",
+buyerGuidePadelTitle:
+  "How to inspect a padel racket before buying",
+buyerGuidePadelTip1:
+  "Ask for a clear photo of the QR code, hologram or serial number.",
+buyerGuidePadelTip2:
+  "Check the weight: it should normally be between 350 and 390 g.",
+buyerGuidePadelTip3:
+  "Inspect the edges, graphics, cracks and frame finish.",
+
+buyerGuideTennisSport: "Tennis",
+buyerGuideTennisTitle:
+  "How to inspect a tennis racket before buying",
+buyerGuideTennisTip1:
+  "Ask for a video showing the code on the shaft.",
+buyerGuideTennisTip2:
+  "Compare the measurements and model with the brand’s official specifications.",
+buyerGuideTennisTip3:
+  "Inspect the grip, strings, frame and any possible cracks.",
+
+buyerGuideGolfSport: "Golf",
+buyerGuideGolfTitle:
+  "How to inspect golf clubs before buying",
+buyerGuideGolfTip1:
+  "Ask for a photo of the serial number engraved on the hosel.",
+buyerGuideGolfTip2:
+  "Inspect the welds, chrome finish, clubface and shaft.",
+buyerGuideGolfTip3:
+  "When in doubt, take it to a golf shop before accepting it.",
+
+buyerGuideGenericSport: "Buyer guide",
+buyerGuideGenericTitle: "What to check before buying",
+buyerGuideGenericTip1:
+  "Ask for real photos, the serial number and close-ups of any wear.",
+buyerGuideGenericTip2:
+  "Compare the model with the brand’s official website.",
+buyerGuideGenericTip3:
+  "Request a receipt, invoice or proof of purchase when possible.",
+  // en
+defaultResponseTime: "< 1 hour",
   },
 
   pt: {
@@ -979,5 +1068,50 @@ singleUnitLabel: "Só existe uma unidade disponível",
 paymentNoteLabel:
   "Não é efetuada qualquer cobrança até avançar para o pagamento seguro.",
 countryFallbackLabel: "Espanha",
+conditionNew: "Novo",
+conditionLikeNew: "Como novo",
+conditionExcellent: "Excelente",
+conditionGood: "Bom estado",
+conditionUsed: "Usado",
+buyerGuidePadelSport: "Padel",
+buyerGuidePadelTitle:
+  "Como verificar uma raquete de padel antes de comprar",
+buyerGuidePadelTip1:
+  "Peça uma fotografia nítida do código QR, holograma ou número de série.",
+buyerGuidePadelTip2:
+  "Verifique o peso: normalmente deve estar entre 350 e 390 g.",
+buyerGuidePadelTip3:
+  "Verifique as bordas, grafismos, fissuras e acabamento da estrutura.",
+
+buyerGuideTennisSport: "Ténis",
+buyerGuideTennisTitle:
+  "Como verificar uma raquete de ténis antes de comprar",
+buyerGuideTennisTip1:
+  "Peça um vídeo que mostre o código no cabo.",
+buyerGuideTennisTip2:
+  "Compare as medidas e o modelo com a ficha oficial da marca.",
+buyerGuideTennisTip3:
+  "Verifique o grip, cordas, estrutura e possíveis fissuras.",
+
+buyerGuideGolfSport: "Golfe",
+buyerGuideGolfTitle:
+  "Como verificar tacos de golfe antes de comprar",
+buyerGuideGolfTip1:
+  "Peça uma fotografia do número de série gravado no hosel.",
+buyerGuideGolfTip2:
+  "Verifique soldaduras, cromado, face do taco e shaft.",
+buyerGuideGolfTip3:
+  "Em caso de dúvida, leve-o a uma loja de golfe antes de o aceitar.",
+
+buyerGuideGenericSport: "Guia do comprador",
+buyerGuideGenericTitle: "O que verificar antes de comprar",
+buyerGuideGenericTip1:
+  "Peça fotografias reais, número de série e detalhes do desgaste.",
+buyerGuideGenericTip2:
+  "Compare o modelo com o site oficial da marca.",
+buyerGuideGenericTip3:
+  "Peça recibo, fatura ou comprovativo de compra, se possível.",
+  // pt
+defaultResponseTime: "< 1 hora",
   },
 };
