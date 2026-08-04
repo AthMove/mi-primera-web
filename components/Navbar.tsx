@@ -263,7 +263,7 @@ useEffect(() => {
  const mobileLinks = (
   <>
     <p style={drawerSectionTitleStyle}>
-  🛍️ MARKETPLACE
+  🛍️ {t.marketplaceMenu.toUpperCase()}
 </p>
 
 <Link
@@ -271,7 +271,7 @@ useEffect(() => {
   style={drawerLinkStyle}
   onClick={() => setMenuOpen(false)}
 >
-  COMPRAR
+  {t.buy.toUpperCase()}
 </Link>
 
 <Link
@@ -279,7 +279,7 @@ useEffect(() => {
   style={drawerLinkStyle}
   onClick={() => setMenuOpen(false)}
 >
-  MARCAS
+ {t.brands}
 </Link>
 
 <Link
@@ -295,78 +295,78 @@ useEffect(() => {
   style={drawerLinkStyle}
   onClick={() => setMenuOpen(false)}
 >
-  SOBRE ATHMOV
+  {t.aboutAthmov.toUpperCase()}
 </Link>
 
     <Link href="/products?category=PADEL" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-      PÁDEL
+    {t.padel.toUpperCase()}
     </Link>
 
     <Link href="/products?category=GOLF" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-      GOLF
+     {t.golf.toUpperCase()}
     </Link>
 
    <Link href="/products?category=TENIS" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-  TENIS
+  {t.tennis.toUpperCase()}
 </Link>
 
     <Link href="/products?category=RUNNING" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-      RUNNING
+     {t.running.toUpperCase()}
     </Link>
 
     <p style={drawerSectionTitleStyle}>
-  💼 SELLER
+  💼 {t.sellerMenu.toUpperCase()}
 </p>
 
     <Link href="/sell" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-      VENDER
+     {t.sell.toUpperCase()}
     </Link>
 
     {userEmail && (
       <>
         <Link href="/seller-dashboard" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-          PANEL
+         {t.sellerDashboard.toUpperCase()}
         </Link>
 
         <Link href="/orders" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-          PEDIDOS{badge(ordersCount)}
+          {t.orders.toUpperCase()}{badge(ordersCount)}
         </Link>
 
 
         <Link href="/offers" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-          OFERTAS{badge(offersCount)}
+          {t.offers.toUpperCase()}{badge(offersCount)}
         </Link>
       </>
     )}
 
     <p style={drawerSectionTitleStyle}>
-  👤 ACCOUNT
+  👤 {t.accountMenu.toUpperCase()}
 </p>
 
     <Link href="/cart" style={drawerLinkStyle} onClick={() => setMenuOpen(false)}>
-      CARRITO ({cartCount})
+      {t.cart.toUpperCase()} ({cartCount})
     </Link>
 
    {userEmail ? (
   <>
     <Link href="/messages" style={desktopIconLinkStyle}>
-      MENSAJES{badge(messagesCount)}
+     {t.messages.toUpperCase()}{badge(messagesCount)}
     </Link>
 
     <Link href="/offers" style={desktopIconLinkStyle}>
-      OFERTAS{badge(offersCount)}
+      {t.offers.toUpperCase()}{badge(offersCount)}
     </Link>
 
     <Link href="/orders" style={desktopIconLinkStyle}>
-      PEDIDOS{badge(ordersCount)}
+     {t.orders.toUpperCase()}{badge(ordersCount)}
     </Link>
 
     <Link href="/notifications" style={desktopIconLinkStyle}>
-      AVISOS{badge(notificationsCount)}
+      {t.notifications.toUpperCase()}{badge(notificationsCount)}
     </Link>
 
     <Link href="/account" style={registerStyle}>
-      CUENTA
+      {t.account.toUpperCase()}
     </Link>
     <button
   onClick={() => {
@@ -375,7 +375,7 @@ useEffect(() => {
   }}
   style={drawerButtonStyle}
 >
-  CERRAR SESIÓN
+  {t.logout.toUpperCase()}
 </button>
   </>
 ) : (
@@ -429,7 +429,7 @@ height={84}
  {!compactNav && (
   <div style={rightLinksStyle}>
       <Link href="/cart" style={cartLinkStyle}>
-        CARRITO ({cartCount})
+        {t.cart.toUpperCase()} ({cartCount})
       </Link>
 
       <Link href="/products" style={navMainLinkStyle}>
@@ -437,7 +437,7 @@ height={84}
       </Link>
 
       <Link href="/brands" style={navMainLinkStyle}>
-        MARCAS
+       {t.brands}
       </Link>
 
       <Link href="/sell" style={navMainLinkStyle}>
@@ -513,6 +513,19 @@ height={84}
         )}
       </div>
 
+      <select
+  value={lang}
+  onChange={(e) =>
+    setLang(e.target.value as "es" | "en" | "pt")
+  }
+  aria-label="Seleccionar idioma"
+  style={languageSelectStyle}
+>
+  <option value="es">ES</option>
+  <option value="en">EN</option>
+  <option value="pt">PT</option>
+</select>
+
       {userEmail ? (
         <Link href="/account" style={signInStyle}>
           {t.account}
@@ -536,7 +549,7 @@ height={84}
   onClick={() => setMenuOpen(true)}
   style={menuButtonStyle}
 >
-  MENÚ
+  {t.menu.toUpperCase()}
 </button>
   
 </nav>
@@ -548,7 +561,7 @@ height={84}
   <div style={drawerTitleStyle}>ATHMOV</div>
 
   <div style={drawerSubtitleStyle}>
-    Marketplace Premium
+   {t.marketplace} Premium
   </div>
 </div>
 
@@ -561,11 +574,11 @@ height={84}
 
   <div style={drawerHeroStyle}>
     <div style={drawerHeroTitleStyle}>
-      Descubre ATHMOV
+      {t.discoverAthmov}
     </div>
 
     <div style={drawerHeroTextStyle}>
-      Compra y vende material deportivo premium de segunda mano.
+      {t.drawerDescription}
     </div>
 
     <form
@@ -579,7 +592,7 @@ height={84}
   <input
     value={searchQuery}
     onChange={(e) => searchProducts(e.target.value)}
-    placeholder="Buscar..."
+   placeholder={t.searchShort}
     style={{
       flex: 1,
       border: "none",
@@ -612,11 +625,11 @@ height={84}
   style={drawerHeroButtonStyle}
   onClick={() => setMenuOpen(false)}
 >
-  Explorar Marketplace →
+ {t.exploreMarketplace}
 </Link>
   <div style={{ marginTop: 24 }}>
   <div style={drawerSectionTitleStyle}>
-    IDIOMA
+    {t.language.toUpperCase()}
   </div>
 
   <select
@@ -1054,4 +1067,19 @@ const desktopIconLinkStyle = {
   lineHeight: 1,
   whiteSpace: "nowrap" as const,
   letterSpacing: "1.1px",
+};
+
+const languageSelectStyle = {
+  height: "42px",
+  minWidth: "62px",
+  padding: "0 12px",
+  border: "1px solid rgba(0,0,0,0.1)",
+  borderRadius: "999px",
+  background: "rgba(255,255,255,0.85)",
+  color: "#111",
+  fontSize: "11px",
+  fontWeight: 900,
+  letterSpacing: "1px",
+  outline: "none",
+  cursor: "pointer",
 };
