@@ -513,19 +513,6 @@ height={84}
         )}
       </div>
 
-      <select
-  value={lang}
-  onChange={(e) =>
-    setLang(e.target.value as "es" | "en" | "pt")
-  }
-  aria-label="Seleccionar idioma"
-  style={languageSelectStyle}
->
-  <option value="es">ES</option>
-  <option value="en">EN</option>
-  <option value="pt">PT</option>
-</select>
-
       {userEmail ? (
         <Link href="/account" style={signInStyle}>
           {t.account}
@@ -1067,19 +1054,4 @@ const desktopIconLinkStyle = {
   lineHeight: 1,
   whiteSpace: "nowrap" as const,
   letterSpacing: "1.1px",
-};
-
-const languageSelectStyle = {
-  height: "42px",
-  minWidth: "62px",
-  padding: "0 12px",
-  border: "1px solid rgba(0,0,0,0.1)",
-  borderRadius: "999px",
-  background: "rgba(255,255,255,0.85)",
-  color: "#111",
-  fontSize: "11px",
-  fontWeight: 900,
-  letterSpacing: "1px",
-  outline: "none",
-  cursor: "pointer",
 };
