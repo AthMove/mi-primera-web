@@ -15,8 +15,20 @@ export const metadata: Metadata = {
 
 export default function ProductsPage() {
   return (
-    <Suspense fallback={<main>Loading products...</main>}>
-      <ProductsClient />
-    </Suspense>
+   <Suspense
+  fallback={
+    <main
+      style={{
+        minHeight: "100vh",
+        padding: "160px 24px 60px",
+        textAlign: "center",
+      }}
+    >
+      ATHMOV
+    </main>
+  }
+>
+  <ProductsClient />
+</Suspense>
   );
 }

@@ -76,7 +76,13 @@ export default function ProductsClient({
 }: ProductsClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
+  const locale =
+  lang === "en"
+    ? "en-GB"
+    : lang === "pt"
+      ? "pt-PT"
+      : "es-ES";
   const [showLaunchModal, setShowLaunchModal] = useState(false);
 
   const categoryFilter =
@@ -173,7 +179,7 @@ useEffect(() => {
         channel
       );
     };
-  }, [fixedBrand]);
+ }, [fixedBrand, t]);
 
   async function loadMarketplace() {
     try {
@@ -299,7 +305,7 @@ useEffect(() => {
       setDebug(
         error instanceof Error
           ? error.message
-          : "Error al cargar productos"
+          : t.productsLoadError
       );
 
       setProductos([]);
@@ -477,38 +483,37 @@ useEffect(() => {
     ]);
 
   const categories = [
-    {
-      label: "Todo",
-      value: "",
-      route: "/products",
-    },
-    {
-      label: "Pádel",
-      value: "PADEL",
-      route: "/padel",
-    },
-    {
-      label: "Tenis",
-      value: "TENNIS",
-      route: "/tenis",
-    },
-    {
-      label: "Golf",
-      value: "GOLF",
-      route: "/golf",
-    },
-    {
-      label: "Running",
-      value: "RUNNING",
-      route: "/running",
-    },
-    {
-      label: "Fitness",
-      value: "FITNESS",
-      route:
-        "/products?category=FITNESS",
-    },
-  ];
+  {
+    label: t.allCategory,
+    value: "",
+    route: "/products",
+  },
+  {
+    label: t.padel,
+    value: "PADEL",
+    route: "/padel",
+  },
+  {
+    label: t.tennis,
+    value: "TENNIS",
+    route: "/tenis",
+  },
+  {
+    label: t.golf,
+    value: "GOLF",
+    route: "/golf",
+  },
+  {
+    label: t.running,
+    value: "RUNNING",
+    route: "/running",
+  },
+  {
+    label: t.fitness,
+    value: "FITNESS",
+    route: "/products?category=FITNESS",
+  },
+];
 
   const isGolfCategory =
   !embedded &&
@@ -531,16 +536,12 @@ useEffect(() => {
           categoryFilter
         );
 
-      const labels: Record<
-        string,
-        string
-      > = {
-        padel: "Pádel",
-        tenis: "Tenis",
-        golf: "Golf",
-        running: "Running",
-        fitness: "Fitness",
-      };
+     const labels: Record<string, string> = {
+  padel: t.padel,
+  tenis: t.tennis,
+  golf: t.golf,
+  running: t.running,
+};
 
       return (
         labels[normalized] ||
@@ -749,9 +750,9 @@ useEffect(() => {
         >
           {!embedded && (
             <div>
-              <p style={eyebrowStyle}>
-                MARKETPLACE
-              </p>
+           <p style={eyebrowStyle}>
+  {t.marketplace.toUpperCase()}
+</p>
 
               <h2
                 style={sectionTitleStyle}
@@ -776,9 +777,9 @@ useEffect(() => {
         ) : filteredProducts.length ===
           0 ? (
           <div style={emptyStyle}>
-            {fixedBrand
-              ? `Todavía no hay productos ${fixedBrand} disponibles.`
-              : t.noProducts}
+           {fixedBrand
+  ? `${t.noBrandProductsPrefix} ${fixedBrand} ${t.noBrandProductsSuffix}`
+  : t.noProducts}
           </div>
         ) : (
           <div style={gridStyle}>
@@ -803,142 +804,107 @@ useEffect(() => {
           aria-labelledby="golf-seo-title"
         >
           <div style={golfSeoIntroStyle}>
-            <p style={eyebrowStyle}>
-              GUÍA DE COMPRA
-            </p>
+           <p style={eyebrowStyle}>
+  {t.golfGuideEyebrow}
+</p>
 
-            <h2
-              id="golf-seo-title"
-              style={golfSeoTitleStyle}
-            >
-              Palos de golf de segunda mano:
-              compra material premium con
-              confianza
-            </h2>
+<h2
+  id="golf-seo-title"
+  style={golfSeoTitleStyle}
+>
+  {t.golfSeoTitle}
+</h2>
 
-            <p style={golfSeoLeadStyle}>
-              Comprar palos de golf de segunda
-              mano permite acceder a material de
-              marcas premium por un precio más
-              competitivo. En ATHMOV puedes
-              encontrar drivers, hierros, wedges,
-              putters, híbridos y bolsas de golf
-              publicados por otros jugadores.
-            </p>
+<p style={golfSeoLeadStyle}>
+  {t.golfSeoLead}
+</p>
           </div>
 
           <div style={golfSeoContentGridStyle}>
             <article style={golfSeoCardStyle}>
-              <h3 style={golfSeoCardTitleStyle}>
-                Qué revisar antes de comprar
-              </h3>
+  <h3 style={golfSeoCardTitleStyle}>
+    {t.golfCheckBeforeBuyingTitle}
+  </h3>
 
-              <p style={golfSeoParagraphStyle}>
-                Antes de comprar un palo de golf
-                usado, revisa el estado de la
-                cabeza, la varilla y el grip. Las
-                marcas normales de uso no suelen
-                afectar al rendimiento, pero es
-                importante comprobar que no
-                existan grietas, golpes profundos
-                o daños estructurales.
-              </p>
+  <p style={golfSeoParagraphStyle}>
+    {t.golfCheckBeforeBuyingText1}
+  </p>
 
-              <p style={golfSeoParagraphStyle}>
-                También debes comprobar que la
-                flexibilidad, longitud y peso de
-                la varilla se adapten a tu nivel
-                de juego y velocidad de swing.
-                Una buena elección puede mejorar
-                la consistencia y ayudarte a
-                aprovechar mejor cada golpe.
-              </p>
-            </article>
+  <p style={golfSeoParagraphStyle}>
+    {t.golfCheckBeforeBuyingText2}
+  </p>
+</article>
 
-            <article style={golfSeoCardStyle}>
-              <h3 style={golfSeoCardTitleStyle}>
-                Material premium por menos
-              </h3>
+        <article style={golfSeoCardStyle}>
+  <h3 style={golfSeoCardTitleStyle}>
+    {t.golfPremiumForLessTitle}
+  </h3>
 
-              <p style={golfSeoParagraphStyle}>
-                Muchos jugadores renuevan su
-                material aunque sus palos
-                anteriores continúen en excelentes
-                condiciones. Esto permite
-                encontrar modelos de TaylorMade,
-                Callaway, Ping, Titleist, Cobra,
-                Mizuno y otras marcas reconocidas
-                a precios inferiores a los de un
-                producto nuevo.
-              </p>
+  <p style={golfSeoParagraphStyle}>
+    {t.golfPremiumForLessText1}
+  </p>
 
-              <p style={golfSeoParagraphStyle}>
-                La segunda mano también es una
-                buena opción para probar un tipo
-                de palo diferente, completar un
-                juego o sustituir una unidad
-                concreta sin tener que comprar un
-                set completo.
-              </p>
-            </article>
+  <p style={golfSeoParagraphStyle}>
+    {t.golfPremiumForLessText2}
+  </p>
+</article>
           </div>
 
           <div style={golfLinksBlockStyle}>
             <div>
               <p style={golfLinksEyebrowStyle}>
-                EXPLORA EL MARKETPLACE
-              </p>
+  {t.golfExploreMarketplace}
+</p>
 
-              <h3 style={golfLinksTitleStyle}>
-                Encuentra el material que necesita
-                tu juego
-              </h3>
+<h3 style={golfLinksTitleStyle}>
+  {t.golfFindYourGear}
+</h3>
             </div>
 
             <nav
               style={golfLinksStyle}
-              aria-label="Tipos de material de golf"
+             aria-label={t.golfMaterialTypesAria}
             >
               <Link
                 href="/golf?search=driver"
                 style={golfSeoLinkStyle}
               >
-                Drivers
+               {t.golfDrivers}
               </Link>
 
               <Link
                 href="/golf?search=hierros"
                 style={golfSeoLinkStyle}
               >
-                Hierros
+                {t.golfIrons}
               </Link>
 
               <Link
                 href="/golf?search=wedge"
                 style={golfSeoLinkStyle}
               >
-                Wedges
+               {t.golfWedges}
               </Link>
 
               <Link
                 href="/golf?search=putter"
                 style={golfSeoLinkStyle}
               >
-                Putters
+                {t.golfPutters}
               </Link>
 
               <Link
                 href="/golf?search=bolsa"
                 style={golfSeoLinkStyle}
               >
-                Bolsas de golf
+                {t.golfBags}
               </Link>
 
               <Link
                 href="/buyer-guide"
                 style={golfSeoLinkStyle}
               >
-                Guía del comprador
+                {t.buyerGuide}
               </Link>
             </nav>
           </div>
@@ -949,89 +915,53 @@ useEffect(() => {
 >
             <div style={golfFaqHeaderStyle}>
               <p style={eyebrowStyle}>
-                PREGUNTAS FRECUENTES
-              </p>
+  {t.faqEyebrow}
+</p>
 
-              <h2 style={golfFaqTitleStyle}>
-                Comprar y vender material de golf
-                usado
-              </h2>
+<h2 style={golfFaqTitleStyle}>
+  {t.golfFaqTitle}
+</h2>
             </div>
 
             <div style={golfFaqListStyle}>
               <details style={golfFaqItemStyle}>
-                <summary
-                  style={golfFaqSummaryStyle}
-                >
-                  ¿Merece la pena comprar palos de
-                  golf de segunda mano?
-                </summary>
+               <summary style={golfFaqSummaryStyle}>
+  {t.golfFaqQuestion1}
+</summary>
 
-                <p style={golfFaqAnswerStyle}>
-                  Sí. Un palo de golf bien cuidado
-                  puede conservar su rendimiento
-                  durante años. Comprar de segunda
-                  mano permite acceder a modelos
-                  premium por un precio inferior,
-                  siempre que se compruebe su
-                  estado y sus especificaciones.
-                </p>
+<p style={golfFaqAnswerStyle}>
+  {t.golfFaqAnswer1}
+</p>
               </details>
 
               <details style={golfFaqItemStyle}>
-                <summary
-                  style={golfFaqSummaryStyle}
-                >
-                  ¿Qué debo comprobar antes de
-                  comprar un driver usado?
-                </summary>
+             <summary style={golfFaqSummaryStyle}>
+  {t.golfFaqQuestion2}
+</summary>
 
-                <p style={golfFaqAnswerStyle}>
-                  Revisa la cara y la corona del
-                  driver, la unión entre la cabeza
-                  y la varilla, el grip, el loft y
-                  la flexibilidad de la varilla.
-                  También es recomendable
-                  comprobar que no haya grietas ni
-                  sonidos internos extraños.
-                </p>
+<p style={golfFaqAnswerStyle}>
+  {t.golfFaqAnswer2}
+</p>
               </details>
 
               <details style={golfFaqItemStyle}>
-                <summary
-                  style={golfFaqSummaryStyle}
-                >
-                  ¿Qué marcas de golf puedo
-                  encontrar en ATHMOV?
-                </summary>
+              <summary style={golfFaqSummaryStyle}>
+  {t.golfFaqQuestion3}
+</summary>
 
-                <p style={golfFaqAnswerStyle}>
-                  La disponibilidad depende de los
-                  anuncios publicados. Puedes
-                  encontrar material de marcas
-                  como TaylorMade, Callaway, Ping,
-                  Titleist, Cobra, Mizuno,
-                  Cleveland y otras firmas
-                  especializadas.
-                </p>
+<p style={golfFaqAnswerStyle}>
+  {t.golfFaqAnswer3}
+</p>
               </details>
 
               <details style={golfFaqItemStyle}>
-                <summary
-                  style={golfFaqSummaryStyle}
-                >
-                  ¿Puedo vender mis antiguos palos
-                  de golf?
-                </summary>
+               <summary style={golfFaqSummaryStyle}>
+  {t.golfFaqQuestion4}
+</summary>
 
-                <p style={golfFaqAnswerStyle}>
-                  Sí. Puedes publicar drivers,
-                  hierros, wedges, putters,
-                  híbridos, bolsas y otros
-                  accesorios que ya no utilices,
-                  indicando su estado,
-                  características y precio.
-                </p>
+<p style={golfFaqAnswerStyle}>
+  {t.golfFaqAnswer4}
+</p>
               </details>
             </div>
           </div>
@@ -1039,13 +969,12 @@ useEffect(() => {
           <div style={golfCtaStyle}>
             <div>
               <p style={golfCtaEyebrowStyle}>
-                THE GAME CONTINUES
-              </p>
+  THE GAME CONTINUES
+</p>
 
-              <h2 style={golfCtaTitleStyle}>
-                Tu próximo palo puede estar aquí.
-                El que ya no usas también.
-              </h2>
+<h2 style={golfCtaTitleStyle}>
+  {t.golfCtaTitle}
+</h2>
             </div>
 
             <div style={golfCtaActionsStyle}>
@@ -1053,7 +982,7 @@ useEffect(() => {
                 href="/golf"
                 style={golfCtaPrimaryStyle}
               >
-                Ver productos
+                {t.viewProducts}
               </Link>
 
               <button
@@ -1063,7 +992,7 @@ useEffect(() => {
                 }
                 style={golfCtaSecondaryStyle}
               >
-                Vender material
+               {t.sellGear}
               </button>
             </div>
           </div>
@@ -1124,8 +1053,7 @@ useEffect(() => {
                             feedEmailStyle
                           }
                         >
-                          {post.user_email ||
-                            "ATHMOV user"}
+                         {post.user_email || t.athmovUser}
                         </p>
 
                         <p
@@ -1136,9 +1064,7 @@ useEffect(() => {
                           {post.created_at
                             ? new Date(
                                 post.created_at
-                              ).toLocaleDateString(
-                                "es-ES"
-                              )
+                              ).toLocaleDateString(locale)
                             : ""}
                         </p>
                       </div>
@@ -1164,7 +1090,7 @@ useEffect(() => {
                           src={safeImage(
                             post.image
                           )}
-                          alt="Feed"
+                          alt={t.feedImageAlt}
                           fill
                           sizes="300px"
                           style={{

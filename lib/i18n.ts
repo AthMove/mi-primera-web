@@ -473,6 +473,67 @@ sellBuyerProtectionBadge: "PROTECCIÓN AL COMPRADOR",
 sellImmediateBadge: "PUBLICACIÓN INMEDIATA",
 sellPublishing: "Publicando...",
 sellPublishProduct: "Publicar producto",
+productsLoadError: "Error al cargar productos",
+allCategory: "Todo",
+fitness: "Fitness",
+noBrandProductsPrefix: "Todavía no hay productos",
+noBrandProductsSuffix: "disponibles.",
+athmovUser: "Usuario ATHMOV",
+feedImageAlt: "Publicación del feed",
+golfGuideEyebrow: "GUÍA DE COMPRA",
+golfSeoTitle:
+  "Palos de golf de segunda mano: compra material premium con confianza",
+golfSeoLead:
+  "Comprar palos de golf de segunda mano permite acceder a material de marcas premium por un precio más competitivo. En ATHMOV puedes encontrar drivers, hierros, wedges, putters, híbridos y bolsas de golf publicados por otros jugadores.",
+
+golfCheckBeforeBuyingTitle: "Qué revisar antes de comprar",
+golfCheckBeforeBuyingText1:
+  "Antes de comprar un palo de golf usado, revisa el estado de la cabeza, la varilla y el grip. Las marcas normales de uso no suelen afectar al rendimiento, pero es importante comprobar que no existan grietas, golpes profundos o daños estructurales.",
+golfCheckBeforeBuyingText2:
+  "También debes comprobar que la flexibilidad, longitud y peso de la varilla se adapten a tu nivel de juego y velocidad de swing. Una buena elección puede mejorar la consistencia y ayudarte a aprovechar mejor cada golpe.",
+
+golfPremiumForLessTitle: "Material premium por menos",
+golfPremiumForLessText1:
+  "Muchos jugadores renuevan su material aunque sus palos anteriores continúen en excelentes condiciones. Esto permite encontrar modelos de TaylorMade, Callaway, Ping, Titleist, Cobra, Mizuno y otras marcas reconocidas a precios inferiores a los de un producto nuevo.",
+golfPremiumForLessText2:
+  "La segunda mano también es una buena opción para probar un tipo de palo diferente, completar un juego o sustituir una unidad concreta sin tener que comprar un set completo.",
+
+golfExploreMarketplace: "EXPLORA EL MARKETPLACE",
+golfFindYourGear: "Encuentra el material que necesita tu juego",
+golfDrivers: "Drivers",
+golfIrons: "Hierros",
+golfWedges: "Wedges",
+golfPutters: "Putters",
+golfBags: "Bolsas de golf",
+golfMaterialTypesAria: "Tipos de material de golf",
+
+faqEyebrow: "PREGUNTAS FRECUENTES",
+golfFaqTitle: "Comprar y vender material de golf usado",
+
+golfFaqQuestion1:
+  "¿Merece la pena comprar palos de golf de segunda mano?",
+golfFaqAnswer1:
+  "Sí. Un palo de golf bien cuidado puede conservar su rendimiento durante años. Comprar de segunda mano permite acceder a modelos premium por un precio inferior, siempre que se compruebe su estado y sus especificaciones.",
+
+golfFaqQuestion2:
+  "¿Qué debo comprobar antes de comprar un driver usado?",
+golfFaqAnswer2:
+  "Revisa la cara y la corona del driver, la unión entre la cabeza y la varilla, el grip, el loft y la flexibilidad de la varilla. También es recomendable comprobar que no haya grietas ni sonidos internos extraños.",
+
+golfFaqQuestion3:
+  "¿Qué marcas de golf puedo encontrar en ATHMOV?",
+golfFaqAnswer3:
+  "La disponibilidad depende de los anuncios publicados. Puedes encontrar material de marcas como TaylorMade, Callaway, Ping, Titleist, Cobra, Mizuno, Cleveland y otras firmas especializadas.",
+
+golfFaqQuestion4:
+  "¿Puedo vender mis antiguos palos de golf?",
+golfFaqAnswer4:
+  "Sí. Puedes publicar drivers, hierros, wedges, putters, híbridos, bolsas y otros accesorios que ya no utilices, indicando su estado, características y precio.",
+
+golfCtaTitle:
+  "Tu próximo palo puede estar aquí. El que ya no usas también.",
+viewProducts: "Ver productos",
+sellGear: "Vender material",
   },
 
 
@@ -951,6 +1012,67 @@ sellBuyerProtectionBadge: "BUYER PROTECTION",
 sellImmediateBadge: "IMMEDIATE PUBLICATION",
 sellPublishing: "Publishing...",
 sellPublishProduct: "Publish product",
+productsLoadError: "Error loading products",
+allCategory: "All",
+fitness: "Fitness",
+noBrandProductsPrefix: "There are no",
+noBrandProductsSuffix: "products available yet.",
+athmovUser: "ATHMOV user",
+feedImageAlt: "Feed post",
+golfGuideEyebrow: "BUYING GUIDE",
+golfSeoTitle:
+  "Second-hand golf clubs: buy premium equipment with confidence",
+golfSeoLead:
+  "Buying second-hand golf clubs gives you access to premium-brand equipment at a more competitive price. On ATHMOV you can find drivers, irons, wedges, putters, hybrids and golf bags listed by other players.",
+
+golfCheckBeforeBuyingTitle: "What to check before buying",
+golfCheckBeforeBuyingText1:
+  "Before buying a used golf club, inspect the head, shaft and grip. Normal signs of use do not usually affect performance, but it is important to check for cracks, deep dents or structural damage.",
+golfCheckBeforeBuyingText2:
+  "You should also check that the shaft flex, length and weight suit your level of play and swing speed. A good choice can improve consistency and help you get more from every shot.",
+
+golfPremiumForLessTitle: "Premium equipment for less",
+golfPremiumForLessText1:
+  "Many players replace their equipment even though their previous clubs remain in excellent condition. This makes it possible to find models from TaylorMade, Callaway, Ping, Titleist, Cobra, Mizuno and other recognised brands at lower prices than new products.",
+golfPremiumForLessText2:
+  "Second hand is also a good option for trying a different type of club, completing a set or replacing a specific club without buying an entire set.",
+
+golfExploreMarketplace: "EXPLORE THE MARKETPLACE",
+golfFindYourGear: "Find the equipment your game needs",
+golfDrivers: "Drivers",
+golfIrons: "Irons",
+golfWedges: "Wedges",
+golfPutters: "Putters",
+golfBags: "Golf bags",
+golfMaterialTypesAria: "Types of golf equipment",
+
+faqEyebrow: "FREQUENTLY ASKED QUESTIONS",
+golfFaqTitle: "Buying and selling used golf equipment",
+
+golfFaqQuestion1:
+  "Is it worth buying second-hand golf clubs?",
+golfFaqAnswer1:
+  "Yes. A well-maintained golf club can retain its performance for years. Buying second hand gives you access to premium models at a lower price, provided you check their condition and specifications.",
+
+golfFaqQuestion2:
+  "What should I check before buying a used driver?",
+golfFaqAnswer2:
+  "Inspect the face and crown, the joint between the head and shaft, the grip, loft and shaft flex. It is also advisable to check for cracks or unusual internal sounds.",
+
+golfFaqQuestion3:
+  "Which golf brands can I find on ATHMOV?",
+golfFaqAnswer3:
+  "Availability depends on current listings. You may find equipment from brands such as TaylorMade, Callaway, Ping, Titleist, Cobra, Mizuno, Cleveland and other specialist manufacturers.",
+
+golfFaqQuestion4:
+  "Can I sell my old golf clubs?",
+golfFaqAnswer4:
+  "Yes. You can list drivers, irons, wedges, putters, hybrids, bags and other accessories you no longer use, including their condition, specifications and price.",
+
+golfCtaTitle:
+  "Your next club could be here. So could the one you no longer use.",
+viewProducts: "View products",
+sellGear: "Sell equipment",
   },
 
   pt: {
@@ -1428,5 +1550,65 @@ sellBuyerProtectionBadge: "PROTEÇÃO AO COMPRADOR",
 sellImmediateBadge: "PUBLICAÇÃO IMEDIATA",
 sellPublishing: "A publicar...",
 sellPublishProduct: "Publicar produto",
+productsLoadError: "Erro ao carregar produtos",
+allCategory: "Todos",
+fitness: "Fitness",
+noBrandProductsPrefix: "Ainda não existem produtos",
+noBrandProductsSuffix: "disponíveis.",
+athmovUser: "Utilizador ATHMOV",
+golfGuideEyebrow: "GUIA DE COMPRA",
+golfSeoTitle:
+  "Tacos de golfe em segunda mão: compre material premium com confiança",
+golfSeoLead:
+  "Comprar tacos de golfe em segunda mão permite aceder a material de marcas premium por um preço mais competitivo. Na ATHMOV pode encontrar drivers, ferros, wedges, putters, híbridos e sacos de golfe publicados por outros jogadores.",
+
+golfCheckBeforeBuyingTitle: "O que verificar antes de comprar",
+golfCheckBeforeBuyingText1:
+  "Antes de comprar um taco de golfe usado, verifique o estado da cabeça, da vara e do grip. As marcas normais de utilização não costumam afetar o desempenho, mas é importante verificar se existem fissuras, mossas profundas ou danos estruturais.",
+golfCheckBeforeBuyingText2:
+  "Também deve confirmar que a flexibilidade, o comprimento e o peso da vara se adaptam ao seu nível de jogo e à velocidade do swing. Uma boa escolha pode melhorar a consistência e ajudá-lo a aproveitar melhor cada tacada.",
+
+golfPremiumForLessTitle: "Material premium por menos",
+golfPremiumForLessText1:
+  "Muitos jogadores renovam o equipamento mesmo quando os tacos anteriores continuam em excelentes condições. Isto permite encontrar modelos da TaylorMade, Callaway, Ping, Titleist, Cobra, Mizuno e outras marcas reconhecidas a preços inferiores aos de um produto novo.",
+golfPremiumForLessText2:
+  "A segunda mão também é uma boa opção para experimentar um tipo de taco diferente, completar um conjunto ou substituir uma unidade específica sem comprar um conjunto completo.",
+
+golfExploreMarketplace: "EXPLORE O MARKETPLACE",
+golfFindYourGear: "Encontre o material de que o seu jogo precisa",
+golfDrivers: "Drivers",
+golfIrons: "Ferros",
+golfWedges: "Wedges",
+golfPutters: "Putters",
+golfBags: "Sacos de golfe",
+golfMaterialTypesAria: "Tipos de material de golfe",
+
+faqEyebrow: "PERGUNTAS FREQUENTES",
+golfFaqTitle: "Comprar e vender material de golfe usado",
+
+golfFaqQuestion1:
+  "Vale a pena comprar tacos de golfe em segunda mão?",
+golfFaqAnswer1:
+  "Sim. Um taco de golfe bem conservado pode manter o seu desempenho durante anos. Comprar em segunda mão permite aceder a modelos premium por um preço inferior, desde que se verifique o estado e as especificações.",
+
+golfFaqQuestion2:
+  "O que devo verificar antes de comprar um driver usado?",
+golfFaqAnswer2:
+  "Verifique a face e a coroa do driver, a união entre a cabeça e a vara, o grip, o loft e a flexibilidade da vara. Também é aconselhável verificar se existem fissuras ou ruídos internos estranhos.",
+
+golfFaqQuestion3:
+  "Que marcas de golfe posso encontrar na ATHMOV?",
+golfFaqAnswer3:
+  "A disponibilidade depende dos anúncios publicados. Pode encontrar material de marcas como TaylorMade, Callaway, Ping, Titleist, Cobra, Mizuno, Cleveland e outros fabricantes especializados.",
+
+golfFaqQuestion4:
+  "Posso vender os meus antigos tacos de golfe?",
+golfFaqAnswer4:
+  "Sim. Pode publicar drivers, ferros, wedges, putters, híbridos, sacos e outros acessórios que já não utiliza, indicando o estado, as características e o preço.",
+
+golfCtaTitle:
+  "O seu próximo taco pode estar aqui. O que já não utiliza também.",
+viewProducts: "Ver produtos",
+sellGear: "Vender material",
   },
 };
