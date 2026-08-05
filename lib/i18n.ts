@@ -785,6 +785,73 @@ messagesOffer: "Oferta",
 messagesNoMessages: "Sin mensajes",
 messagesOpen: "Abrir",
 messagesArchive: "Archivar",
+chatSeenRecently: "Visto recientemente",
+chatSeenNow: "Visto ahora",
+chatSeenOneMinute: "Visto hace 1 min",
+chatSeenMinutesPrefix: "Visto hace",
+chatMinutes: "min",
+chatSeenOneHour: "Visto hace 1 hora",
+chatSeenHoursPrefix: "Visto hace",
+chatHours: "horas",
+chatSeenYesterday: "Visto ayer",
+
+chatOfferAccepted: "Aceptada",
+chatOfferRejected: "Rechazada",
+chatOfferPending: "Pendiente",
+chatSeen: "Visto",
+chatDelivered: "Entregado",
+
+chatImage: "Imagen",
+chatNewMessageNotification: "Nuevo mensaje",
+chatImageReceivedNotification:
+  "Has recibido una imagen",
+
+chatEnterOffer: "Introduce tu oferta (€)",
+chatInvalidOffer:
+  "Introduce una cantidad válida",
+chatOffer: "Oferta",
+chatOfferSendError:
+  "No se pudo enviar la oferta",
+chatNewOfferNotification:
+  "Nueva oferta recibida",
+chatOfferReceivedNotification:
+  "Has recibido una oferta de",
+
+chatOfferUpdateError:
+  "No se pudo actualizar la oferta",
+chatProductAlreadySold:
+  "Este producto ya se ha vendido",
+chatSellerStripeMissing:
+  "El vendedor no ha conectado los pagos de Stripe",
+chatOrderCreateError:
+  "No se pudo crear el pedido",
+chatCheckoutStartError:
+  "Error al iniciar el checkout",
+
+chatInvalidConversation:
+  "Conversación no válida. Abre el chat desde Mensajes.",
+chatBack: "Volver",
+chatEyebrow: "CHAT ATHMOV",
+chatConversationFallback: "Conversación",
+chatOnlineNow: "En línea ahora",
+chatOrderLabel: "Pedido",
+chatLoading: "Cargando conversación...",
+chatEmptyConversation:
+  "Todavía no hay mensajes. Empieza la conversación.",
+
+chatStatus: "Estado",
+chatAccept: "Aceptar",
+chatReject: "Rechazar",
+chatImageAlt: "Imagen del chat",
+chatTyping: "Escribiendo",
+chatPreviewImageAlt:
+  "Vista previa de la imagen",
+chatCancel: "Cancelar",
+chatSend: "Enviar",
+chatInputPlaceholder:
+  "Escribe un mensaje o pregunta por el producto...",
+chatMakeOffer: "Hacer oferta",
+chatUploadImage: "Subir imagen",
   },
 
 
@@ -1576,6 +1643,71 @@ messagesOffer: "Offer",
 messagesNoMessages: "No messages",
 messagesOpen: "Open",
 messagesArchive: "Archive",
+chatSeenRecently: "Seen recently",
+chatSeenNow: "Seen now",
+chatSeenOneMinute: "Seen 1 min ago",
+chatSeenMinutesPrefix: "Seen",
+chatMinutes: "min ago",
+chatSeenOneHour: "Seen 1 hour ago",
+chatSeenHoursPrefix: "Seen",
+chatHours: "hours ago",
+chatSeenYesterday: "Seen yesterday",
+
+chatOfferAccepted: "Accepted",
+chatOfferRejected: "Rejected",
+chatOfferPending: "Pending",
+chatSeen: "Seen",
+chatDelivered: "Delivered",
+
+chatImage: "Image",
+chatNewMessageNotification: "New message",
+chatImageReceivedNotification:
+  "You have received an image",
+
+chatEnterOffer: "Enter your offer (€)",
+chatInvalidOffer: "Enter a valid amount",
+chatOffer: "Offer",
+chatOfferSendError:
+  "The offer could not be sent",
+chatNewOfferNotification:
+  "New offer received",
+chatOfferReceivedNotification:
+  "You have received an offer of",
+
+chatOfferUpdateError:
+  "The offer could not be updated",
+chatProductAlreadySold:
+  "This product has already been sold",
+chatSellerStripeMissing:
+  "The seller has not connected Stripe payments",
+chatOrderCreateError:
+  "The order could not be created",
+chatCheckoutStartError:
+  "Error starting checkout",
+
+chatInvalidConversation:
+  "Invalid conversation. Open the chat from Messages.",
+chatBack: "Back",
+chatEyebrow: "ATHMOV CHAT",
+chatConversationFallback: "Conversation",
+chatOnlineNow: "Online now",
+chatOrderLabel: "Order",
+chatLoading: "Loading conversation...",
+chatEmptyConversation:
+  "There are no messages yet. Start the conversation.",
+
+chatStatus: "Status",
+chatAccept: "Accept",
+chatReject: "Reject",
+chatImageAlt: "Chat image",
+chatTyping: "Typing",
+chatPreviewImageAlt: "Image preview",
+chatCancel: "Cancel",
+chatSend: "Send",
+chatInputPlaceholder:
+  "Write a message or ask about the product...",
+chatMakeOffer: "Make an offer",
+chatUploadImage: "Upload image",
   },
 
   pt: {
@@ -2368,5 +2500,72 @@ messagesOffer: "Oferta",
 messagesNoMessages: "Sem mensagens",
 messagesOpen: "Abrir",
 messagesArchive: "Arquivar",
+chatSeenRecently: "Visto recentemente",
+chatSeenNow: "Visto agora",
+chatSeenOneMinute: "Visto há 1 min",
+chatSeenMinutesPrefix: "Visto há",
+chatMinutes: "min",
+chatSeenOneHour: "Visto há 1 hora",
+chatSeenHoursPrefix: "Visto há",
+chatHours: "horas",
+chatSeenYesterday: "Visto ontem",
+
+chatOfferAccepted: "Aceite",
+chatOfferRejected: "Rejeitada",
+chatOfferPending: "Pendente",
+chatSeen: "Visto",
+chatDelivered: "Entregue",
+
+chatImage: "Imagem",
+chatNewMessageNotification: "Nova mensagem",
+chatImageReceivedNotification:
+  "Recebeu uma imagem",
+
+chatEnterOffer: "Introduza a sua oferta (€)",
+chatInvalidOffer:
+  "Introduza um valor válido",
+chatOffer: "Oferta",
+chatOfferSendError:
+  "Não foi possível enviar a oferta",
+chatNewOfferNotification:
+  "Nova oferta recebida",
+chatOfferReceivedNotification:
+  "Recebeu uma oferta de",
+
+chatOfferUpdateError:
+  "Não foi possível atualizar a oferta",
+chatProductAlreadySold:
+  "Este produto já foi vendido",
+chatSellerStripeMissing:
+  "O vendedor não ligou os pagamentos Stripe",
+chatOrderCreateError:
+  "Não foi possível criar a encomenda",
+chatCheckoutStartError:
+  "Erro ao iniciar o checkout",
+
+chatInvalidConversation:
+  "Conversa inválida. Abra o chat a partir de Mensagens.",
+chatBack: "Voltar",
+chatEyebrow: "CHAT ATHMOV",
+chatConversationFallback: "Conversa",
+chatOnlineNow: "Online agora",
+chatOrderLabel: "Encomenda",
+chatLoading: "A carregar conversa...",
+chatEmptyConversation:
+  "Ainda não existem mensagens. Inicie a conversa.",
+
+chatStatus: "Estado",
+chatAccept: "Aceitar",
+chatReject: "Rejeitar",
+chatImageAlt: "Imagem do chat",
+chatTyping: "A escrever",
+chatPreviewImageAlt:
+  "Pré-visualização da imagem",
+chatCancel: "Cancelar",
+chatSend: "Enviar",
+chatInputPlaceholder:
+  "Escreva uma mensagem ou pergunte sobre o produto...",
+chatMakeOffer: "Fazer uma oferta",
+chatUploadImage: "Carregar imagem",
   },
 };

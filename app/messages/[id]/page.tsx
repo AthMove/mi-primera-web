@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { createNotification } from "@/lib/createNotification";
+import { useLanguage } from "@/components/LanguageProvider";
 
 const PROFILE_TABLE = "profiles";
 
@@ -28,6 +29,14 @@ type Message = {
 
 export default function ConversationPage() {
   const params = useParams();
+const { lang, t } = useLanguage();
+
+const locale =
+  lang === "en"
+    ? "en-GB"
+    : lang === "pt"
+      ? "pt-PT"
+      : "es-ES";
   const conversationId = String(params.id);
 
   const invalidConversationId =
@@ -62,28 +71,51 @@ const [previewFile, setPreviewFile] = useState<File | null>(null);
     }, 80);
   };
 
-  const formatLastSeen = (dateString: string | null) => {
-    if (!dateString) return "Visto recientemente";
+ const formatLastSeen = (dateString: string | null) => {
+  if (!dateString) return t.chatSeenRecently;
 
-    const diff = Date.now() - new Date(dateString).getTime();
-    const minutes = Math.floor(diff / 60000);
+  const diff =
+    Date.now() - new Date(dateString).getTime();
 
-    if (minutes < 1) return "Visto ahora";
-    if (minutes === 1) return "Visto hace 1 min";
-    if (minutes < 60) return `Visto hace ${minutes} min`;
+  const minutes = Math.floor(diff / 60000);
 
-    const hours = Math.floor(minutes / 60);
-    if (hours === 1) return "Visto hace 1 hora";
-    if (hours < 24) return `Visto hace ${hours} horas`;
+  if (minutes < 1) {
+    return t.chatSeenNow;
+  }
 
-    return "Visto ayer";
-  };
+  if (minutes === 1) {
+    return t.chatSeenOneMinute;
+  }
 
-  const getOfferStatusLabel = (status?: string) => {
-    if (status === "accepted") return "Aceptada";
-    if (status === "rejected") return "Rechazada";
-    return "Pendiente";
-  };
+  if (minutes < 60) {
+    return `${t.chatSeenMinutesPrefix} ${minutes} ${t.chatMinutes}`;
+  }
+
+  const hours = Math.floor(minutes / 60);
+
+  if (hours === 1) {
+    return t.chatSeenOneHour;
+  }
+
+  if (hours < 24) {
+    return `${t.chatSeenHoursPrefix} ${hours} ${t.chatHours}`;
+  }
+
+  return t.chatSeenYesterday;
+};
+const getOfferStatusLabel = (
+  status?: string
+) => {
+  if (status === "accepted") {
+    return t.chatOfferAccepted;
+  }
+
+  if (status === "rejected") {
+    return t.chatOfferRejected;
+  }
+
+  return t.chatOfferPending;
+};
 
   const updateMyPresence = async (online: boolean, currentUserId?: string) => {
     const id = currentUserId || userIdRef.current;
@@ -162,7 +194,9 @@ const [previewFile, setPreviewFile] = useState<File | null>(null);
       ? message.read_by_buyer
       : message.read_by_seller;
 
-    return otherHasRead ? "✓✓ Visto" : "✓ Entregado";
+    return otherHasRead
+  ? `✓✓ ${t.chatSeen}`
+  : `✓ ${t.chatDelivered}`;
   };
 
   const loadMessages = async () => {
@@ -374,15 +408,20 @@ const [previewFile, setPreviewFile] = useState<File | null>(null);
       return;
     }
 
-    await updateConversationUnread(imageUrl ? "Imagen" : text, user.id);
+   await updateConversationUnread(
+  imageUrl ? t.chatImage : text,
+  user.id
+);
 
     if (otherUserId) {
-      await createNotification({
-        user_id: otherUserId,
-        title: "Nuevo mensaje",
-        message: imageUrl ? "Has recibido una imagen" : text,
-        link: `/messages/${conversationId}`,
-      });
+    await createNotification({
+  user_id: otherUserId,
+  title: t.chatNewMessageNotification,
+  message: imageUrl
+    ? t.chatImageReceivedNotification
+    : text,
+  link: `/messages/${conversationId}`,
+});
     }
 
     if (data) {
@@ -395,13 +434,13 @@ const [previewFile, setPreviewFile] = useState<File | null>(null);
   };
 
   const sendOffer = async () => {
-    const amount = prompt("Introduce tu oferta (€)");
+   const amount = prompt(t.chatEnterOffer);
     if (!amount) return;
 
     const numericAmount = Number(amount);
 
     if (!numericAmount || numericAmount <= 0) {
-      alert("Introduce una cantidad válida");
+      alert(t.chatInvalidOffer);
       return;
     }
 
@@ -420,7 +459,13 @@ const [previewFile, setPreviewFile] = useState<File | null>(null);
       .insert({
         conversation_id: conversationId,
         sender_id: user.id,
-        content: `Oferta: €${numericAmount}`,
+        content: `${t.chatOffer}: ${new Intl.NumberFormat(
+  locale,
+  {
+    style: "currency",
+    currency: "EUR",
+  }
+).format(numericAmount)}`,
         is_offer: true,
         offer_price: numericAmount,
         offer_status: "pending",
@@ -433,19 +478,34 @@ const [previewFile, setPreviewFile] = useState<File | null>(null);
 
     if (error) {
       console.log(error);
-      alert("No se pudo enviar la oferta");
+      alert(t.chatOfferSendError);
       return;
     }
 
-    await updateConversationUnread(`Oferta: €${numericAmount}`, user.id);
+   await updateConversationUnread(
+  `${t.chatOffer}: ${new Intl.NumberFormat(
+    locale,
+    {
+      style: "currency",
+      currency: "EUR",
+    }
+  ).format(numericAmount)}`,
+  user.id
+);
 
     if (otherUserId) {
-      await createNotification({
-        user_id: otherUserId,
-        title: "Nueva oferta recibida",
-        message: `Has recibido una oferta de €${numericAmount}`,
-        link: `/messages/${conversationId}`,
-      });
+   await createNotification({
+  user_id: otherUserId,
+  title: t.chatNewOfferNotification,
+  message: `${t.chatOfferReceivedNotification} ${new Intl.NumberFormat(
+    locale,
+    {
+      style: "currency",
+      currency: "EUR",
+    }
+  ).format(numericAmount)}`,
+  link: `/messages/${conversationId}`,
+});
     }
 
     if (data) {
@@ -471,7 +531,7 @@ const [previewFile, setPreviewFile] = useState<File | null>(null);
 
     if (error) {
       console.log(error);
-      alert("No se pudo actualizar la oferta");
+      alert(t.chatOfferUpdateError);
       return;
     }
 
@@ -500,7 +560,7 @@ const [previewFile, setPreviewFile] = useState<File | null>(null);
     if (!product) return;
 
     if (product.sold) {
-      alert("Este producto ya se ha vendido");
+      alert(t.chatProductAlreadySold);
       return;
     }
 
@@ -515,7 +575,7 @@ const [previewFile, setPreviewFile] = useState<File | null>(null);
       !sellerProfile?.stripe_charges_enabled ||
       !sellerProfile?.stripe_payouts_enabled
     ) {
-      alert("El vendedor no ha conectado los pagos de Stripe");
+      alert(t.chatSellerStripeMissing);
       return;
     }
 
@@ -545,7 +605,7 @@ const [previewFile, setPreviewFile] = useState<File | null>(null);
 
     if (orderError || !order) {
       console.log(orderError);
-      alert("No se pudo crear el pedido");
+     alert(t.chatOrderCreateError);
       return;
     }
 
@@ -572,7 +632,10 @@ const [previewFile, setPreviewFile] = useState<File | null>(null);
     const checkoutData = await response.json();
 
     if (!response.ok || !checkoutData.url) {
-      alert(checkoutData.error || "Error al iniciar el checkout");
+      alert(
+  checkoutData.error ||
+    t.chatCheckoutStartError
+);
       return;
     }
 
@@ -634,9 +697,9 @@ const confirmImageUpload = async () => {
     return (
       <main style={pageStyle}>
         <div style={chatStyle}>
-          <div style={emptyStateStyle}>
-            Conversación no válida. Abre el chat desde Mensajes.
-          </div>
+      <div style={emptyStateStyle}>
+  {t.chatInvalidConversation}
+</div>
         </div>
       </main>
     );
@@ -647,14 +710,17 @@ const confirmImageUpload = async () => {
       <div style={chatStyle} className="chat-shell">
         <div style={headerStyle} className="chat-header">
           <button onClick={() => window.history.back()} style={backButtonStyle}>
-            ← Volver
+           ← {t.chatBack}
           </button>
 
           <div>
-            <p style={headerEyebrowStyle}>CHAT ATHMOV</p>
+            <p style={headerEyebrowStyle}>
+  {t.chatEyebrow}
+</p>
 
             <h1 style={headerTitleStyle}>
-  {productData?.title || "Conversación"}
+{productData?.title ||
+  t.chatConversationFallback}
 </h1>
 
             <p style={statusTextStyle}>
@@ -664,7 +730,9 @@ const confirmImageUpload = async () => {
                   background: otherOnline ? "#20c95a" : "#999",
                 }}
               />
-              {otherOnline ? "En línea ahora" : formatLastSeen(otherLastSeen)}
+              {otherOnline
+  ? t.chatOnlineNow
+  : formatLastSeen(otherLastSeen)}
             </p>
           </div>
         </div>
@@ -679,7 +747,10 @@ const confirmImageUpload = async () => {
                   productData.images?.[0] ||
                   "/logo.png"
                 }
-                alt={productData.title || "Producto"}
+               alt={
+  productData.title ||
+  t.productFallback
+}
                 fill
                 sizes="64px"
                 style={{ objectFit: "cover" }}
@@ -687,10 +758,15 @@ const confirmImageUpload = async () => {
             </div>
 
             <div>
-              <strong>{productData.title || productData.nombre || "Producto"}</strong>
+              <strong>
+  {productData.title ||
+    productData.nombre ||
+    t.productFallback}
+</strong>
               {conversationData?.order_id && (
                 <p style={orderPreviewTextStyle}>
-                  Pedido #{conversationData.order_id.slice(0, 8)}
+                 {t.chatOrderLabel} #
+{conversationData.order_id.slice(0, 8)}
                 </p>
               )}
             </div>
@@ -699,11 +775,13 @@ const confirmImageUpload = async () => {
 
         <div style={messagesStyle} className="chat-messages">
           {loading ? (
-            <div style={emptyStateStyle}>Cargando conversación...</div>
-          ) : messages.length === 0 ? (
             <div style={emptyStateStyle}>
-              Todavía no hay mensajes. Empieza la conversación.
-            </div>
+  {t.chatLoading}
+</div>
+          ) : messages.length === 0 ? (
+           <div style={emptyStateStyle}>
+  {t.chatEmptyConversation}
+</div>
           ) : (
             messages.map((message) => {
               const mine = message.sender_id === userId;
@@ -727,12 +805,24 @@ const confirmImageUpload = async () => {
                         borderBottomLeftRadius: mine ? "26px" : "8px",
                       }}
                     >
-                      <p style={offerEyebrowStyle}>OFERTA</p>
+                      <p style={offerEyebrowStyle}>
+  {t.chatOffer.toUpperCase()}
+</p>
 
-                      <h2 style={offerPriceStyle}>€{message.offer_price}</h2>
+                      <h2 style={offerPriceStyle}>
+  {new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "EUR",
+  }).format(
+    Number(message.offer_price || 0)
+  )}
+</h2>
 
                       <p style={offerStatusStyle}>
-                        Estado: {getOfferStatusLabel(message.offer_status)}
+                        {t.chatStatus}:{" "}
+{getOfferStatusLabel(
+  message.offer_status
+)}
                       </p>
 
                       {!mine && message.offer_status === "pending" && (
@@ -743,7 +833,7 @@ const confirmImageUpload = async () => {
                             }
                             style={acceptButtonStyle}
                           >
-                            Aceptar
+                           {t.chatAccept}
                           </button>
 
                           <button
@@ -752,7 +842,7 @@ const confirmImageUpload = async () => {
                             }
                             style={rejectButtonStyle}
                           >
-                            Rechazar
+                           {t.chatReject}
                           </button>
                         </div>
                       )}
@@ -782,7 +872,7 @@ const confirmImageUpload = async () => {
                         <div style={chatImageWrapperStyle}>
                           <Image
                             src={message.content}
-                            alt="Imagen del chat"
+                            alt={t.chatImageAlt}
                             fill
                             sizes="280px"
                             style={{ objectFit: "cover" }}
@@ -794,13 +884,18 @@ const confirmImageUpload = async () => {
                     </div>
                   )}
 
-                  <span style={timeStyle}>
-                    {new Date(message.created_at).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                    {seenStatus ? ` · ${seenStatus}` : ""}
-                  </span>
+  <span style={timeStyle}>
+  {new Date(
+    message.created_at
+  ).toLocaleTimeString(locale, {
+    hour: "2-digit",
+    minute: "2-digit",
+  })}
+
+  {seenStatus
+    ? ` · ${seenStatus}`
+    : ""}
+</span>
                 </div>
               );
             })
@@ -808,7 +903,8 @@ const confirmImageUpload = async () => {
 
           {otherTyping && (
             <div style={typingStyle}>
-              Escribiendo<span className="typing-dots">...</span>
+              {t.chatTyping}
+<span className="typing-dots">...</span>
             </div>
           )}
 
@@ -817,10 +913,11 @@ const confirmImageUpload = async () => {
 
 {previewImage && (
   <div style={previewContainerStyle}>
-    <img
-      src={previewImage}
-      style={previewImageStyle}
-    />
+  <img
+  src={previewImage}
+  alt={t.chatPreviewImageAlt}
+  style={previewImageStyle}
+/>
 
     <div style={previewButtonsStyle}>
       <button
@@ -830,14 +927,14 @@ const confirmImageUpload = async () => {
         }}
         style={rejectButtonStyle}
       >
-        Cancelar
+        {t.chatCancel}
       </button>
 
       <button
         onClick={confirmImageUpload}
         style={acceptButtonStyle}
       >
-        Enviar
+        {t.chatSend}
       </button>
     </div>
   </div>
@@ -857,28 +954,36 @@ const confirmImageUpload = async () => {
                 sendMessage();
               }
             }}
-            placeholder="Escribe un mensaje o pregunta por el producto..."
+            placeholder={t.chatInputPlaceholder}
             style={inputStyle}
           />
 
-          <label style={uploadButtonStyle}>
-            {uploading ? "..." : "📷"}
+       <label
+  style={uploadButtonStyle}
+  aria-label={t.chatUploadImage}
+>
+  {uploading ? "..." : "📷"}
 
-            <input
-              type="file"
-              accept="image/*"
-              onChange={uploadImage}
-              style={{ display: "none" }}
-            />
-          </label>
+  <input
+    type="file"
+    accept="image/*"
+    onChange={uploadImage}
+    style={{ display: "none" }}
+  />
+</label>
 
           <button onClick={sendOffer} style={offerButtonStyle}>
-            Hacer oferta
+            {t.chatMakeOffer}
           </button>
 
-          <button onClick={() => sendMessage()} style={buttonStyle}>
-            ➤
-          </button>
+         <button
+  type="button"
+  onClick={() => sendMessage()}
+  style={buttonStyle}
+  aria-label={t.chatSend}
+>
+  ➤
+</button>
         </div>
       </div>
 
