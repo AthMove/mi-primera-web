@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/components/LanguageProvider";
 
 interface ProfileState {
   username: string;
@@ -46,6 +47,7 @@ const emptyProfile: ProfileState = {
 };
 
 export default function AccountPage() {
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [checkingStripe, setCheckingStripe] = useState(false);
@@ -87,7 +89,7 @@ export default function AccountPage() {
       if (!response.ok) {
         throw new Error(
           data.error ||
-            "No se pudo comprobar el estado de Stripe"
+           t.accountStripeStatusError
         );
       }
 
@@ -230,12 +232,10 @@ export default function AccountPage() {
         throw new Error(userError.message);
       }
 
-      if (!user) {
-        alert(
-          "Debes iniciar sesión para conectar Stripe"
-        );
-        return;
-      }
+   if (!user) {
+  alert(t.accountStripeLoginRequired);
+  return;
+}
 
       const response = await fetch(
         "/api/stripe/connect/create-account",
@@ -261,7 +261,7 @@ export default function AccountPage() {
       if (!response.ok) {
         throw new Error(
           data.error ||
-            "No se pudo iniciar la conexión con Stripe"
+            t.accountStripeConnectionStartError
         );
       }
 
@@ -272,7 +272,7 @@ export default function AccountPage() {
 
       throw new Error(
         data.error ||
-          "Stripe no devolvió un enlace de configuración"
+          t.accountStripeLinkError
       );
     } catch (error) {
       console.error(
@@ -283,7 +283,7 @@ export default function AccountPage() {
       alert(
         error instanceof Error
           ? error.message
-          : "No se pudo conectar Stripe"
+          : t.accountStripeConnectionError
       );
     } finally {
       setConnectingStripe(false);
@@ -304,10 +304,10 @@ export default function AccountPage() {
         return;
       }
 
-      if (!user) {
-        alert("Debes iniciar sesión");
-        return;
-      }
+  if (!user) {
+  alert(t.accountLoginRequired);
+  return;
+}
 
       const { error } = await supabase
         .from("profiles")
@@ -332,9 +332,7 @@ export default function AccountPage() {
         return;
       }
 
-      alert(
-        "Perfil actualizado correctamente"
-      );
+    alert(t.accountProfileUpdated);
 
       await loadProfile();
     } catch (error) {
@@ -343,9 +341,7 @@ export default function AccountPage() {
         error
       );
 
-      alert(
-        "No se pudo actualizar el perfil"
-      );
+     alert(t.accountProfileUpdateError);
     } finally {
       setSaving(false);
     }
@@ -372,7 +368,7 @@ export default function AccountPage() {
   if (loading) {
     return (
       <main style={loadingStyle}>
-        Cargando perfil...
+       {t.accountLoading}
       </main>
     );
   }
@@ -383,20 +379,20 @@ export default function AccountPage() {
       className="account-page"
     >
       <section style={heroStyle}>
-        <p style={eyebrowStyle}>
-          PERFIL ATHMOV
-        </p>
+     <p style={eyebrowStyle}>
+  {t.accountEyebrow}
+</p>
 
         <h1
           style={titleStyle}
           className="account-title"
         >
-          Tu cuenta
+          {t.accountTitle}
         </h1>
 
         <p style={subtitleStyle}>
-          Gestiona tu perfil público de vendedor.
-        </p>
+  {t.accountSubtitle}
+</p>
       </section>
 
       <section
@@ -409,7 +405,7 @@ export default function AccountPage() {
               src={safeAvatar(
                 profile.avatar_url
               )}
-              alt="Avatar"
+              alt={t.accountAvatarAlt}
               fill
               sizes="220px"
               style={{
@@ -427,203 +423,191 @@ export default function AccountPage() {
                   event.target.value,
               }))
             }
-            placeholder="URL de imagen de perfil"
+            placeholder={t.accountAvatarPlaceholder}
             style={inputStyle}
           />
 
-          <p style={helperStyle}>
-            Pega una URL de imagen para tu foto
-            de perfil.
-          </p>
+         <p style={helperStyle}>
+  {t.accountAvatarHelper}
+</p>
 
-          <div style={stripeBoxStyle}>
-            <p style={stripeTitleStyle}>
-              Estado de Stripe
-            </p>
+       <div style={stripeBoxStyle}>
+  <p style={stripeTitleStyle}>
+    {t.accountStripeStatus}
+  </p>
 
-            {stripeReady ? (
-              <p style={stripeOkStyle}>
-                Pagos activos ✓
-              </p>
-            ) : profile.stripe_account_id ? (
-              <p style={stripePendingStyle}>
-                Configuración pendiente
-              </p>
-            ) : (
-              <p style={stripePendingStyle}>
-                Stripe no conectado
-              </p>
-            )}
+  {stripeReady ? (
+    <p style={stripeOkStyle}>
+      {t.accountPaymentsActive} ✓
+    </p>
+  ) : profile.stripe_account_id ? (
+    <p style={stripePendingStyle}>
+      {t.accountStripePending}
+    </p>
+  ) : (
+    <p style={stripePendingStyle}>
+      {t.accountStripeNotConnected}
+    </p>
+  )}
 
-            {profile.stripe_account_id && (
-              <div style={stripeDetailsStyle}>
-                <span>
-                  Formulario:{" "}
-                  {profile.stripe_onboarding_complete
-                    ? "completado"
-                    : "pendiente"}
-                </span>
+  {profile.stripe_account_id && (
+    <div style={stripeDetailsStyle}>
+      <span>
+        {t.accountStripeForm}:{" "}
+        {profile.stripe_onboarding_complete
+          ? t.accountCompleted
+          : t.accountPending}
+      </span>
 
-                <span>
-                  Cobros:{" "}
-                  {profile.stripe_charges_enabled
-                    ? "activos"
-                    : "pendientes"}
-                </span>
+      <span>
+        {t.accountCharges}:{" "}
+        {profile.stripe_charges_enabled
+          ? t.accountActivePlural
+          : t.accountPendingPlural}
+      </span>
 
-                <span>
-                  Pagos al vendedor:{" "}
-                  {profile.stripe_payouts_enabled
-                    ? "activos"
-                    : "pendientes"}
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
+      <span>
+        {t.accountSellerPayments}:{" "}
+        {profile.stripe_payouts_enabled
+          ? t.accountActivePlural
+          : t.accountPendingPlural}
+      </span>
+    </div>
+  )}
+</div>
+</div>
 
-        <div style={formCardStyle}>
-          <div style={fieldStyle}>
-            <label style={labelStyle}>
-              Usuario
-            </label>
+<div style={formCardStyle}>
+  <div style={fieldStyle}>
+    <label style={labelStyle}>
+      {t.accountUsername}
+    </label>
 
-            <input
-              value={profile.username}
-              onChange={(event) =>
-                setProfile((currentProfile) => ({
-                  ...currentProfile,
-                  username:
-                    event.target.value,
-                }))
-              }
-              placeholder="@usuario"
-              style={inputStyle}
-            />
-          </div>
+    <input
+      value={profile.username}
+      onChange={(event) =>
+        setProfile((currentProfile) => ({
+          ...currentProfile,
+          username: event.target.value,
+        }))
+      }
+      placeholder={t.accountUsernamePlaceholder}
+      style={inputStyle}
+    />
+  </div>
 
-          <div style={fieldStyle}>
-            <label style={labelStyle}>
-              Nombre completo
-            </label>
+  <div style={fieldStyle}>
+    <label style={labelStyle}>
+      {t.accountFullName}
+    </label>
 
-            <input
-              value={profile.full_name}
-              onChange={(event) =>
-                setProfile((currentProfile) => ({
-                  ...currentProfile,
-                  full_name:
-                    event.target.value,
-                }))
-              }
-              placeholder="Tu nombre completo"
-              style={inputStyle}
-            />
-          </div>
+    <input
+      value={profile.full_name}
+      onChange={(event) =>
+        setProfile((currentProfile) => ({
+          ...currentProfile,
+          full_name: event.target.value,
+        }))
+      }
+      placeholder={t.accountFullNamePlaceholder}
+      style={inputStyle}
+    />
+  </div>
 
-          <div style={fieldStyle}>
-            <label style={labelStyle}>
-              Ubicación
-            </label>
+  <div style={fieldStyle}>
+    <label style={labelStyle}>
+      {t.accountLocation}
+    </label>
 
-            <input
-              value={profile.location}
-              onChange={(event) =>
-                setProfile((currentProfile) => ({
-                  ...currentProfile,
-                  location:
-                    event.target.value,
-                }))
-              }
-              placeholder="Madrid, España"
-              style={inputStyle}
-            />
-          </div>
+    <input
+      value={profile.location}
+      onChange={(event) =>
+        setProfile((currentProfile) => ({
+          ...currentProfile,
+          location: event.target.value,
+        }))
+      }
+      placeholder={t.accountLocationPlaceholder}
+      style={inputStyle}
+    />
+  </div>
 
-          <div style={fieldStyle}>
-            <label style={labelStyle}>
-              Biografía
-            </label>
+  <div style={fieldStyle}>
+    <label style={labelStyle}>
+      {t.accountBio}
+    </label>
 
-            <textarea
-              value={profile.bio}
-              onChange={(event) =>
-                setProfile((currentProfile) => ({
-                  ...currentProfile,
-                  bio: event.target.value,
-                }))
-              }
-              placeholder="Cuéntale a los compradores quién eres..."
-              style={textareaStyle}
-            />
-          </div>
+    <textarea
+      value={profile.bio}
+      onChange={(event) =>
+        setProfile((currentProfile) => ({
+          ...currentProfile,
+          bio: event.target.value,
+        }))
+      }
+      placeholder={t.accountBioPlaceholder}
+      style={textareaStyle}
+    />
+  </div>
 
-          <div style={buttonsRowStyle}>
-            <button
-              type="button"
-              onClick={saveProfile}
-              style={buttonStyle}
-              disabled={saving}
-            >
-              {saving
-                ? "Guardando..."
-                : "Guardar perfil"}
-            </button>
+  <div style={buttonsRowStyle}>
+    <button
+      type="button"
+      onClick={saveProfile}
+      style={buttonStyle}
+      disabled={saving}
+    >
+      {saving
+        ? t.accountSaving
+        : t.accountSaveProfile}
+    </button>
 
-            {!profile.stripe_account_id ? (
-              <button
-                type="button"
-                onClick={
-                  startStripeOnboarding
-                }
-                style={connectButtonStyle}
-                disabled={connectingStripe}
-              >
-                {connectingStripe
-                  ? "Conectando..."
-                  : "Conectar pagos de Stripe"}
-              </button>
-            ) : stripeReady ? (
-              <div style={stripeConnectedStyle}>
-                Pagos de Stripe activos ✓
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={
-                  startStripeOnboarding
-                }
-                style={connectButtonStyle}
-                disabled={connectingStripe}
-              >
-                {connectingStripe
-                  ? "Abriendo Stripe..."
-                  : "Completar configuración de Stripe"}
-              </button>
-            )}
+    {!profile.stripe_account_id ? (
+      <button
+        type="button"
+        onClick={startStripeOnboarding}
+        style={connectButtonStyle}
+        disabled={connectingStripe}
+      >
+        {connectingStripe
+          ? t.accountConnecting
+          : t.accountConnectStripe}
+      </button>
+    ) : stripeReady ? (
+      <div style={stripeConnectedStyle}>
+        {t.accountStripePaymentsActive} ✓
+      </div>
+    ) : (
+      <button
+        type="button"
+        onClick={startStripeOnboarding}
+        style={connectButtonStyle}
+        disabled={connectingStripe}
+      >
+        {connectingStripe
+          ? t.accountOpeningStripe
+          : t.accountCompleteStripe}
+      </button>
+    )}
 
-            <button
-              type="button"
-              onClick={loadProfile}
-              style={refreshButtonStyle}
-              disabled={
-                checkingStripe || loading
-              }
-            >
-              {checkingStripe
-                ? "Comprobando..."
-                : "Actualizar estado de Stripe"}
-            </button>
-          </div>
+    <button
+      type="button"
+      onClick={loadProfile}
+      style={refreshButtonStyle}
+      disabled={checkingStripe || loading}
+    >
+      {checkingStripe
+        ? t.accountChecking
+        : t.accountRefreshStripe}
+    </button>
+  </div>
 
-          {userId && (
-            <p style={statusHelperStyle}>
-              El estado se consulta directamente
-              en Stripe y se sincroniza con tu
-              perfil de ATHMOV.
-            </p>
-          )}
-        </div>
+  {userId && (
+    <p style={statusHelperStyle}>
+      {t.accountStripeSyncHelper}
+    </p>
+  )}
+</div>
       </section>
 
       <style>{`

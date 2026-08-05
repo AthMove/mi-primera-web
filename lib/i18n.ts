@@ -677,6 +677,71 @@ howPageCtaTitle:
   "Compra y vende material deportivo premium con confianza real.",
 howPageBuyGear: "Comprar material",
 howPageSellGear: "Vender material",
+accountStripeStatusError:
+  "No se pudo comprobar el estado de Stripe",
+accountStripeLoginRequired:
+  "Debes iniciar sesión para conectar Stripe",
+accountStripeConnectionStartError:
+  "No se pudo iniciar la conexión con Stripe",
+accountStripeLinkError:
+  "Stripe no devolvió un enlace de configuración",
+accountStripeConnectionError:
+  "No se pudo conectar Stripe",
+accountLoginRequired:
+  "Debes iniciar sesión",
+accountProfileUpdated:
+  "Perfil actualizado correctamente",
+accountProfileUpdateError:
+  "No se pudo actualizar el perfil",
+
+accountLoading: "Cargando perfil...",
+accountEyebrow: "PERFIL ATHMOV",
+accountTitle: "Tu cuenta",
+accountSubtitle:
+  "Gestiona tu perfil público de vendedor.",
+
+accountAvatarAlt: "Avatar",
+accountAvatarPlaceholder:
+  "URL de imagen de perfil",
+accountAvatarHelper:
+  "Pega una URL de imagen para tu foto de perfil.",
+
+accountStripeStatus: "Estado de Stripe",
+accountPaymentsActive: "Pagos activos",
+accountStripePending: "Configuración pendiente",
+accountStripeNotConnected: "Stripe no conectado",
+accountStripeForm: "Formulario",
+accountCompleted: "completado",
+accountPending: "pendiente",
+accountCharges: "Cobros",
+accountSellerPayments: "Pagos al vendedor",
+accountActivePlural: "activos",
+accountPendingPlural: "pendientes",
+
+accountUsername: "Usuario",
+accountFullName: "Nombre completo",
+accountLocation: "Ubicación",
+accountBio: "Biografía",
+accountUsernamePlaceholder: "@usuario",
+accountFullNamePlaceholder: "Tu nombre completo",
+accountLocationPlaceholder: "Madrid, España",
+accountBioPlaceholder:
+  "Cuéntale a los compradores quién eres...",
+
+accountSaving: "Guardando...",
+accountSaveProfile: "Guardar perfil",
+accountConnecting: "Conectando...",
+accountConnectStripe: "Conectar pagos de Stripe",
+accountStripePaymentsActive:
+  "Pagos de Stripe activos",
+accountOpeningStripe: "Abriendo Stripe...",
+accountCompleteStripe:
+  "Completar configuración de Stripe",
+accountChecking: "Comprobando...",
+accountRefreshStripe:
+  "Actualizar estado de Stripe",
+accountStripeSyncHelper:
+  "El estado se consulta directamente en Stripe y se sincroniza con tu perfil de ATHMOV.",
   },
 
 
@@ -1359,6 +1424,72 @@ howPageCtaTitle:
   "Buy and sell premium sports equipment with real confidence.",
 howPageBuyGear: "Buy equipment",
 howPageSellGear: "Sell equipment",
+accountStripeStatusError:
+  "Stripe status could not be checked",
+accountStripeLoginRequired:
+  "You must sign in to connect Stripe",
+accountStripeConnectionStartError:
+  "The Stripe connection could not be started",
+accountStripeLinkError:
+  "Stripe did not return a setup link",
+accountStripeConnectionError:
+  "Stripe could not be connected",
+accountLoginRequired:
+  "You must sign in",
+accountProfileUpdated:
+  "Profile updated successfully",
+accountProfileUpdateError:
+  "The profile could not be updated",
+
+accountLoading: "Loading profile...",
+accountEyebrow: "ATHMOV PROFILE",
+accountTitle: "Your account",
+accountSubtitle:
+  "Manage your public seller profile.",
+
+accountAvatarAlt: "Profile avatar",
+accountAvatarPlaceholder:
+  "Profile image URL",
+accountAvatarHelper:
+  "Paste an image URL for your profile photograph.",
+
+accountStripeStatus: "Stripe status",
+accountPaymentsActive: "Payments active",
+accountStripePending: "Setup pending",
+accountStripeNotConnected:
+  "Stripe not connected",
+accountStripeForm: "Onboarding",
+accountCompleted: "completed",
+accountPending: "pending",
+accountCharges: "Charges",
+accountSellerPayments: "Seller payouts",
+accountActivePlural: "active",
+accountPendingPlural: "pending",
+
+accountUsername: "Username",
+accountFullName: "Full name",
+accountLocation: "Location",
+accountBio: "Biography",
+accountUsernamePlaceholder: "@username",
+accountFullNamePlaceholder: "Your full name",
+accountLocationPlaceholder: "London, United Kingdom",
+accountBioPlaceholder:
+  "Tell buyers a little about yourself...",
+
+accountSaving: "Saving...",
+accountSaveProfile: "Save profile",
+accountConnecting: "Connecting...",
+accountConnectStripe: "Connect Stripe payments",
+accountStripePaymentsActive:
+  "Stripe payments active",
+accountOpeningStripe: "Opening Stripe...",
+accountCompleteStripe:
+  "Complete Stripe setup",
+accountChecking: "Checking...",
+accountRefreshStripe:
+  "Refresh Stripe status",
+accountStripeSyncHelper:
+  "The status is checked directly with Stripe and synchronised with your ATHMOV profile.",
   },
 
   pt: {
@@ -2040,5 +2171,73 @@ howPageCtaTitle:
   "Compre e venda material desportivo premium com verdadeira confiança.",
 howPageBuyGear: "Comprar material",
 howPageSellGear: "Vender material",
+accountStripeStatusError:
+  "Não foi possível verificar o estado do Stripe",
+accountStripeLoginRequired:
+  "Tem de iniciar sessão para ligar o Stripe",
+accountStripeConnectionStartError:
+  "Não foi possível iniciar a ligação ao Stripe",
+accountStripeLinkError:
+  "O Stripe não devolveu uma ligação de configuração",
+accountStripeConnectionError:
+  "Não foi possível ligar o Stripe",
+accountLoginRequired:
+  "Tem de iniciar sessão",
+accountProfileUpdated:
+  "Perfil atualizado com sucesso",
+accountProfileUpdateError:
+  "Não foi possível atualizar o perfil",
+
+accountLoading: "A carregar perfil...",
+accountEyebrow: "PERFIL ATHMOV",
+accountTitle: "A sua conta",
+accountSubtitle:
+  "Faça a gestão do seu perfil público de vendedor.",
+
+accountAvatarAlt: "Avatar do perfil",
+accountAvatarPlaceholder:
+  "URL da imagem de perfil",
+accountAvatarHelper:
+  "Cole uma URL de imagem para a sua fotografia de perfil.",
+
+accountStripeStatus: "Estado do Stripe",
+accountPaymentsActive: "Pagamentos ativos",
+accountStripePending: "Configuração pendente",
+accountStripeNotConnected:
+  "Stripe não ligado",
+accountStripeForm: "Formulário",
+accountCompleted: "concluído",
+accountPending: "pendente",
+accountCharges: "Cobranças",
+accountSellerPayments:
+  "Pagamentos ao vendedor",
+accountActivePlural: "ativos",
+accountPendingPlural: "pendentes",
+
+accountUsername: "Utilizador",
+accountFullName: "Nome completo",
+accountLocation: "Localização",
+accountBio: "Biografia",
+accountUsernamePlaceholder: "@utilizador",
+accountFullNamePlaceholder: "O seu nome completo",
+accountLocationPlaceholder: "Lisboa, Portugal",
+accountBioPlaceholder:
+  "Conte aos compradores um pouco sobre si...",
+
+accountSaving: "A guardar...",
+accountSaveProfile: "Guardar perfil",
+accountConnecting: "A ligar...",
+accountConnectStripe:
+  "Ligar pagamentos Stripe",
+accountStripePaymentsActive:
+  "Pagamentos Stripe ativos",
+accountOpeningStripe: "A abrir o Stripe...",
+accountCompleteStripe:
+  "Concluir configuração do Stripe",
+accountChecking: "A verificar...",
+accountRefreshStripe:
+  "Atualizar estado do Stripe",
+accountStripeSyncHelper:
+  "O estado é consultado diretamente no Stripe e sincronizado com o seu perfil ATHMOV.",
   },
 };
