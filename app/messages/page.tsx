@@ -4,9 +4,18 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function MessagesPage() {
   const router = useRouter();
+  const { lang, t } = useLanguage();
+
+const locale =
+  lang === "en"
+    ? "en-GB"
+    : lang === "pt"
+      ? "pt-PT"
+      : "es-ES";
 
   const [userId, setUserId] = useState("");
   const [conversations, setConversations] = useState<any[]>([]);
@@ -139,7 +148,9 @@ const { data: otherUser } = await supabase
   ) => {
     e.stopPropagation();
 
-    const confirmArchive = confirm("¿Archivar esta conversación?");
+   const confirmArchive = confirm(
+  t.messagesArchiveConfirm
+);
     if (!confirmArchive) return;
 
     const isSeller = conversation.seller_id === userId;
@@ -155,7 +166,7 @@ const { data: otherUser } = await supabase
 
     if (error) {
       console.log(error);
-      alert("No se pudo archivar la conversación");
+     alert(t.messagesArchiveError);
       return;
     }
 
@@ -167,31 +178,51 @@ const { data: otherUser } = await supabase
   const safeImage = (src?: string) => {
   return src?.startsWith("http") || src?.startsWith("/") ? src : "/logo.png";
 };
-
-  if (loading) {
-    return <main style={loadingStyle}>Cargando mensajes...</main>;
-  }
-
+if (loading) {
   return (
+    <main style={loadingStyle}>
+      {t.messagesLoading}
+    </main>
+  );
+}
+
+return (
     <main style={pageStyle} className="messages-page">
-      <section style={headerStyle}>
-        <p style={eyebrowStyle}>MENSAJES ATHMOV</p>
-        <h1 style={titleStyle} className="messages-title">Mensajes</h1>
-        <p style={subtitleStyle}>Conversaciones con compradores y vendedores.</p>
-      </section>
+    <section style={headerStyle}>
+  <p style={eyebrowStyle}>
+    {t.messagesEyebrow}
+  </p>
+
+  <h1
+    style={titleStyle}
+    className="messages-title"
+  >
+    {t.messagesTitle}
+  </h1>
+
+  <p style={subtitleStyle}>
+    {t.messagesSubtitle}
+  </p>
+</section>
 
       {conversations.length === 0 ? (
-        <section style={emptyStyle}>
-          <h2 style={emptyTitleStyle}>Todavía no tienes conversaciones</h2>
+<section style={emptyStyle}>
+  <h2 style={emptyTitleStyle}>
+    {t.messagesEmptyTitle}
+  </h2>
 
-          <p style={emptyTextStyle}>
-            Cuando contactes con un vendedor, tus conversaciones aparecerán aquí.
-          </p>
+  <p style={emptyTextStyle}>
+    {t.messagesEmptyText}
+  </p>
 
-          <button onClick={() => router.push("/products")} style={buttonStyle}>
-            Ir al marketplace
-          </button>
-        </section>
+  <button
+    type="button"
+    onClick={() => router.push("/products")}
+    style={buttonStyle}
+  >
+    {t.messagesGoMarketplace}
+  </button>
+</section>
       ) : (
         <section style={listStyle}>
           {conversations.map((conversation: any) => {
@@ -220,7 +251,7 @@ const { data: otherUser } = await supabase
               <div style={avatarStyle}>
   <Image
     src={safeImage(conversation.otherUser?.avatar_url)}
-    alt="Usuario"
+    alt={t.messagesUserAlt}
     fill
     sizes="60px"
     style={{ objectFit: "cover" }}
@@ -229,7 +260,7 @@ const { data: otherUser } = await supabase
                 <div style={imageWrapperStyle}>
                   <Image
                     src={safeImage(product?.image)}
-                    alt={product?.title || "Producto"}
+                    alt={product?.title || t.productFallback}
                     fill
                     sizes="120px"
                     style={{ objectFit: "cover" }}
@@ -242,23 +273,25 @@ const { data: otherUser } = await supabase
                  <div style={conversationMetaRowStyle}>
   <span style={onlineDotStyle} />
   <p style={metaStyle}>
-    {isOnline
-      ? "En línea"
-      : isSeller
-        ? "Conversación con comprador"
-        : "Conversación con vendedor"}
+{isOnline
+  ? t.messagesOnline
+  : isSeller
+    ? t.messagesBuyerConversation
+    : t.messagesSellerConversation}
   </p>
 </div>
 <h2 style={conversationTitleStyle}>
   {conversation.otherUser?.full_name ||
     conversation.otherUser?.username ||
-    "Usuario"}
+    t.messagesUserFallback}
 </h2>
 
 <div style={productChipStyle}>
 <Image
   src={safeImage(product?.image)}
-  alt={`Producto ${product?.title || "ATHMOV"}`}
+  alt={`${t.messagesProductAlt} ${
+  product?.title || "ATHMOV"
+}`}
   width={44}
   height={44}
 />
@@ -268,9 +301,12 @@ const { data: otherUser } = await supabase
       {product?.title}
     </div>
 
-    <div style={productPriceChipStyle}>
-      €{product?.price}
-    </div>
+  <div style={productPriceChipStyle}>
+  {new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "EUR",
+  }).format(Number(product?.price || 0))}
+</div>
   </div>
 </div>
 
@@ -282,18 +318,28 @@ const { data: otherUser } = await supabase
                     }}
                   >
 {lastMessage?.is_image
-  ? "📷 Imagen"
+  ? `📷 ${t.messagesImage}`
   : lastMessage?.is_offer
-  ? `💰 Oferta · €${lastMessage.offer_price}`
-  : lastMessage?.content || "Sin mensajes"}
+    ? `💰 ${t.messagesOffer} · ${new Intl.NumberFormat(
+        locale,
+        {
+          style: "currency",
+          currency: "EUR",
+        }
+      ).format(Number(lastMessage.offer_price || 0))}`
+    : lastMessage?.content ||
+      t.messagesNoMessages}
                   </p>
 
                   <p style={timeStyle}>
                     {lastMessage?.created_at
-                      ? new Date(lastMessage.created_at).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })
+                      ? new Date(
+  lastMessage.created_at
+).toLocaleTimeString(locale, {
+  hour: "2-digit",
+  minute: "2-digit",
+})
+                  
                       : ""}
                   </p>
                 </div>
@@ -306,16 +352,23 @@ const { data: otherUser } = await supabase
                   )}
 
                   <strong style={priceStyle}>
-                    {product?.price ? `€${product.price}` : ""}
-                  </strong>
+  {product?.price
+    ? new Intl.NumberFormat(locale, {
+        style: "currency",
+        currency: "EUR",
+      }).format(Number(product.price))
+    : ""}
+</strong>
 
-                  <span style={openStyle}>Abrir →</span>
+                 <span style={openStyle}>
+  {t.messagesOpen} →
+</span>
 
                   <button
                     onClick={(e) => archiveConversation(e, conversation)}
                     style={archiveButtonStyle}
                   >
-                    Archivar
+                   {t.messagesArchive}
                   </button>
                 </div>
               </article>

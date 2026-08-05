@@ -758,6 +758,33 @@ orderStatusDelivered: "Entregado",
 orderStatusCompleted: "Completado",
 orderStatusCancelled: "Cancelado",
 orderStatusRefunded: "Reembolsado",
+messagesArchiveConfirm:
+  "¿Archivar esta conversación?",
+messagesArchiveError:
+  "No se pudo archivar la conversación",
+messagesLoading: "Cargando mensajes...",
+messagesEyebrow: "MENSAJES ATHMOV",
+messagesTitle: "Mensajes",
+messagesSubtitle:
+  "Conversaciones con compradores y vendedores.",
+messagesEmptyTitle:
+  "Todavía no tienes conversaciones",
+messagesEmptyText:
+  "Cuando contactes con un vendedor, tus conversaciones aparecerán aquí.",
+messagesGoMarketplace: "Ir al marketplace",
+messagesUserAlt: "Usuario",
+messagesUserFallback: "Usuario",
+messagesProductAlt: "Producto",
+messagesOnline: "En línea",
+messagesBuyerConversation:
+  "Conversación con comprador",
+messagesSellerConversation:
+  "Conversación con vendedor",
+messagesImage: "Imagen",
+messagesOffer: "Oferta",
+messagesNoMessages: "Sin mensajes",
+messagesOpen: "Abrir",
+messagesArchive: "Archivar",
   },
 
 
@@ -1522,6 +1549,33 @@ orderStatusDelivered: "Delivered",
 orderStatusCompleted: "Completed",
 orderStatusCancelled: "Cancelled",
 orderStatusRefunded: "Refunded",
+messagesArchiveConfirm:
+  "Archive this conversation?",
+messagesArchiveError:
+  "The conversation could not be archived",
+messagesLoading: "Loading messages...",
+messagesEyebrow: "ATHMOV MESSAGES",
+messagesTitle: "Messages",
+messagesSubtitle:
+  "Conversations with buyers and sellers.",
+messagesEmptyTitle:
+  "You do not have any conversations yet",
+messagesEmptyText:
+  "Your conversations will appear here when you contact a seller.",
+messagesGoMarketplace: "Go to marketplace",
+messagesUserAlt: "User",
+messagesUserFallback: "User",
+messagesProductAlt: "Product",
+messagesOnline: "Online",
+messagesBuyerConversation:
+  "Conversation with buyer",
+messagesSellerConversation:
+  "Conversation with seller",
+messagesImage: "Image",
+messagesOffer: "Offer",
+messagesNoMessages: "No messages",
+messagesOpen: "Open",
+messagesArchive: "Archive",
   },
 
   pt: {
@@ -2287,5 +2341,32 @@ orderStatusDelivered: "Entregue",
 orderStatusCompleted: "Concluído",
 orderStatusCancelled: "Cancelado",
 orderStatusRefunded: "Reembolsado",
+messagesArchiveConfirm:
+  "Arquivar esta conversa?",
+messagesArchiveError:
+  "Não foi possível arquivar a conversa",
+messagesLoading: "A carregar mensagens...",
+messagesEyebrow: "MENSAGENS ATHMOV",
+messagesTitle: "Mensagens",
+messagesSubtitle:
+  "Conversas com compradores e vendedores.",
+messagesEmptyTitle:
+  "Ainda não tem conversas",
+messagesEmptyText:
+  "As suas conversas aparecerão aqui quando contactar um vendedor.",
+messagesGoMarketplace: "Ir para o marketplace",
+messagesUserAlt: "Utilizador",
+messagesUserFallback: "Utilizador",
+messagesProductAlt: "Produto",
+messagesOnline: "Online",
+messagesBuyerConversation:
+  "Conversa com comprador",
+messagesSellerConversation:
+  "Conversa com vendedor",
+messagesImage: "Imagem",
+messagesOffer: "Oferta",
+messagesNoMessages: "Sem mensagens",
+messagesOpen: "Abrir",
+messagesArchive: "Arquivar",
   },
 };
