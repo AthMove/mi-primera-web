@@ -534,6 +534,81 @@ golfCtaTitle:
   "Tu próximo palo puede estar aquí. El que ya no usas también.",
 viewProducts: "Ver productos",
 sellGear: "Vender material",
+buyerPageEyebrow: "GUÍA DEL COMPRADOR ATHMOV · BETA",
+buyerPageTitle1: "Infórmate antes",
+buyerPageTitle2: "de",
+buyerPageTitle3: "comprar.",
+buyerPageHeroText:
+  "Una guía educativa para ayudarte a comprar material deportivo premium de segunda mano con más criterio. Estamos en beta y trabajamos para que pronto podamos verificarlo nosotros por ti.",
+buyerPageBetaGuide: "Guía beta",
+buyerPageSportIntro:
+  "4 cosas que debes comprobar antes de comprar.",
+
+buyerPagePadelTitle: "Pala auténtica",
+buyerPagePadelTip1Title: "Holograma o QR oficial",
+buyerPagePadelTip1Text:
+  "Bullpadel, Nox y Head suelen incluir holograma o QR verificable. Pide una foto clara y compruébalo antes de pagar.",
+buyerPagePadelTip2Title: "Peso entre 350 y 390 g",
+buyerPagePadelTip2Text:
+  "Pide pesar la pala. Las réplicas suelen tener un peso o balance extraño.",
+buyerPagePadelTip3Title: "Serigrafía y acabados",
+buyerPagePadelTip3Text:
+  "Compara logos, colores y bordes con fotos oficiales del modelo.",
+buyerPagePadelTip4Title: "Número de serie",
+buyerPagePadelTip4Text:
+  "Busca el número en el marco y pide una foto cercana.",
+buyerPagePadelBuyerTip:
+  "Pídele siempre al vendedor fotos del QR, del marco y del recibo original de compra.",
+
+buyerPageTennisTitle: "Raqueta original",
+buyerPageTennisTip1Title: "Código en el mástil",
+buyerPageTennisTip1Text:
+  "Wilson, Babolat y Head suelen incluir códigos o referencias visibles en el mástil.",
+buyerPageTennisTip2Title: "Sonido del marco",
+buyerPageTennisTip2Text:
+  "Si puedes probarla, el grafito de calidad suele sonar seco y definido.",
+buyerPageTennisTip3Title: "Medidas oficiales",
+buyerPageTennisTip3Text:
+  "Longitud, marco y cabeza deben coincidir con la ficha técnica de la marca.",
+buyerPageTennisTip4Title: "Grip y encordado",
+buyerPageTennisTip4Text:
+  "Revisa marcas, tensión y estado general del grip y las cuerdas.",
+buyerPageTennisBuyerTip:
+  "Antes de cerrar el trato, solicita un vídeo mostrando el código del mástil en cámara.",
+
+buyerPageGolfTitle: "Palos genuinos",
+buyerPageGolfTip1Title: "Serial en el hosel",
+buyerPageGolfTip1Text:
+  "Callaway, TaylorMade y Titleist suelen grabar números de serie en el hosel.",
+buyerPageGolfTip2Title: "Soldaduras y cromado",
+buyerPageGolfTip2Text:
+  "Acabados irregulares, cromado desigual o textura rara pueden ser señal de réplica.",
+buyerPageGolfTip3Title: "Loft y lie",
+buyerPageGolfTip3Text:
+  "Una tienda de golf puede ayudarte a medirlos y compararlos con especificaciones oficiales.",
+buyerPageGolfTip4Title: "Shaft con marcaje",
+buyerPageGolfTip4Text:
+  "Marca, flex y características deben estar claramente impresas.",
+buyerPageGolfBuyerTip:
+  "Ante la duda, paga en mano y llévalo a revisar antes de aceptar la compra.",
+
+buyerPageChecklistEyebrow: "CHECKLIST BETA",
+buyerPageChecklistTitle: "Compra con criterio.",
+buyerPageChecklistText:
+  "Antes de comprar cualquier pieza premium de segunda mano, sigue estos 3 pasos básicos.",
+buyerPageRule1Title: "Pide fotos del QR o serial",
+buyerPageRule1Text:
+  "Hazlo antes de cerrar cualquier acuerdo con el vendedor.",
+buyerPageRule2Title: "Contrasta con el catálogo oficial",
+buyerPageRule2Text:
+  "Peso, medidas, colores y acabados deben coincidir.",
+buyerPageRule3Title: "Solicita factura o ticket original",
+buyerPageRule3Text:
+  "Un vendedor serio normalmente podrá enseñarlo.",
+buyerPageBetaText:
+  "ATHMOV está en beta. Esta guía no sustituye una verificación técnica profesional, pero te ayuda a comprar mejor mientras construimos ese servicio.",
+exploreAthmov: "Explorar ATHMOV",
+howItWorks: "Cómo funciona",
   },
 
 
@@ -1073,6 +1148,81 @@ golfCtaTitle:
   "Your next club could be here. So could the one you no longer use.",
 viewProducts: "View products",
 sellGear: "Sell equipment",
+buyerPageEyebrow: "ATHMOV BUYER GUIDE · BETA",
+buyerPageTitle1: "Learn before",
+buyerPageTitle2: "you",
+buyerPageTitle3: "buy.",
+buyerPageHeroText:
+  "An educational guide to help you buy premium second-hand sports equipment with greater confidence. ATHMOV is currently in beta and we are working towards verifying products for you.",
+buyerPageBetaGuide: "Beta guide",
+buyerPageSportIntro:
+  "4 things you should check before buying.",
+
+buyerPagePadelTitle: "Authentic padel racket",
+buyerPagePadelTip1Title: "Official hologram or QR code",
+buyerPagePadelTip1Text:
+  "Bullpadel, Nox and Head often include a verifiable hologram or QR code. Request a clear photograph and check it before paying.",
+buyerPagePadelTip2Title: "Weight between 350 and 390 g",
+buyerPagePadelTip2Text:
+  "Ask the seller to weigh the racket. Replicas often have an unusual weight or balance.",
+buyerPagePadelTip3Title: "Printing and finish",
+buyerPagePadelTip3Text:
+  "Compare the logos, colours and edges with official photographs of the model.",
+buyerPagePadelTip4Title: "Serial number",
+buyerPagePadelTip4Text:
+  "Look for the number on the frame and request a close-up photograph.",
+buyerPagePadelBuyerTip:
+  "Always ask the seller for photographs of the QR code, frame and original purchase receipt.",
+
+buyerPageTennisTitle: "Original tennis racket",
+buyerPageTennisTip1Title: "Code on the shaft",
+buyerPageTennisTip1Text:
+  "Wilson, Babolat and Head often include visible codes or references on the shaft.",
+buyerPageTennisTip2Title: "Frame sound",
+buyerPageTennisTip2Text:
+  "When possible, test it. Quality graphite usually produces a dry, defined sound.",
+buyerPageTennisTip3Title: "Official measurements",
+buyerPageTennisTip3Text:
+  "The length, frame and head size should match the brand's official specifications.",
+buyerPageTennisTip4Title: "Grip and strings",
+buyerPageTennisTip4Text:
+  "Check the branding, tension and overall condition of the grip and strings.",
+buyerPageTennisBuyerTip:
+  "Before completing the purchase, request a video showing the shaft code on camera.",
+
+buyerPageGolfTitle: "Genuine golf clubs",
+buyerPageGolfTip1Title: "Serial number on the hosel",
+buyerPageGolfTip1Text:
+  "Callaway, TaylorMade and Titleist often engrave serial numbers on the hosel.",
+buyerPageGolfTip2Title: "Welding and chrome finish",
+buyerPageGolfTip2Text:
+  "Uneven finishes, inconsistent chrome or unusual textures may indicate a replica.",
+buyerPageGolfTip3Title: "Loft and lie",
+buyerPageGolfTip3Text:
+  "A golf shop can help measure them and compare them with official specifications.",
+buyerPageGolfTip4Title: "Marked shaft",
+buyerPageGolfTip4Text:
+  "The brand, flex and specifications should be clearly printed.",
+buyerPageGolfBuyerTip:
+  "When in doubt, complete the transaction in person and have the club checked before accepting it.",
+
+buyerPageChecklistEyebrow: "BETA CHECKLIST",
+buyerPageChecklistTitle: "Buy with confidence.",
+buyerPageChecklistText:
+  "Before buying any premium second-hand item, follow these 3 basic steps.",
+buyerPageRule1Title: "Request photographs of the QR code or serial number",
+buyerPageRule1Text:
+  "Do this before completing any agreement with the seller.",
+buyerPageRule2Title: "Compare it with the official catalogue",
+buyerPageRule2Text:
+  "Weight, measurements, colours and finishes should match.",
+buyerPageRule3Title: "Request the original invoice or receipt",
+buyerPageRule3Text:
+  "A reliable seller will normally be able to show it.",
+buyerPageBetaText:
+  "ATHMOV is currently in beta. This guide does not replace professional technical verification, but it can help you make better purchases while we build that service.",
+exploreAthmov: "Explore ATHMOV",
+howItWorks: "How it works",
   },
 
   pt: {
@@ -1611,5 +1761,80 @@ golfCtaTitle:
   "O seu próximo taco pode estar aqui. O que já não utiliza também.",
 viewProducts: "Ver produtos",
 sellGear: "Vender material",
+buyerPageEyebrow: "GUIA DO COMPRADOR ATHMOV · BETA",
+buyerPageTitle1: "Informe-se antes",
+buyerPageTitle2: "de",
+buyerPageTitle3: "comprar.",
+buyerPageHeroText:
+  "Um guia educativo para ajudá-lo a comprar material desportivo premium em segunda mão com maior confiança. A ATHMOV está em fase beta e estamos a trabalhar para que em breve possamos verificar os produtos por si.",
+buyerPageBetaGuide: "Guia beta",
+buyerPageSportIntro:
+  "4 aspetos que deve verificar antes de comprar.",
+
+buyerPagePadelTitle: "Raquete de padel autêntica",
+buyerPagePadelTip1Title: "Holograma ou código QR oficial",
+buyerPagePadelTip1Text:
+  "Bullpadel, Nox e Head costumam incluir um holograma ou código QR verificável. Peça uma fotografia nítida e verifique-o antes de pagar.",
+buyerPagePadelTip2Title: "Peso entre 350 e 390 g",
+buyerPagePadelTip2Text:
+  "Peça ao vendedor para pesar a raquete. As réplicas costumam ter um peso ou equilíbrio estranho.",
+buyerPagePadelTip3Title: "Impressão e acabamentos",
+buyerPagePadelTip3Text:
+  "Compare os logótipos, cores e bordas com fotografias oficiais do modelo.",
+buyerPagePadelTip4Title: "Número de série",
+buyerPagePadelTip4Text:
+  "Procure o número na estrutura e peça uma fotografia aproximada.",
+buyerPagePadelBuyerTip:
+  "Peça sempre ao vendedor fotografias do código QR, da estrutura e do recibo original de compra.",
+
+buyerPageTennisTitle: "Raquete de ténis original",
+buyerPageTennisTip1Title: "Código na haste",
+buyerPageTennisTip1Text:
+  "Wilson, Babolat e Head costumam incluir códigos ou referências visíveis na haste.",
+buyerPageTennisTip2Title: "Som da estrutura",
+buyerPageTennisTip2Text:
+  "Quando possível, experimente-a. A grafite de qualidade costuma produzir um som seco e definido.",
+buyerPageTennisTip3Title: "Medidas oficiais",
+buyerPageTennisTip3Text:
+  "O comprimento, a estrutura e a cabeça devem coincidir com as especificações oficiais da marca.",
+buyerPageTennisTip4Title: "Grip e cordas",
+buyerPageTennisTip4Text:
+  "Verifique as marcas, a tensão e o estado geral do grip e das cordas.",
+buyerPageTennisBuyerTip:
+  "Antes de concluir a compra, peça um vídeo que mostre o código da haste.",
+
+buyerPageGolfTitle: "Tacos de golfe genuínos",
+buyerPageGolfTip1Title: "Número de série no hosel",
+buyerPageGolfTip1Text:
+  "Callaway, TaylorMade e Titleist costumam gravar números de série no hosel.",
+buyerPageGolfTip2Title: "Soldaduras e cromado",
+buyerPageGolfTip2Text:
+  "Acabamentos irregulares, cromado desigual ou texturas estranhas podem indicar uma réplica.",
+buyerPageGolfTip3Title: "Loft e lie",
+buyerPageGolfTip3Text:
+  "Uma loja de golfe pode ajudar a medi-los e compará-los com as especificações oficiais.",
+buyerPageGolfTip4Title: "Vara identificada",
+buyerPageGolfTip4Text:
+  "A marca, a flexibilidade e as características devem estar claramente impressas.",
+buyerPageGolfBuyerTip:
+  "Em caso de dúvida, faça o pagamento presencialmente e peça uma verificação antes de aceitar a compra.",
+
+buyerPageChecklistEyebrow: "CHECKLIST BETA",
+buyerPageChecklistTitle: "Compre com confiança.",
+buyerPageChecklistText:
+  "Antes de comprar qualquer artigo premium em segunda mão, siga estes 3 passos básicos.",
+buyerPageRule1Title: "Peça fotografias do código QR ou número de série",
+buyerPageRule1Text:
+  "Faça-o antes de concluir qualquer acordo com o vendedor.",
+buyerPageRule2Title: "Compare com o catálogo oficial",
+buyerPageRule2Text:
+  "O peso, as medidas, as cores e os acabamentos devem coincidir.",
+buyerPageRule3Title: "Peça a fatura ou o recibo original",
+buyerPageRule3Text:
+  "Um vendedor de confiança normalmente poderá apresentá-lo.",
+buyerPageBetaText:
+  "A ATHMOV está em fase beta. Este guia não substitui uma verificação técnica profissional, mas ajuda-o a comprar melhor enquanto desenvolvemos esse serviço.",
+exploreAthmov: "Explorar a ATHMOV",
+howItWorks: "Como funciona",
   },
 };

@@ -1,112 +1,116 @@
 "use client";
 
 import Link from "next/link";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function BuyerGuidePage() {
-  const sports = [
-    {
-      name: "Pádel",
-      title: "Pala auténtica",
-      intro: "4 cosas que debes comprobar antes de comprar.",
-      theme: "light",
-      tips: [
-        [
-          "Holograma o QR oficial",
-          "Bullpadel, Nox y Head suelen incluir holograma o QR verificable. Pide una foto clara y compruébalo antes de pagar.",
-        ],
-        [
-          "Peso entre 350 y 390 g",
-          "Pide pesar la pala. Las réplicas suelen tener un peso o balance extraño.",
-        ],
-        [
-          "Serigrafía y acabados",
-          "Compara logos, colores y bordes con fotos oficiales del modelo.",
-        ],
-        [
-          "Número de serie",
-          "Busca el número en el marco y pide una foto cercana.",
-        ],
+  const { t } = useLanguage();
+ const sports = [
+  {
+    name: t.padel,
+    title: t.buyerPagePadelTitle,
+    intro: t.buyerPageSportIntro,
+    theme: "light",
+    tips: [
+      [
+        t.buyerPagePadelTip1Title,
+        t.buyerPagePadelTip1Text,
       ],
-      buyerTip:
-        "Pídele siempre al vendedor fotos del QR, del marco y del recibo original de compra.",
-    },
-    {
-      name: "Tenis",
-      title: "Raqueta original",
-      intro: "4 cosas que debes comprobar antes de comprar.",
-      theme: "light",
-      tips: [
-        [
-          "Código en el mástil",
-          "Wilson, Babolat y Head suelen incluir códigos o referencias visibles en el mástil.",
-        ],
-        [
-          "Sonido del marco",
-          "Si puedes probarla, el grafito de calidad suele sonar seco y definido.",
-        ],
-        [
-          "Medidas oficiales",
-          "Longitud, marco y cabeza deben coincidir con la ficha técnica de la marca.",
-        ],
-        [
-          "Grip y encordado",
-          "Revisa marcas, tensión y estado general del grip y las cuerdas.",
-        ],
+      [
+        t.buyerPagePadelTip2Title,
+        t.buyerPagePadelTip2Text,
       ],
-      buyerTip:
-        "Antes de cerrar el trato, solicita un vídeo mostrando el código del mástil en cámara.",
-    },
-    {
-      name: "Golf",
-      title: "Palos genuinos",
-      intro: "4 cosas que debes comprobar antes de comprar.",
-      theme: "dark",
-      tips: [
-        [
-          "Serial en el hosel",
-          "Callaway, TaylorMade y Titleist suelen grabar números de serie en el hosel.",
-        ],
-        [
-          "Soldaduras y cromado",
-          "Acabados irregulares, cromado desigual o textura rara pueden ser señal de réplica.",
-        ],
-        [
-          "Loft y lie",
-          "Una tienda de golf puede ayudarte a medirlos y compararlos con especificaciones oficiales.",
-        ],
-        [
-          "Shaft con marcaje",
-          "Marca, flex y características deben estar claramente impresas.",
-        ],
+      [
+        t.buyerPagePadelTip3Title,
+        t.buyerPagePadelTip3Text,
       ],
-      buyerTip:
-        "Ante la duda, paga en mano y llévalo a revisar antes de aceptar la compra.",
-    },
-  ];
+      [
+        t.buyerPagePadelTip4Title,
+        t.buyerPagePadelTip4Text,
+      ],
+    ],
+    buyerTip: t.buyerPagePadelBuyerTip,
+  },
+  {
+    name: t.tennis,
+    title: t.buyerPageTennisTitle,
+    intro: t.buyerPageSportIntro,
+    theme: "light",
+    tips: [
+      [
+        t.buyerPageTennisTip1Title,
+        t.buyerPageTennisTip1Text,
+      ],
+      [
+        t.buyerPageTennisTip2Title,
+        t.buyerPageTennisTip2Text,
+      ],
+      [
+        t.buyerPageTennisTip3Title,
+        t.buyerPageTennisTip3Text,
+      ],
+      [
+        t.buyerPageTennisTip4Title,
+        t.buyerPageTennisTip4Text,
+      ],
+    ],
+    buyerTip: t.buyerPageTennisBuyerTip,
+  },
+  {
+    name: t.golf,
+    title: t.buyerPageGolfTitle,
+    intro: t.buyerPageSportIntro,
+    theme: "dark",
+    tips: [
+      [
+        t.buyerPageGolfTip1Title,
+        t.buyerPageGolfTip1Text,
+      ],
+      [
+        t.buyerPageGolfTip2Title,
+        t.buyerPageGolfTip2Text,
+      ],
+      [
+        t.buyerPageGolfTip3Title,
+        t.buyerPageGolfTip3Text,
+      ],
+      [
+        t.buyerPageGolfTip4Title,
+        t.buyerPageGolfTip4Text,
+      ],
+    ],
+    buyerTip: t.buyerPageGolfBuyerTip,
+  },
+];
 
   return (
     <main style={pageStyle} className="buyer-guide-page">
       <section style={heroStyle}>
-        <p style={eyebrowStyle}>GUÍA DEL COMPRADOR ATHMOV · BETA</p>
+        <p style={eyebrowStyle}>
+  {t.buyerPageEyebrow}
+</p>
 
         <h1 style={titleStyle} className="buyer-guide-title">
-          Infórmate antes
-          <br />
-          de <em style={mutedItalicStyle}>comprar.</em>
-        </h1>
+  {t.buyerPageTitle1}
+  <br />
+  {t.buyerPageTitle2}{" "}
+  <em style={mutedItalicStyle}>
+    {t.buyerPageTitle3}
+  </em>
+</h1>
 
-        <p style={heroTextStyle}>
-          Una guía educativa para ayudarte a comprar material deportivo premium
-          de segunda mano con más criterio. Estamos en beta y trabajamos para
-          que pronto podamos verificarlo nosotros por ti.
-        </p>
+      <p style={heroTextStyle}>
+  {t.buyerPageHeroText}
+</p>
 
-        <div style={chipsStyle}>
-          <span style={chipStyle}>Pádel</span>
-          <span style={chipStyle}>Tenis</span>
-          <span style={chipStyle}>Golf</span>
-          <span style={betaChipStyle}>Guía beta</span>
-        </div>
+      <div style={chipsStyle}>
+  <span style={chipStyle}>{t.padel}</span>
+  <span style={chipStyle}>{t.tennis}</span>
+  <span style={chipStyle}>{t.golf}</span>
+  <span style={betaChipStyle}>
+    {t.buyerPageBetaGuide}
+  </span>
+</div>
       </section>
 
       {sports.map((sport) => {
@@ -197,56 +201,60 @@ export default function BuyerGuidePage() {
       })}
 
       <section style={checklistStyle}>
-        <p style={eyebrowLightStyle}>CHECKLIST BETA</p>
+       <p style={eyebrowLightStyle}>
+  {t.buyerPageChecklistEyebrow}
+</p>
 
-        <h2 style={checklistTitleStyle}>Compra con criterio.</h2>
+        <h2 style={checklistTitleStyle}>
+  {t.buyerPageChecklistTitle}
+</h2>
 
         <p style={checklistTextStyle}>
-          Antes de comprar cualquier pieza premium de segunda mano, sigue estos
-          3 pasos básicos.
-        </p>
+  {t.buyerPageChecklistText}
+</p>
 
-        <div style={rulesStyle}>
-          <div style={ruleStyle}>
-            <span style={ruleIconStyle}>🔍</span>
-            <div>
-              <strong>Pide fotos del QR o serial</strong>
-              <p>Hazlo antes de cerrar cualquier acuerdo con el vendedor.</p>
-            </div>
-          </div>
+       <div style={rulesStyle}>
+  <div style={ruleStyle}>
+    <span style={ruleIconStyle}>🔍</span>
 
-          <div style={ruleStyle}>
-            <span style={ruleIconStyle}>📋</span>
-            <div>
-              <strong>Contrasta con el catálogo oficial</strong>
-              <p>Peso, medidas, colores y acabados deben coincidir.</p>
-            </div>
-          </div>
+    <div>
+      <strong>{t.buyerPageRule1Title}</strong>
+      <p>{t.buyerPageRule1Text}</p>
+    </div>
+  </div>
 
-          <div style={ruleStyle}>
-            <span style={ruleIconStyle}>🧾</span>
-            <div>
-              <strong>Solicita factura o ticket original</strong>
-              <p>Un vendedor serio normalmente podrá enseñarlo.</p>
-            </div>
-          </div>
-        </div>
+  <div style={ruleStyle}>
+    <span style={ruleIconStyle}>📋</span>
 
-        <p style={betaTextStyle}>
-          ATHMOV está en beta. Esta guía no sustituye una verificación técnica
-          profesional, pero te ayuda a comprar mejor mientras construimos ese
-          servicio.
-        </p>
+    <div>
+      <strong>{t.buyerPageRule2Title}</strong>
+      <p>{t.buyerPageRule2Text}</p>
+    </div>
+  </div>
 
-        <div style={buttonsStyle}>
-          <Link href="/products" style={primaryButtonStyle}>
-            Explorar ATHMOV
-          </Link>
+  <div style={ruleStyle}>
+    <span style={ruleIconStyle}>🧾</span>
 
-          <Link href="/how-it-works" style={secondaryButtonStyle}>
-            Cómo funciona
-          </Link>
-        </div>
+    <div>
+      <strong>{t.buyerPageRule3Title}</strong>
+      <p>{t.buyerPageRule3Text}</p>
+    </div>
+  </div>
+</div>
+
+<p style={betaTextStyle}>
+  {t.buyerPageBetaText}
+</p>
+
+     <div style={buttonsStyle}>
+  <Link href="/products" style={primaryButtonStyle}>
+    {t.exploreAthmov}
+  </Link>
+
+  <Link href="/how-it-works" style={secondaryButtonStyle}>
+    {t.howItWorks}
+  </Link>
+</div>
       </section>
 
       <style>{`
