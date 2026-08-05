@@ -3,16 +3,44 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/components/LanguageProvider";
 
 
 export default function OrdersPage() {
   const router = useRouter();
+  const { lang, t } = useLanguage();
+  const locale =
+  lang === "en"
+    ? "en-GB"
+    : lang === "pt"
+      ? "pt-PT"
+      : "es-ES";
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadOrders();
   }, []);
+
+  const getOrderStatusLabel = (status?: string) => {
+  const normalizedStatus = String(status || "")
+    .trim()
+    .toLowerCase();
+
+  const labels: Record<string, string> = {
+    pending: t.orderStatusPending,
+    paid: t.orderStatusPaid,
+    preparing: t.orderStatusPreparing,
+    shipped: t.orderStatusShipped,
+    delivered: t.orderStatusDelivered,
+    completed: t.orderStatusCompleted,
+    cancelled: t.orderStatusCancelled,
+    canceled: t.orderStatusCancelled,
+    refunded: t.orderStatusRefunded,
+  };
+
+  return labels[normalizedStatus] || status || t.orderStatusPending;
+};
 
   const loadOrders = async () => {
     const {
@@ -37,46 +65,83 @@ export default function OrdersPage() {
     setLoading(false);
   };
 
-  if (loading) {
-    return <main style={pageStyle}>Loading...</main>;
-  }
+if (loading) {
+  return (
+    <main style={pageStyle}>
+      {t.ordersLoading}
+    </main>
+  );
+}
 
   return (
     <main style={pageStyle}>
       <section style={headerStyle}>
-        <p style={eyebrowStyle}>ATHMOV ACCOUNT</p>
-        <h1 style={titleStyle}>My orders</h1>
+      <p style={eyebrowStyle}>
+  {t.ordersEyebrow}
+</p>
+
+<h1 style={titleStyle}>
+  {t.ordersTitle}
+</h1>
       </section>
 
       {orders.length === 0 ? (
-        <section style={emptyStyle}>
-          <h2 style={{ margin: 0 }}>No orders yet</h2>
-          <p style={{ color: "#666" }}>
-            Your purchases will appear here after checkout.
-          </p>
-        </section>
+  <section style={emptyStyle}>
+  <h2 style={{ margin: 0 }}>
+    {t.ordersEmptyTitle}
+  </h2>
+
+  <p style={{ color: "#666" }}>
+    {t.ordersEmptyText}
+  </p>
+</section>
       ) : (
         <section style={ordersStyle}>
           {orders.map((order) => (
             <article key={order.id} style={orderCardStyle}>
               <div style={topRowStyle}>
                 <div>
-                  <p style={eyebrowStyle}>ORDER</p>
+                 <p style={eyebrowStyle}>
+  {t.orderLabel}
+</p>
                   <h2 style={orderTitleStyle}>
-                    {new Date(order.created_at).toLocaleDateString()}
+                   {new Date(order.created_at).toLocaleDateString(locale)}
                   </h2>
                 </div>
 
-                <strong style={totalStyle}>€{order.total}</strong>
+                <strong style={totalStyle}>
+  {new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "EUR",
+  }).format(Number(order.total || 0))}
+</strong>
               </div>
 
-              <div style={statusStyle}>{order.status}</div>
+              <div style={statusStyle}>
+  {getOrderStatusLabel(order.status)}
+</div>
 
               <div style={itemsStyle}>
                 {(order.items || []).map((item: any, index: number) => (
                   <div key={index} style={itemStyle}>
-                    <span>{item.nombre}</span>
-                    <strong>{item.precio}</strong>
+                  <span>
+  {item.nombre ||
+    item.title ||
+    t.orderProductFallback}
+</span>
+
+<strong>
+  {new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "EUR",
+  }).format(
+    Number(
+      item.precio ??
+        item.price ??
+        0
+    )
+  )}
+</strong>
                   </div>
                 ))}
               </div>
