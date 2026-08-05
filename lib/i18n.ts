@@ -1556,6 +1556,7 @@ fitness: "Fitness",
 noBrandProductsPrefix: "Ainda não existem produtos",
 noBrandProductsSuffix: "disponíveis.",
 athmovUser: "Utilizador ATHMOV",
+feedImageAlt: "Publicação do feed",
 golfGuideEyebrow: "GUIA DE COMPRA",
 golfSeoTitle:
   "Tacos de golfe em segunda mão: compre material premium com confiança",
