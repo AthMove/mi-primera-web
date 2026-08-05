@@ -1,27 +1,97 @@
 "use client";
 
+import { useLanguage } from "@/components/LanguageProvider";
+
 export default function HowItWorksPage() {
+  const { t } = useLanguage();
+  const flowItems = [
+  t.howPageFlowPublish,
+  t.howPageFlowVerify,
+  t.howPageFlowShipping,
+  t.howPageFlowConfirm,
+];
+
+const sellerSteps = [
+  [
+    t.howPageSellerStep1Title,
+    t.howPageSellerStep1Text,
+  ],
+  [
+    t.howPageSellerStep2Title,
+    t.howPageSellerStep2Text,
+  ],
+  [
+    t.howPageSellerStep3Title,
+    t.howPageSellerStep3Text,
+  ],
+  [
+    t.howPageSellerStep4Title,
+    t.howPageSellerStep4Text,
+  ],
+];
+
+const verificationLevels = [
+  [
+    "01",
+    t.howPageLevel1Title,
+    t.howPageLevel1Badge,
+    t.howPageLevel1Text,
+  ],
+  [
+    "02",
+    t.howPageLevel2Title,
+    t.howPageLevel2Badge,
+    t.howPageLevel2Text,
+  ],
+  [
+    "03",
+    t.howPageLevel3Title,
+    t.howPageLevel3Badge,
+    t.howPageLevel3Text,
+  ],
+];
+
+const buyerSteps = [
+  [
+    t.howPageBuyerStep1Title,
+    t.howPageBuyerStep1Text,
+  ],
+  [
+    t.howPageBuyerStep2Title,
+    t.howPageBuyerStep2Text,
+  ],
+  [
+    t.howPageBuyerStep3Title,
+    t.howPageBuyerStep3Text,
+  ],
+  [
+    t.howPageBuyerStep4Title,
+    t.howPageBuyerStep4Text,
+  ],
+];
   return (
     <main style={pageStyle} className="how-page">
       <section style={heroStyle}>
-        <p style={eyebrowStyle}>CÓMO FUNCIONA ATHMOV</p>
+        <p style={eyebrowStyle}>
+  {t.howPageEyebrow}
+</p>
 
-        <h1 style={titleStyle}>
-          Directo.
-          <br />
-          Verificado.
-          <br />
-          <em style={mutedItalicStyle}>Premium.</em>
-        </h1>
+       <h1 style={titleStyle}>
+  {t.howPageTitle1}
+  <br />
+  {t.howPageTitle2}
+  <br />
+  <em style={mutedItalicStyle}>
+    {t.howPageTitle3}
+  </em>
+</h1>
 
-        <p style={textStyle}>
-          ATHMOV combina envío directo entre particulares con verificación por
-          niveles. Más valor, más control. Simple para el vendedor, seguro para
-          el comprador.
-        </p>
+<p style={textStyle}>
+  {t.howPageHeroText}
+</p>
 
         <div style={flowStyle}>
-          {["Publicas", "ATHMOV verifica", "Envío directo", "Confirmas"].map(
+          {flowItems.map(
             (item, index) => (
               <div key={item} style={flowItemStyle}>
                 <span style={flowNumberStyle}>0{index + 1}</span>
@@ -32,132 +102,130 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      <section style={sectionStyle}>
-        <p style={eyebrowStyle}>PROCESO DEL VENDEDOR</p>
-        <h2 style={sectionTitleStyle}>Si vendes</h2>
+    <section style={sectionStyle}>
+  <p style={eyebrowStyle}>
+    {t.howPageSellerEyebrow}
+  </p>
 
-        <div style={cardsStyle}>
-          {[
-            [
-              "Publica con fotos reales",
-              "Sube imágenes propias, estado honesto y un precio justo.",
-            ],
-            [
-              "Graba vídeo en tiempo real",
-              "Cuando haya comprador, muestras serial, estado y embalaje.",
-            ],
-            [
-              "ATHMOV da el OK",
-              "Solo tras validar el vídeo se activa el envío.",
-            ],
-            [
-              "Envía con seguimiento",
-              "SEUR, MRW o DHL Express. El comprador sigue el pedido.",
-            ],
-          ].map(([title, text], index) => (
-            <article key={title} style={cardStyle}>
-              <span style={cardNumberStyle}>{index + 1}</span>
-              <h3 style={cardTitleStyle}>{title}</h3>
-              <p style={cardTextStyle}>{text}</p>
-            </article>
-          ))}
-        </div>
-      </section>
+  <h2 style={sectionTitleStyle}>
+    {t.howPageSellerTitle}
+  </h2>
 
-      <section style={darkSectionStyle}>
-        <p style={eyebrowLightStyle}>VERIFICACIÓN ATHMOV</p>
-        <h2 style={darkTitleStyle}>
-          Tres niveles
-          <br />
-          de control.
-        </h2>
+  <div style={cardsStyle}>
+    {sellerSteps.map(([title, text], index) => (
+      <article key={title} style={cardStyle}>
+        <span style={cardNumberStyle}>
+          {index + 1}
+        </span>
 
-        <div style={levelsStyle}>
-          {[
-            [
-              "01",
-              "Verificación en vídeo",
-              "Todos los artículos",
-              "El vendedor graba serial, estado físico y embalaje. ATHMOV revisa antes de activar el envío.",
-            ],
-            [
-              "02",
-              "Revisión física partner",
-              "Artículos +300 €",
-              "El artículo puede pasar por una tienda especializada de confianza antes de llegar al comprador.",
-            ],
-            [
-              "03",
-              "ATHMOV Certified",
-              "Próximamente",
-              "Revisión técnica propia con sello certificado ATHMOV.",
-            ],
-          ].map(([num, title, badge, text]) => (
-            <article key={title} style={levelCardStyle}>
-              <div style={levelTopStyle}>
-                <span style={levelNumberStyle}>{num}</span>
-                <div>
-                  <h3 style={levelTitleStyle}>{title}</h3>
-                  <span style={levelBadgeStyle}>{badge}</span>
-                </div>
-              </div>
+        <h3 style={cardTitleStyle}>
+          {title}
+        </h3>
 
-              <p style={levelTextStyle}>{text}</p>
-            </article>
-          ))}
-        </div>
-      </section>
+        <p style={cardTextStyle}>
+          {text}
+        </p>
+      </article>
+    ))}
+  </div>
+</section>
 
-      <section style={sectionStyle}>
-        <p style={eyebrowStyle}>PROCESO DEL COMPRADOR</p>
-        <h2 style={sectionTitleStyle}>Si compras</h2>
+<section style={darkSectionStyle}>
+  <p style={eyebrowLightStyle}>
+    {t.howPageVerificationEyebrow}
+  </p>
 
-        <div style={cardsStyle}>
-          {[
-            [
-              "Puedes pedir el vídeo",
-              "Ves exactamente qué revisó ATHMOV antes del envío.",
-            ],
-            [
-              "Graba tu unboxing",
-              "Si hay daño de transporte, ese vídeo ayuda a abrir una incidencia.",
-            ],
-            [
-              "48 h para revisar",
-              "Tienes tiempo para comprobar el producto recibido.",
-            ],
-            [
-              "El pago se libera después",
-              "El vendedor cobra cuando el pedido se completa correctamente.",
-            ],
-          ].map(([title, text], index) => (
-            <article key={title} style={cardStyle}>
-              <span style={cardNumberStyle}>{index + 1}</span>
-              <h3 style={cardTitleStyle}>{title}</h3>
-              <p style={cardTextStyle}>{text}</p>
-            </article>
-          ))}
-        </div>
-      </section>
+  <h2 style={darkTitleStyle}>
+    {t.howPageVerificationTitle1}
+    <br />
+    {t.howPageVerificationTitle2}
+  </h2>
 
-      <section style={ctaStyle}>
-        <p style={eyebrowLightStyle}>SEGUNDA MANO. PRIMERA CLASE.</p>
+  <div style={levelsStyle}>
+    {verificationLevels.map(
+      ([num, title, badge, text]) => (
+        <article
+          key={num}
+          style={levelCardStyle}
+        >
+          <div style={levelTopStyle}>
+            <span style={levelNumberStyle}>
+              {num}
+            </span>
 
-        <h2 style={ctaTitleStyle}>
-          Compra y vende material deportivo premium con confianza real.
-        </h2>
+            <div>
+              <h3 style={levelTitleStyle}>
+                {title}
+              </h3>
 
-        <div style={ctaButtonsStyle}>
-          <a href="/products" style={primaryButtonStyle}>
-            Comprar material
-          </a>
+              <span style={levelBadgeStyle}>
+                {badge}
+              </span>
+            </div>
+          </div>
 
-          <a href="/sell" style={secondaryDarkButtonStyle}>
-            Vender material
-          </a>
-        </div>
-      </section>
+          <p style={levelTextStyle}>
+            {text}
+          </p>
+        </article>
+      )
+    )}
+  </div>
+</section>
 
+<section style={sectionStyle}>
+  <p style={eyebrowStyle}>
+    {t.howPageBuyerEyebrow}
+  </p>
+
+  <h2 style={sectionTitleStyle}>
+    {t.howPageBuyerTitle}
+  </h2>
+
+  <div style={cardsStyle}>
+    {buyerSteps.map(([title, text], index) => (
+      <article key={title} style={cardStyle}>
+        <span style={cardNumberStyle}>
+          {index + 1}
+        </span>
+
+        <h3 style={cardTitleStyle}>
+          {title}
+        </h3>
+
+        <p style={cardTextStyle}>
+          {text}
+        </p>
+      </article>
+    ))}
+  </div>
+</section>
+
+<section style={ctaStyle}>
+  <p style={eyebrowLightStyle}>
+    {t.howPageCtaEyebrow}
+  </p>
+
+  <h2 style={ctaTitleStyle}>
+    {t.howPageCtaTitle}
+  </h2>
+
+  <div style={ctaButtonsStyle}>
+    <a
+      href="/products"
+      style={primaryButtonStyle}
+    >
+      {t.howPageBuyGear}
+    </a>
+
+    <a
+      href="/sell"
+      style={secondaryDarkButtonStyle}
+    >
+      {t.howPageSellGear}
+    </a>
+  </div>
+</section>
       <style>{`
         @media (max-width: 800px) {
           .how-page {

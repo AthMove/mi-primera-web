@@ -609,6 +609,74 @@ buyerPageBetaText:
   "ATHMOV está en beta. Esta guía no sustituye una verificación técnica profesional, pero te ayuda a comprar mejor mientras construimos ese servicio.",
 exploreAthmov: "Explorar ATHMOV",
 howItWorks: "Cómo funciona",
+howPageEyebrow: "CÓMO FUNCIONA ATHMOV",
+howPageTitle1: "Directo.",
+howPageTitle2: "Verificado.",
+howPageTitle3: "Premium.",
+howPageHeroText:
+  "ATHMOV combina envío directo entre particulares con verificación por niveles. Más valor, más control. Simple para el vendedor, seguro para el comprador.",
+
+howPageFlowPublish: "Publicas",
+howPageFlowVerify: "ATHMOV verifica",
+howPageFlowShipping: "Envío directo",
+howPageFlowConfirm: "Confirmas",
+
+howPageSellerEyebrow: "PROCESO DEL VENDEDOR",
+howPageSellerTitle: "Si vendes",
+
+howPageSellerStep1Title: "Publica con fotos reales",
+howPageSellerStep1Text:
+  "Sube imágenes propias, estado honesto y un precio justo.",
+howPageSellerStep2Title: "Graba vídeo en tiempo real",
+howPageSellerStep2Text:
+  "Cuando haya comprador, muestras serial, estado y embalaje.",
+howPageSellerStep3Title: "ATHMOV da el OK",
+howPageSellerStep3Text:
+  "Solo tras validar el vídeo se activa el envío.",
+howPageSellerStep4Title: "Envía con seguimiento",
+howPageSellerStep4Text:
+  "SEUR, MRW o DHL Express. El comprador sigue el pedido.",
+
+howPageVerificationEyebrow: "VERIFICACIÓN ATHMOV",
+howPageVerificationTitle1: "Tres niveles",
+howPageVerificationTitle2: "de control.",
+
+howPageLevel1Title: "Verificación en vídeo",
+howPageLevel1Badge: "Todos los artículos",
+howPageLevel1Text:
+  "El vendedor graba serial, estado físico y embalaje. ATHMOV revisa antes de activar el envío.",
+
+howPageLevel2Title: "Revisión física partner",
+howPageLevel2Badge: "Artículos +300 €",
+howPageLevel2Text:
+  "El artículo puede pasar por una tienda especializada de confianza antes de llegar al comprador.",
+
+howPageLevel3Title: "ATHMOV Certified",
+howPageLevel3Badge: "Próximamente",
+howPageLevel3Text:
+  "Revisión técnica propia con sello certificado ATHMOV.",
+
+howPageBuyerEyebrow: "PROCESO DEL COMPRADOR",
+howPageBuyerTitle: "Si compras",
+
+howPageBuyerStep1Title: "Puedes pedir el vídeo",
+howPageBuyerStep1Text:
+  "Ves exactamente qué revisó ATHMOV antes del envío.",
+howPageBuyerStep2Title: "Graba tu unboxing",
+howPageBuyerStep2Text:
+  "Si hay daño de transporte, ese vídeo ayuda a abrir una incidencia.",
+howPageBuyerStep3Title: "48 h para revisar",
+howPageBuyerStep3Text:
+  "Tienes tiempo para comprobar el producto recibido.",
+howPageBuyerStep4Title: "El pago se libera después",
+howPageBuyerStep4Text:
+  "El vendedor cobra cuando el pedido se completa correctamente.",
+
+howPageCtaEyebrow: "SEGUNDA MANO. PRIMERA CLASE.",
+howPageCtaTitle:
+  "Compra y vende material deportivo premium con confianza real.",
+howPageBuyGear: "Comprar material",
+howPageSellGear: "Vender material",
   },
 
 
@@ -1223,6 +1291,74 @@ buyerPageBetaText:
   "ATHMOV is currently in beta. This guide does not replace professional technical verification, but it can help you make better purchases while we build that service.",
 exploreAthmov: "Explore ATHMOV",
 howItWorks: "How it works",
+howPageEyebrow: "HOW ATHMOV WORKS",
+howPageTitle1: "Direct.",
+howPageTitle2: "Verified.",
+howPageTitle3: "Premium.",
+howPageHeroText:
+  "ATHMOV combines direct shipping between individuals with tiered verification. More value, more control. Simple for the seller and secure for the buyer.",
+
+howPageFlowPublish: "You list",
+howPageFlowVerify: "ATHMOV verifies",
+howPageFlowShipping: "Direct shipping",
+howPageFlowConfirm: "You confirm",
+
+howPageSellerEyebrow: "SELLER PROCESS",
+howPageSellerTitle: "When you sell",
+
+howPageSellerStep1Title: "List with real photographs",
+howPageSellerStep1Text:
+  "Upload your own images, describe the condition honestly and set a fair price.",
+howPageSellerStep2Title: "Record a real-time video",
+howPageSellerStep2Text:
+  "Once there is a buyer, show the serial number, condition and packaging.",
+howPageSellerStep3Title: "ATHMOV approves it",
+howPageSellerStep3Text:
+  "Shipping is only activated after the video has been validated.",
+howPageSellerStep4Title: "Ship with tracking",
+howPageSellerStep4Text:
+  "SEUR, MRW or DHL Express. The buyer can track the order.",
+
+howPageVerificationEyebrow: "ATHMOV VERIFICATION",
+howPageVerificationTitle1: "Three levels",
+howPageVerificationTitle2: "of control.",
+
+howPageLevel1Title: "Video verification",
+howPageLevel1Badge: "All items",
+howPageLevel1Text:
+  "The seller records the serial number, physical condition and packaging. ATHMOV reviews the video before shipping is activated.",
+
+howPageLevel2Title: "Partner physical inspection",
+howPageLevel2Badge: "Items over €300",
+howPageLevel2Text:
+  "The item may be inspected by a trusted specialist store before reaching the buyer.",
+
+howPageLevel3Title: "ATHMOV Certified",
+howPageLevel3Badge: "Coming soon",
+howPageLevel3Text:
+  "Our own technical inspection with an ATHMOV certified seal.",
+
+howPageBuyerEyebrow: "BUYER PROCESS",
+howPageBuyerTitle: "When you buy",
+
+howPageBuyerStep1Title: "You can request the video",
+howPageBuyerStep1Text:
+  "See exactly what ATHMOV reviewed before shipping.",
+howPageBuyerStep2Title: "Record your unboxing",
+howPageBuyerStep2Text:
+  "When there is transport damage, the video can help you open a claim.",
+howPageBuyerStep3Title: "48 hours to inspect",
+howPageBuyerStep3Text:
+  "You have time to check the product you received.",
+howPageBuyerStep4Title: "Payment is released afterwards",
+howPageBuyerStep4Text:
+  "The seller is paid once the order has been completed correctly.",
+
+howPageCtaEyebrow: "SECOND HAND. FIRST CLASS.",
+howPageCtaTitle:
+  "Buy and sell premium sports equipment with real confidence.",
+howPageBuyGear: "Buy equipment",
+howPageSellGear: "Sell equipment",
   },
 
   pt: {
@@ -1836,5 +1972,73 @@ buyerPageBetaText:
   "A ATHMOV está em fase beta. Este guia não substitui uma verificação técnica profissional, mas ajuda-o a comprar melhor enquanto desenvolvemos esse serviço.",
 exploreAthmov: "Explorar a ATHMOV",
 howItWorks: "Como funciona",
+howPageEyebrow: "COMO FUNCIONA A ATHMOV",
+howPageTitle1: "Direto.",
+howPageTitle2: "Verificado.",
+howPageTitle3: "Premium.",
+howPageHeroText:
+  "A ATHMOV combina envio direto entre particulares com verificação por níveis. Mais valor, mais controlo. Simples para o vendedor e seguro para o comprador.",
+
+howPageFlowPublish: "Publica",
+howPageFlowVerify: "A ATHMOV verifica",
+howPageFlowShipping: "Envio direto",
+howPageFlowConfirm: "Confirma",
+
+howPageSellerEyebrow: "PROCESSO DO VENDEDOR",
+howPageSellerTitle: "Quando vende",
+
+howPageSellerStep1Title: "Publique com fotografias reais",
+howPageSellerStep1Text:
+  "Carregue imagens próprias, descreva o estado com honestidade e defina um preço justo.",
+howPageSellerStep2Title: "Grave um vídeo em tempo real",
+howPageSellerStep2Text:
+  "Quando houver comprador, mostre o número de série, o estado e a embalagem.",
+howPageSellerStep3Title: "A ATHMOV dá aprovação",
+howPageSellerStep3Text:
+  "O envio só é ativado depois de o vídeo ser validado.",
+howPageSellerStep4Title: "Envie com seguimento",
+howPageSellerStep4Text:
+  "SEUR, MRW ou DHL Express. O comprador acompanha a encomenda.",
+
+howPageVerificationEyebrow: "VERIFICAÇÃO ATHMOV",
+howPageVerificationTitle1: "Três níveis",
+howPageVerificationTitle2: "de controlo.",
+
+howPageLevel1Title: "Verificação por vídeo",
+howPageLevel1Badge: "Todos os artigos",
+howPageLevel1Text:
+  "O vendedor grava o número de série, o estado físico e a embalagem. A ATHMOV revê o vídeo antes de ativar o envio.",
+
+howPageLevel2Title: "Inspeção física por parceiro",
+howPageLevel2Badge: "Artigos acima de 300 €",
+howPageLevel2Text:
+  "O artigo pode ser inspecionado por uma loja especializada de confiança antes de chegar ao comprador.",
+
+howPageLevel3Title: "ATHMOV Certified",
+howPageLevel3Badge: "Brevemente",
+howPageLevel3Text:
+  "Inspeção técnica própria com selo certificado ATHMOV.",
+
+howPageBuyerEyebrow: "PROCESSO DO COMPRADOR",
+howPageBuyerTitle: "Quando compra",
+
+howPageBuyerStep1Title: "Pode pedir o vídeo",
+howPageBuyerStep1Text:
+  "Veja exatamente o que a ATHMOV verificou antes do envio.",
+howPageBuyerStep2Title: "Grave o unboxing",
+howPageBuyerStep2Text:
+  "Se existirem danos de transporte, o vídeo pode ajudar a abrir uma reclamação.",
+howPageBuyerStep3Title: "48 horas para verificar",
+howPageBuyerStep3Text:
+  "Tem tempo para verificar o produto recebido.",
+howPageBuyerStep4Title: "O pagamento é libertado depois",
+howPageBuyerStep4Text:
+  "O vendedor recebe quando a encomenda é concluída corretamente.",
+
+howPageCtaEyebrow: "SEGUNDA MÃO. PRIMEIRA CLASSE.",
+howPageCtaTitle:
+  "Compre e venda material desportivo premium com verdadeira confiança.",
+howPageBuyGear: "Comprar material",
+howPageSellGear: "Vender material",
   },
 };
