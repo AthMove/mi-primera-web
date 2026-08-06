@@ -1078,6 +1078,9 @@ sellerSoldBadge: "VENDIDO",
 sellerSoldCompleted:
   "Venta completada",
   sellerReviewsTitle: "Valoraciones",
+  sellerTabsActive: "Activos",
+sellerTabsSold: "Vendidos",
+sellerTabsReviews: "Valoraciones",
   },
 
 
@@ -2159,6 +2162,9 @@ sellerSoldBadge: "SOLD",
 sellerSoldCompleted:
   "Sale completed",
   sellerReviewsTitle: "Reviews",
+  sellerTabsActive: "Active",
+sellerTabsSold: "Sold",
+sellerTabsReviews: "Reviews",
   },
 
   pt: {
@@ -3247,5 +3253,8 @@ sellerSoldBadge: "VENDIDO",
 sellerSoldCompleted:
   "Venda concluída",
   sellerReviewsTitle: "Avaliações",
+  sellerTabsActive: "Ativos",
+sellerTabsSold: "Vendidos",
+sellerTabsReviews: "Avaliações",
   },
 };

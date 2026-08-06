@@ -1,5 +1,7 @@
 "use client";
 
+import { useLanguage } from "@/components/LanguageProvider";
+
 interface Props {
   activeTab: "active" | "sold" | "reviews";
   activeCount: number;
@@ -15,27 +17,28 @@ export default function SellerTabs({
   totalReviews,
   onChange,
 }: Props) {
+  const { t } = useLanguage();
   return (
     <div className="seller-tabs">
       <button
         onClick={() => onChange("active")}
         className={activeTab === "active" ? "tab active" : "tab"}
       >
-        Activos ({activeCount})
+       {t.sellerTabsActive} ({activeCount})
       </button>
 
       <button
         onClick={() => onChange("sold")}
         className={activeTab === "sold" ? "tab active" : "tab"}
       >
-        Vendidos ({soldCount})
+       {t.sellerTabsSold} ({soldCount})
       </button>
 
       <button
         onClick={() => onChange("reviews")}
         className={activeTab === "reviews" ? "tab active" : "tab"}
       >
-        Valoraciones ({totalReviews})
+        {t.sellerTabsReviews} ({totalReviews})
       </button>
 
       <style jsx>{`
