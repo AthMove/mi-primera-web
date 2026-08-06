@@ -1041,6 +1041,31 @@ sellerTimelinePublishedOn:
   "Publicada el",
 sellerTimelineVerifiedReview:
   "Valoración verificada",
+  sellerActiveInventory:
+  "INVENTARIO DEL VENDEDOR",
+sellerActiveTitle:
+  "Productos activos",
+sellerActiveEmpty:
+  "Este vendedor todavía no tiene productos activos.",
+
+sellerActiveFeatured: "DESTACADO",
+sellerActiveAvailable: "DISPONIBLE",
+sellerActiveRemoveFavorite:
+  "Eliminar de favoritos",
+sellerActiveAddFavorite:
+  "Añadir a favoritos",
+sellerActiveProductFallback:
+  "Producto ATHMOV",
+sellerActiveDefaultLocation:
+  "España",
+
+sellerConditionNew: "Nuevo",
+sellerConditionLikeNew:
+  "Como nuevo",
+sellerConditionExcellent:
+  "Excelente",
+sellerConditionGood: "Bueno",
+sellerConditionUsed: "Usado",
   },
 
 
@@ -2085,6 +2110,31 @@ sellerTimelinePublishedOn:
   "Published on",
 sellerTimelineVerifiedReview:
   "Verified review",
+  sellerActiveInventory:
+  "SELLER INVENTORY",
+sellerActiveTitle:
+  "Active products",
+sellerActiveEmpty:
+  "This seller does not have any active products yet.",
+
+sellerActiveFeatured: "FEATURED",
+sellerActiveAvailable: "AVAILABLE",
+sellerActiveRemoveFavorite:
+  "Remove from favourites",
+sellerActiveAddFavorite:
+  "Add to favourites",
+sellerActiveProductFallback:
+  "ATHMOV product",
+sellerActiveDefaultLocation:
+  "Spain",
+
+sellerConditionNew: "New",
+sellerConditionLikeNew:
+  "Like new",
+sellerConditionExcellent:
+  "Excellent",
+sellerConditionGood: "Good",
+sellerConditionUsed: "Used",
   },
 
   pt: {
@@ -3136,5 +3186,30 @@ sellerTimelinePublishedOn:
   "Publicada em",
 sellerTimelineVerifiedReview:
   "Avaliação verificada",
+  sellerActiveInventory:
+  "INVENTÁRIO DO VENDEDOR",
+sellerActiveTitle:
+  "Produtos ativos",
+sellerActiveEmpty:
+  "Este vendedor ainda não tem produtos ativos.",
+
+sellerActiveFeatured: "DESTAQUE",
+sellerActiveAvailable: "DISPONÍVEL",
+sellerActiveRemoveFavorite:
+  "Remover dos favoritos",
+sellerActiveAddFavorite:
+  "Adicionar aos favoritos",
+sellerActiveProductFallback:
+  "Produto ATHMOV",
+sellerActiveDefaultLocation:
+  "Espanha",
+
+sellerConditionNew: "Novo",
+sellerConditionLikeNew:
+  "Como novo",
+sellerConditionExcellent:
+  "Excelente",
+sellerConditionGood: "Bom",
+sellerConditionUsed: "Usado",
   },
 };

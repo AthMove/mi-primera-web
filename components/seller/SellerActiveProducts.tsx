@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useLanguage } from "@/components/LanguageProvider";
 
 interface Product {
   id: string | number;
@@ -30,20 +31,85 @@ export default function SellerActiveProducts({
   safeImage,
   onProductClick,
   onToggleFavorite,
-  eyebrow = "INVENTARIO DEL VENDEDOR",
-  emptyText = "Este vendedor todavía no tiene productos activos.",
+eyebrow,
+emptyText,
 }: Props) {
+  const { lang, t } = useLanguage();
+
+const locale =
+  lang === "en"
+    ? "en-GB"
+    : lang === "pt"
+      ? "pt-PT"
+      : "es-ES";
+
   const activeProducts = products.filter((product) => !product.sold);
+
+  const getConditionLabel = (
+  condition?: string
+) => {
+  const value = condition
+    ?.toLowerCase()
+    .trim();
+
+  if (
+    value === "new" ||
+    value === "nuevo" ||
+    value === "novo"
+  ) {
+    return t.sellerConditionNew;
+  }
+
+  if (
+    value === "like new" ||
+    value === "como nuevo" ||
+    value === "como novo"
+  ) {
+    return t.sellerConditionLikeNew;
+  }
+
+  if (
+    value === "excellent" ||
+    value === "excelente"
+  ) {
+    return t.sellerConditionExcellent;
+  }
+
+  if (
+    value === "good" ||
+    value === "bueno" ||
+    value === "bom"
+  ) {
+    return t.sellerConditionGood;
+  }
+
+  if (
+    value === "used" ||
+    value === "usado"
+  ) {
+    return t.sellerConditionUsed;
+  }
+
+  return condition ||
+    t.sellerConditionExcellent;
+};
 
   return (
     <section className="seller-active-section">
       <div className="section-header">
-        <p>{eyebrow}</p>
-        <h2>Productos activos</h2>
+        <p>
+  {eyebrow || t.sellerActiveInventory}
+</p>
+
+<h2>
+  {t.sellerActiveTitle}
+</h2>
       </div>
 
       {activeProducts.length === 0 ? (
-        <div className="empty-state">{emptyText}</div>
+       <div className="empty-state">
+  {emptyText || t.sellerActiveEmpty}
+</div>
       ) : (
         <div className="products-grid">
           {activeProducts.map((product) => {
@@ -57,17 +123,19 @@ export default function SellerActiveProducts({
               >
                 <div className="image-wrapper">
                   <span className="product-badge">
-                    {product.featured ? "⭐ DESTACADO" : "DISPONIBLE"}
+                   {product.featured
+  ? `⭐ ${t.sellerActiveFeatured}`
+  : t.sellerActiveAvailable}
                   </span>
 
                   <button
                     type="button"
                     className="favorite-button"
-                    aria-label={
-                      isFavorite
-                        ? "Eliminar de favoritos"
-                        : "Añadir a favoritos"
-                    }
+                  aria-label={
+  isFavorite
+    ? t.sellerActiveRemoveFavorite
+    : t.sellerActiveAddFavorite
+}
                     onClick={(event) => {
                       event.stopPropagation();
                       onToggleFavorite(product);
@@ -79,7 +147,10 @@ export default function SellerActiveProducts({
                   <Image
                     className="product-image"
                     src={safeImage(product.image)}
-                    alt={product.title || "Producto ATHMOV"}
+                   alt={
+  product.title ||
+  t.sellerActiveProductFallback
+}
                     fill
                     sizes="(max-width: 700px) 100vw, 33vw"
                   />
@@ -88,15 +159,32 @@ export default function SellerActiveProducts({
                 <div className="card-content">
                   <p className="brand">{product.brand || "ATHMOV"}</p>
 
-                  <h3>{product.title}</h3>
+                 <h3>
+  {product.title ||
+    t.sellerActiveProductFallback}
+</h3>
 
-                  <p className="price">{product.price} €</p>
+                 <p className="price">
+  {new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "EUR",
+  }).format(Number(product.price || 0))}
+</p>
 
-                  <div className="product-meta">
-                    <span>{product.location || "España"}</span>
-                    <span>•</span>
-                    <span>{product.condition || "Excelente"}</span>
-                  </div>
+                <div className="product-meta">
+  <span>
+    {product.location ||
+      t.sellerActiveDefaultLocation}
+  </span>
+
+  <span>•</span>
+
+  <span>
+    {getConditionLabel(
+      product.condition
+    )}
+  </span>
+</div>
                 </div>
               </article>
             );
