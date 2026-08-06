@@ -17,7 +17,8 @@ import SellerTabs from "@/components/seller/SellerTabs";
 export default function SellerPage() {
   const params = useParams();
   const router = useRouter();
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
+  
   const sellerId = String(params.id);
 
   const [loading, setLoading] = useState(true);
@@ -132,7 +133,7 @@ setFavorites((prev) =>
   prev.filter((id) => id !== String(product.id))
 );
 
-alert("Eliminado de favoritos");
+alert(t.sellerFavoriteRemoved);
 return;
   }
 
@@ -146,7 +147,7 @@ await supabase.from("favorites").insert([
 
 setFavorites((prev) => [...prev, String(product.id)]);
 
-alert("Añadido a favoritos");
+alert(t.sellerFavoriteAdded);
 };
 
 const toggleFollowSeller = async () => {
@@ -160,7 +161,7 @@ const toggleFollowSeller = async () => {
   }
 
   if (user.id === sellerId) {
-    alert("No puedes seguir tu propio perfil");
+   alert(t.sellerCannotFollowYourself);
     return;
   }
 
@@ -203,7 +204,7 @@ const sellerName =
   seller?.full_name ||
   seller?.username ||
   seller?.email ||
-  "Vendedor ATHMOV";
+  t.sellerDefaultName;
 
 const soldCount =
   seller?.total_sales ??
@@ -256,14 +257,14 @@ const trustPercentage = Math.round(sellerTrustScore * 10);
 
 const trustLabel =
   sellerTrustScore >= 9.5
-    ? "EXCELENTE"
+    ? t.sellerTrustExcellent
     : sellerTrustScore >= 8.5
-    ? "MUY BUENO"
-    : sellerTrustScore >= 7.5
-    ? "BUENO"
-    : seller?.seller_verified
-    ? "VERIFICADO"
-    : "NUEVO";
+      ? t.sellerTrustVeryGood
+      : sellerTrustScore >= 7.5
+        ? t.sellerTrustGood
+        : seller?.seller_verified
+          ? t.sellerTrustVerified
+          : t.sellerTrustNew;
 
   if (loading) {
     return <main style={pageStyle}>{t.loadingSeller}</main>;
@@ -271,16 +272,25 @@ const trustLabel =
 
   return (
     <main style={pageStyle} className="seller-page">
-      <nav className="seller-breadcrumb">
-  <span onClick={() => router.push("/")}>Inicio</span>
-
-  <span className="seller-breadcrumb-separator">›</span>
-
-  <span onClick={() => router.push("/products")}>
-    Marketplace
+ <nav
+  className="seller-breadcrumb"
+  aria-label={t.sellerBreadcrumbLabel}
+>
+  <span onClick={() => router.push("/")}>
+    {t.home}
   </span>
 
-  <span className="seller-breadcrumb-separator">›</span>
+  <span className="seller-breadcrumb-separator">
+    ›
+  </span>
+
+  <span onClick={() => router.push("/products")}>
+    {t.marketplace}
+  </span>
+
+  <span className="seller-breadcrumb-separator">
+    ›
+  </span>
 
   <strong>{sellerName}</strong>
 </nav>
@@ -290,7 +300,7 @@ const trustLabel =
   className="seller-back-button"
   onClick={() => router.back()}
 >
-  ← Volver
+ ← {t.back}
 </button>
    <SellerHero
   seller={seller}
@@ -301,12 +311,16 @@ const trustLabel =
   scrollY={scrollY}
   safeImage={safeImage}
   onFollow={toggleFollowSeller}
-  onShare={() => {
-    navigator.clipboard
-      .writeText(window.location.href)
-      .then(() => alert("Enlace copiado"))
-      .catch(() => alert("No se pudo copiar el enlace"));
-  }}
+ onShare={() => {
+  navigator.clipboard
+    .writeText(window.location.href)
+    .then(() =>
+      alert(t.sellerLinkCopied)
+    )
+    .catch(() =>
+      alert(t.sellerLinkCopyError)
+    );
+}}
   onLeaveReview={() =>
     router.push(`/seller/${sellerId}/review`)
   }
@@ -324,27 +338,27 @@ const trustLabel =
   style={floatingStatsStyle}
   className="floating-stats"
 >
-  {[
-   {
-  label: "TRUST SCORE",
-  value:
-    totalReviews === 0 && soldCount === 0
-      ? "NEW"
-      : sellerTrustScore.toFixed(1),
-},
-    {
-      label: "VENTAS",
-      value: soldCount,
-    },
-    {
-  label: "SEGUIDORES",
-  value: followersCount,
-},
-    {
-      label: "VALORACIÓN",
-      value: `★ ${averageRating}`,
-    },
-  ].map((item) => (
+ {[
+  {
+    label: t.sellerTrustScoreLabel,
+    value:
+      totalReviews === 0 && soldCount === 0
+        ? t.sellerNewShort
+        : sellerTrustScore.toFixed(1),
+  },
+  {
+    label: t.sellerSalesLabel,
+    value: soldCount,
+  },
+  {
+    label: t.sellerFollowersLabel,
+    value: followersCount,
+  },
+  {
+    label: t.sellerRatingLabel,
+    value: `★ ${averageRating}`,
+  },
+].map((item) => (
     <div key={item.label} style={floatingStatItemStyle}>
       <p style={floatingStatLabelStyle}>{item.label}</p>
       <h2 style={floatingStatValueStyle}>{item.value}</h2>
@@ -352,7 +366,7 @@ const trustLabel =
   ))}
 </section>
 
-   <SellerDashboard
+  <SellerDashboard
   trustLabel={trustLabel}
   trustPercentage={trustPercentage}
   sellerTrustScore={sellerTrustScore}
@@ -399,7 +413,7 @@ const trustLabel =
 )}
 
 {activeTab === "sold" && (
-  <SellerSoldProducts
+ <SellerSoldProducts
     products={products}
     safeImage={safeImage}
     onProductClick={(productId) =>
@@ -409,7 +423,7 @@ const trustLabel =
 )}
 
 {activeTab === "reviews" && (
-  <SellerReviews
+ <SellerReviews
     reviews={reviews}
     eyebrow={t.buyerFeedback}
     noComment={t.noComment}

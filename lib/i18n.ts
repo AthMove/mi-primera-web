@@ -937,6 +937,32 @@ offersEmptyText:
 offersPending: "Oferta pendiente",
 offersAccept: "Aceptar",
 offersReject: "Rechazar",
+sellerFavoriteRemoved:
+  "Eliminado de favoritos",
+sellerFavoriteAdded:
+  "Añadido a favoritos",
+sellerCannotFollowYourself:
+  "No puedes seguir tu propio perfil",
+sellerDefaultName:
+  "Vendedor ATHMOV",
+
+sellerTrustExcellent: "EXCELENTE",
+sellerTrustVeryGood: "MUY BUENO",
+sellerTrustGood: "BUENO",
+sellerTrustVerified: "VERIFICADO",
+sellerTrustNew: "NUEVO",
+
+sellerBreadcrumbLabel:
+  "Navegación del perfil del vendedor",
+sellerLinkCopied: "Enlace copiado",
+sellerLinkCopyError:
+  "No se pudo copiar el enlace",
+
+sellerTrustScoreLabel: "TRUST SCORE",
+sellerSalesLabel: "VENTAS",
+sellerFollowersLabel: "SEGUIDORES",
+sellerRatingLabel: "VALORACIÓN",
+sellerNewShort: "NUEVO",
   },
 
 
@@ -1877,6 +1903,32 @@ offersEmptyText:
 offersPending: "Pending offer",
 offersAccept: "Accept",
 offersReject: "Reject",
+sellerFavoriteRemoved:
+  "Removed from favourites",
+sellerFavoriteAdded:
+  "Added to favourites",
+sellerCannotFollowYourself:
+  "You cannot follow your own profile",
+sellerDefaultName:
+  "ATHMOV seller",
+
+sellerTrustExcellent: "EXCELLENT",
+sellerTrustVeryGood: "VERY GOOD",
+sellerTrustGood: "GOOD",
+sellerTrustVerified: "VERIFIED",
+sellerTrustNew: "NEW",
+
+sellerBreadcrumbLabel:
+  "Seller profile navigation",
+sellerLinkCopied: "Link copied",
+sellerLinkCopyError:
+  "The link could not be copied",
+
+sellerTrustScoreLabel: "TRUST SCORE",
+sellerSalesLabel: "SALES",
+sellerFollowersLabel: "FOLLOWERS",
+sellerRatingLabel: "RATING",
+sellerNewShort: "NEW",
   },
 
   pt: {
@@ -2822,5 +2874,31 @@ offersEmptyText:
 offersPending: "Oferta pendente",
 offersAccept: "Aceitar",
 offersReject: "Rejeitar",
+sellerFavoriteRemoved:
+  "Removido dos favoritos",
+sellerFavoriteAdded:
+  "Adicionado aos favoritos",
+sellerCannotFollowYourself:
+  "Não pode seguir o seu próprio perfil",
+sellerDefaultName:
+  "Vendedor ATHMOV",
+
+sellerTrustExcellent: "EXCELENTE",
+sellerTrustVeryGood: "MUITO BOM",
+sellerTrustGood: "BOM",
+sellerTrustVerified: "VERIFICADO",
+sellerTrustNew: "NOVO",
+
+sellerBreadcrumbLabel:
+  "Navegação do perfil do vendedor",
+sellerLinkCopied: "Ligação copiada",
+sellerLinkCopyError:
+  "Não foi possível copiar a ligação",
+
+sellerTrustScoreLabel: "TRUST SCORE",
+sellerSalesLabel: "VENDAS",
+sellerFollowersLabel: "SEGUIDORES",
+sellerRatingLabel: "AVALIAÇÃO",
+sellerNewShort: "NOVO",
   },
 };
