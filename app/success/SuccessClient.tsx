@@ -50,12 +50,14 @@ export default function SuccessClient() {
 
         <p style={eyebrowStyle}>{t.checkoutEyebrow}</p>
 
-       <h1 style={titleStyle}>
-  {loading ? "Procesando tu pedido" : "Pago confirmado"}
+  <h1 style={titleStyle}>
+  {loading
+    ? t.successProcessingOrder
+    : t.successPaymentConfirmed}
 </h1>
 
-        <p style={textStyle}>
-  Tu compra está protegida por ATHMOV. El vendedor ha sido notificado y podrás seguir el estado del envío desde tus pedidos.
+<p style={textStyle}>
+  {t.successProtectionText}
 </p>
 
         <div style={timelineStyle}>
@@ -87,28 +89,40 @@ export default function SuccessClient() {
         </div>
 
 <div style={nextStepStyle}>
-  <p style={nextStepLabelStyle}>SIGUIENTE PASO</p>
-  <h3 style={nextStepTitleStyle}>El vendedor preparará el envío</h3>
+  <p style={nextStepLabelStyle}>
+    {t.successNextStepLabel}
+  </p>
+
+  <h3 style={nextStepTitleStyle}>
+    {t.successNextStepTitle}
+  </h3>
+
   <p style={nextStepTextStyle}>
-    Te avisaremos cuando el pedido tenga número de seguimiento.
+    {t.successNextStepText}
   </p>
 </div>
 
-        <div style={actionsStyle}>
-          <button
-            onClick={() => (window.location.href = "/orders")}
-            style={buttonStyle}
-          >
-            {t.viewOrder}
-          </button>
+     <div style={actionsStyle}>
+  <button
+    type="button"
+    onClick={() =>
+      (window.location.href = "/orders")
+    }
+    style={buttonStyle}
+  >
+    {t.viewOrder}
+  </button>
 
-          <button
-            onClick={() => (window.location.href = "/products")}
-            style={secondaryButtonStyle}
-          >
-            {t.continueShopping}
-          </button>
-        </div>
+  <button
+    type="button"
+    onClick={() =>
+      (window.location.href = "/products")
+    }
+    style={secondaryButtonStyle}
+  >
+    {t.continueShopping}
+  </button>
+</div>
       </section>
     </main>
   );

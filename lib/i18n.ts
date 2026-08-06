@@ -1215,6 +1215,19 @@ sellerPageTransferPending: "Pendiente",
 sellerPageTransferReleased: "Liberado",
 sellerPageTransferCancelled: "Cancelado",
 sellerPageTransferRefunded: "Reembolsado",
+successProcessingOrder:
+  "Procesando tu pedido",
+successPaymentConfirmed:
+  "Pago confirmado",
+successProtectionText:
+  "Tu compra está protegida por ATHMOV. El vendedor ha sido notificado y podrás seguir el estado del envío desde tus pedidos.",
+
+successNextStepLabel:
+  "SIGUIENTE PASO",
+successNextStepTitle:
+  "El vendedor preparará el envío",
+successNextStepText:
+  "Te avisaremos cuando el pedido tenga número de seguimiento.",
   },
 
 
@@ -2427,6 +2440,19 @@ sellerPageTransferPending: "Pending",
 sellerPageTransferReleased: "Released",
 sellerPageTransferCancelled: "Cancelled",
 sellerPageTransferRefunded: "Refunded",
+successProcessingOrder:
+  "Processing your order",
+successPaymentConfirmed:
+  "Payment confirmed",
+successProtectionText:
+  "Your purchase is protected by ATHMOV. The seller has been notified and you can track the shipping status from your orders.",
+
+successNextStepLabel:
+  "NEXT STEP",
+successNextStepTitle:
+  "The seller will prepare the shipment",
+successNextStepText:
+  "We will notify you when the order has a tracking number.",
   },
 
   pt: {
@@ -3653,5 +3679,18 @@ sellerPageTransferPending: "Pendente",
 sellerPageTransferReleased: "Libertado",
 sellerPageTransferCancelled: "Cancelado",
 sellerPageTransferRefunded: "Reembolsado",
+successProcessingOrder:
+  "A processar a sua encomenda",
+successPaymentConfirmed:
+  "Pagamento confirmado",
+successProtectionText:
+  "A sua compra está protegida pela ATHMOV. O vendedor foi notificado e poderá acompanhar o estado do envio nas suas encomendas.",
+
+successNextStepLabel:
+  "PRÓXIMO PASSO",
+successNextStepTitle:
+  "O vendedor irá preparar o envio",
+successNextStepText:
+  "Será notificado quando a encomenda tiver um número de seguimento.",
   },
 };
