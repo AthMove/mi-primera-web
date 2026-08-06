@@ -1,5 +1,7 @@
 "use client";
 
+import { useLanguage } from "@/components/LanguageProvider";
+
 interface Review {
   id?: string;
   rating?: number | string;
@@ -22,41 +24,64 @@ export default function SellerTimeline({
   soldCount,
   reviews,
 }: SellerTimelineProps) {
+  const { lang, t } = useLanguage();
+
+const locale =
+  lang === "en"
+    ? "en-GB"
+    : lang === "pt"
+      ? "pt-PT"
+      : "es-ES";
+
   const latestReview = reviews[0];
 
   const memberYear = seller?.created_at
     ? new Date(seller.created_at).getFullYear()
     : "2025";
 
-  const latestReviewDate = latestReview?.created_at
-    ? new Date(latestReview.created_at).toLocaleDateString("es-ES")
-    : "";
+const latestReviewDate = latestReview?.created_at
+  ? new Date(
+      latestReview.created_at
+    ).toLocaleDateString(locale)
+  : "";
 
   return (
     <section className="seller-timeline">
       <div className="timeline-heading">
-        <p>SELLER HISTORY</p>
-        <h2>Historial del vendedor</h2>
-      </div>
+  <p>{t.sellerTimelineEyebrow}</p>
+
+  <h2>{t.sellerTimelineTitle}</h2>
+</div>
 
       <div className="timeline">
         <article className="timeline-item">
           <div className="timeline-dot">✓</div>
 
-          <div className="timeline-content">
-            <strong>Se unió a ATHMOV</strong>
-            <p>Miembro desde {memberYear}</p>
-          </div>
+       <div className="timeline-content">
+  <strong>
+    {t.sellerTimelineJoined}
+  </strong>
+
+  <p>
+    {t.sellerTimelineMemberSince}{" "}
+    {memberYear}
+  </p>
+</div>
         </article>
 
         {seller?.seller_verified && (
           <article className="timeline-item">
             <div className="timeline-dot">✓</div>
 
-            <div className="timeline-content">
-              <strong>Perfil verificado</strong>
-              <p>Identidad comprobada por ATHMOV</p>
-            </div>
+           <div className="timeline-content">
+  <strong>
+    {t.sellerTimelineVerifiedProfile}
+  </strong>
+
+  <p>
+    {t.sellerTimelineIdentityVerified}
+  </p>
+</div>
           </article>
         )}
 
@@ -64,13 +89,18 @@ export default function SellerTimeline({
           <article className="timeline-item">
             <div className="timeline-dot">📦</div>
 
-            <div className="timeline-content">
-              <strong>
-                {soldCount} {soldCount === 1 ? "venta completada" : "ventas completadas"}
-              </strong>
+<div className="timeline-content">
+  <strong>
+    {soldCount}{" "}
+    {soldCount === 1
+      ? t.sellerTimelineSaleSingular
+      : t.sellerTimelineSalePlural}
+  </strong>
 
-              <p>Productos vendidos a través de ATHMOV</p>
-            </div>
+  <p>
+    {t.sellerTimelineProductsSold}
+  </p>
+</div>
           </article>
         )}
 
@@ -78,17 +108,18 @@ export default function SellerTimeline({
           <article className="timeline-item">
             <div className="timeline-dot">★</div>
 
-            <div className="timeline-content">
-              <strong>
-                Última valoración: {Number(latestReview.rating || 0)}/5
-              </strong>
+          <div className="timeline-content">
+  <strong>
+    {t.sellerTimelineLatestReview}:{" "}
+    {Number(latestReview.rating || 0)}/5
+  </strong>
 
-              <p>
-                {latestReviewDate
-                  ? `Publicada el ${latestReviewDate}`
-                  : "Valoración verificada"}
-              </p>
-            </div>
+  <p>
+    {latestReviewDate
+      ? `${t.sellerTimelinePublishedOn} ${latestReviewDate}`
+      : t.sellerTimelineVerifiedReview}
+  </p>
+</div>
           </article>
         )}
       </div>

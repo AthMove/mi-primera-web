@@ -1013,6 +1013,34 @@ sellerDashboardResponse: "Respuesta",
 sellerDashboardDefaultResponse: "< 1 hora",
 sellerDashboardAverageTime:
   "Tiempo medio",
+  sellerTimelineEyebrow:
+  "HISTORIAL DEL VENDEDOR",
+sellerTimelineTitle:
+  "Historial del vendedor",
+
+sellerTimelineJoined:
+  "Se unió a ATHMOV",
+sellerTimelineMemberSince:
+  "Miembro desde",
+
+sellerTimelineVerifiedProfile:
+  "Perfil verificado",
+sellerTimelineIdentityVerified:
+  "Identidad comprobada por ATHMOV",
+
+sellerTimelineSaleSingular:
+  "venta completada",
+sellerTimelineSalePlural:
+  "ventas completadas",
+sellerTimelineProductsSold:
+  "Productos vendidos a través de ATHMOV",
+
+sellerTimelineLatestReview:
+  "Última valoración",
+sellerTimelinePublishedOn:
+  "Publicada el",
+sellerTimelineVerifiedReview:
+  "Valoración verificada",
   },
 
 
@@ -2029,6 +2057,34 @@ sellerDashboardResponse: "Response",
 sellerDashboardDefaultResponse: "< 1 hour",
 sellerDashboardAverageTime:
   "Average time",
+  sellerTimelineEyebrow:
+  "SELLER HISTORY",
+sellerTimelineTitle:
+  "Seller history",
+
+sellerTimelineJoined:
+  "Joined ATHMOV",
+sellerTimelineMemberSince:
+  "Member since",
+
+sellerTimelineVerifiedProfile:
+  "Verified profile",
+sellerTimelineIdentityVerified:
+  "Identity verified by ATHMOV",
+
+sellerTimelineSaleSingular:
+  "completed sale",
+sellerTimelineSalePlural:
+  "completed sales",
+sellerTimelineProductsSold:
+  "Products sold through ATHMOV",
+
+sellerTimelineLatestReview:
+  "Latest review",
+sellerTimelinePublishedOn:
+  "Published on",
+sellerTimelineVerifiedReview:
+  "Verified review",
   },
 
   pt: {
@@ -3052,5 +3108,33 @@ sellerDashboardResponse: "Resposta",
 sellerDashboardDefaultResponse: "< 1 hora",
 sellerDashboardAverageTime:
   "Tempo médio",
+  sellerTimelineEyebrow:
+  "HISTÓRICO DO VENDEDOR",
+sellerTimelineTitle:
+  "Histórico do vendedor",
+
+sellerTimelineJoined:
+  "Aderiu à ATHMOV",
+sellerTimelineMemberSince:
+  "Membro desde",
+
+sellerTimelineVerifiedProfile:
+  "Perfil verificado",
+sellerTimelineIdentityVerified:
+  "Identidade verificada pela ATHMOV",
+
+sellerTimelineSaleSingular:
+  "venda concluída",
+sellerTimelineSalePlural:
+  "vendas concluídas",
+sellerTimelineProductsSold:
+  "Produtos vendidos através da ATHMOV",
+
+sellerTimelineLatestReview:
+  "Última avaliação",
+sellerTimelinePublishedOn:
+  "Publicada em",
+sellerTimelineVerifiedReview:
+  "Avaliação verificada",
   },
 };
