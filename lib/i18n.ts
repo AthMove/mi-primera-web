@@ -1082,7 +1082,46 @@ sellerSoldCompleted:
 sellerTabsSold: "Vendidos",
 sellerTabsReviews: "Valoraciones",
 reviewRatingLabel: "Puntuación",
-reviewCommentLabel: "Comentario de la valoración",
+reviewCommentLabel: "Comentario de la valoración",disputeLoading: "Cargando...",
+disputeOrderNotFound:
+  "Pedido no encontrado",
+disputeCompleteFields:
+  "Completa todos los campos",
+disputeMaxFiles:
+  "Puedes subir un máximo de 5 archivos",
+disputeNoPermission:
+  "No tienes permiso para abrir una disputa en este pedido",
+disputeAlreadyOpen:
+  "Este pedido ya tiene una disputa abierta",
+disputeOpened:
+  "Disputa abierta",
+disputeUnexpectedError:
+  "Error inesperado al abrir la disputa",
+
+disputeEyebrow:
+  "PROTECCIÓN ATHMOV",
+disputeTitle:
+  "Abrir disputa",
+disputeReasonPlaceholder:
+  "Motivo",
+disputeReasonLabel:
+  "Motivo de la disputa",
+disputeDescriptionPlaceholder:
+  "Describe el problema",
+disputeDescriptionLabel:
+  "Descripción del problema",
+
+disputeEvidenceTitle:
+  "Fotos como prueba",
+disputeEvidenceHint:
+  "Sube hasta 5 imágenes para ayudar a ATHMOV a revisar el caso.",
+disputeEvidenceLabel:
+  "Seleccionar imágenes como prueba",
+
+disputeOpening:
+  "Abriendo...",
+disputeSubmit:
+  "Enviar disputa",
   },
 
 
@@ -2169,6 +2208,46 @@ sellerTabsSold: "Sold",
 sellerTabsReviews: "Reviews",
 reviewRatingLabel: "Rating",
 reviewCommentLabel: "Review comment",
+disputeLoading: "Cargando...",
+disputeOrderNotFound:
+  "Pedido no encontrado",
+disputeCompleteFields:
+  "Completa todos los campos",
+disputeMaxFiles:
+  "Puedes subir un máximo de 5 archivos",
+disputeNoPermission:
+  "No tienes permiso para abrir una disputa en este pedido",
+disputeAlreadyOpen:
+  "Este pedido ya tiene una disputa abierta",
+disputeOpened:
+  "Disputa abierta",
+disputeUnexpectedError:
+  "Error inesperado al abrir la disputa",
+
+disputeEyebrow:
+  "PROTECCIÓN ATHMOV",
+disputeTitle:
+  "Abrir disputa",
+disputeReasonPlaceholder:
+  "Motivo",
+disputeReasonLabel:
+  "Motivo de la disputa",
+disputeDescriptionPlaceholder:
+  "Describe el problema",
+disputeDescriptionLabel:
+  "Descripción del problema",
+
+disputeEvidenceTitle:
+  "Fotos como prueba",
+disputeEvidenceHint:
+  "Sube hasta 5 imágenes para ayudar a ATHMOV a revisar el caso.",
+disputeEvidenceLabel:
+  "Seleccionar imágenes como prueba",
+
+disputeOpening:
+  "Abriendo...",
+disputeSubmit:
+  "Enviar disputa",
   },
 
   pt: {
@@ -3262,5 +3341,45 @@ sellerTabsSold: "Vendidos",
 sellerTabsReviews: "Avaliações",
 reviewRatingLabel: "Classificação",
 reviewCommentLabel: "Comentário da avaliação",
+disputeLoading: "A carregar...",
+disputeOrderNotFound:
+  "Encomenda não encontrada",
+disputeCompleteFields:
+  "Preencha todos os campos",
+disputeMaxFiles:
+  "Pode carregar um máximo de 5 ficheiros",
+disputeNoPermission:
+  "Não tem permissão para abrir uma disputa nesta encomenda",
+disputeAlreadyOpen:
+  "Esta encomenda já tem uma disputa aberta",
+disputeOpened:
+  "Disputa aberta",
+disputeUnexpectedError:
+  "Erro inesperado ao abrir a disputa",
+
+disputeEyebrow:
+  "PROTEÇÃO ATHMOV",
+disputeTitle:
+  "Abrir disputa",
+disputeReasonPlaceholder:
+  "Motivo",
+disputeReasonLabel:
+  "Motivo da disputa",
+disputeDescriptionPlaceholder:
+  "Descreva o problema",
+disputeDescriptionLabel:
+  "Descrição do problema",
+
+disputeEvidenceTitle:
+  "Fotografias como prova",
+disputeEvidenceHint:
+  "Carregue até 5 imagens para ajudar a ATHMOV a analisar o caso.",
+disputeEvidenceLabel:
+  "Selecionar imagens como prova",
+
+disputeOpening:
+  "A abrir...",
+disputeSubmit:
+  "Enviar disputa",
   },
 };

@@ -2,16 +2,26 @@
 
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function CreateDisputePage() {
+  const { t } = useLanguage();
+
   return (
-    <Suspense fallback={<main style={{ padding: 140 }}>Cargando...</main>}>
+    <Suspense
+      fallback={
+        <main style={{ padding: 140 }}>
+          {t.disputeLoading}
+        </main>
+      }
+    >
       <CreateDisputeContent />
     </Suspense>
   );
 }
 
 function CreateDisputeContent() {
+  const { t } = useLanguage();
   const searchParams = useSearchParams();
   const orderId = searchParams.get("order");
 
@@ -22,17 +32,17 @@ function CreateDisputeContent() {
 
   const submitDispute = async () => {
     if (!orderId) {
-      alert("Pedido no encontrado");
+      alert(t.disputeOrderNotFound);
       return;
     }
 
     if (!reason.trim() || !description.trim()) {
-      alert("Completa todos los campos");
+     alert(t.disputeCompleteFields);
       return;
     }
 
     if (files.length > 5) {
-      alert("Puedes subir un máximo de 5 archivos");
+     alert(t.disputeMaxFiles);
       return;
     }
 
@@ -57,17 +67,20 @@ function CreateDisputeContent() {
         .maybeSingle();
 
       if (orderError || !order) {
-        alert(orderError?.message || "Pedido no encontrado");
+       alert(
+  orderError?.message ||
+    t.disputeOrderNotFound
+);
         return;
       }
 
       if (user.id !== order.buyer_id && user.id !== order.seller_id) {
-        alert("No tienes permiso para abrir una disputa en este pedido");
+       alert(t.disputeNoPermission);
         return;
       }
 
       if (order.dispute_status === "open") {
-        alert("Este pedido ya tiene una disputa abierta");
+        alert(t.disputeAlreadyOpen);
         return;
       }
 
@@ -163,11 +176,11 @@ function CreateDisputeContent() {
         }),
       });
 
-      alert("Disputa abierta");
+     alert(t.disputeOpened);
       window.location.href = "/orders";
     } catch (err) {
       console.error("ERROR AL CREAR DISPUTA:", err);
-      alert("Error inesperado al abrir la disputa");
+     alert(t.disputeUnexpectedError);
     } finally {
       setLoading(false);
     }
@@ -176,34 +189,44 @@ function CreateDisputeContent() {
   return (
     <main style={pageStyle}>
       <div style={cardStyle}>
-        <p style={eyebrowStyle}>PROTECCIÓN ATHMOV</p>
-        <h1 style={titleStyle}>Abrir disputa</h1>
+   <p style={eyebrowStyle}>
+  {t.disputeEyebrow}
+</p>
 
-        <input
-          placeholder="Motivo"
-          value={reason}
-          onChange={(e) => setReason(e.target.value)}
-          style={inputStyle}
-        />
+<h1 style={titleStyle}>
+  {t.disputeTitle}
+</h1>
 
-        <textarea
-          placeholder="Describe el problema"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          style={textareaStyle}
-        />
+       <input
+  placeholder={t.disputeReasonPlaceholder}
+  aria-label={t.disputeReasonLabel}
+  value={reason}
+  onChange={(e) => setReason(e.target.value)}
+  style={inputStyle}
+/>
+
+       <textarea
+  placeholder={t.disputeDescriptionPlaceholder}
+  aria-label={t.disputeDescriptionLabel}
+  value={description}
+  onChange={(e) => setDescription(e.target.value)}
+  style={textareaStyle}
+/>
 
         <div style={uploadBoxStyle}>
-          <strong>Fotos como prueba</strong>
+        <strong>
+  {t.disputeEvidenceTitle}
+</strong>
 
-          <p style={hintStyle}>
-            Sube hasta 5 imágenes para ayudar a ATHMOV a revisar el caso.
-          </p>
+<p style={hintStyle}>
+  {t.disputeEvidenceHint}
+</p>
 
           <input
             type="file"
             accept="image/*"
             multiple
+            aria-label={t.disputeEvidenceLabel}
             onChange={(e) => {
               const selected = Array.from(e.target.files || []).slice(0, 5);
               setFiles(selected);
@@ -221,9 +244,22 @@ function CreateDisputeContent() {
           )}
         </div>
 
-        <button onClick={submitDispute} disabled={loading} style={buttonStyle}>
-          {loading ? "Abriendo..." : "Enviar disputa"}
-        </button>
+      <button
+  type="button"
+  onClick={submitDispute}
+  disabled={loading}
+  style={{
+    ...buttonStyle,
+    opacity: loading ? 0.6 : 1,
+    cursor: loading
+      ? "not-allowed"
+      : "pointer",
+  }}
+>
+  {loading
+    ? t.disputeOpening
+    : t.disputeSubmit}
+</button>
       </div>
     </main>
   );
