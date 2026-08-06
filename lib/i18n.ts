@@ -1081,6 +1081,8 @@ sellerSoldCompleted:
   sellerTabsActive: "Activos",
 sellerTabsSold: "Vendidos",
 sellerTabsReviews: "Valoraciones",
+reviewRatingLabel: "Puntuación",
+reviewCommentLabel: "Comentario de la valoración",
   },
 
 
@@ -2165,6 +2167,8 @@ sellerSoldCompleted:
   sellerTabsActive: "Active",
 sellerTabsSold: "Sold",
 sellerTabsReviews: "Reviews",
+reviewRatingLabel: "Rating",
+reviewCommentLabel: "Review comment",
   },
 
   pt: {
@@ -3256,5 +3260,7 @@ sellerSoldCompleted:
   sellerTabsActive: "Ativos",
 sellerTabsSold: "Vendidos",
 sellerTabsReviews: "Avaliações",
+reviewRatingLabel: "Classificação",
+reviewCommentLabel: "Comentário da avaliação",
   },
 };

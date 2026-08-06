@@ -56,12 +56,12 @@ export default function SellerReviewPage() {
       return;
     }
 
-    const { data: existingReview } = await supabase
-      .from("seller_reviews")
-      .select("id")
-      .eq("seller_id", sellerId)
-      .eq("buyer_id", user.id)
-      .maybeSingle();
+   const { data: existingReview } = await supabase
+  .from("reviews")
+  .select("id")
+  .eq("seller_id", sellerId)
+  .eq("buyer_id", user.id)
+  .maybeSingle();
 
     if (existingReview) {
       setLoading(false);
@@ -69,7 +69,7 @@ export default function SellerReviewPage() {
       return;
     }
 
-    const { error } = await supabase.from("seller_reviews").insert([
+    const { error } = await supabase.from("reviews").insert([
       {
         seller_id: sellerId,
         buyer_id: user.id,
@@ -101,6 +101,7 @@ export default function SellerReviewPage() {
             value={rating}
             onChange={(e) => setRating(e.target.value)}
             style={inputStyle}
+            aria-label={t.reviewRatingLabel}
           >
             <option value="5">★★★★★ 5</option>
             <option value="4">★★★★ 4</option>
@@ -113,6 +114,7 @@ export default function SellerReviewPage() {
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             placeholder={t.reviewPlaceholder}
+            aria-label={t.reviewCommentLabel}
             required
             style={textareaStyle}
           />
