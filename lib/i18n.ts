@@ -1228,6 +1228,34 @@ successNextStepTitle:
   "El vendedor preparará el envío",
 successNextStepText:
   "Te avisaremos cuando el pedido tenga número de seguimiento.",
+  verifySubmitted:
+  "Verificación enviada",
+
+verifyEyebrow:
+  "VERIFICACIÓN ATHMOV",
+verifyTitle:
+  "Verificación de vendedor",
+verifyDescription:
+  "Sube tu DNI, pasaporte o permiso de conducir para convertirte en vendedor verificado de ATHMOV.",
+
+verifyStatusLabel: "Estado",
+verifyStatusVerified:
+  "Verificado",
+verifyStatusPending:
+  "Pendiente de revisión",
+verifyStatusUnverified:
+  "No verificado",
+
+verifyViewDocument:
+  "Ver documento subido",
+verifyUploadLabel:
+  "Subir documento de verificación",
+verifyUploading:
+  "Subiendo...",
+verifyUploadButton:
+  "Subir DNI o pasaporte",
+verifyAcceptedDocuments:
+  "Aceptado: DNI, pasaporte o permiso de conducir.",
   },
 
 
@@ -2453,6 +2481,34 @@ successNextStepTitle:
   "The seller will prepare the shipment",
 successNextStepText:
   "We will notify you when the order has a tracking number.",
+  verifySubmitted:
+  "Verification submitted",
+
+verifyEyebrow:
+  "ATHMOV VERIFICATION",
+verifyTitle:
+  "Seller verification",
+verifyDescription:
+  "Upload your identity card, passport or driving licence to become a verified ATHMOV seller.",
+
+verifyStatusLabel: "Status",
+verifyStatusVerified:
+  "Verified",
+verifyStatusPending:
+  "Pending review",
+verifyStatusUnverified:
+  "Not verified",
+
+verifyViewDocument:
+  "View uploaded document",
+verifyUploadLabel:
+  "Upload verification document",
+verifyUploading:
+  "Uploading...",
+verifyUploadButton:
+  "Upload ID or passport",
+verifyAcceptedDocuments:
+  "Accepted: identity card, passport or driving licence.",
   },
 
   pt: {
@@ -3692,5 +3748,33 @@ successNextStepTitle:
   "O vendedor irá preparar o envio",
 successNextStepText:
   "Será notificado quando a encomenda tiver um número de seguimento.",
+  verifySubmitted:
+  "Verificação enviada",
+
+verifyEyebrow:
+  "VERIFICAÇÃO ATHMOV",
+verifyTitle:
+  "Verificação do vendedor",
+verifyDescription:
+  "Carregue o seu documento de identificação, passaporte ou carta de condução para se tornar um vendedor verificado da ATHMOV.",
+
+verifyStatusLabel: "Estado",
+verifyStatusVerified:
+  "Verificado",
+verifyStatusPending:
+  "Pendente de revisão",
+verifyStatusUnverified:
+  "Não verificado",
+
+verifyViewDocument:
+  "Ver documento carregado",
+verifyUploadLabel:
+  "Carregar documento de verificação",
+verifyUploading:
+  "A carregar...",
+verifyUploadButton:
+  "Carregar documento ou passaporte",
+verifyAcceptedDocuments:
+  "Aceite: documento de identificação, passaporte ou carta de condução.",
   },
 };

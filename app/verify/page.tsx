@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function VerifyPage() {
+  const { t } = useLanguage();
   const [userId, setUserId] = useState("");
   const [status, setStatus] = useState("unverified");
   const [uploading, setUploading] = useState(false);
@@ -81,7 +83,7 @@ export default function VerifyPage() {
       setStatus("pending");
       setDocumentUrl(publicUrl);
 
-      alert("Verificación enviada");
+     alert(t.verifySubmitted);
     } finally {
       setUploading(false);
       e.target.value = "";
@@ -91,23 +93,29 @@ export default function VerifyPage() {
   return (
     <main style={pageStyle}>
       <section style={cardStyle}>
-        <p style={eyebrowStyle}>ATHMOV VERIFICACIÓN</p>
+        <p style={eyebrowStyle}>
+  {t.verifyEyebrow}
+</p>
 
-        <h1 style={titleStyle}>Verificación de vendedor</h1>
+<h1 style={titleStyle}>
+  {t.verifyTitle}
+</h1>
 
-        <p style={textStyle}>
-          Sube tu DNI, pasaporte o permiso de conducir para convertirte en
-          vendedor verificado de ATHMOV.
-        </p>
+<p style={textStyle}>
+  {t.verifyDescription}
+</p>
 
-        <div style={statusBoxStyle}>
-          <strong>Estado:</strong>{" "}
-          {status === "verified"
-            ? "Verificado ✓"
-            : status === "pending"
-              ? "Pendiente de revisión"
-              : "No verificado"}
-        </div>
+   <div style={statusBoxStyle}>
+  <strong>
+    {t.verifyStatusLabel}:
+  </strong>{" "}
+
+  {status === "verified"
+    ? `${t.verifyStatusVerified} ✓`
+    : status === "pending"
+      ? t.verifyStatusPending
+      : t.verifyStatusUnverified}
+</div>
 
         {documentUrl && (
           <a
@@ -116,13 +124,14 @@ export default function VerifyPage() {
             rel="noopener noreferrer"
             style={linkStyle}
           >
-            Ver documento subido →
+            {t.verifyViewDocument} →
           </a>
         )}
 
         {status !== "verified" && (
           <>
             <label
+            aria-label={t.verifyUploadLabel}
               style={{
                 ...uploadBoxStyle,
                 opacity: uploading ? 0.6 : 1,
@@ -137,12 +146,14 @@ export default function VerifyPage() {
                 style={{ display: "none" }}
               />
 
-              {uploading ? "Subiendo..." : "Subir DNI o pasaporte"}
+             {uploading
+  ? t.verifyUploading
+  : t.verifyUploadButton}
             </label>
 
-            <p style={smallTextStyle}>
-              Aceptado: DNI, pasaporte o permiso de conducir.
-            </p>
+         <p style={smallTextStyle}>
+  {t.verifyAcceptedDocuments}
+</p>
           </>
         )}
       </section>
