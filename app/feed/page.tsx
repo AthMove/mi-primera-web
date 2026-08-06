@@ -4,9 +4,18 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function FeedPage() {
   const router = useRouter();
+  const { lang, t } = useLanguage();
+
+const locale =
+  lang === "en"
+    ? "en-GB"
+    : lang === "pt"
+      ? "pt-PT"
+      : "es-ES";
 
   const [posts, setPosts] = useState<any[]>([]);
   const [featuredDrops, setFeaturedDrops] = useState<any[]>([]);
@@ -92,7 +101,7 @@ export default function FeedPage() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      alert("Debes iniciar sesión");
+      alert(t.feedLoginRequired);
       return;
     }
 
@@ -164,7 +173,7 @@ export default function FeedPage() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      alert("Debes iniciar sesión");
+      alert(t.feedLoginRequired);
       return;
     }
 
@@ -191,7 +200,9 @@ export default function FeedPage() {
   };
 
   const deleteComment = async (commentId: string) => {
-    const confirmDelete = confirm("¿Eliminar este comentario?");
+    const confirmDelete = confirm(
+  t.feedDeleteCommentConfirm
+);
     if (!confirmDelete) return;
 
     await supabase.from("feed_comments").delete().eq("id", commentId);
@@ -205,31 +216,40 @@ export default function FeedPage() {
   return (
     <main style={pageStyle} className="feed-page">
       <section style={heroStyle}>
-        <p style={eyebrowStyle}>FEED ATHMOV</p>
+       <p style={eyebrowStyle}>
+  {t.feedPageEyebrow}
+</p>
 
-        <h1 style={titleStyle} className="feed-title">
-          Drops y comunidad
-        </h1>
+        <h1
+  style={titleStyle}
+  className="feed-title"
+>
+  {t.feedPageTitle}
+</h1>
 
         <p style={subtitleStyle}>
-          Material deportivo premium, drops seleccionados y novedades de la
-          comunidad.
-        </p>
+  {t.feedPageSubtitle}
+</p>
       </section>
 
       {featuredDrops.length > 0 && (
         <section style={featuredSectionStyle}>
           <div style={sectionHeaderStyle}>
             <div>
-              <p style={eyebrowStyle}>SELECCIÓN ATHMOV</p>
-              <h2 style={sectionTitleStyle}>Drops destacados</h2>
+       <p style={eyebrowStyle}>
+  {t.feedFeaturedEyebrow}
+</p>
+
+<h2 style={sectionTitleStyle}>
+  {t.feedFeaturedTitle}
+</h2>
             </div>
 
             <button
               onClick={() => router.push("/products")}
               style={smallButtonStyle}
             >
-              Ver todo →
+              {t.feedViewAll} →
             </button>
           </div>
 
@@ -242,7 +262,7 @@ export default function FeedPage() {
               >
                 <Image
                   src={safeImage(product.image)}
-                  alt={product.title || "Producto"}
+                alt={product.title || t.productFallback}
                   fill
                   sizes="33vw"
                   style={{ objectFit: "cover" }}
@@ -251,7 +271,12 @@ export default function FeedPage() {
                 <div style={featuredOverlayStyle}>
                   <p style={featuredBrandStyle}>{product.brand || "ATHMOV"}</p>
                   <h3 style={featuredTitleStyle}>{product.title}</h3>
-                  <p style={featuredPriceStyle}>€{product.price}</p>
+                 <p style={featuredPriceStyle}>
+  {new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "EUR",
+  }).format(Number(product.price || 0))}
+</p>
                 </div>
               </article>
             ))}
@@ -262,8 +287,13 @@ export default function FeedPage() {
       <section style={recentSectionStyle}>
         <div style={sectionHeaderStyle}>
           <div>
-            <p style={eyebrowStyle}>ÚLTIMOS PRODUCTOS</p>
-            <h2 style={sectionTitleStyle}>Nuevo material</h2>
+          <p style={eyebrowStyle}>
+  {t.feedRecentEyebrow}
+</p>
+
+<h2 style={sectionTitleStyle}>
+  {t.feedRecentTitle}
+</h2>
           </div>
         </div>
 
@@ -277,7 +307,7 @@ export default function FeedPage() {
               <div style={dropImageStyle}>
                 <Image
                   src={safeImage(product.image)}
-                  alt={product.title || "Producto"}
+                  alt={product.title || t.productFallback}
                   fill
                   sizes="220px"
                   style={{ objectFit: "cover" }}
@@ -287,7 +317,12 @@ export default function FeedPage() {
               <div style={dropContentStyle}>
                 <p style={dropBrandStyle}>{product.brand || "ATHMOV"}</p>
                 <h3 style={dropTitleStyle}>{product.title}</h3>
-                <p style={dropPriceStyle}>€{product.price}</p>
+               <p style={dropPriceStyle}>
+  {new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "EUR",
+  }).format(Number(product.price || 0))}
+</p>
               </div>
             </article>
           ))}
@@ -295,35 +330,48 @@ export default function FeedPage() {
       </section>
 
       <section style={createStyle}>
-        <p style={createEyebrowStyle}>PUBLICACIÓN DE LA COMUNIDAD</p>
+        <p style={createEyebrowStyle}>
+  {t.feedCommunityPostEyebrow}
+</p>
 
         <textarea
-          placeholder="Comparte un drop, un outfit, un momento de partido o una opinión sobre material deportivo..."
+         placeholder={t.feedPostPlaceholder}
           value={content}
           onChange={(e) => setContent(e.target.value)}
           style={textareaStyle}
         />
 
         <div style={actionsStyle}>
-          <label style={uploadButtonStyle}>
-            {uploading ? "Subiendo..." : "Añadir imagen"}
+    <label
+  style={uploadButtonStyle}
+  aria-label={t.feedAddImage}
+>
+  {uploading
+    ? t.feedUploading
+    : t.feedAddImage}
 
-            <input
-              type="file"
-              accept="image/*"
-              style={{ display: "none" }}
-              onChange={uploadImage}
-            />
-          </label>
+  <input
+    type="file"
+    accept="image/*"
+    style={{ display: "none" }}
+    onChange={uploadImage}
+  />
+</label>
 
-          <button onClick={() => createPost()} style={buttonStyle}>
-            Publicar
-          </button>
+        <button
+  type="button"
+  onClick={() => createPost()}
+  style={buttonStyle}
+>
+  {t.feedPublish}
+</button>
         </div>
       </section>
 
       {loading ? (
-        <p style={loadingStyle}>Cargando feed...</p>
+       <p style={loadingStyle}>
+  {t.feedLoading}
+</p>
       ) : (
         <section style={feedStyle}>
           {posts.map((post) => (
@@ -337,7 +385,9 @@ export default function FeedPage() {
                   <p style={emailStyle}>{post.user_email}</p>
 
                   <p style={dateStyle}>
-                    {new Date(post.created_at).toLocaleDateString()}
+                   {new Date(
+  post.created_at
+).toLocaleDateString(locale)}
                   </p>
                 </div>
               </div>
@@ -348,7 +398,7 @@ export default function FeedPage() {
                 <div style={imageWrapperStyle}>
                   <Image
                     src={safeImage(post.image)}
-                    alt="Imagen del feed"
+                   alt={t.feedPostImageAlt}
                     fill
                     sizes="800px"
                     style={{ objectFit: "cover" }}
@@ -364,7 +414,8 @@ export default function FeedPage() {
 
               <div style={commentsStyle}>
                 <p style={commentsTitleStyle}>
-                  Comentarios ({comments[post.id]?.length || 0})
+                  {t.feedComments} (
+{comments[post.id]?.length || 0})
                 </p>
 
                 <div style={commentsListStyle}>
@@ -375,12 +426,16 @@ export default function FeedPage() {
                         <p style={commentTextStyle}>{comment.comment}</p>
                       </div>
 
-                      <button
-                        onClick={() => deleteComment(comment.id)}
-                        style={deleteButtonStyle}
-                      >
-                        ✕
-                      </button>
+                    <button
+  type="button"
+  onClick={() =>
+    deleteComment(comment.id)
+  }
+  style={deleteButtonStyle}
+  aria-label={t.feedDeleteComment}
+>
+  ✕
+</button>
                     </div>
                   ))}
                 </div>
@@ -400,16 +455,17 @@ export default function FeedPage() {
                         addComment(post.id);
                       }
                     }}
-                    placeholder="Escribe un comentario..."
+                   placeholder={t.feedCommentPlaceholder}
                     style={commentInputStyle}
                   />
 
-                  <button
-                    onClick={() => addComment(post.id)}
-                    style={commentButtonStyle}
-                  >
-                    Enviar
-                  </button>
+                 <button
+  type="button"
+  onClick={() => addComment(post.id)}
+  style={commentButtonStyle}
+>
+  {t.feedSendComment}
+</button>
                 </div>
               </div>
             </article>

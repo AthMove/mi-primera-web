@@ -883,6 +883,38 @@ favoritesEmptyText:
 favoritesExploreMarketplace:
   "Explorar marketplace",
 favoritesRemove: "Quitar de favoritos",
+feedLoginRequired: "Debes iniciar sesión",
+feedDeleteCommentConfirm:
+  "¿Eliminar este comentario?",
+
+feedPageEyebrow: "FEED ATHMOV",
+feedPageTitle: "Drops y comunidad",
+feedPageSubtitle:
+  "Material deportivo premium, drops seleccionados y novedades de la comunidad.",
+
+feedFeaturedEyebrow: "SELECCIÓN ATHMOV",
+feedFeaturedTitle: "Drops destacados",
+feedViewAll: "Ver todo",
+
+feedRecentEyebrow: "ÚLTIMOS PRODUCTOS",
+feedRecentTitle: "Nuevo material",
+
+feedCommunityPostEyebrow:
+  "PUBLICACIÓN DE LA COMUNIDAD",
+feedPostPlaceholder:
+  "Comparte un drop, un outfit, un momento de partido o una opinión sobre material deportivo...",
+feedUploading: "Subiendo...",
+feedAddImage: "Añadir imagen",
+feedPublish: "Publicar",
+feedLoading: "Cargando feed...",
+feedPostImageAlt: "Imagen del feed",
+
+feedComments: "Comentarios",
+feedDeleteComment:
+  "Eliminar comentario",
+feedCommentPlaceholder:
+  "Escribe un comentario...",
+feedSendComment: "Enviar",
   },
 
 
@@ -1770,6 +1802,37 @@ favoritesEmptyText:
 favoritesExploreMarketplace:
   "Explore marketplace",
 favoritesRemove: "Remove from favourites",
+feedLoginRequired: "You must sign in",
+feedDeleteCommentConfirm:
+  "Delete this comment?",
+
+feedPageEyebrow: "ATHMOV FEED",
+feedPageTitle: "Drops and community",
+feedPageSubtitle:
+  "Premium sports equipment, curated drops and community updates.",
+
+feedFeaturedEyebrow: "ATHMOV SELECTION",
+feedFeaturedTitle: "Featured drops",
+feedViewAll: "View all",
+
+feedRecentEyebrow: "LATEST PRODUCTS",
+feedRecentTitle: "New equipment",
+
+feedCommunityPostEyebrow:
+  "COMMUNITY POST",
+feedPostPlaceholder:
+  "Share a drop, an outfit, a match moment or your opinion about sports equipment...",
+feedUploading: "Uploading...",
+feedAddImage: "Add image",
+feedPublish: "Publish",
+feedLoading: "Loading feed...",
+feedPostImageAlt: "Feed image",
+
+feedComments: "Comments",
+feedDeleteComment: "Delete comment",
+feedCommentPlaceholder:
+  "Write a comment...",
+feedSendComment: "Send",
   },
 
   pt: {
@@ -2660,5 +2723,38 @@ favoritesEmptyText:
 favoritesExploreMarketplace:
   "Explorar marketplace",
 favoritesRemove: "Remover dos favoritos",
+feedLoginRequired:
+  "Tem de iniciar sessão",
+feedDeleteCommentConfirm:
+  "Eliminar este comentário?",
+
+feedPageEyebrow: "FEED ATHMOV",
+feedPageTitle: "Drops e comunidade",
+feedPageSubtitle:
+  "Material desportivo premium, drops selecionados e novidades da comunidade.",
+
+feedFeaturedEyebrow: "SELEÇÃO ATHMOV",
+feedFeaturedTitle: "Drops em destaque",
+feedViewAll: "Ver tudo",
+
+feedRecentEyebrow: "ÚLTIMOS PRODUTOS",
+feedRecentTitle: "Novo material",
+
+feedCommunityPostEyebrow:
+  "PUBLICAÇÃO DA COMUNIDADE",
+feedPostPlaceholder:
+  "Partilhe um drop, um outfit, um momento de jogo ou uma opinião sobre material desportivo...",
+feedUploading: "A carregar...",
+feedAddImage: "Adicionar imagem",
+feedPublish: "Publicar",
+feedLoading: "A carregar feed...",
+feedPostImageAlt: "Imagem do feed",
+
+feedComments: "Comentários",
+feedDeleteComment:
+  "Eliminar comentário",
+feedCommentPlaceholder:
+  "Escreva um comentário...",
+feedSendComment: "Enviar",
   },
 };
