@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import PremiumButton from "@/components/ui/PremiumButton";
+import { useLanguage } from "@/components/LanguageProvider";
 
 interface Seller {
   avatar_url?: string;
@@ -54,13 +55,28 @@ export default function SellerHero({
   memberSinceText,
   leaveReviewText,
 }: SellerHeroProps) {
-  const sellerLevel = (
-    seller?.seller_badge ||
-    seller?.seller_level ||
-    "new"
-  )
-    .toString()
-    .toUpperCase();
+  const { t } = useLanguage();
+
+ const rawSellerLevel = (
+  seller?.seller_badge ||
+  seller?.seller_level ||
+  "new"
+)
+  .toString()
+  .toLowerCase();
+
+const sellerLevel =
+  rawSellerLevel === "premium"
+    ? t.sellerLevelPremium
+    : rawSellerLevel === "professional"
+      ? t.sellerLevelProfessional
+      : rawSellerLevel === "expert"
+        ? t.sellerLevelExpert
+        : rawSellerLevel === "verified"
+          ? t.sellerLevelVerified
+          : rawSellerLevel === "trusted"
+            ? t.sellerLevelTrusted
+            : t.sellerLevelNew;
 
   const memberYear = seller?.created_at
     ? new Date(seller.created_at).getFullYear()
@@ -112,19 +128,21 @@ export default function SellerHero({
           </span>
         </div>
 
-  <div className="hero-actions">
+<div className="hero-actions">
   <PremiumButton
     variant={isFollowing ? "outline" : "dark"}
     onClick={onFollow}
   >
-    {isFollowing ? "Siguiendo" : "Seguir vendedor"}
+    {isFollowing
+      ? t.sellerFollowing
+      : t.sellerFollow}
   </PremiumButton>
 
   <PremiumButton
     variant="light"
     onClick={onShare}
   >
-    Compartir perfil
+    {t.sellerShareProfile}
   </PremiumButton>
 </div>
 
@@ -140,25 +158,32 @@ export default function SellerHero({
 </PremiumButton>
 
         <div className="info-row">
-          <div className="info-card">
-            <p>Ubicación</p>
-            <strong>{seller?.location || "España"}</strong>
-          </div>
+         <div className="info-card">
+  <p>{t.sellerLocation}</p>
+
+  <strong>
+    {seller?.location || t.sellerDefaultLocation}
+  </strong>
+</div>
 
           <div className="info-card">
-            <p>{responseTimeText}</p>
-            <strong>{seller?.response_time || "< 1 hora"}</strong>
-          </div>
+  <p>{responseTimeText}</p>
+
+  <strong>
+    {seller?.response_time ||
+      t.sellerDefaultResponseTime}
+  </strong>
+</div>
 
           <div className="info-card">
             <p>{memberSinceText}</p>
             <strong>{memberYear}</strong>
           </div>
 
-          <div className="info-card">
-            <p>Valoración</p>
-            <strong>★ {averageRating}</strong>
-          </div>
+        <div className="info-card">
+  <p>{t.sellerRating}</p>
+  <strong>★ {averageRating}</strong>
+</div>
         </div>
       </div>
 
