@@ -915,6 +915,28 @@ feedDeleteComment:
 feedCommentPlaceholder:
   "Escribe un comentario...",
 feedSendComment: "Enviar",
+offersAcceptConfirm:
+  "¿Aceptar esta oferta?",
+offersRejectConfirm:
+  "¿Rechazar esta oferta?",
+offersUpdateError:
+  "No se pudo actualizar la oferta",
+offersOrderCreateError:
+  "No se pudo crear el pedido",
+
+offersLoading: "Cargando ofertas...",
+offersEyebrow: "OFERTAS ATHMOV",
+offersTitle: "Ofertas recibidas",
+offersSubtitle:
+  "Gestiona las ofertas de compradores para tus productos.",
+
+offersEmptyTitle:
+  "No tienes ofertas pendientes",
+offersEmptyText:
+  "Las ofertas de compradores aparecerán aquí.",
+offersPending: "Oferta pendiente",
+offersAccept: "Aceptar",
+offersReject: "Rechazar",
   },
 
 
@@ -1833,6 +1855,28 @@ feedDeleteComment: "Delete comment",
 feedCommentPlaceholder:
   "Write a comment...",
 feedSendComment: "Send",
+offersAcceptConfirm:
+  "Accept this offer?",
+offersRejectConfirm:
+  "Reject this offer?",
+offersUpdateError:
+  "The offer could not be updated",
+offersOrderCreateError:
+  "The order could not be created",
+
+offersLoading: "Loading offers...",
+offersEyebrow: "ATHMOV OFFERS",
+offersTitle: "Offers received",
+offersSubtitle:
+  "Manage buyer offers for your products.",
+
+offersEmptyTitle:
+  "You have no pending offers",
+offersEmptyText:
+  "Buyer offers will appear here.",
+offersPending: "Pending offer",
+offersAccept: "Accept",
+offersReject: "Reject",
   },
 
   pt: {
@@ -2756,5 +2800,27 @@ feedDeleteComment:
 feedCommentPlaceholder:
   "Escreva um comentário...",
 feedSendComment: "Enviar",
+offersAcceptConfirm:
+  "Aceitar esta oferta?",
+offersRejectConfirm:
+  "Rejeitar esta oferta?",
+offersUpdateError:
+  "Não foi possível atualizar a oferta",
+offersOrderCreateError:
+  "Não foi possível criar a encomenda",
+
+offersLoading: "A carregar ofertas...",
+offersEyebrow: "OFERTAS ATHMOV",
+offersTitle: "Ofertas recebidas",
+offersSubtitle:
+  "Faça a gestão das ofertas de compradores para os seus produtos.",
+
+offersEmptyTitle:
+  "Não tem ofertas pendentes",
+offersEmptyText:
+  "As ofertas dos compradores aparecerão aqui.",
+offersPending: "Oferta pendente",
+offersAccept: "Aceitar",
+offersReject: "Rejeitar",
   },
 };

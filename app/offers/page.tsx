@@ -3,8 +3,17 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function OffersPage() {
+  const { lang, t } = useLanguage();
+
+const locale =
+  lang === "en"
+    ? "en-GB"
+    : lang === "pt"
+      ? "pt-PT"
+      : "es-ES";
   const [offers, setOffers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -75,11 +84,11 @@ export default function OffersPage() {
   };
 
   const updateOffer = async (offer: any, status: string) => {
-    const confirmed = confirm(
-      status === "accepted"
-        ? "¿Aceptar esta oferta?"
-        : "¿Rechazar esta oferta?"
-    );
+  const confirmed = confirm(
+  status === "accepted"
+    ? t.offersAcceptConfirm
+    : t.offersRejectConfirm
+);
 
     if (!confirmed) return;
 
@@ -92,7 +101,10 @@ export default function OffersPage() {
 
     if (updateError || !updatedOffer) {
       console.log("OFFER UPDATE ERROR:", updateError);
-      alert(updateError?.message || "No se pudo actualizar la oferta");
+      alert(
+  updateError?.message ||
+    t.offersUpdateError
+);
       return;
     }
 
@@ -148,7 +160,10 @@ export default function OffersPage() {
 
       if (orderError || !order) {
         console.log("ORDER ERROR:", orderError);
-        alert(orderError?.message || "No se pudo crear el pedido");
+       alert(
+  orderError?.message ||
+    t.offersOrderCreateError
+);
         return;
       }
     }
@@ -162,34 +177,53 @@ export default function OffersPage() {
       : "/logo.png";
   };
 
-  if (loading) {
-    return <main style={pageStyle}>Cargando ofertas...</main>;
-  }
+ if (loading) {
+  return (
+    <main style={pageStyle}>
+      {t.offersLoading}
+    </main>
+  );
+}
 
   return (
     <main style={pageStyle} className="offers-page">
       <section style={headerStyle}>
-        <p style={eyebrowStyle}>OFERTAS ATHMOV</p>
+    <p style={eyebrowStyle}>
+  {t.offersEyebrow}
+</p>
 
-        <h1 style={titleStyle} className="offers-title">
-          Ofertas recibidas
-        </h1>
+<h1
+  style={titleStyle}
+  className="offers-title"
+>
+  {t.offersTitle}
+</h1>
 
-        <p style={subtitleStyle}>
-          Gestiona las ofertas de compradores para tus productos.
-        </p>
+<p style={subtitleStyle}>
+  {t.offersSubtitle}
+</p>
       </section>
 
       {offers.length === 0 ? (
-        <section style={emptyStyle}>
-          <h2 style={{ fontSize: "32px", margin: 0 }}>
-            No tienes ofertas pendientes
-          </h2>
+   <section style={emptyStyle}>
+  <h2
+    style={{
+      fontSize: "32px",
+      margin: 0,
+    }}
+  >
+    {t.offersEmptyTitle}
+  </h2>
 
-          <p style={{ color: "#666", marginTop: "12px" }}>
-            Las ofertas de compradores aparecerán aquí.
-          </p>
-        </section>
+  <p
+    style={{
+      color: "#666",
+      marginTop: "12px",
+    }}
+  >
+    {t.offersEmptyText}
+  </p>
+</section>
       ) : (
         <section style={listStyle}>
           {offers.map((offer: any) => (
@@ -197,7 +231,10 @@ export default function OffersPage() {
               <div style={imageWrapperStyle}>
                 <Image
                   src={safeImage(offer.product?.image)}
-                  alt={offer.product?.title || "Producto"}
+                  alt={
+  offer.product?.title ||
+  t.productFallback
+}
                   fill
                   sizes="120px"
                   style={{ objectFit: "cover" }}
@@ -205,33 +242,47 @@ export default function OffersPage() {
               </div>
 
               <div style={{ flex: 1 }}>
-                <p style={metaStyle}>Oferta pendiente</p>
+               <p style={metaStyle}>
+  {t.offersPending}
+</p>
 
                 <h2 style={offerTitleStyle}>
-                  {offer.product?.title || "Producto"}
+                  {offer.product?.title ||
+  t.productFallback}
                 </h2>
 
                 <p style={buyerStyle}>{offer.buyer_email}</p>
               </div>
 
               <div style={rightStyle}>
-                <strong style={amountStyle}>€{offer.amount}</strong>
+                <strong style={amountStyle}>
+  {new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "EUR",
+  }).format(Number(offer.amount || 0))}
+</strong>
 
-                <div style={actionsStyle}>
-                  <button
-                    onClick={() => updateOffer(offer, "accepted")}
-                    style={acceptButtonStyle}
-                  >
-                    Aceptar
-                  </button>
+            <div style={actionsStyle}>
+  <button
+    type="button"
+    onClick={() =>
+      updateOffer(offer, "accepted")
+    }
+    style={acceptButtonStyle}
+  >
+    {t.offersAccept}
+  </button>
 
-                  <button
-                    onClick={() => updateOffer(offer, "rejected")}
-                    style={rejectButtonStyle}
-                  >
-                    Rechazar
-                  </button>
-                </div>
+  <button
+    type="button"
+    onClick={() =>
+      updateOffer(offer, "rejected")
+    }
+    style={rejectButtonStyle}
+  >
+    {t.offersReject}
+  </button>
+</div>
               </div>
             </article>
           ))}
