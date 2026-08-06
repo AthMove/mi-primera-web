@@ -2,8 +2,24 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function SellerDashboardPage() {
+  const { lang, t } = useLanguage();
+
+const locale =
+  lang === "en"
+    ? "en-GB"
+    : lang === "pt"
+      ? "pt-PT"
+      : "es-ES";
+
+const formatCurrency = (value: number) =>
+  new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "EUR",
+  }).format(value);
+
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
@@ -58,8 +74,8 @@ export default function SellerDashboardPage() {
       .eq("seller_id", user.id)
       .order("created_at", { ascending: false });
 
-    const { data: reviewsData } = await supabase
-      .from("seller_reviews")
+   const { data: reviewsData } = await supabase
+  .from("reviews")
       .select("*")
       .eq("seller_id", user.id)
       .order("created_at", { ascending: false });
@@ -162,141 +178,227 @@ export default function SellerDashboardPage() {
     setLoading(false);
   };
 
-  const sellerLevel = profile?.seller_badge || profile?.seller_level || "nuevo";
+  const rawSellerLevel = (
+  profile?.seller_badge ||
+  profile?.seller_level ||
+  "new"
+)
+  .toString()
+  .toLowerCase();
 
-  const getOrderStatusLabel = (status?: string) => {
-    if (status === "pending") return "Pendiente";
-    if (status === "paid") return "Pagado";
-    if (status === "preparing") return "En preparación";
-    if (status === "shipped") return "Enviado";
-    if (status === "delivered") return "Entregado";
-    if (status === "completed") return "Completado";
-    if (status === "refunded") return "Reembolsado";
-    return status || "Pendiente";
-  };
+const sellerLevel =
+  rawSellerLevel === "premium"
+    ? t.sellerDashboardLevelPremium
+    : rawSellerLevel === "professional"
+      ? t.sellerDashboardLevelProfessional
+      : rawSellerLevel === "expert"
+        ? t.sellerDashboardLevelExpert
+        : rawSellerLevel === "verified"
+          ? t.sellerDashboardLevelVerified
+          : t.sellerDashboardLevelNew;
 
-  const getTransferStatusLabel = (status?: string) => {
-    if (status === "pending") return "Pendiente";
-    if (status === "released") return "Liberado";
-    if (status === "cancelled") return "Cancelado";
-    if (status === "refunded") return "Reembolsado";
-    return status || "Pendiente";
-  };
+const getOrderStatusLabel = (status?: string) => {
+  if (status === "pending") {
+    return t.sellerPageOrderPending;
+  }
+
+  if (status === "paid") {
+    return t.sellerPageOrderPaid;
+  }
+
+  if (status === "preparing") {
+    return t.sellerPageOrderPreparing;
+  }
+
+  if (status === "shipped") {
+    return t.sellerPageOrderShipped;
+  }
+
+  if (status === "delivered") {
+    return t.sellerPageOrderDelivered;
+  }
+
+  if (status === "completed") {
+    return t.sellerPageOrderCompleted;
+  }
+
+  if (status === "refunded") {
+    return t.sellerPageOrderRefunded;
+  }
+
+  return status || t.sellerPageOrderPending;
+};
+
+const getTransferStatusLabel = (
+  status?: string
+) => {
+  if (status === "pending") {
+    return t.sellerPageTransferPending;
+  }
+
+  if (status === "released") {
+    return t.sellerPageTransferReleased;
+  }
+
+  if (status === "cancelled") {
+    return t.sellerPageTransferCancelled;
+  }
+
+  if (status === "refunded") {
+    return t.sellerPageTransferRefunded;
+  }
+
+  return status ||
+    t.sellerPageTransferPending;
+};
 
   if (loading) {
-    return <main style={loadingStyle}>Cargando panel de vendedor...</main>;
+return (
+  <main style={loadingStyle}>
+    {t.sellerPageLoading}
+  </main>
+);
   }
 
   return (
     <main style={pageStyle} className="seller-dashboard-page">
       <section style={heroStyle}>
         <div>
-          <p style={eyebrowStyle}>ATHMOV VENDEDOR</p>
+         <p style={eyebrowStyle}>
+  {t.sellerPageEyebrow}
+</p>
 
           <h1 style={titleStyle} className="seller-dashboard-title">
-            Panel de vendedor
+            {t.sellerPageTitle}
           </h1>
 
-          <p style={subtitleStyle}>
-            Controla tus ventas, pagos, nivel de vendedor y rendimiento dentro
-            del marketplace.
-          </p>
+         <p style={subtitleStyle}>
+  {t.sellerPageSubtitle}
+</p>
 
           <div style={heroBadgesStyle}>
             {profile?.seller_verified && (
-              <span style={verifiedBadgeStyle}>VENDEDOR VERIFICADO ✓</span>
+             <span style={verifiedBadgeStyle}>
+  {t.sellerPageVerifiedSeller} ✓
+</span>
             )}
 
-            <span style={levelBadgeStyle}>
-              VENDEDOR {String(sellerLevel).toUpperCase()}
-            </span>
+          <span style={levelBadgeStyle}>
+  {t.sellerPageSellerLabel}{" "}
+  {sellerLevel}
+</span>
           </div>
         </div>
 
         <div style={trustScoreCardStyle}>
-          <p style={trustLabelStyle}>Puntuación de confianza</p>
+         <p style={trustLabelStyle}>
+  {t.sellerPageTrustScore}
+</p>
           <h2 style={trustValueStyle}>{stats.trustScore}</h2>
-          <p style={trustTextStyle}>
-            Basada en verificación, ventas, valoraciones y productos activos.
-          </p>
+         <p style={trustTextStyle}>
+  {t.sellerPageTrustDescription}
+</p>
         </div>
       </section>
 
       <section style={walletStyle}>
         <div>
           <p style={eyebrowStyle}>ATHMOV WALLET</p>
-          <h2 style={walletTitleStyle}>€{stats.pendingPayouts.toFixed(2)}</h2>
-          <p style={walletTextStyle}>Saldo pendiente de liberar</p>
+          <h2 style={walletTitleStyle}>
+  {formatCurrency(stats.pendingPayouts)}
+</h2>
+          <p style={walletTextStyle}>{t.sellerPagePendingBalance}</p>
         </div>
 
         <div style={walletMiniGridStyle}>
           <div style={walletMiniCardStyle}>
-            <span>Pagos liberados</span>
-            <strong>€{stats.completedPayouts.toFixed(2)}</strong>
+           <span>
+  {t.sellerPageReleasedPayments}
+</span>
+
+<strong>
+  {formatCurrency(
+    stats.completedPayouts
+  )}
+</strong>
           </div>
 
           <div style={walletMiniCardStyle}>
-            <span>Ventas totales</span>
-            <strong>€{stats.totalSales.toFixed(2)}</strong>
+   <span>
+  {t.sellerPageTotalSales}
+</span>
+
+<strong>
+  {formatCurrency(stats.totalSales)}
+</strong>
           </div>
         </div>
       </section>
 
       <section style={statsGridStyle}>
         <div style={cardStyle}>
-          <span style={labelStyle}>Pedidos vendidos</span>
+          <span style={labelStyle}>{t.sellerPageOrdersSold}</span>
           <strong style={valueStyle}>{stats.ordersSold}</strong>
         </div>
 
         <div style={cardStyle}>
-          <span style={labelStyle}>Pedido medio</span>
+          <span style={labelStyle}>{t.sellerPageAverageOrder}</span>
           <strong style={valueStyle}>
-            €{stats.averageOrderValue.toFixed(2)}
+          {formatCurrency(
+  stats.averageOrderValue
+)}
           </strong>
         </div>
 
         <div style={cardStyle}>
-          <span style={labelStyle}>Valoración</span>
+          <span style={labelStyle}>{t.sellerPageRating}</span>
           <strong style={valueStyle}>★ {stats.averageRating}</strong>
         </div>
 
         <div style={cardStyle}>
-          <span style={labelStyle}>Valoraciones</span>
+          <span style={labelStyle}>{t.sellerPageReviews}</span>
           <strong style={valueStyle}>{stats.totalReviews}</strong>
         </div>
 
         <div style={cardStyle}>
-          <span style={labelStyle}>Productos activos</span>
+          <span style={labelStyle}>{t.sellerPageActiveProducts}</span>
           <strong style={valueStyle}>{stats.activeProducts}</strong>
         </div>
 
         <div style={cardStyle}>
-          <span style={labelStyle}>Pendientes de aprobar</span>
+          <span style={labelStyle}>{t.sellerPagePendingApproval}</span>
           <strong style={valueStyle}>{stats.pendingProducts}</strong>
         </div>
 
         <div style={cardStyle}>
-          <span style={labelStyle}>Productos rechazados</span>
+          <span style={labelStyle}>{t.sellerPageRejectedProducts}</span>
           <strong style={valueStyle}>{stats.rejectedProducts}</strong>
         </div>
 
         <div style={cardStyle}>
-          <span style={labelStyle}>Productos vendidos</span>
+          <span style={labelStyle}>{t.sellerPageSoldProducts}</span>
           <strong style={valueStyle}>{stats.soldProducts}</strong>
         </div>
       </section>
 
       <section style={insightsGridStyle}>
         <div style={panelStyle}>
-          <p style={sectionEyebrowStyle}>CONFIANZA DEL VENDEDOR</p>
-          <h2 style={sectionTitleStyle}>Rendimiento</h2>
+          <p style={sectionEyebrowStyle}>
+  {t.sellerPageTrustEyebrow}
+</p>
+
+<h2 style={sectionTitleStyle}>
+  {t.sellerPagePerformance}
+</h2>
 
           <div style={trustBarsStyle}>
             <div>
               <div style={barHeaderStyle}>
-                <span>Verificación</span>
+                <span>{t.sellerPageVerification}</span>
                 <strong>
-                  {profile?.seller_verified ? "Completa" : "Pendiente"}
+                  {profile?.seller_verified
+  ? t.sellerPageComplete
+  : t.sellerPagePending}
                 </strong>
               </div>
               <div style={barTrackStyle}>
@@ -311,8 +413,14 @@ export default function SellerDashboardPage() {
 
             <div>
               <div style={barHeaderStyle}>
-                <span>Actividad del vendedor</span>
-                <strong>{stats.activeProducts} activos</strong>
+               <span>
+  {t.sellerPageSellerActivity}
+</span>
+
+<strong>
+  {stats.activeProducts}{" "}
+  {t.sellerPageActiveShort}
+</strong>
               </div>
               <div style={barTrackStyle}>
                 <div
@@ -326,7 +434,9 @@ export default function SellerDashboardPage() {
 
             <div>
               <div style={barHeaderStyle}>
-                <span>Opiniones de compradores</span>
+               <span>
+  {t.sellerPageBuyerFeedback}
+</span>
                 <strong>★ {stats.averageRating}</strong>
               </div>
               <div style={barTrackStyle}>
@@ -342,36 +452,41 @@ export default function SellerDashboardPage() {
         </div>
 
         <div style={panelStyle}>
-          <p style={sectionEyebrowStyle}>ACCIONES DEL VENDEDOR</p>
-          <h2 style={sectionTitleStyle}>Accesos rápidos</h2>
+        <p style={sectionEyebrowStyle}>
+  {t.sellerPageActionsEyebrow}
+</p>
+
+<h2 style={sectionTitleStyle}>
+  {t.sellerPageQuickActions}
+</h2>
 
           <div style={quickActionsStyle}>
             <button
               onClick={() => (window.location.href = "/sell")}
               style={buttonStyle}
             >
-              Añadir producto
+              {t.sellerPageAddProduct}
             </button>
 
             <button
               onClick={() => (window.location.href = "/orders?filter=selling")}
               style={secondaryButtonStyle}
             >
-              Ver pedidos
+             {t.sellerPageViewOrders}
             </button>
 
             <button
               onClick={() => (window.location.href = "/verify")}
               style={secondaryButtonStyle}
             >
-              Verificación
+             {t.sellerPageVerification}
             </button>
 
             <button
               onClick={() => (window.location.href = "/account")}
               style={secondaryButtonStyle}
             >
-              Cuenta
+              {t.sellerPageAccount}
             </button>
           </div>
         </div>
@@ -380,35 +495,50 @@ export default function SellerDashboardPage() {
       <section style={ordersSectionStyle}>
         <div style={sectionHeaderStyle}>
           <div>
-            <p style={sectionEyebrowStyle}>VENTAS RECIENTES</p>
-            <h2 style={sectionTitleStyle}>Últimos pedidos</h2>
+            <p style={sectionEyebrowStyle}>
+  {t.sellerPageRecentSales}
+</p>
+
+<h2 style={sectionTitleStyle}>
+  {t.sellerPageLatestOrders}
+</h2>
           </div>
 
           <button
             onClick={() => (window.location.href = "/orders")}
             style={smallButtonStyle}
           >
-            Ver todo →
+           {t.sellerPageViewAll} →
           </button>
         </div>
 
         {orders.length === 0 ? (
-          <div style={emptyStyle}>Todavía no hay ventas.</div>
+          <div style={emptyStyle}>
+  {t.sellerPageNoSales}
+</div>
         ) : (
           <div style={ordersListStyle}>
             {orders.slice(0, 8).map((order: any) => (
               <div key={order.id} style={orderCardStyle}>
                 <div>
-                  <p style={orderMetaStyle}>PEDIDO</p>
+                 <p style={orderMetaStyle}>
+  {t.sellerPageOrderLabel}
+</p>
 
                   <p style={orderAmountStyle}>
-                    €{Number(order.seller_amount || 0).toFixed(2)}
+                   {formatCurrency(
+  Number(order.seller_amount || 0)
+)}
                   </p>
 
                   <p style={orderTextStyle}>
-                    Estado: {getOrderStatusLabel(order.status)} ·
-                    Transferencia:{" "}
-                    {getTransferStatusLabel(order.transfer_status)}
+                   {t.sellerPageStatus}:{" "}
+{getOrderStatusLabel(order.status)}
+{" · "}
+{t.sellerPageTransfer}:{" "}
+{getTransferStatusLabel(
+  order.transfer_status
+)}
                   </p>
                 </div>
 

@@ -1122,6 +1122,99 @@ disputeOpening:
   "Abriendo...",
 disputeSubmit:
   "Enviar disputa",
+  sellerPageLoading:
+  "Cargando panel de vendedor...",
+sellerPageEyebrow: "ATHMOV VENDEDOR",
+sellerPageTitle: "Panel de vendedor",
+sellerPageSubtitle:
+  "Controla tus ventas, pagos, nivel de vendedor y rendimiento dentro del marketplace.",
+
+sellerPageVerifiedSeller:
+  "VENDEDOR VERIFICADO",
+sellerPageSellerLabel: "VENDEDOR",
+
+sellerDashboardLevelPremium: "PREMIUM",
+sellerDashboardLevelProfessional:
+  "PROFESIONAL",
+sellerDashboardLevelExpert: "EXPERTO",
+sellerDashboardLevelVerified:
+  "VERIFICADO",
+sellerDashboardLevelNew: "NUEVO",
+
+sellerPageTrustScore:
+  "Puntuación de confianza",
+sellerPageTrustDescription:
+  "Basada en verificación, ventas, valoraciones y productos activos.",
+
+sellerPagePendingBalance:
+  "Saldo pendiente de liberar",
+sellerPageReleasedPayments:
+  "Pagos liberados",
+sellerPageTotalSales:
+  "Ventas totales",
+
+sellerPageOrdersSold:
+  "Pedidos vendidos",
+sellerPageAverageOrder:
+  "Pedido medio",
+sellerPageRating: "Valoración",
+sellerPageReviews: "Valoraciones",
+sellerPageActiveProducts:
+  "Productos activos",
+sellerPagePendingApproval:
+  "Pendientes de aprobar",
+sellerPageRejectedProducts:
+  "Productos rechazados",
+sellerPageSoldProducts:
+  "Productos vendidos",
+
+sellerPageTrustEyebrow:
+  "CONFIANZA DEL VENDEDOR",
+sellerPagePerformance: "Rendimiento",
+sellerPageVerification:
+  "Verificación",
+sellerPageComplete: "Completa",
+sellerPagePending: "Pendiente",
+sellerPageSellerActivity:
+  "Actividad del vendedor",
+sellerPageActiveShort: "activos",
+sellerPageBuyerFeedback:
+  "Opiniones de compradores",
+
+sellerPageActionsEyebrow:
+  "ACCIONES DEL VENDEDOR",
+sellerPageQuickActions:
+  "Accesos rápidos",
+sellerPageAddProduct:
+  "Añadir producto",
+sellerPageViewOrders:
+  "Ver pedidos",
+sellerPageAccount: "Cuenta",
+
+sellerPageRecentSales:
+  "VENTAS RECIENTES",
+sellerPageLatestOrders:
+  "Últimos pedidos",
+sellerPageViewAll: "Ver todo",
+sellerPageNoSales:
+  "Todavía no hay ventas.",
+sellerPageOrderLabel: "PEDIDO",
+sellerPageStatus: "Estado",
+sellerPageTransfer: "Transferencia",
+
+sellerPageOrderPending: "Pendiente",
+sellerPageOrderPaid: "Pagado",
+sellerPageOrderPreparing:
+  "En preparación",
+sellerPageOrderShipped: "Enviado",
+sellerPageOrderDelivered: "Entregado",
+sellerPageOrderCompleted: "Completado",
+sellerPageOrderRefunded: "Reembolsado",
+
+sellerPageTransferPending: "Pendiente",
+sellerPageTransferReleased: "Liberado",
+sellerPageTransferCancelled: "Cancelado",
+sellerPageTransferRefunded: "Reembolsado",
   },
 
 
@@ -2248,6 +2341,92 @@ disputeOpening:
   "Abriendo...",
 disputeSubmit:
   "Enviar disputa",
+  sellerPageLoading:
+  "Loading seller dashboard...",
+sellerPageEyebrow: "ATHMOV SELLER",
+sellerPageTitle: "Seller dashboard",
+sellerPageSubtitle:
+  "Manage your sales, payments, seller level and marketplace performance.",
+
+sellerPageVerifiedSeller:
+  "VERIFIED SELLER",
+sellerPageSellerLabel: "SELLER",
+
+sellerDashboardLevelPremium: "PREMIUM",
+sellerDashboardLevelProfessional:
+  "PROFESSIONAL",
+sellerDashboardLevelExpert: "EXPERT",
+sellerDashboardLevelVerified:
+  "VERIFIED",
+sellerDashboardLevelNew: "NEW",
+
+sellerPageTrustScore: "Trust score",
+sellerPageTrustDescription:
+  "Based on verification, sales, reviews and active products.",
+
+sellerPagePendingBalance:
+  "Balance pending release",
+sellerPageReleasedPayments:
+  "Released payments",
+sellerPageTotalSales: "Total sales",
+
+sellerPageOrdersSold: "Orders sold",
+sellerPageAverageOrder:
+  "Average order",
+sellerPageRating: "Rating",
+sellerPageReviews: "Reviews",
+sellerPageActiveProducts:
+  "Active products",
+sellerPagePendingApproval:
+  "Pending approval",
+sellerPageRejectedProducts:
+  "Rejected products",
+sellerPageSoldProducts:
+  "Sold products",
+
+sellerPageTrustEyebrow:
+  "SELLER TRUST",
+sellerPagePerformance: "Performance",
+sellerPageVerification: "Verification",
+sellerPageComplete: "Complete",
+sellerPagePending: "Pending",
+sellerPageSellerActivity:
+  "Seller activity",
+sellerPageActiveShort: "active",
+sellerPageBuyerFeedback:
+  "Buyer feedback",
+
+sellerPageActionsEyebrow:
+  "SELLER ACTIONS",
+sellerPageQuickActions:
+  "Quick actions",
+sellerPageAddProduct: "Add product",
+sellerPageViewOrders: "View orders",
+sellerPageAccount: "Account",
+
+sellerPageRecentSales:
+  "RECENT SALES",
+sellerPageLatestOrders:
+  "Latest orders",
+sellerPageViewAll: "View all",
+sellerPageNoSales:
+  "There are no sales yet.",
+sellerPageOrderLabel: "ORDER",
+sellerPageStatus: "Status",
+sellerPageTransfer: "Transfer",
+
+sellerPageOrderPending: "Pending",
+sellerPageOrderPaid: "Paid",
+sellerPageOrderPreparing: "Preparing",
+sellerPageOrderShipped: "Shipped",
+sellerPageOrderDelivered: "Delivered",
+sellerPageOrderCompleted: "Completed",
+sellerPageOrderRefunded: "Refunded",
+
+sellerPageTransferPending: "Pending",
+sellerPageTransferReleased: "Released",
+sellerPageTransferCancelled: "Cancelled",
+sellerPageTransferRefunded: "Refunded",
   },
 
   pt: {
@@ -3381,5 +3560,98 @@ disputeOpening:
   "A abrir...",
 disputeSubmit:
   "Enviar disputa",
+  sellerPageLoading:
+  "A carregar o painel do vendedor...",
+sellerPageEyebrow: "VENDEDOR ATHMOV",
+sellerPageTitle: "Painel do vendedor",
+sellerPageSubtitle:
+  "Controle as suas vendas, pagamentos, nível de vendedor e desempenho no marketplace.",
+
+sellerPageVerifiedSeller:
+  "VENDEDOR VERIFICADO",
+sellerPageSellerLabel: "VENDEDOR",
+
+sellerDashboardLevelPremium: "PREMIUM",
+sellerDashboardLevelProfessional:
+  "PROFISSIONAL",
+sellerDashboardLevelExpert:
+  "ESPECIALISTA",
+sellerDashboardLevelVerified:
+  "VERIFICADO",
+sellerDashboardLevelNew: "NOVO",
+
+sellerPageTrustScore:
+  "Pontuação de confiança",
+sellerPageTrustDescription:
+  "Baseada na verificação, vendas, avaliações e produtos ativos.",
+
+sellerPagePendingBalance:
+  "Saldo pendente de libertação",
+sellerPageReleasedPayments:
+  "Pagamentos libertados",
+sellerPageTotalSales:
+  "Vendas totais",
+
+sellerPageOrdersSold:
+  "Encomendas vendidas",
+sellerPageAverageOrder:
+  "Valor médio da encomenda",
+sellerPageRating: "Avaliação",
+sellerPageReviews: "Avaliações",
+sellerPageActiveProducts:
+  "Produtos ativos",
+sellerPagePendingApproval:
+  "Pendentes de aprovação",
+sellerPageRejectedProducts:
+  "Produtos rejeitados",
+sellerPageSoldProducts:
+  "Produtos vendidos",
+
+sellerPageTrustEyebrow:
+  "CONFIANÇA DO VENDEDOR",
+sellerPagePerformance: "Desempenho",
+sellerPageVerification: "Verificação",
+sellerPageComplete: "Completa",
+sellerPagePending: "Pendente",
+sellerPageSellerActivity:
+  "Atividade do vendedor",
+sellerPageActiveShort: "ativos",
+sellerPageBuyerFeedback:
+  "Opiniões dos compradores",
+
+sellerPageActionsEyebrow:
+  "AÇÕES DO VENDEDOR",
+sellerPageQuickActions:
+  "Acessos rápidos",
+sellerPageAddProduct:
+  "Adicionar produto",
+sellerPageViewOrders:
+  "Ver encomendas",
+sellerPageAccount: "Conta",
+
+sellerPageRecentSales:
+  "VENDAS RECENTES",
+sellerPageLatestOrders:
+  "Últimas encomendas",
+sellerPageViewAll: "Ver tudo",
+sellerPageNoSales:
+  "Ainda não existem vendas.",
+sellerPageOrderLabel: "ENCOMENDA",
+sellerPageStatus: "Estado",
+sellerPageTransfer: "Transferência",
+
+sellerPageOrderPending: "Pendente",
+sellerPageOrderPaid: "Pago",
+sellerPageOrderPreparing:
+  "Em preparação",
+sellerPageOrderShipped: "Enviado",
+sellerPageOrderDelivered: "Entregue",
+sellerPageOrderCompleted: "Concluído",
+sellerPageOrderRefunded: "Reembolsado",
+
+sellerPageTransferPending: "Pendente",
+sellerPageTransferReleased: "Libertado",
+sellerPageTransferCancelled: "Cancelado",
+sellerPageTransferRefunded: "Reembolsado",
   },
 };
