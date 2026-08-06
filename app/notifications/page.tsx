@@ -3,9 +3,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function NotificationsPage() {
   const router = useRouter();
+  const { lang, t } = useLanguage();
+
+const locale =
+  lang === "en"
+    ? "en-GB"
+    : lang === "pt"
+      ? "pt-PT"
+      : "es-ES";
 
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -95,7 +104,9 @@ export default function NotificationsPage() {
   ) => {
     e.stopPropagation();
 
-    const confirmDelete = confirm("¿Eliminar esta notificación?");
+    const confirmDelete = confirm(
+  t.notificationsDeleteConfirm
+);
     if (!confirmDelete) return;
 
     await supabase
@@ -106,52 +117,125 @@ export default function NotificationsPage() {
     await loadNotifications();
   };
 
-  const getIcon = (type?: string, title?: string) => {
-  const value = `${type || ""} ${title || ""}`.toLowerCase();
+  const getIcon = (
+  type?: string,
+  title?: string
+) => {
+  const value = `${type || ""} ${
+    title || ""
+  }`
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 
-  if (value.includes("message")) return "✉";
-  if (value.includes("offer")) return "€";
-  if (value.includes("review")) return "★";
-  if (value.includes("shipped") || value.includes("tracking")) return "↗";
-  if (value.includes("payout")) return "€";
-  if (value.includes("order") || value.includes("sold") || value.includes("completed")) return "✓";
-  if (value.includes("verified") || value.includes("approved")) return "✓";
+  if (
+    value.includes("message") ||
+    value.includes("mensaje") ||
+    value.includes("mensagem")
+  ) {
+    return "✉";
+  }
+
+  if (
+    value.includes("offer") ||
+    value.includes("oferta")
+  ) {
+    return "€";
+  }
+
+  if (
+    value.includes("review") ||
+    value.includes("resena") ||
+    value.includes("avaliacao")
+  ) {
+    return "★";
+  }
+
+  if (
+    value.includes("shipped") ||
+    value.includes("tracking") ||
+    value.includes("enviado") ||
+    value.includes("seguimiento") ||
+    value.includes("seguimento")
+  ) {
+    return "↗️";
+  }
+
+  if (
+    value.includes("payout") ||
+    value.includes("pago") ||
+    value.includes("pagamento")
+  ) {
+    return "€";
+  }
+
+  if (
+    value.includes("order") ||
+    value.includes("pedido") ||
+    value.includes("encomenda") ||
+    value.includes("sold") ||
+    value.includes("vendido") ||
+    value.includes("completed") ||
+    value.includes("completado") ||
+    value.includes("concluido")
+  ) {
+    return "✓";
+  }
+
+  if (
+    value.includes("verified") ||
+    value.includes("approved") ||
+    value.includes("verificado") ||
+    value.includes("aprobado") ||
+    value.includes("aprovado")
+  ) {
+    return "✓";
+  }
 
   return "•";
 };
 
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleString([], {
+const formatDate = (date: string) => {
+  return new Date(date).toLocaleString(
+    locale,
+    {
       day: "2-digit",
       month: "short",
       hour: "2-digit",
       minute: "2-digit",
-    });
-  };
+    }
+  );
+};
 
-  if (loading) {
-    return <main style={pageStyle}>Cargando notificaciones...</main>;
-  }
+if (loading) {
+  return (
+    <main style={pageStyle}>
+      {t.notificationsLoading}
+    </main>
+  );
+}
 
   return (
     <main style={pageStyle} className="notifications-page">
       <section style={headerStyle}>
-        <p style={eyebrowStyle}>ALERTAS ATHMOV</p>
+       <p style={eyebrowStyle}>
+  {t.notificationsEyebrow}
+</p>
 
         <div style={headerRowStyle}>
           <div>
             <h1 style={titleStyle} className="notifications-title">
-              Notificaciones
+              {t.notificationsTitle}
             </h1>
 
-            <p style={subtitleStyle}>
-              Mensajes, ofertas, pedidos y reseñas.
-            </p>
+           <p style={subtitleStyle}>
+  {t.notificationsSubtitle}
+</p>
           </div>
 
           {unreadCount > 0 && (
             <button onClick={markAllAsRead} style={markButtonStyle}>
-              Marcar todo como leído
+             {t.notificationsMarkAllRead}
             </button>
           )}
         </div>
@@ -159,19 +243,24 @@ export default function NotificationsPage() {
         {unreadCount > 0 && (
           <div style={summaryPillStyle}>
             <span style={pulseDotStyle} />
-            {unreadCount} notificación{unreadCount === 1 ? "" : "es"} sin leer
+           {unreadCount}{" "}
+{unreadCount === 1
+  ? t.notificationsUnreadSingular
+  : t.notificationsUnreadPlural}
           </div>
         )}
       </section>
 
       {notifications.length === 0 ? (
-        <section style={emptyStyle}>
-          <h2 style={emptyTitleStyle}>Todavía no tienes notificaciones</h2>
+  <section style={emptyStyle}>
+  <h2 style={emptyTitleStyle}>
+    {t.notificationsEmptyTitle}
+  </h2>
 
-          <p style={emptyTextStyle}>
-            Tu actividad del marketplace aparecerá aquí.
-          </p>
-        </section>
+  <p style={emptyTextStyle}>
+    {t.notificationsEmptyText}
+  </p>
+</section>
       ) : (
         <section style={listStyle}>
           {notifications.map((notification: any) => (
@@ -206,7 +295,11 @@ export default function NotificationsPage() {
                       {notification.title}
                     </h2>
 
-                    {!notification.is_read && <span style={newBadgeStyle}>NUEVA</span>}
+                   {!notification.is_read && (
+  <span style={newBadgeStyle}>
+    {t.notificationsNewBadge}
+  </span>
+)}
                   </div>
 
                   <p style={messageStyle}>{notification.message}</p>
@@ -218,13 +311,16 @@ export default function NotificationsPage() {
               </div>
 
               <div style={rightStyle}>
-                <span style={openStyle}>Abrir →</span>
+               <span style={openStyle}>
+  {t.notificationsOpen} →
+</span>
 
                 <button
+                type="button"
                   onClick={(e) => deleteNotification(e, notification.id)}
                   style={deleteButtonStyle}
                 >
-                  Eliminar
+                  {t.notificationsDelete}
                 </button>
               </div>
             </article>

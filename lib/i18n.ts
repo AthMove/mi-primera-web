@@ -852,6 +852,27 @@ chatInputPlaceholder:
   "Escribe un mensaje o pregunta por el producto...",
 chatMakeOffer: "Hacer oferta",
 chatUploadImage: "Subir imagen",
+notificationsDeleteConfirm:
+  "¿Eliminar esta notificación?",
+notificationsLoading:
+  "Cargando notificaciones...",
+notificationsEyebrow: "ALERTAS ATHMOV",
+notificationsTitle: "Notificaciones",
+notificationsSubtitle:
+  "Mensajes, ofertas, pedidos y reseñas.",
+notificationsMarkAllRead:
+  "Marcar todo como leído",
+notificationsUnreadSingular:
+  "notificación sin leer",
+notificationsUnreadPlural:
+  "notificaciones sin leer",
+notificationsEmptyTitle:
+  "Todavía no tienes notificaciones",
+notificationsEmptyText:
+  "Tu actividad del marketplace aparecerá aquí.",
+notificationsNewBadge: "NUEVA",
+notificationsOpen: "Abrir",
+notificationsDelete: "Eliminar",
   },
 
 
@@ -1708,6 +1729,27 @@ chatInputPlaceholder:
   "Write a message or ask about the product...",
 chatMakeOffer: "Make an offer",
 chatUploadImage: "Upload image",
+notificationsDeleteConfirm:
+  "Delete this notification?",
+notificationsLoading:
+  "Loading notifications...",
+notificationsEyebrow: "ATHMOV ALERTS",
+notificationsTitle: "Notifications",
+notificationsSubtitle:
+  "Messages, offers, orders and reviews.",
+notificationsMarkAllRead:
+  "Mark all as read",
+notificationsUnreadSingular:
+  "unread notification",
+notificationsUnreadPlural:
+  "unread notifications",
+notificationsEmptyTitle:
+  "You do not have any notifications yet",
+notificationsEmptyText:
+  "Your marketplace activity will appear here.",
+notificationsNewBadge: "NEW",
+notificationsOpen: "Open",
+notificationsDelete: "Delete",
   },
 
   pt: {
@@ -2567,5 +2609,26 @@ chatInputPlaceholder:
   "Escreva uma mensagem ou pergunte sobre o produto...",
 chatMakeOffer: "Fazer uma oferta",
 chatUploadImage: "Carregar imagem",
+notificationsDeleteConfirm:
+  "Eliminar esta notificação?",
+notificationsLoading:
+  "A carregar notificações...",
+notificationsEyebrow: "ALERTAS ATHMOV",
+notificationsTitle: "Notificações",
+notificationsSubtitle:
+  "Mensagens, ofertas, encomendas e avaliações.",
+notificationsMarkAllRead:
+  "Marcar tudo como lido",
+notificationsUnreadSingular:
+  "notificação por ler",
+notificationsUnreadPlural:
+  "notificações por ler",
+notificationsEmptyTitle:
+  "Ainda não tem notificações",
+notificationsEmptyText:
+  "A sua atividade no marketplace aparecerá aqui.",
+notificationsNewBadge: "NOVA",
+notificationsOpen: "Abrir",
+notificationsDelete: "Eliminar",
   },
 };
