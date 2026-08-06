@@ -1,5 +1,7 @@
 "use client";
 
+import { useLanguage } from "@/components/LanguageProvider";
+
 interface Review {
   id: string;
   rating?: number;
@@ -20,11 +22,20 @@ export default function SellerReviews({
   noReviewsText,
   eyebrow,
 }: Props) {
+  const { lang, t } = useLanguage();
+
+const locale =
+  lang === "en"
+    ? "en-GB"
+    : lang === "pt"
+      ? "pt-PT"
+      : "es-ES";
+
   return (
     <section className="seller-reviews">
       <div className="section-header">
         <p>{eyebrow}</p>
-        <h2>Valoraciones</h2>
+        <h2>{t.sellerReviewsTitle}</h2>
       </div>
 
       {reviews.length === 0 ? (
@@ -48,9 +59,11 @@ export default function SellerReviews({
               </p>
 
               <p className="date">
-                {review.created_at
-                  ? new Date(review.created_at).toLocaleDateString()
-                  : ""}
+               {review.created_at
+  ? new Date(
+      review.created_at
+    ).toLocaleDateString(locale)
+  : ""}
               </p>
             </article>
           ))}

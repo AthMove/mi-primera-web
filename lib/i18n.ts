@@ -1077,6 +1077,7 @@ sellerSoldProductFallback:
 sellerSoldBadge: "VENDIDO",
 sellerSoldCompleted:
   "Venta completada",
+  sellerReviewsTitle: "Valoraciones",
   },
 
 
@@ -2157,6 +2158,7 @@ sellerSoldProductFallback:
 sellerSoldBadge: "SOLD",
 sellerSoldCompleted:
   "Sale completed",
+  sellerReviewsTitle: "Reviews",
   },
 
   pt: {
@@ -3244,5 +3246,6 @@ sellerSoldProductFallback:
 sellerSoldBadge: "VENDIDO",
 sellerSoldCompleted:
   "Venda concluída",
+  sellerReviewsTitle: "Avaliações",
   },
 };
