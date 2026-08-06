@@ -1066,6 +1066,17 @@ sellerConditionExcellent:
   "Excelente",
 sellerConditionGood: "Bueno",
 sellerConditionUsed: "Usado",
+sellerSoldEyebrow:
+  "HISTORIAL DEL VENDEDOR",
+sellerSoldTitle:
+  "Productos vendidos",
+sellerSoldEmpty:
+  "Este vendedor todavía no tiene productos vendidos.",
+sellerSoldProductFallback:
+  "Producto vendido",
+sellerSoldBadge: "VENDIDO",
+sellerSoldCompleted:
+  "Venta completada",
   },
 
 
@@ -2135,6 +2146,17 @@ sellerConditionExcellent:
   "Excellent",
 sellerConditionGood: "Good",
 sellerConditionUsed: "Used",
+sellerSoldEyebrow:
+  "SELLER HISTORY",
+sellerSoldTitle:
+  "Sold products",
+sellerSoldEmpty:
+  "This seller does not have any sold products yet.",
+sellerSoldProductFallback:
+  "Sold product",
+sellerSoldBadge: "SOLD",
+sellerSoldCompleted:
+  "Sale completed",
   },
 
   pt: {
@@ -3211,5 +3233,16 @@ sellerConditionExcellent:
   "Excelente",
 sellerConditionGood: "Bom",
 sellerConditionUsed: "Usado",
+sellerSoldEyebrow:
+  "HISTÓRICO DO VENDEDOR",
+sellerSoldTitle:
+  "Produtos vendidos",
+sellerSoldEmpty:
+  "Este vendedor ainda não tem produtos vendidos.",
+sellerSoldProductFallback:
+  "Produto vendido",
+sellerSoldBadge: "VENDIDO",
+sellerSoldCompleted:
+  "Venda concluída",
   },
 };

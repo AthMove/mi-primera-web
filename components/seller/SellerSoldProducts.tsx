@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useLanguage } from "@/components/LanguageProvider";
 
 interface Product {
   id: string | number;
@@ -22,19 +23,29 @@ export default function SellerSoldProducts({
   safeImage,
   onProductClick,
 }: Props) {
+  const { lang, t } = useLanguage();
+
+const locale =
+  lang === "en"
+    ? "en-GB"
+    : lang === "pt"
+      ? "pt-PT"
+      : "es-ES";
+
   const soldProducts = products.filter((product) => product.sold);
 
   return (
     <section className="seller-sold-section">
-      <div className="section-header">
-        <p>HISTORIAL DEL VENDEDOR</p>
-        <h2>Productos vendidos</h2>
-      </div>
+    <div className="section-header">
+  <p>{t.sellerSoldEyebrow}</p>
+
+  <h2>{t.sellerSoldTitle}</h2>
+</div>
 
       {soldProducts.length === 0 ? (
         <div className="empty-state">
-          Este vendedor todavía no tiene productos vendidos.
-        </div>
+  {t.sellerSoldEmpty}
+</div>
       ) : (
         <div className="sold-products-grid">
           {soldProducts.slice(0, 6).map((product) => (
@@ -46,12 +57,17 @@ export default function SellerSoldProducts({
               <div className="sold-product-image">
                 <Image
                   src={safeImage(product.image)}
-                  alt={product.title || "Producto vendido"}
+                  alt={
+  product.title ||
+  t.sellerSoldProductFallback
+}
                   fill
                   sizes="(max-width: 700px) 100vw, 33vw"
                 />
 
-                <span className="sold-product-badge">VENDIDO</span>
+               <span className="sold-product-badge">
+  {t.sellerSoldBadge}
+</span>
               </div>
 
               <div className="sold-product-content">
@@ -59,11 +75,21 @@ export default function SellerSoldProducts({
                   {product.brand || "ATHMOV"}
                 </p>
 
-                <h3>{product.title}</h3>
+                <h3>
+  {product.title ||
+    t.sellerSoldProductFallback}
+</h3>
 
                 <div className="sold-product-footer">
-                  <span>{product.price} €</span>
-                  <span>Venta completada</span>
+                  <span>
+  {new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "EUR",
+  }).format(Number(product.price || 0))}
+</span>
+                 <span>
+  {t.sellerSoldCompleted}
+</span>
                 </div>
               </div>
             </article>
