@@ -978,6 +978,41 @@ sellerLocation: "Ubicación",
 sellerDefaultLocation: "España",
 sellerDefaultResponseTime: "< 1 hora",
 sellerRating: "Valoración",
+sellerDashboardEyebrow: "PANEL DEL VENDEDOR",
+sellerDashboardTitle: "Confianza verificada",
+
+sellerDashboardVerifiedProfile:
+  "Perfil verificado",
+sellerDashboardProtectedPayments:
+  "Pagos protegidos",
+sellerDashboardPublicHistory:
+  "Historial público",
+sellerDashboardVerifiedReviews:
+  "Valoraciones verificadas",
+
+sellerDashboardTrustScore: "Trust Score",
+sellerDashboardNew: "NUEVO",
+sellerDashboardExcellentReputation:
+  "Excelente reputación",
+
+sellerDashboardSales: "Ventas",
+sellerDashboardProductsSold:
+  "Productos vendidos",
+
+sellerDashboardFollowers: "Seguidores",
+sellerDashboardCommunity: "Comunidad",
+
+sellerDashboardRating: "Valoración",
+sellerDashboardReviewSingular: "reseña",
+sellerDashboardReviewPlural: "reseñas",
+
+sellerDashboardMember: "Miembro",
+sellerDashboardSince: "Desde",
+
+sellerDashboardResponse: "Respuesta",
+sellerDashboardDefaultResponse: "< 1 hora",
+sellerDashboardAverageTime:
+  "Tiempo medio",
   },
 
 
@@ -1959,6 +1994,41 @@ sellerLocation: "Location",
 sellerDefaultLocation: "Spain",
 sellerDefaultResponseTime: "< 1 hour",
 sellerRating: "Rating",
+sellerDashboardEyebrow: "SELLER DASHBOARD",
+sellerDashboardTitle: "Verified trust",
+
+sellerDashboardVerifiedProfile:
+  "Verified profile",
+sellerDashboardProtectedPayments:
+  "Protected payments",
+sellerDashboardPublicHistory:
+  "Public history",
+sellerDashboardVerifiedReviews:
+  "Verified reviews",
+
+sellerDashboardTrustScore: "Trust Score",
+sellerDashboardNew: "NEW",
+sellerDashboardExcellentReputation:
+  "Excellent reputation",
+
+sellerDashboardSales: "Sales",
+sellerDashboardProductsSold:
+  "Products sold",
+
+sellerDashboardFollowers: "Followers",
+sellerDashboardCommunity: "Community",
+
+sellerDashboardRating: "Rating",
+sellerDashboardReviewSingular: "review",
+sellerDashboardReviewPlural: "reviews",
+
+sellerDashboardMember: "Member",
+sellerDashboardSince: "Since",
+
+sellerDashboardResponse: "Response",
+sellerDashboardDefaultResponse: "< 1 hour",
+sellerDashboardAverageTime:
+  "Average time",
   },
 
   pt: {
@@ -2945,5 +3015,42 @@ sellerLocation: "Localização",
 sellerDefaultLocation: "Espanha",
 sellerDefaultResponseTime: "< 1 hora",
 sellerRating: "Avaliação",
+sellerDashboardEyebrow:
+  "PAINEL DO VENDEDOR",
+sellerDashboardTitle:
+  "Confiança verificada",
+
+sellerDashboardVerifiedProfile:
+  "Perfil verificado",
+sellerDashboardProtectedPayments:
+  "Pagamentos protegidos",
+sellerDashboardPublicHistory:
+  "Histórico público",
+sellerDashboardVerifiedReviews:
+  "Avaliações verificadas",
+
+sellerDashboardTrustScore: "Trust Score",
+sellerDashboardNew: "NOVO",
+sellerDashboardExcellentReputation:
+  "Excelente reputação",
+
+sellerDashboardSales: "Vendas",
+sellerDashboardProductsSold:
+  "Produtos vendidos",
+
+sellerDashboardFollowers: "Seguidores",
+sellerDashboardCommunity: "Comunidade",
+
+sellerDashboardRating: "Avaliação",
+sellerDashboardReviewSingular: "avaliação",
+sellerDashboardReviewPlural: "avaliações",
+
+sellerDashboardMember: "Membro",
+sellerDashboardSince: "Desde",
+
+sellerDashboardResponse: "Resposta",
+sellerDashboardDefaultResponse: "< 1 hora",
+sellerDashboardAverageTime:
+  "Tempo médio",
   },
 };

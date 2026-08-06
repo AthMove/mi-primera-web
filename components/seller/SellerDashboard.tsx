@@ -3,6 +3,7 @@
 import GlassCard from "@/components/ui/GlassCard";
 import AnimatedCounter from "@/components/ui/AnimatedCounter";
 import PremiumStatCard from "@/components/ui/PremiumStatCard";
+import { useLanguage } from "@/components/LanguageProvider";
 
 interface Props {
   trustLabel: string;
@@ -25,14 +26,19 @@ export default function SellerDashboard({
   averageRating,
   seller,
 }: Props) {
+  const { t } = useLanguage();
   return (
     <div style={dashboardWrapperStyle}>
       <GlassCard padding="large" hover={false}>
         <section style={sellerDashboardStyle}>
           <div style={dashboardLeftStyle}>
-            <p style={dashboardEyebrowStyle}>SELLER DASHBOARD</p>
+           <p style={dashboardEyebrowStyle}>
+  {t.sellerDashboardEyebrow}
+</p>
 
-            <h2 style={dashboardTitleStyle}>Confianza verificada</h2>
+<h2 style={dashboardTitleStyle}>
+  {t.sellerDashboardTitle}
+</h2>
 
             <div style={trustProgressWrapperStyle}>
               <div style={trustProgressHeaderStyle}>
@@ -56,71 +62,89 @@ export default function SellerDashboard({
               </div>
             </div>
 
-            <div style={dashboardChecklistStyle}>
-              <span>✓ Perfil verificado</span>
-              <span>✓ Pagos protegidos</span>
-              <span>✓ Historial público</span>
-              <span>✓ Valoraciones verificadas</span>
-            </div>
+        <div style={dashboardChecklistStyle}>
+  <span>
+    ✓ {t.sellerDashboardVerifiedProfile}
+  </span>
+
+  <span>
+    ✓ {t.sellerDashboardProtectedPayments}
+  </span>
+
+  <span>
+    ✓ {t.sellerDashboardPublicHistory}
+  </span>
+
+  <span>
+    ✓ {t.sellerDashboardVerifiedReviews}
+  </span>
+</div>
           </div>
 
           <div style={dashboardRightStyle}>
-            <PremiumStatCard
-              label="Trust Score"
-              value={
-                totalReviews === 0 && soldCount === 0 ? (
-                  "NEW"
-                ) : (
-                  <AnimatedCounter
-                    value={sellerTrustScore}
-                    decimals={1}
-                  />
-                )
-              }
-              subtitle="Excelente reputación"
-            />
+          <PremiumStatCard
+  label={t.sellerDashboardTrustScore}
+  value={
+    totalReviews === 0 && soldCount === 0 ? (
+      t.sellerDashboardNew
+    ) : (
+      <AnimatedCounter
+        value={sellerTrustScore}
+        decimals={1}
+      />
+    )
+  }
+  subtitle={t.sellerDashboardExcellentReputation}
+/>
 
-            <PremiumStatCard
-              label="Ventas"
-              value={<AnimatedCounter value={soldCount} />}
-              subtitle="Productos vendidos"
-            />
+           <PremiumStatCard
+  label={t.sellerDashboardSales}
+  value={<AnimatedCounter value={soldCount} />}
+  subtitle={t.sellerDashboardProductsSold}
+/>
 
-            <PremiumStatCard
-              label="Seguidores"
-              value={<AnimatedCounter value={followersCount} />}
-              subtitle="Comunidad"
-            />
+<PremiumStatCard
+  label={t.sellerDashboardFollowers}
+  value={<AnimatedCounter value={followersCount} />}
+  subtitle={t.sellerDashboardCommunity}
+/>
 
-            <PremiumStatCard
-              label="Valoración"
-              value={
-                <>
-                  ★{" "}
-                  <AnimatedCounter
-                    value={Number(averageRating) || 0}
-                    decimals={1}
-                  />
-                </>
-              }
-              subtitle={`${totalReviews} reseñas`}
-            />
+         <PremiumStatCard
+  label={t.sellerDashboardRating}
+  value={
+    <>
+      ★{" "}
+      <AnimatedCounter
+        value={Number(averageRating) || 0}
+        decimals={1}
+      />
+    </>
+  }
+  subtitle={`${totalReviews} ${
+    totalReviews === 1
+      ? t.sellerDashboardReviewSingular
+      : t.sellerDashboardReviewPlural
+  }`}
+/>
 
-            <PremiumStatCard
-              label="Miembro"
-              value={
-                seller?.created_at
-                  ? new Date(seller.created_at).getFullYear()
-                  : "2025"
-              }
-              subtitle="Desde"
-            />
+       <PremiumStatCard
+  label={t.sellerDashboardMember}
+  value={
+    seller?.created_at
+      ? new Date(seller.created_at).getFullYear()
+      : "2025"
+  }
+  subtitle={t.sellerDashboardSince}
+/>
 
-            <PremiumStatCard
-              label="Respuesta"
-              value={seller?.response_time || "<1h"}
-              subtitle="Tiempo medio"
-            />
+           <PremiumStatCard
+  label={t.sellerDashboardResponse}
+  value={
+    seller?.response_time ||
+    t.sellerDashboardDefaultResponse
+  }
+  subtitle={t.sellerDashboardAverageTime}
+/>
           </div>
         </section>
       </GlassCard>
