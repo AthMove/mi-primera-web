@@ -873,6 +873,16 @@ notificationsEmptyText:
 notificationsNewBadge: "NUEVA",
 notificationsOpen: "Abrir",
 notificationsDelete: "Eliminar",
+favoritesLoading: "Cargando favoritos...",
+favoritesEyebrow: "FAVORITOS ATHMOV",
+favoritesTitle: "Favoritos",
+favoritesEmptyTitle:
+  "Todavía no tienes favoritos",
+favoritesEmptyText:
+  "Guarda productos premium para verlos más tarde.",
+favoritesExploreMarketplace:
+  "Explorar marketplace",
+favoritesRemove: "Quitar de favoritos",
   },
 
 
@@ -1750,6 +1760,16 @@ notificationsEmptyText:
 notificationsNewBadge: "NEW",
 notificationsOpen: "Open",
 notificationsDelete: "Delete",
+favoritesLoading: "Loading favourites...",
+favoritesEyebrow: "ATHMOV FAVOURITES",
+favoritesTitle: "Favourites",
+favoritesEmptyTitle:
+  "You do not have any favourites yet",
+favoritesEmptyText:
+  "Save premium products to view them later.",
+favoritesExploreMarketplace:
+  "Explore marketplace",
+favoritesRemove: "Remove from favourites",
   },
 
   pt: {
@@ -2630,5 +2650,15 @@ notificationsEmptyText:
 notificationsNewBadge: "NOVA",
 notificationsOpen: "Abrir",
 notificationsDelete: "Eliminar",
+favoritesLoading: "A carregar favoritos...",
+favoritesEyebrow: "FAVORITOS ATHMOV",
+favoritesTitle: "Favoritos",
+favoritesEmptyTitle:
+  "Ainda não tem favoritos",
+favoritesEmptyText:
+  "Guarde produtos premium para os consultar mais tarde.",
+favoritesExploreMarketplace:
+  "Explorar marketplace",
+favoritesRemove: "Remover dos favoritos",
   },
 };

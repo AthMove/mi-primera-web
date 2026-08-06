@@ -3,9 +3,18 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function FavoritesPage() {
   const router = useRouter();
+  const { lang, t } = useLanguage();
+
+const locale =
+  lang === "en"
+    ? "en-GB"
+    : lang === "pt"
+      ? "pt-PT"
+      : "es-ES";
 
   const [favorites, setFavorites] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -90,35 +99,52 @@ export default function FavoritesPage() {
     return src?.startsWith("http") || src?.startsWith("/") ? src : "/logo.png";
   };
 
-  if (loading) {
-    return <main style={pageStyle}>Cargando favoritos...</main>;
-  }
+ if (loading) {
+  return (
+    <main style={pageStyle}>
+      {t.favoritesLoading}
+    </main>
+  );
+}
 
   return (
     <main style={pageStyle} className="favorites-page">
       <section style={headerStyle}>
-        <p style={eyebrowStyle}>FAVORITOS ATHMOV</p>
+       <p style={eyebrowStyle}>
+  {t.favoritesEyebrow}
+</p>
 
-        <h1 style={titleStyle} className="favorites-title">
-          Favoritos
-        </h1>
+        <h1
+  style={titleStyle}
+  className="favorites-title"
+>
+  {t.favoritesTitle}
+</h1>
       </section>
 
       {favorites.length === 0 ? (
-        <section style={emptyStyle}>
-          <h2 style={{ margin: 0 }}>Todavía no tienes favoritos</h2>
+       <section style={emptyStyle}>
+  <h2 style={{ margin: 0 }}>
+    {t.favoritesEmptyTitle}
+  </h2>
 
-          <p style={{ color: "#666", marginTop: "12px" }}>
-            Guarda productos premium para verlos más tarde.
-          </p>
+  <p
+    style={{
+      color: "#666",
+      marginTop: "12px",
+    }}
+  >
+    {t.favoritesEmptyText}
+  </p>
 
-          <button
-            onClick={() => router.push("/products")}
-            style={shopButtonStyle}
-          >
-            Explorar marketplace
-          </button>
-        </section>
+  <button
+    type="button"
+    onClick={() => router.push("/products")}
+    style={shopButtonStyle}
+  >
+    {t.favoritesExploreMarketplace}
+  </button>
+</section>
       ) : (
         <section style={gridStyle} className="favorites-grid">
           {favorites.map((product: any) => (
@@ -130,7 +156,7 @@ export default function FavoritesPage() {
                 <div style={imageWrapperStyle}>
                   <Image
                     src={safeImage(product)}
-                    alt={product.title || "Producto"}
+                   alt={product.title || t.productFallback}
                     fill
                     sizes="(max-width: 900px) 100vw, 33vw"
                     style={{ objectFit: "cover" }}
@@ -141,10 +167,15 @@ export default function FavoritesPage() {
                   <p style={brandStyle}>{product.brand || "ATHMOV"}</p>
 
                   <h2 style={productTitleStyle}>
-                    {product.title || "Producto"}
+                   {product.title || t.productFallback}
                   </h2>
 
-                  <p style={priceStyle}>€{product.price}</p>
+                 <p style={priceStyle}>
+  {new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "EUR",
+  }).format(Number(product.price || 0))}
+</p>
                 </div>
               </div>
 
@@ -153,7 +184,7 @@ export default function FavoritesPage() {
                   onClick={() => removeFavorite(product.id)}
                   style={removeButtonStyle}
                 >
-                  Quitar de favoritos
+                 {t.favoritesRemove}
                 </button>
               </div>
             </article>
