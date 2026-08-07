@@ -1394,6 +1394,52 @@ homeFollowedProductsUpdatedContent:
   "Contenido actualizado según los vendedores que sigues.",
 homeFollowedProductsManageSellers:
   "Gestionar vendedores seguidos",
+  homeRecentlySoldEyebrow:
+  "Actividad ATHMOV",
+homeRecentlySoldTitleFirst:
+  "Vendidos",
+homeRecentlySoldTitleSecond:
+  "recientemente.",
+homeRecentlySoldDescription:
+  "El mejor material deportivo encuentra rápidamente una nueva historia.",
+homeRecentlySoldSummary:
+  "Productos premium vendidos recientemente dentro de la comunidad ATHMOV.",
+
+homeRecentlySoldProductAlt:
+  "Producto vendido",
+homeRecentlySoldBadge:
+  "Vendido",
+homeRecentlySoldDefaultCategory:
+  "Material deportivo",
+homeRecentlySoldDefaultProduct:
+  "Producto premium",
+homeRecentlySoldDefaultLocation:
+  "España",
+
+homeRecentlySoldResult:
+  "Resultado",
+homeRecentlySoldProductSold:
+  "Producto vendido",
+
+homeRecentlySoldSellFaster:
+  "Vende más rápido",
+homeRecentlySoldSellDescription:
+  "Publica tu material premium y encuentra a su próximo propietario.",
+homeRecentlySoldStartSelling:
+  "Empieza a vender",
+
+homeRecentlySoldRecent:
+  "Vendido recientemente",
+homeRecentlySoldAgo:
+  "Hace",
+homeRecentlySoldMinutesShort:
+  "min",
+homeRecentlySoldHoursShort:
+  "h",
+homeRecentlySoldOneDayAgo:
+  "Hace 1 día",
+homeRecentlySoldDays:
+  "días",
   },
 
 
@@ -2784,6 +2830,52 @@ homeFollowedProductsUpdatedContent:
   "Content updated based on the sellers you follow.",
 homeFollowedProductsManageSellers:
   "Manage followed sellers",
+  homeRecentlySoldEyebrow:
+  "ATHMOV activity",
+homeRecentlySoldTitleFirst:
+  "Recently",
+homeRecentlySoldTitleSecond:
+  "sold.",
+homeRecentlySoldDescription:
+  "The best sports equipment quickly finds a new story.",
+homeRecentlySoldSummary:
+  "Premium products recently sold within the ATHMOV community.",
+
+homeRecentlySoldProductAlt:
+  "Sold product",
+homeRecentlySoldBadge:
+  "Sold",
+homeRecentlySoldDefaultCategory:
+  "Sports equipment",
+homeRecentlySoldDefaultProduct:
+  "Premium product",
+homeRecentlySoldDefaultLocation:
+  "Europe",
+
+homeRecentlySoldResult:
+  "Result",
+homeRecentlySoldProductSold:
+  "Product sold",
+
+homeRecentlySoldSellFaster:
+  "Sell faster",
+homeRecentlySoldSellDescription:
+  "List your premium equipment and find its next owner.",
+homeRecentlySoldStartSelling:
+  "Start selling",
+
+homeRecentlySoldRecent:
+  "Recently sold",
+homeRecentlySoldAgo:
+  "Ago",
+homeRecentlySoldMinutesShort:
+  "min",
+homeRecentlySoldHoursShort:
+  "h",
+homeRecentlySoldOneDayAgo:
+  "1 day ago",
+homeRecentlySoldDays:
+  "days",
   },
 
   pt: {
@@ -4190,5 +4282,51 @@ homeFollowedProductsUpdatedContent:
   "Conteúdo atualizado de acordo com os vendedores que segue.",
 homeFollowedProductsManageSellers:
   "Gerir vendedores seguidos",
+  homeRecentlySoldEyebrow:
+  "Atividade ATHMOV",
+homeRecentlySoldTitleFirst:
+  "Vendidos",
+homeRecentlySoldTitleSecond:
+  "recentemente.",
+homeRecentlySoldDescription:
+  "O melhor material desportivo encontra rapidamente uma nova história.",
+homeRecentlySoldSummary:
+  "Produtos premium vendidos recentemente dentro da comunidade ATHMOV.",
+
+homeRecentlySoldProductAlt:
+  "Produto vendido",
+homeRecentlySoldBadge:
+  "Vendido",
+homeRecentlySoldDefaultCategory:
+  "Material desportivo",
+homeRecentlySoldDefaultProduct:
+  "Produto premium",
+homeRecentlySoldDefaultLocation:
+  "Europa",
+
+homeRecentlySoldResult:
+  "Resultado",
+homeRecentlySoldProductSold:
+  "Produto vendido",
+
+homeRecentlySoldSellFaster:
+  "Venda mais rápido",
+homeRecentlySoldSellDescription:
+  "Publique o seu material premium e encontre o próximo proprietário.",
+homeRecentlySoldStartSelling:
+  "Começar a vender",
+
+homeRecentlySoldRecent:
+  "Vendido recentemente",
+homeRecentlySoldAgo:
+  "Há",
+homeRecentlySoldMinutesShort:
+  "min",
+homeRecentlySoldHoursShort:
+  "h",
+homeRecentlySoldOneDayAgo:
+  "Há 1 dia",
+homeRecentlySoldDays:
+  "dias",
   },
 };

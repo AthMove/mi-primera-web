@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/components/LanguageProvider";
 
 type SoldProduct = {
   id: string;
@@ -26,6 +27,14 @@ export default function RecentlySoldSection({
   loading,
 }: Props) {
   const router = useRouter();
+  const { lang, t } = useLanguage();
+
+const locale =
+  lang === "en"
+    ? "en-GB"
+    : lang === "pt"
+      ? "pt-PT"
+      : "es-ES";
 
   const sectionRef = useRef<HTMLElement | null>(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -43,7 +52,7 @@ export default function RecentlySoldSection({
 };
 
 const getSoldText = (date?: string) => {
-  if (!date) return "Vendido recientemente";
+  if (!date) return t.homeRecentlySoldRecent;
 
   const createdDate = new Date(date);
   const now = new Date();
@@ -53,12 +62,23 @@ const getSoldText = (date?: string) => {
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
 
-  if (minutes < 1) return "Vendido recientemente";
-  if (minutes < 60) return `Hace ${minutes} min`;
-  if (hours < 24) return `Hace ${hours} h`;
-  if (days === 1) return "Hace 1 día";
+  if (minutes < 1) {
+    return t.homeRecentlySoldRecent;
+  }
 
-  return `Hace ${days} días`;
+  if (minutes < 60) {
+    return `${t.homeRecentlySoldAgo} ${minutes} ${t.homeRecentlySoldMinutesShort}`;
+  }
+
+  if (hours < 24) {
+    return `${t.homeRecentlySoldAgo} ${hours} ${t.homeRecentlySoldHoursShort}`;
+  }
+
+  if (days === 1) {
+    return t.homeRecentlySoldOneDayAgo;
+  }
+
+  return `${t.homeRecentlySoldAgo} ${days} ${t.homeRecentlySoldDays}`;
 };
 
   useEffect(() => {
@@ -84,8 +104,8 @@ const getSoldText = (date?: string) => {
     return () => observer.disconnect();
   }, []);
 
-  const formatPrice = (price: number) =>
-    new Intl.NumberFormat("es-ES", {
+const formatPrice = (price: number) =>
+  new Intl.NumberFormat(locale, {
       style: "currency",
       currency: "EUR",
       maximumFractionDigits: 0,
@@ -112,21 +132,20 @@ if (!soldProducts.length) {
             <div className="recently-sold-eyebrow-row">
               <span className="recently-sold-line" />
 
-              <p className="recently-sold-eyebrow">
-                Actividad ATHMOV
-              </p>
+            <p className="recently-sold-eyebrow">
+  {t.homeRecentlySoldEyebrow}
+</p>
             </div>
 
-            <h2 className="recently-sold-title">
-              Recently
-              <br />
-              sold.
-            </h2>
+         <h2 className="recently-sold-title">
+  {t.homeRecentlySoldTitleFirst}
+  <br />
+  {t.homeRecentlySoldTitleSecond}
+</h2>
 
-            <p className="recently-sold-description">
-              El mejor material deportivo encuentra rápidamente una
-              nueva historia.
-            </p>
+        <p className="recently-sold-description">
+  {t.homeRecentlySoldDescription}
+</p>
           </div>
 
           <div className="recently-sold-summary">
@@ -134,10 +153,9 @@ if (!soldProducts.length) {
               {String(soldProducts.slice(0, 3).length).padStart(2, "0")}
             </span>
 
-            <p>
-              Productos premium vendidos recientemente dentro de la
-              comunidad ATHMOV.
-            </p>
+           <p>
+  {t.homeRecentlySoldSummary}
+</p>
           </div>
         </div>
 
@@ -155,7 +173,7 @@ if (!soldProducts.length) {
               <div className="recently-sold-image-wrap">
                 <img
                   src={safeImage(product)}
-                  alt={product.title || "Producto vendido"}
+                  alt={product.title || t.homeRecentlySoldProductAlt}
                   className="recently-sold-image"
                 />
 
@@ -165,7 +183,7 @@ if (!soldProducts.length) {
 
                 <span className="recently-sold-badge">
                   <span className="recently-sold-badge-dot" />
-                  Vendido
+                  {t.homeRecentlySoldBadge}
                 </span>
               </div>
 
@@ -173,10 +191,12 @@ if (!soldProducts.length) {
                 <div className="recently-sold-content-top">
                   <div>
                     <p className="recently-sold-category">
-                      {product.category || "Material deportivo"}
+                      {product.category || t.homeRecentlySoldDefaultCategory}
                     </p>
 
-                    <h3>{product.title || "Producto premium"}</h3>
+                    <h3>
+  {product.title || t.homeRecentlySoldDefaultProduct}
+</h3>
                   </div>
 
                   <strong>
@@ -185,7 +205,9 @@ if (!soldProducts.length) {
                 </div>
 
                 <div className="recently-sold-meta">
-                  <span>{product.location || "España"}</span>
+                 <span>
+  {product.location || t.homeRecentlySoldDefaultLocation}
+</span>
                   <span className="recently-sold-meta-dot" />
                   <span>{getSoldText(product.created_at)}</span>
                 </div>
@@ -198,8 +220,8 @@ if (!soldProducts.length) {
                   </span>
 
                   <div>
-                    <span>Resultado</span>
-                    <strong>Producto vendido</strong>
+                 <span>{t.homeRecentlySoldResult}</span>
+<strong>{t.homeRecentlySoldProductSold}</strong>
                   </div>
                 </div>
               </div>
@@ -209,14 +231,13 @@ if (!soldProducts.length) {
 
         <div className="recently-sold-footer">
           <div>
-            <span className="recently-sold-footer-label">
-              Sell faster
-            </span>
+         <span className="recently-sold-footer-label">
+  {t.homeRecentlySoldSellFaster}
+</span>
 
-            <p>
-              Publica tu material premium y encuentra a su próximo
-              propietario.
-            </p>
+         <p>
+  {t.homeRecentlySoldSellDescription}
+</p>
           </div>
 
           <button
@@ -224,7 +245,7 @@ if (!soldProducts.length) {
             className="recently-sold-link"
             onClick={() => router.push("/sell")}
           >
-            <span>Empieza a vender</span>
+            <span>{t.homeRecentlySoldStartSelling}</span>
 
             <span className="recently-sold-link-circle">
               <svg viewBox="0 0 24 24" aria-hidden="true">
