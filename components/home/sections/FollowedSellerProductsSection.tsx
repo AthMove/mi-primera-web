@@ -2,6 +2,7 @@
 
 import type { CSSProperties } from "react";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/components/LanguageProvider";
 import ProductCard from "../cards/ProductCard";
 import SkeletonCard from "@/components/common/SkeletonCard";
 
@@ -17,6 +18,7 @@ export default function FollowedSellerProductsSection({
   loading = false,
 }: FollowedSellerProductsSectionProps) {
   const router = useRouter();
+  const { t } = useLanguage();
 
   if (!products?.length) {
     return null;
@@ -36,18 +38,17 @@ export default function FollowedSellerProductsSection({
               <span className="followed-products-line" />
 
               <p className="followed-products-eyebrow">
-                Novedades de tu comunidad
-              </p>
+  {t.homeFollowedProductsEyebrow}
+</p>
             </div>
 
             <h2 className="followed-products-title">
-              Productos de vendedores que sigues
-            </h2>
+  {t.homeFollowedProductsTitle}
+</h2>
 
-            <p className="followed-products-description">
-              Nuevas piezas publicadas por vendedores que ya forman
-              parte de tu selección personal en ATHMOV.
-            </p>
+         <p className="followed-products-description">
+  {t.homeFollowedProductsDescription}
+</p>
           </div>
 
           <button
@@ -55,7 +56,7 @@ export default function FollowedSellerProductsSection({
             className="followed-products-button"
             onClick={() => router.push("/feed")}
           >
-            Ver novedades
+           {t.homeFollowedProductsViewUpdates}
 
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M5 12h14M13 6l6 6-6 6" />
@@ -87,16 +88,16 @@ export default function FollowedSellerProductsSection({
           <div className="followed-products-footer-copy">
             <span className="followed-products-footer-dot" />
 
-            <p>
-              Contenido actualizado según los vendedores que sigues.
-            </p>
+           <p>
+  {t.homeFollowedProductsUpdatedContent}
+</p>
           </div>
 
           <button
             type="button"
             onClick={() => router.push("/following")}
           >
-            Gestionar vendedores seguidos
+           {t.homeFollowedProductsManageSellers}
 
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M5 12h14M13 6l6 6-6 6" />

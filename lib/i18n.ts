@@ -1382,6 +1382,18 @@ homeFollowedSellersRating:
   "Valoración",
 homeFollowedSellersResponse:
   "Respuesta",
+  homeFollowedProductsEyebrow:
+  "Novedades de tu comunidad",
+homeFollowedProductsTitle:
+  "Productos de vendedores que sigues",
+homeFollowedProductsDescription:
+  "Nuevas piezas publicadas por vendedores que ya forman parte de tu selección personal en ATHMOV.",
+homeFollowedProductsViewUpdates:
+  "Ver novedades",
+homeFollowedProductsUpdatedContent:
+  "Contenido actualizado según los vendedores que sigues.",
+homeFollowedProductsManageSellers:
+  "Gestionar vendedores seguidos",
   },
 
 
@@ -2760,6 +2772,18 @@ homeFollowedSellersRating:
   "Rating",
 homeFollowedSellersResponse:
   "Response",
+  homeFollowedProductsEyebrow:
+  "Updates from your community",
+homeFollowedProductsTitle:
+  "Products from sellers you follow",
+homeFollowedProductsDescription:
+  "New pieces listed by sellers who are already part of your personal selection on ATHMOV.",
+homeFollowedProductsViewUpdates:
+  "View updates",
+homeFollowedProductsUpdatedContent:
+  "Content updated based on the sellers you follow.",
+homeFollowedProductsManageSellers:
+  "Manage followed sellers",
   },
 
   pt: {
@@ -4154,5 +4178,17 @@ homeFollowedSellersRating:
   "Avaliação",
 homeFollowedSellersResponse:
   "Resposta",
+  homeFollowedProductsEyebrow:
+  "Novidades da sua comunidade",
+homeFollowedProductsTitle:
+  "Produtos de vendedores que segue",
+homeFollowedProductsDescription:
+  "Novas peças publicadas por vendedores que já fazem parte da sua seleção pessoal na ATHMOV.",
+homeFollowedProductsViewUpdates:
+  "Ver novidades",
+homeFollowedProductsUpdatedContent:
+  "Conteúdo atualizado de acordo com os vendedores que segue.",
+homeFollowedProductsManageSellers:
+  "Gerir vendedores seguidos",
   },
 };
