@@ -73,9 +73,9 @@ export default function LatestDropsSection({
                 {t.news}
               </h2>
 
-              <p className="latest-drops-description">
-                Cargando la selección más reciente de ATHMOV.
-              </p>
+             <p className="latest-drops-description">
+  {t.homeLatestLoadingDescription}
+</p>
             </div>
           </div>
 
@@ -118,10 +118,9 @@ export default function LatestDropsSection({
               {t.news}
             </h2>
 
-            <p className="latest-drops-description">
-              Una selección de material deportivo premium que
-              acaba de llegar a ATHMOV.
-            </p>
+           <p className="latest-drops-description">
+  {t.homeLatestDescription}
+</p>
           </div>
 
          <button
@@ -167,34 +166,36 @@ export default function LatestDropsSection({
               00
             </span>
 
-            <h3>Próximamente</h3>
+        <h3>
+  {t.homeLatestComingSoon}
+</h3>
 
-            <p>
-              Estamos preparando una nueva selección de productos
-              deportivos premium.
-            </p>
+<p>
+  {t.homeLatestEmptyDescription}
+</p>
 
-            <button
-              type="button"
-              onClick={() => router.push("/feed")}
-            >
-              Explorar ATHMOV
-            </button>
+<button
+  type="button"
+  onClick={() => router.push("/feed")}
+>
+  {t.homeLatestExploreAthmov}
+</button>
           </div>
         )}
 
         <div className="latest-drops-footer">
-          <p>
-            Nuevos productos añadidos por deportistas de la
-            comunidad ATHMOV.
-          </p>
+     <p>
+  {t.homeLatestCommunityProducts}
+</p>
 
      <button
   type="button"
   className="latest-drops-link"
   onClick={() => router.push("/feed")}
 >
-  <span>Explorar todos los productos</span>
+  <span>
+  {t.homeLatestExploreAll}
+</span>
 
   <span className="latest-drops-link-circle">
     <svg viewBox="0 0 24 24" aria-hidden="true">

@@ -1338,6 +1338,20 @@ homeEditorialItemThreeTitle:
   "Comunidad deportiva",
 homeEditorialItemThreeDescription:
   "Pádel, golf, tenis y running reunidos en un mismo lugar.",
+  homeLatestLoadingDescription:
+  "Cargando la selección más reciente de ATHMOV.",
+homeLatestDescription:
+  "Una selección de material deportivo premium que acaba de llegar a ATHMOV.",
+homeLatestComingSoon:
+  "Próximamente",
+homeLatestEmptyDescription:
+  "Estamos preparando una nueva selección de productos deportivos premium.",
+homeLatestExploreAthmov:
+  "Explorar ATHMOV",
+homeLatestCommunityProducts:
+  "Nuevos productos añadidos por deportistas de la comunidad ATHMOV.",
+homeLatestExploreAll:
+  "Explorar todos los productos",
   },
 
 
@@ -2672,6 +2686,20 @@ homeEditorialItemThreeTitle:
   "Sports community",
 homeEditorialItemThreeDescription:
   "Padel, golf, tennis and running brought together in one place.",
+  homeLatestLoadingDescription:
+  "Loading ATHMOV's latest selection.",
+homeLatestDescription:
+  "A selection of premium sports equipment that has just arrived on ATHMOV.",
+homeLatestComingSoon:
+  "Coming soon",
+homeLatestEmptyDescription:
+  "We are preparing a new selection of premium sports equipment.",
+homeLatestExploreAthmov:
+  "Explore ATHMOV",
+homeLatestCommunityProducts:
+  "New products added by athletes from the ATHMOV community.",
+homeLatestExploreAll:
+  "Explore all products",
   },
 
   pt: {
@@ -4022,5 +4050,19 @@ homeEditorialItemThreeTitle:
   "Comunidade desportiva",
 homeEditorialItemThreeDescription:
   "Padel, golfe, ténis e running reunidos num só lugar.",
+  homeLatestLoadingDescription:
+  "A carregar a seleção mais recente da ATHMOV.",
+homeLatestDescription:
+  "Uma seleção de material desportivo premium que acaba de chegar à ATHMOV.",
+homeLatestComingSoon:
+  "Em breve",
+homeLatestEmptyDescription:
+  "Estamos a preparar uma nova seleção de material desportivo premium.",
+homeLatestExploreAthmov:
+  "Explorar ATHMOV",
+homeLatestCommunityProducts:
+  "Novos produtos adicionados por desportistas da comunidade ATHMOV.",
+homeLatestExploreAll:
+  "Explorar todos os produtos",
   },
 };
