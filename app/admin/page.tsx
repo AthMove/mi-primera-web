@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function AdminPage() {
   const [loading, setLoading] = useState(true);
@@ -10,6 +11,20 @@ export default function AdminPage() {
   const [products, setProducts] = useState<any[]>([]);
   const [refundingId, setRefundingId] = useState("");
   const [profiles, setProfiles] = useState<any[]>([]);
+  const { lang, t } = useLanguage();
+
+const locale =
+  lang === "en"
+    ? "en-GB"
+    : lang === "pt"
+      ? "pt-PT"
+      : "es-ES";
+
+const formatCurrency = (value: number) =>
+  new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "EUR",
+  }).format(value);
 
   useEffect(() => {
     loadAdmin();
@@ -47,9 +62,11 @@ export default function AdminPage() {
   };
 
   const refundOrder = async (order: any) => {
-    const confirmRefund = confirm(
-      `Refund this order of €${order.amount}? This action cannot be undone.`
-    );
+   const confirmRefund = confirm(
+  `${t.adminRefundConfirm} ${formatCurrency(
+    Number(order.amount || 0)
+  )}. ${t.adminRefundIrreversible}`
+);
 
     if (!confirmRefund) return;
 
@@ -65,15 +82,15 @@ export default function AdminPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.error || "Refund failed");
+       alert(data.error || t.adminRefundFailed);
         return;
       }
 
-      alert("Refund completed");
+      alert(t.adminRefundCompleted);
       await loadAdmin();
     } catch (error) {
       console.log(error);
-      alert("Refund failed");
+      alert(t.adminRefundFailed);
     } finally {
       setRefundingId("");
     }
@@ -103,82 +120,94 @@ const openDisputes = orders.filter(
 );
 
   if (loading) {
-    return <main style={pageStyle}>Loading admin...</main>;
+    return (
+  <main style={pageStyle}>
+    {t.adminLoading}
+  </main>
+);
   }
 
   return (
     <main style={pageStyle} className="admin-page">
       <section style={heroStyle}>
-        <p style={eyebrowStyle}>ATHMOV ADMIN</p>
+        <p style={eyebrowStyle}>
+  {t.adminEyebrow}
+</p>
 
         <h1 style={titleStyle} className="admin-title">
-          Marketplace Control
+         {t.adminTitle}
         </h1>
 
         <p style={subtitleStyle}>
-          Revenue, orders, products and marketplace performance.
+         {t.adminSubtitle}
         </p>
       </section>
 
       <section style={statsGridStyle}>
         <div style={cardStyle}>
-          <p style={labelStyle}>Gross Sales</p>
-          <h2 style={valueStyle}>€{totalSales}</h2>
+          <p style={labelStyle}>{t.adminGrossSales}</p>
+          <h2 style={valueStyle}>
+  {formatCurrency(totalSales)}
+</h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={labelStyle}>ATHMOV Fees</p>
-          <h2 style={valueStyle}>€{athmovFees}</h2>
+          <p style={labelStyle}>{t.adminFees}</p>
+        <h2 style={valueStyle}>
+  {formatCurrency(athmovFees)}
+</h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={labelStyle}>Seller Payouts</p>
-          <h2 style={valueStyle}>€{sellerPayouts}</h2>
+          <p style={labelStyle}>{t.adminSellerPayouts}</p>
+         <h2 style={valueStyle}>
+  {formatCurrency(sellerPayouts)}
+</h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={labelStyle}>Orders</p>
+          <p style={labelStyle}>{t.adminOrders}</p>
           <h2 style={valueStyle}>{orders.length}</h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={labelStyle}>Pending Orders</p>
+          <p style={labelStyle}>{t.adminPendingOrders}</p>
           <h2 style={valueStyle}>{pendingOrders}</h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={labelStyle}>Products</p>
+          <p style={labelStyle}>{t.adminProducts}</p>
           <h2 style={valueStyle}>{products.length}</h2>
         </div>
       </section>
 
       <section style={actionsStyle}>
         <Link href="/orders" style={buttonStyle}>
-          View Orders
+         {t.adminViewOrders}
         </Link>
 
         <Link href="/products" style={buttonStyle}>
-          View Marketplace
+         {t.adminViewMarketplace}
         </Link>
 
         <Link href="/dashboard" style={buttonStyle}>
-          Seller Dashboard
+         {t.adminSellerDashboard}
         </Link>
       </section>
 
       <section style={sectionStyle}>
         <div style={sectionHeaderStyle}>
-          <h2 style={sectionTitleStyle}>Pending Seller Verifications</h2>
+          <h2 style={sectionTitleStyle}>{t.adminPendingVerifications}</h2>
         </div>
 
         {profiles.length === 0 ? (
-          <div style={emptyStyle}>No pending verifications.</div>
+          <div style={emptyStyle}>{t.adminNoPendingVerifications}</div>
         ) : (
           <div style={listStyle}>
             {profiles.map((profile: any) => (
               <article key={profile.id} style={rowStyle}>
                 <div>
-                  <p style={rowMetaStyle}>SELLER VERIFICATION</p>
+                  <p style={rowMetaStyle}>{t.adminSellerVerification}</p>
 
                   <h3 style={rowTitleStyle}>
                     {profile.full_name || profile.username || profile.email}
@@ -191,7 +220,7 @@ const openDisputes = orders.filter(
                       rel="noopener noreferrer"
                       style={smallLinkStyle}
                     >
-                      View document →
+                      {t.adminViewDocument} →
                     </a>
                   )}
                 </div>
@@ -213,7 +242,7 @@ const openDisputes = orders.filter(
                     await loadAdmin();
                   }}
                 >
-                  Approve
+                  {t.adminApprove}
                 </button>
               </article>
             ))}
@@ -223,27 +252,35 @@ const openDisputes = orders.filter(
 
       <section style={sectionStyle}>
         <div style={sectionHeaderStyle}>
-          <h2 style={sectionTitleStyle}>Recent Orders</h2>
+          <h2 style={sectionTitleStyle}>{t.adminRecentOrders}</h2>
         </div>
 
         {orders.length === 0 ? (
-          <div style={emptyStyle}>No orders yet.</div>
+          <div style={emptyStyle}>{t.adminNoOrders}</div>
         ) : (
           <div style={listStyle}>
             {orders.slice(0, 12).map((order: any) => (
               <article key={order.id} style={rowStyle}>
                 <div>
-                  <p style={rowMetaStyle}>ORDER</p>
-                  <h3 style={rowTitleStyle}>€{order.amount}</h3>
+                  <p style={rowMetaStyle}>{t.adminOrder}</p>
+                  <h3 style={rowTitleStyle}>
+  {formatCurrency(Number(order.amount || 0))}
+</h3>
 
                   <p style={rowTextStyle}>
-                    ATHMOV fee: €{order.platform_fee || 0} · Seller payout: €
-                    {order.seller_amount || 0}
+                  {t.adminAthmovFee}:{" "}
+{formatCurrency(Number(order.platform_fee || 0))}
+{" · "}
+{t.adminSellerPayout}:{" "}
+{formatCurrency(Number(order.seller_amount || 0))}
                   </p>
 
                   <p style={rowTextStyle}>
-                    Payment: {order.payment_status || "pending"} · Transfer:{" "}
-                    {order.transfer_status || "pending"}
+                   {t.adminPayment}:{" "}
+{order.payment_status || "pending"}
+{" · "}
+{t.adminTransfer}:{" "}
+{order.transfer_status || "pending"}
                   </p>
                 </div>
 
@@ -257,12 +294,14 @@ const openDisputes = orders.filter(
                         style={dangerButtonStyle}
                         disabled={refundingId === order.id}
                       >
-                        {refundingId === order.id ? "Refunding..." : "Refund"}
+                       {refundingId === order.id
+  ? t.adminRefunding
+  : t.adminRefund}
                       </button>
                     )}
 
                   {order.payment_status === "refunded" && (
-                    <span style={refundedStyle}>Refunded</span>
+                    <span style={refundedStyle}>{t.adminRefunded}</span>
                   )}
                 </div>
               </article>
@@ -273,18 +312,21 @@ const openDisputes = orders.filter(
 
       <section style={sectionStyle}>
         <div style={sectionHeaderStyle}>
-          <h2 style={sectionTitleStyle}>Open Disputes</h2>
+          <h2 style={sectionTitleStyle}>{t.adminOpenDisputes}</h2>
         </div>
 
         {openDisputes.length === 0 ? (
-          <div style={emptyStyle}>No disputes open.</div>
+          <div style={emptyStyle}>{t.adminNoOpenDisputes}</div>
         ) : (
           <div style={listStyle}>
             {openDisputes.map((order: any) => (
               <article key={order.id} style={rowStyle}>
                 <div>
-                  <p style={rowMetaStyle}>DISPUTE</p>
-                  <h3 style={rowTitleStyle}>Order €{order.amount}</h3>
+                  <p style={rowMetaStyle}>{t.adminDispute}</p>
+                  <h3 style={rowTitleStyle}>
+  {t.adminOrder}{" "}
+  {formatCurrency(Number(order.amount || 0))}
+</h3>
                   <p style={rowTextStyle}>{order.dispute_reason}</p>
                 </div>
 
@@ -304,7 +346,7 @@ const openDisputes = orders.filter(
                       await loadAdmin();
                     }}
                   >
-                    Resolve
+                   {t.adminResolve}
                   </button>
 
                   <button
@@ -327,7 +369,7 @@ const openDisputes = orders.filter(
                       await loadAdmin();
                     }}
                   >
-                    Refund buyer
+                    {t.adminRefundBuyer}
                   </button>
                 </div>
               </article>
@@ -338,32 +380,39 @@ const openDisputes = orders.filter(
 
       <section style={sectionStyle}>
         <div style={sectionHeaderStyle}>
-          <h2 style={sectionTitleStyle}>Product Moderation</h2>
+          <h2 style={sectionTitleStyle}>{t.adminProductModeration}</h2>
         </div>
 
         {products.length === 0 ? (
-          <div style={emptyStyle}>No products yet.</div>
+          <div style={emptyStyle}>{t.adminNoProducts}</div>
         ) : (
           <div style={listStyle}>
             {products.slice(0, 30).map((product: any) => (
               <article key={product.id} style={rowStyle}>
                 <div>
                   <p style={rowMetaStyle}>
-                    PRODUCT · {product.moderation_status || "pending"}
-                    {product.featured ? " · FEATURED" : ""}
+                 {t.adminProduct} · {product.moderation_status || "pending"}
+{product.featured
+  ? ` · ${t.adminFeatured}`
+  : ""}
                   </p>
 
-                  <h3 style={rowTitleStyle}>{product.title || "Product"}</h3>
+                  <h3 style={rowTitleStyle}>{product.title || t.adminProduct}</h3>
 
                   <p style={rowTextStyle}>
-                    €{product.price} · {product.brand || "Brand"} ·{" "}
-                    {product.category || product.sport || "Category"}
+                   {formatCurrency(Number(product.price || 0))}
+{" · "}
+{product.brand || t.adminBrand}
+{" · "}
+{product.category ||
+  product.sport ||
+  t.adminCategory}
                   </p>
                 </div>
 
                 <div style={rowActionsStyle}>
                   <Link href={`/products/${product.id}`} style={smallLinkStyle}>
-                    Open →
+                    {t.adminOpen} →
                   </Link>
 
                   <button
@@ -380,7 +429,7 @@ const openDisputes = orders.filter(
                       await loadAdmin();
                     }}
                   >
-                    Approve
+                   {t.adminApprove}
                   </button>
 
                   <button
@@ -397,7 +446,7 @@ const openDisputes = orders.filter(
                       await loadAdmin();
                     }}
                   >
-                    Reject
+                    {t.adminReject}
                   </button>
 
                   {product.featured ? (
@@ -415,7 +464,7 @@ const openDisputes = orders.filter(
                         await loadAdmin();
                       }}
                     >
-                      Unfeature
+                      {t.adminUnfeature}
                     </button>
                   ) : (
                     <button
@@ -434,7 +483,7 @@ const openDisputes = orders.filter(
                         await loadAdmin();
                       }}
                     >
-                      Feature
+                      {t.adminFeature}
                     </button>
                   )}
                 </div>

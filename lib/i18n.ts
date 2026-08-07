@@ -1446,6 +1446,107 @@ homeBlogGolfTitle:
   "Cuándo comprar y vender palos de golf de segunda mano",
 homeBlogGolfDescription:
   "El calendario clave para compradores y vendedores de golf premium.",
+  adminLoading:
+  "Cargando administración...",
+adminEyebrow:
+  "ATHMOV ADMIN",
+adminTitle:
+  "Control del marketplace",
+adminSubtitle:
+  "Ingresos, pedidos, productos y rendimiento del marketplace.",
+
+adminGrossSales:
+  "Ventas brutas",
+adminFees:
+  "Comisiones ATHMOV",
+adminSellerPayouts:
+  "Pagos a vendedores",
+adminOrders:
+  "Pedidos",
+adminPendingOrders:
+  "Pedidos pendientes",
+adminProducts:
+  "Productos",
+
+adminViewOrders:
+  "Ver pedidos",
+adminViewMarketplace:
+  "Ver marketplace",
+adminSellerDashboard:
+  "Panel de vendedor",
+
+adminPendingVerifications:
+  "Verificaciones de vendedores pendientes",
+adminNoPendingVerifications:
+  "No hay verificaciones pendientes.",
+adminSellerVerification:
+  "Verificación de vendedor",
+adminViewDocument:
+  "Ver documento",
+adminApprove:
+  "Aprobar",
+
+adminRecentOrders:
+  "Pedidos recientes",
+adminNoOrders:
+  "Todavía no hay pedidos.",
+adminOrder:
+  "Pedido",
+adminAthmovFee:
+  "Comisión ATHMOV",
+adminSellerPayout:
+  "Pago al vendedor",
+adminPayment:
+  "Pago",
+adminTransfer:
+  "Transferencia",
+
+adminRefundConfirm:
+  "¿Reembolsar este pedido por",
+adminRefundIrreversible:
+  "Esta acción no se puede deshacer.",
+adminRefundFailed:
+  "El reembolso ha fallado",
+adminRefundCompleted:
+  "Reembolso completado",
+adminRefunding:
+  "Reembolsando...",
+adminRefund:
+  "Reembolsar",
+adminRefunded:
+  "Reembolsado",
+
+adminOpenDisputes:
+  "Disputas abiertas",
+adminNoOpenDisputes:
+  "No hay disputas abiertas.",
+adminDispute:
+  "Disputa",
+adminResolve:
+  "Resolver",
+adminRefundBuyer:
+  "Reembolsar al comprador",
+
+adminProductModeration:
+  "Moderación de productos",
+adminNoProducts:
+  "Todavía no hay productos.",
+adminProduct:
+  "Producto",
+adminFeatured:
+  "Destacado",
+adminBrand:
+  "Marca",
+adminCategory:
+  "Categoría",
+adminOpen:
+  "Abrir",
+adminReject:
+  "Rechazar",
+adminFeature:
+  "Destacar",
+adminUnfeature:
+  "Quitar destacado",
   },
 
 
@@ -2888,6 +2989,107 @@ homeBlogGolfTitle:
   "When to buy and sell second-hand golf clubs",
 homeBlogGolfDescription:
   "The key calendar for buyers and sellers of premium golf equipment.",
+  adminLoading:
+  "Loading admin...",
+adminEyebrow:
+  "ATHMOV ADMIN",
+adminTitle:
+  "Marketplace Control",
+adminSubtitle:
+  "Revenue, orders, products and marketplace performance.",
+
+adminGrossSales:
+  "Gross Sales",
+adminFees:
+  "ATHMOV Fees",
+adminSellerPayouts:
+  "Seller Payouts",
+adminOrders:
+  "Orders",
+adminPendingOrders:
+  "Pending Orders",
+adminProducts:
+  "Products",
+
+adminViewOrders:
+  "View Orders",
+adminViewMarketplace:
+  "View Marketplace",
+adminSellerDashboard:
+  "Seller Dashboard",
+
+adminPendingVerifications:
+  "Pending Seller Verifications",
+adminNoPendingVerifications:
+  "No pending verifications.",
+adminSellerVerification:
+  "Seller Verification",
+adminViewDocument:
+  "View document",
+adminApprove:
+  "Approve",
+
+adminRecentOrders:
+  "Recent Orders",
+adminNoOrders:
+  "No orders yet.",
+adminOrder:
+  "Order",
+adminAthmovFee:
+  "ATHMOV fee",
+adminSellerPayout:
+  "Seller payout",
+adminPayment:
+  "Payment",
+adminTransfer:
+  "Transfer",
+
+adminRefundConfirm:
+  "Refund this order of",
+adminRefundIrreversible:
+  "This action cannot be undone.",
+adminRefundFailed:
+  "Refund failed",
+adminRefundCompleted:
+  "Refund completed",
+adminRefunding:
+  "Refunding...",
+adminRefund:
+  "Refund",
+adminRefunded:
+  "Refunded",
+
+adminOpenDisputes:
+  "Open Disputes",
+adminNoOpenDisputes:
+  "No disputes open.",
+adminDispute:
+  "Dispute",
+adminResolve:
+  "Resolve",
+adminRefundBuyer:
+  "Refund buyer",
+
+adminProductModeration:
+  "Product Moderation",
+adminNoProducts:
+  "No products yet.",
+adminProduct:
+  "Product",
+adminFeatured:
+  "Featured",
+adminBrand:
+  "Brand",
+adminCategory:
+  "Category",
+adminOpen:
+  "Open",
+adminReject:
+  "Reject",
+adminFeature:
+  "Feature",
+adminUnfeature:
+  "Unfeature",
   },
 
   pt: {
@@ -4346,5 +4548,106 @@ homeBlogGolfTitle:
   "Quando comprar e vender tacos de golfe em segunda mão",
 homeBlogGolfDescription:
   "O calendário essencial para compradores e vendedores de material de golfe premium.",
+  adminLoading:
+  "A carregar administração...",
+adminEyebrow:
+  "ATHMOV ADMIN",
+adminTitle:
+  "Controlo do marketplace",
+adminSubtitle:
+  "Receitas, encomendas, produtos e desempenho do marketplace.",
+
+adminGrossSales:
+  "Vendas brutas",
+adminFees:
+  "Comissões ATHMOV",
+adminSellerPayouts:
+  "Pagamentos a vendedores",
+adminOrders:
+  "Encomendas",
+adminPendingOrders:
+  "Encomendas pendentes",
+adminProducts:
+  "Produtos",
+
+adminViewOrders:
+  "Ver encomendas",
+adminViewMarketplace:
+  "Ver marketplace",
+adminSellerDashboard:
+  "Painel do vendedor",
+
+adminPendingVerifications:
+  "Verificações de vendedores pendentes",
+adminNoPendingVerifications:
+  "Não existem verificações pendentes.",
+adminSellerVerification:
+  "Verificação de vendedor",
+adminViewDocument:
+  "Ver documento",
+adminApprove:
+  "Aprovar",
+
+adminRecentOrders:
+  "Encomendas recentes",
+adminNoOrders:
+  "Ainda não existem encomendas.",
+adminOrder:
+  "Encomenda",
+adminAthmovFee:
+  "Comissão ATHMOV",
+adminSellerPayout:
+  "Pagamento ao vendedor",
+adminPayment:
+  "Pagamento",
+adminTransfer:
+  "Transferência",
+
+adminRefundConfirm:
+  "Reembolsar esta encomenda no valor de",
+adminRefundIrreversible:
+  "Esta ação não pode ser anulada.",
+adminRefundFailed:
+  "O reembolso falhou",
+adminRefundCompleted:
+  "Reembolso concluído",
+adminRefunding:
+  "A reembolsar...",
+adminRefund:
+  "Reembolsar",
+adminRefunded:
+  "Reembolsado",
+
+adminOpenDisputes:
+  "Disputas abertas",
+adminNoOpenDisputes:
+  "Não existem disputas abertas.",
+adminDispute:
+  "Disputa",
+adminResolve:
+  "Resolver",
+adminRefundBuyer:
+  "Reembolsar comprador",
+
+adminProductModeration:
+  "Moderação de produtos",
+adminNoProducts:
+  "Ainda não existem produtos.",
+adminProduct:
+  "Produto",
+adminFeatured:
+  "Destacado",
+adminBrand:
+  "Marca",
+adminCategory:
+  "Categoria",
+adminOpen:
+  "Abrir",
+adminReject:
+  "Rejeitar",
+adminFeature:
+  "Destacar",
+adminUnfeature:
+  "Remover destaque",
   },
 };
