@@ -414,18 +414,18 @@ export default function AccountPage() {
             />
           </div>
 
-          <input
-            value={profile.avatar_url}
-            onChange={(event) =>
-              setProfile((currentProfile) => ({
-                ...currentProfile,
-                avatar_url:
-                  event.target.value,
-              }))
-            }
-            placeholder={t.accountAvatarPlaceholder}
-            style={inputStyle}
-          />
+        <input
+  value={profile.avatar_url}
+  onChange={(event) =>
+    setProfile((currentProfile) => ({
+      ...currentProfile,
+      avatar_url: event.target.value,
+    }))
+  }
+  placeholder={t.accountAvatarPlaceholder}
+  aria-label={t.accountAvatarAlt}
+  style={inputStyle}
+/>
 
          <p style={helperStyle}>
   {t.accountAvatarHelper}
@@ -483,17 +483,18 @@ export default function AccountPage() {
       {t.accountUsername}
     </label>
 
-    <input
-      value={profile.username}
-      onChange={(event) =>
-        setProfile((currentProfile) => ({
-          ...currentProfile,
-          username: event.target.value,
-        }))
-      }
-      placeholder={t.accountUsernamePlaceholder}
-      style={inputStyle}
-    />
+<input
+  value={profile.username}
+  onChange={(event) =>
+    setProfile((currentProfile) => ({
+      ...currentProfile,
+      username: event.target.value,
+    }))
+  }
+  placeholder={t.accountUsernamePlaceholder}
+  aria-label={t.accountUsername}
+  style={inputStyle}
+/>
   </div>
 
   <div style={fieldStyle}>
@@ -501,17 +502,18 @@ export default function AccountPage() {
       {t.accountFullName}
     </label>
 
-    <input
-      value={profile.full_name}
-      onChange={(event) =>
-        setProfile((currentProfile) => ({
-          ...currentProfile,
-          full_name: event.target.value,
-        }))
-      }
-      placeholder={t.accountFullNamePlaceholder}
-      style={inputStyle}
-    />
+<input
+  value={profile.full_name}
+  onChange={(event) =>
+    setProfile((currentProfile) => ({
+      ...currentProfile,
+      full_name: event.target.value,
+    }))
+  }
+  placeholder={t.accountFullNamePlaceholder}
+  aria-label={t.accountFullName}
+  style={inputStyle}
+/>
   </div>
 
   <div style={fieldStyle}>
@@ -519,17 +521,18 @@ export default function AccountPage() {
       {t.accountLocation}
     </label>
 
-    <input
-      value={profile.location}
-      onChange={(event) =>
-        setProfile((currentProfile) => ({
-          ...currentProfile,
-          location: event.target.value,
-        }))
-      }
-      placeholder={t.accountLocationPlaceholder}
-      style={inputStyle}
-    />
+<input
+  value={profile.location}
+  onChange={(event) =>
+    setProfile((currentProfile) => ({
+      ...currentProfile,
+      location: event.target.value,
+    }))
+  }
+  placeholder={t.accountLocationPlaceholder}
+  aria-label={t.accountLocation}
+  style={inputStyle}
+/>
   </div>
 
   <div style={fieldStyle}>
@@ -537,17 +540,18 @@ export default function AccountPage() {
       {t.accountBio}
     </label>
 
-    <textarea
-      value={profile.bio}
-      onChange={(event) =>
-        setProfile((currentProfile) => ({
-          ...currentProfile,
-          bio: event.target.value,
-        }))
-      }
-      placeholder={t.accountBioPlaceholder}
-      style={textareaStyle}
-    />
+<textarea
+  value={profile.bio}
+  onChange={(event) =>
+    setProfile((currentProfile) => ({
+      ...currentProfile,
+      bio: event.target.value,
+    }))
+  }
+  placeholder={t.accountBioPlaceholder}
+  aria-label={t.accountBio}
+  style={textareaStyle}
+/>
   </div>
 
   <div style={buttonsRowStyle}>
