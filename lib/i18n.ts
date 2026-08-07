@@ -1440,6 +1440,12 @@ homeRecentlySoldOneDayAgo:
   "Hace 1 día",
 homeRecentlySoldDays:
   "días",
+  homeBlogGolfMarket:
+  "GOLF · MERCADO",
+homeBlogGolfTitle:
+  "Cuándo comprar y vender palos de golf de segunda mano",
+homeBlogGolfDescription:
+  "El calendario clave para compradores y vendedores de golf premium.",
   },
 
 
@@ -2876,6 +2882,12 @@ homeRecentlySoldOneDayAgo:
   "1 day ago",
 homeRecentlySoldDays:
   "days",
+  homeBlogGolfMarket:
+  "GOLF · MARKET",
+homeBlogGolfTitle:
+  "When to buy and sell second-hand golf clubs",
+homeBlogGolfDescription:
+  "The key calendar for buyers and sellers of premium golf equipment.",
   },
 
   pt: {
@@ -4328,5 +4340,11 @@ homeRecentlySoldOneDayAgo:
   "Há 1 dia",
 homeRecentlySoldDays:
   "dias",
+  homeBlogGolfMarket:
+  "GOLFE · MERCADO",
+homeBlogGolfTitle:
+  "Quando comprar e vender tacos de golfe em segunda mão",
+homeBlogGolfDescription:
+  "O calendário essencial para compradores e vendedores de material de golfe premium.",
   },
 };

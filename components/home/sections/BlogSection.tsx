@@ -85,7 +85,9 @@ export default function BlogSection({
               padding: isMobile ? "24px" : cardContentStyle.padding,
             }}
           >
-            <p style={brandStyle}>GOLF · MERCADO</p>
+            <p style={brandStyle}>
+  {t.homeBlogGolfMarket}
+</p>
 
             <h3
               style={{
@@ -93,12 +95,12 @@ export default function BlogSection({
                 fontSize: isMobile ? "22px" : cardTitleStyle.fontSize,
               }}
             >
-              Cuándo comprar y vender palos de golf de segunda mano
+              {t.homeBlogGolfTitle}
             </h3>
 
-            <p style={categoryTextStyle}>
-              El calendario clave para compradores y vendedores de golf premium.
-            </p>
+          <p style={categoryTextStyle}>
+  {t.homeBlogGolfDescription}
+</p>
           </div>
         </article>
       </div>
