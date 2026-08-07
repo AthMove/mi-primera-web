@@ -1256,6 +1256,34 @@ verifyUploadButton:
   "Subir DNI o pasaporte",
 verifyAcceptedDocuments:
   "Aceptado: DNI, pasaporte o permiso de conducir.",
+  authStarting: "Iniciando...",
+authMissingCredentials:
+  "Falta el email o la contraseña",
+authEnterCredentials:
+  "Introduce el email y la contraseña",
+authAccessError:
+  "Error de acceso",
+authSignedInAs:
+  "Sesión iniciada como",
+authUnexpectedError:
+  "Error de autenticación",
+
+authEyebrow: "CUENTA ATHMOV",
+authWelcomeBack:
+  "Bienvenido de nuevo",
+authCreateAccount:
+  "Crear cuenta",
+
+authLogin: "Iniciar sesión",
+authRegister: "Registrarse",
+authLoading: "Cargando...",
+
+authEmailPlaceholder: "Email",
+authEmailLabel:
+  "Correo electrónico",
+authPasswordPlaceholder:
+  "Contraseña",
+authPasswordLabel: "Contraseña",
   },
 
 
@@ -2509,6 +2537,33 @@ verifyUploadButton:
   "Upload ID or passport",
 verifyAcceptedDocuments:
   "Accepted: identity card, passport or driving licence.",
+  authStarting: "Starting...",
+authMissingCredentials:
+  "Email or password is missing",
+authEnterCredentials:
+  "Enter your email and password",
+authAccessError:
+  "Sign-in error",
+authSignedInAs:
+  "Signed in as",
+authUnexpectedError:
+  "Authentication error",
+
+authEyebrow: "ATHMOV ACCOUNT",
+authWelcomeBack:
+  "Welcome back",
+authCreateAccount:
+  "Create account",
+
+authLogin: "Sign in",
+authRegister: "Register",
+authLoading: "Loading...",
+
+authEmailPlaceholder: "Email",
+authEmailLabel: "Email address",
+authPasswordPlaceholder:
+  "Password",
+authPasswordLabel: "Password",
   },
 
   pt: {
@@ -3776,5 +3831,34 @@ verifyUploadButton:
   "Carregar documento ou passaporte",
 verifyAcceptedDocuments:
   "Aceite: documento de identificação, passaporte ou carta de condução.",
+  authStarting: "A iniciar...",
+authMissingCredentials:
+  "Falta o email ou a palavra-passe",
+authEnterCredentials:
+  "Introduza o email e a palavra-passe",
+authAccessError:
+  "Erro de acesso",
+authSignedInAs:
+  "Sessão iniciada como",
+authUnexpectedError:
+  "Erro de autenticação",
+
+authEyebrow: "CONTA ATHMOV",
+authWelcomeBack:
+  "Bem-vindo de volta",
+authCreateAccount:
+  "Criar conta",
+
+authLogin: "Iniciar sessão",
+authRegister: "Registar",
+authLoading: "A carregar...",
+
+authEmailPlaceholder: "Email",
+authEmailLabel:
+  "Endereço de email",
+authPasswordPlaceholder:
+  "Palavra-passe",
+authPasswordLabel:
+  "Palavra-passe",
   },
 };

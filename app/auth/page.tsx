@@ -2,22 +2,23 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function AuthPage() {
+  const { t } = useLanguage();
   const [mode, setMode] = useState<"login" | "register">("login");
-  const [email, setEmail] = useState("contact@athmov.com");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [debug, setDebug] = useState("");
 
   const handleAuth = async () => {
     try {
       setLoading(true);
-      setDebug("Iniciando...");
+   
 
       if (!email || !password) {
-        setDebug("Falta email o contraseña");
-        alert("Introduce email y contraseña");
+      
+alert(t.authEnterCredentials);
         return;
       }
 
@@ -40,15 +41,8 @@ export default function AuthPage() {
       console.log("AUTH ERROR:", error);
 
       if (error) {
-        setDebug(`Error de acceso: ${error.message}`);
+      
         alert(error.message);
-        return;
-      }
-
-      setDebug(`Sesión iniciada como: ${data.user?.email || cleanEmail}`);
-
-      if (cleanEmail === "contact@athmov.com") {
-        window.location.replace("/products");
         return;
       }
 
@@ -60,8 +54,11 @@ export default function AuthPage() {
       window.location.replace("/orders");
     } catch (e: any) {
       console.log("AUTH CATCH:", e);
-      setDebug(`Error: ${e.message}`);
-      alert(e.message || "Error de autenticación");
+
+      alert(
+  e.message ||
+    t.authUnexpectedError
+);
     } finally {
       setLoading(false);
     }
@@ -70,61 +67,106 @@ export default function AuthPage() {
   return (
     <main style={pageStyle}>
       <section style={cardStyle}>
-        <p style={eyebrowStyle}>CUENTA ATHMOV</p>
+       <p style={eyebrowStyle}>
+  {t.authEyebrow}
+</p>
 
         <h1 style={titleStyle}>
-          {mode === "login" ? "Bienvenido de nuevo" : "Crear cuenta"}
-        </h1>
+  {mode === "login"
+    ? t.authWelcomeBack
+    : t.authCreateAccount}
+</h1>
 
         <div style={switchStyle}>
-          <button
-            onClick={() => setMode("login")}
-            style={{
-              ...switchButtonStyle,
-              background: mode === "login" ? "#111" : "#fff",
-              color: mode === "login" ? "#fff" : "#111",
-            }}
-          >
-            Iniciar sesión
-          </button>
+       <button
+  type="button"
+  onClick={() => setMode("login")}
+  style={{
+    ...switchButtonStyle,
+    background:
+      mode === "login"
+        ? "#111"
+        : "#fff",
+    color:
+      mode === "login"
+        ? "#fff"
+        : "#111",
+  }}
+>
+  {t.authLogin}
+</button>
 
-          <button
-            onClick={() => setMode("register")}
-            style={{
-              ...switchButtonStyle,
-              background: mode === "register" ? "#111" : "#fff",
-              color: mode === "register" ? "#fff" : "#111",
-            }}
-          >
-            Registrarse
-          </button>
+        <button
+  type="button"
+  onClick={() => setMode("register")}
+  style={{
+    ...switchButtonStyle,
+    background:
+      mode === "register"
+        ? "#111"
+        : "#fff",
+    color:
+      mode === "register"
+        ? "#fff"
+        : "#111",
+  }}
+>
+  {t.authRegister}
+</button>
         </div>
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={inputStyle}
-        />
+       <input
+  type="email"
+  placeholder={t.authEmailPlaceholder}
+  aria-label={t.authEmailLabel}
+  autoComplete="email"
+  value={email}
+  onChange={(e) =>
+    setEmail(e.target.value)
+  }
+  style={inputStyle}
+/>
 
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={inputStyle}
-        />
+     <input
+  type="password"
+  placeholder={t.authPasswordPlaceholder}
+  aria-label={t.authPasswordLabel}
+  autoComplete={
+    mode === "login"
+      ? "current-password"
+      : "new-password"
+  }
+  value={password}
+  onChange={(e) =>
+    setPassword(e.target.value)
+  }
+  onKeyDown={(e) => {
+    if (e.key === "Enter") {
+      handleAuth();
+    }
+  }}
+  style={inputStyle}
+/>
 
-        <button onClick={handleAuth} disabled={loading} style={buttonStyle}>
-          {loading
-            ? "Cargando..."
-            : mode === "login"
-              ? "Iniciar sesión"
-              : "Registrarse"}
-        </button>
+<button
+  type="button"
+  onClick={handleAuth}
+  disabled={loading}
+  style={{
+    ...buttonStyle,
+    opacity: loading ? 0.6 : 1,
+    cursor: loading
+      ? "not-allowed"
+      : "pointer",
+  }}
+>
+  {loading
+    ? t.authLoading
+    : mode === "login"
+      ? t.authLogin
+      : t.authRegister}
+</button>
 
-        <p style={{ marginTop: 16, fontSize: 13 }}>{debug}</p>
       </section>
     </main>
   );
