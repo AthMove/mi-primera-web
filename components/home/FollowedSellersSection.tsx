@@ -8,6 +8,7 @@ import {
   type CSSProperties,
 } from "react";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/components/LanguageProvider";
 
 type FollowedSellersSectionProps = {
   isMobile: boolean;
@@ -19,6 +20,7 @@ export default function FollowedSellersSection({
   sellers,
 }: FollowedSellersSectionProps) {
   const router = useRouter();
+  const { t } = useLanguage();
 
   const sectionRef = useRef<HTMLElement | null>(null);
 const [isVisible, setIsVisible] = useState(false);
@@ -69,19 +71,18 @@ useEffect(() => {
             <div className="followed-sellers-eyebrow-row">
               <span className="followed-sellers-line" />
 
-              <p className="followed-sellers-eyebrow">
-                Tu comunidad
-              </p>
+           <p className="followed-sellers-eyebrow">
+  {t.homeFollowedSellersEyebrow}
+</p>
             </div>
 
-            <h2 className="followed-sellers-title">
-              Vendedores que sigues
-            </h2>
+           <h2 className="followed-sellers-title">
+  {t.homeFollowedSellersTitle}
+</h2>
 
-            <p className="followed-sellers-description">
-              Descubre las nuevas piezas publicadas por vendedores de
-              confianza dentro de ATHMOV.
-            </p>
+     <p className="followed-sellers-description">
+  {t.homeFollowedSellersDescription}
+</p>
           </div>
 
           <button
@@ -89,7 +90,7 @@ useEffect(() => {
             className="followed-sellers-view-all"
             onClick={() => router.push("/following")}
           >
-            Ver comunidad
+            {t.homeFollowedSellersViewCommunity}
 
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M5 12h14M13 6l6 6-6 6" />
@@ -103,7 +104,7 @@ useEffect(() => {
               seller.full_name ||
               seller.username ||
               seller.seller_badge ||
-              "Vendedor ATHMOV";
+              t.homeFollowedSellersDefaultSeller;
 
             const totalSales =
               seller.total_sales ??
@@ -135,7 +136,7 @@ useEffect(() => {
 }
                 role="link"
                 tabIndex={0}
-                aria-label={`Ver perfil de ${sellerName}`}
+                aria-label={`${t.homeFollowedSellersViewProfile} ${sellerName}`}
                 onClick={() =>
                   router.push(`/seller/${seller.id}`)
                 }
@@ -164,7 +165,7 @@ useEffect(() => {
                     {seller.seller_verified && (
                       <span
                         className="followed-seller-verified-icon"
-                        aria-label="Vendedor verificado"
+                       aria-label={t.homeFollowedSellersVerifiedSeller}
                       >
                         <svg
                           viewBox="0 0 24 24"
@@ -190,15 +191,15 @@ useEffect(() => {
                 <div className="followed-seller-badges">
                   {seller.seller_verified && (
                     <span className="followed-seller-badge primary">
-                      Verificado
+                     {t.homeFollowedSellersVerified}
                     </span>
                   )}
 
                   <span className="followed-seller-badge">
                     {String(
-                      seller.seller_badge ||
-                        seller.seller_level ||
-                        "ATHMOV Seller"
+                     seller.seller_badge ||
+seller.seller_level ||
+t.homeFollowedSellersSellerLabel
                     )}
                   </span>
                 </div>
@@ -215,7 +216,9 @@ useEffect(() => {
                       <circle cx="12" cy="10" r="2.2" />
                     </svg>
 
-                    <span>{seller.location || "España"}</span>
+                    <span>
+  {seller.location || t.homeFollowedSellersDefaultLocation}
+</span>
                   </div>
 
                   <div className="followed-seller-divider" />
@@ -223,7 +226,7 @@ useEffect(() => {
                   <div className="followed-seller-stats">
                     <div>
                       <strong>{totalSales}</strong>
-                      <span>Ventas</span>
+                     <span>{t.homeFollowedSellersSales}</span>
                     </div>
 
                     <div>
@@ -231,9 +234,9 @@ useEffect(() => {
                         {rating > 0 ? rating.toFixed(1) : "—"}
                       </strong>
                       <span>
-                        {reviews > 0
-                          ? `${reviews} reseñas`
-                          : "Valoración"}
+                       {reviews > 0
+  ? `${reviews} ${t.homeFollowedSellersReviews}`
+  : t.homeFollowedSellersRating}
                       </span>
                     </div>
 
@@ -241,7 +244,7 @@ useEffect(() => {
                       <strong>
                         {seller.response_time || "< 1 h"}
                       </strong>
-                      <span>Respuesta</span>
+                      <span>{t.homeFollowedSellersResponse}</span>
                     </div>
                   </div>
                 </div>

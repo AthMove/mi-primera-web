@@ -1352,6 +1352,36 @@ homeLatestCommunityProducts:
   "Nuevos productos añadidos por deportistas de la comunidad ATHMOV.",
 homeLatestExploreAll:
   "Explorar todos los productos",
+  homeFollowedSellersEyebrow:
+  "Tu comunidad",
+homeFollowedSellersTitle:
+  "Vendedores que sigues",
+homeFollowedSellersDescription:
+  "Descubre las nuevas piezas publicadas por vendedores de confianza dentro de ATHMOV.",
+homeFollowedSellersViewCommunity:
+  "Ver comunidad",
+
+homeFollowedSellersDefaultSeller:
+  "Vendedor ATHMOV",
+homeFollowedSellersViewProfile:
+  "Ver perfil de",
+homeFollowedSellersVerifiedSeller:
+  "Vendedor verificado",
+homeFollowedSellersVerified:
+  "Verificado",
+homeFollowedSellersSellerLabel:
+  "Vendedor ATHMOV",
+homeFollowedSellersDefaultLocation:
+  "España",
+
+homeFollowedSellersSales:
+  "Ventas",
+homeFollowedSellersReviews:
+  "reseñas",
+homeFollowedSellersRating:
+  "Valoración",
+homeFollowedSellersResponse:
+  "Respuesta",
   },
 
 
@@ -2700,6 +2730,36 @@ homeLatestCommunityProducts:
   "New products added by athletes from the ATHMOV community.",
 homeLatestExploreAll:
   "Explore all products",
+  homeFollowedSellersEyebrow:
+  "Your community",
+homeFollowedSellersTitle:
+  "Sellers you follow",
+homeFollowedSellersDescription:
+  "Discover new pieces listed by trusted sellers within the ATHMOV community.",
+homeFollowedSellersViewCommunity:
+  "View community",
+
+homeFollowedSellersDefaultSeller:
+  "ATHMOV Seller",
+homeFollowedSellersViewProfile:
+  "View profile of",
+homeFollowedSellersVerifiedSeller:
+  "Verified seller",
+homeFollowedSellersVerified:
+  "Verified",
+homeFollowedSellersSellerLabel:
+  "ATHMOV Seller",
+homeFollowedSellersDefaultLocation:
+  "Spain",
+
+homeFollowedSellersSales:
+  "Sales",
+homeFollowedSellersReviews:
+  "reviews",
+homeFollowedSellersRating:
+  "Rating",
+homeFollowedSellersResponse:
+  "Response",
   },
 
   pt: {
@@ -4064,5 +4124,35 @@ homeLatestCommunityProducts:
   "Novos produtos adicionados por desportistas da comunidade ATHMOV.",
 homeLatestExploreAll:
   "Explorar todos os produtos",
+  homeFollowedSellersEyebrow:
+  "A sua comunidade",
+homeFollowedSellersTitle:
+  "Vendedores que segue",
+homeFollowedSellersDescription:
+  "Descubra as novas peças publicadas por vendedores de confiança dentro da comunidade ATHMOV.",
+homeFollowedSellersViewCommunity:
+  "Ver comunidade",
+
+homeFollowedSellersDefaultSeller:
+  "Vendedor ATHMOV",
+homeFollowedSellersViewProfile:
+  "Ver perfil de",
+homeFollowedSellersVerifiedSeller:
+  "Vendedor verificado",
+homeFollowedSellersVerified:
+  "Verificado",
+homeFollowedSellersSellerLabel:
+  "Vendedor ATHMOV",
+homeFollowedSellersDefaultLocation:
+  "Espanha",
+
+homeFollowedSellersSales:
+  "Vendas",
+homeFollowedSellersReviews:
+  "avaliações",
+homeFollowedSellersRating:
+  "Avaliação",
+homeFollowedSellersResponse:
+  "Resposta",
   },
 };
