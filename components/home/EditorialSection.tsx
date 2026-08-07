@@ -7,6 +7,7 @@ import {
   type CSSProperties,
 } from "react";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function EditorialSection({
   isMobile,
@@ -14,6 +15,7 @@ export default function EditorialSection({
   isMobile: boolean;
 }) {
   const router = useRouter();
+  const { t } = useLanguage();
   const sectionRef = useRef<HTMLElement | null>(null);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -42,26 +44,23 @@ export default function EditorialSection({
     };
   }, []);
 
-  const editorialItems = [
-    {
-      number: "01",
-      title: "Solo material premium",
-      description:
-        "Productos seleccionados para deportistas que valoran la calidad.",
-    },
-    {
-      number: "02",
-      title: "Compra protegida",
-      description:
-        "Verificación, pagos seguros y protección durante todo el proceso.",
-    },
-    {
-      number: "03",
-      title: "Comunidad deportiva",
-      description:
-        "Pádel, golf, tenis y running reunidos en un mismo lugar.",
-    },
-  ];
+const editorialItems = [
+  {
+    number: "01",
+    title: t.homeEditorialItemOneTitle,
+    description: t.homeEditorialItemOneDescription,
+  },
+  {
+    number: "02",
+    title: t.homeEditorialItemTwoTitle,
+    description: t.homeEditorialItemTwoDescription,
+  },
+  {
+    number: "03",
+    title: t.homeEditorialItemThreeTitle,
+    description: t.homeEditorialItemThreeDescription,
+  },
+];
 
   return (
     <section
@@ -77,28 +76,26 @@ export default function EditorialSection({
           <span className="editorial-eyebrow-line" />
 
           <p className="editorial-eyebrow">
-            ATHMOV EDITORIAL
-          </p>
+  {t.homeEditorialEyebrow}
+</p>
         </div>
 
-        <h2>
-          El mejor material deportivo no debería terminar en un
-          armario.
-        </h2>
+    <h2>
+  {t.homeEditorialTitle}
+</h2>
 
-        <p className="editorial-description">
-          En ATHMOV creemos que una pala, un driver o unas zapatillas
-          premium todavía tienen muchas victorias por delante.
-          Conectamos deportistas que cuidan su material con otros que
-          buscan calidad sin pagar el precio de un producto nuevo.
-        </p>
+       <p className="editorial-description">
+  {t.homeEditorialDescription}
+</p>
 
         <button
           type="button"
           className="editorial-button"
           onClick={() => router.push("/how-it-works")}
         >
-          <span>Descubrir ATHMOV</span>
+          <span>
+  {t.homeEditorialDiscover}
+</span>
 
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M5 12h14M13 6l6 6-6 6" />

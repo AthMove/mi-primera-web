@@ -1315,6 +1315,29 @@ homeHeroShopConfidently:
 
 homeHeroDiscover:
   "Descubre ATHMOV",
+  homeEditorialEyebrow:
+  "ATHMOV EDITORIAL",
+homeEditorialTitle:
+  "El mejor material deportivo no debería terminar en un armario.",
+homeEditorialDescription:
+  "En ATHMOV creemos que una pala, un driver o unas zapatillas premium todavía tienen muchas victorias por delante. Conectamos deportistas que cuidan su material con otros que buscan calidad sin pagar el precio de un producto nuevo.",
+homeEditorialDiscover:
+  "Descubrir ATHMOV",
+
+homeEditorialItemOneTitle:
+  "Solo material premium",
+homeEditorialItemOneDescription:
+  "Productos seleccionados para deportistas que valoran la calidad.",
+
+homeEditorialItemTwoTitle:
+  "Compra protegida",
+homeEditorialItemTwoDescription:
+  "Verificación, pagos seguros y protección durante todo el proceso.",
+
+homeEditorialItemThreeTitle:
+  "Comunidad deportiva",
+homeEditorialItemThreeDescription:
+  "Pádel, golf, tenis y running reunidos en un mismo lugar.",
   },
 
 
@@ -2626,6 +2649,29 @@ homeHeroShopConfidently:
 
 homeHeroDiscover:
   "Discover ATHMOV",
+  homeEditorialEyebrow:
+  "ATHMOV EDITORIAL",
+homeEditorialTitle:
+  "The best sports equipment should not end up forgotten in a cupboard.",
+homeEditorialDescription:
+  "At ATHMOV, we believe a premium racket, driver or pair of shoes still has many victories ahead. We connect athletes who take care of their equipment with others looking for quality without paying the price of something new.",
+homeEditorialDiscover:
+  "Discover ATHMOV",
+
+homeEditorialItemOneTitle:
+  "Premium equipment only",
+homeEditorialItemOneDescription:
+  "Selected products for athletes who value quality.",
+
+homeEditorialItemTwoTitle:
+  "Protected purchases",
+homeEditorialItemTwoDescription:
+  "Verification, secure payments and protection throughout the entire process.",
+
+homeEditorialItemThreeTitle:
+  "Sports community",
+homeEditorialItemThreeDescription:
+  "Padel, golf, tennis and running brought together in one place.",
   },
 
   pt: {
@@ -3953,5 +3999,28 @@ homeHeroShopConfidently:
 
 homeHeroDiscover:
   "Descubra a ATHMOV",
+  homeEditorialEyebrow:
+  "ATHMOV EDITORIAL",
+homeEditorialTitle:
+  "O melhor material desportivo não deveria acabar esquecido num armário.",
+homeEditorialDescription:
+  "Na ATHMOV acreditamos que uma raquete de padel, um driver ou umas sapatilhas premium ainda têm muitas vitórias pela frente. Ligamos desportistas que cuidam do seu material a outros que procuram qualidade sem pagar o preço de um produto novo.",
+homeEditorialDiscover:
+  "Descobrir ATHMOV",
+
+homeEditorialItemOneTitle:
+  "Apenas material premium",
+homeEditorialItemOneDescription:
+  "Produtos selecionados para desportistas que valorizam a qualidade.",
+
+homeEditorialItemTwoTitle:
+  "Compra protegida",
+homeEditorialItemTwoDescription:
+  "Verificação, pagamentos seguros e proteção durante todo o processo.",
+
+homeEditorialItemThreeTitle:
+  "Comunidade desportiva",
+homeEditorialItemThreeDescription:
+  "Padel, golfe, ténis e running reunidos num só lugar.",
   },
 };
