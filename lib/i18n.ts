@@ -1284,6 +1284,37 @@ authEmailLabel:
 authPasswordPlaceholder:
   "Contraseña",
 authPasswordLabel: "Contraseña",
+homeHeroImageAlt:
+  "Material deportivo premium en ATHMOV",
+homeHeroEyebrow:
+  "ATHMOV · SEGUNDA MANO PREMIUM",
+homeHeroTitlePrimary:
+  "Deporte premium.",
+homeHeroTitleSecondary:
+  "Segunda mano.",
+homeHeroDescription:
+  "Compra y vende material deportivo premium de segunda mano con vendedores verificados, pagos seguros y protección al comprador.",
+
+homeHeroExplore:
+  "Explorar material",
+homeHeroSell:
+  "Vender en ATHMOV",
+
+homeHeroSecurePayments:
+  "Pagos seguros",
+homeHeroProtectedTransactions:
+  "Operaciones protegidas",
+homeHeroVerifiedSellers:
+  "Vendedores verificados",
+homeHeroMoreTrust:
+  "Más confianza al comprar",
+homeHeroBuyerProtection:
+  "Protección al comprador",
+homeHeroShopConfidently:
+  "Compra con tranquilidad",
+
+homeHeroDiscover:
+  "Descubre ATHMOV",
   },
 
 
@@ -2564,6 +2595,37 @@ authEmailLabel: "Email address",
 authPasswordPlaceholder:
   "Password",
 authPasswordLabel: "Password",
+homeHeroImageAlt:
+  "Premium sports equipment on ATHMOV",
+homeHeroEyebrow:
+  "ATHMOV · PREMIUM SECOND HAND",
+homeHeroTitlePrimary:
+  "Luxury sports.",
+homeHeroTitleSecondary:
+  "Second hand.",
+homeHeroDescription:
+  "Buy and sell premium second-hand sports equipment with verified sellers, secure payments and buyer protection.",
+
+homeHeroExplore:
+  "Explore equipment",
+homeHeroSell:
+  "Sell on ATHMOV",
+
+homeHeroSecurePayments:
+  "Secure payments",
+homeHeroProtectedTransactions:
+  "Protected transactions",
+homeHeroVerifiedSellers:
+  "Verified sellers",
+homeHeroMoreTrust:
+  "More confidence when buying",
+homeHeroBuyerProtection:
+  "Buyer protection",
+homeHeroShopConfidently:
+  "Shop with confidence",
+
+homeHeroDiscover:
+  "Discover ATHMOV",
   },
 
   pt: {
@@ -3860,5 +3922,36 @@ authPasswordPlaceholder:
   "Palavra-passe",
 authPasswordLabel:
   "Palavra-passe",
+  homeHeroImageAlt:
+  "Material desportivo premium na ATHMOV",
+homeHeroEyebrow:
+  "ATHMOV · SEGUNDA MÃO PREMIUM",
+homeHeroTitlePrimary:
+  "Desporto premium.",
+homeHeroTitleSecondary:
+  "Segunda mão.",
+homeHeroDescription:
+  "Compre e venda material desportivo premium em segunda mão com vendedores verificados, pagamentos seguros e proteção do comprador.",
+
+homeHeroExplore:
+  "Explorar material",
+homeHeroSell:
+  "Vender na ATHMOV",
+
+homeHeroSecurePayments:
+  "Pagamentos seguros",
+homeHeroProtectedTransactions:
+  "Transações protegidas",
+homeHeroVerifiedSellers:
+  "Vendedores verificados",
+homeHeroMoreTrust:
+  "Mais confiança ao comprar",
+homeHeroBuyerProtection:
+  "Proteção do comprador",
+homeHeroShopConfidently:
+  "Compre com tranquilidade",
+
+homeHeroDiscover:
+  "Descubra a ATHMOV",
   },
 };

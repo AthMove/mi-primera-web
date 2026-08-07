@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/components/LanguageProvider";
 
 type HeroSectionProps = {
   isMobile: boolean;
@@ -13,6 +14,7 @@ export default function HeroSection({
   scrollY,
 }: HeroSectionProps) {
   const router = useRouter();
+  const { t } = useLanguage();
 
   const backgroundMovement = isMobile
     ? 0
@@ -32,7 +34,7 @@ export default function HeroSection({
       >
         <Image
           src="/hero-premium.jpg"
-          alt="Material deportivo premium en ATHMOV"
+          alt={t.homeHeroImageAlt}
           fill
           priority
           sizes="100vw"
@@ -53,21 +55,22 @@ export default function HeroSection({
         <div className="hero-eyebrow-row">
           <span className="hero-eyebrow-line" />
 
-          <p className="hero-eyebrow">
-            ATHMOV · PREMIUM SECOND HAND
-          </p>
+         <p className="hero-eyebrow">
+  {t.homeHeroEyebrow}
+</p>
         </div>
 
-        <h1 className="hero-title">
-          <span>Luxury sports.</span>
-          <span className="hero-title-secondary">Second hand.</span>
-        </h1>
+     <h1 className="hero-title">
+  <span>{t.homeHeroTitlePrimary}</span>
+
+  <span className="hero-title-secondary">
+    {t.homeHeroTitleSecondary}
+  </span>
+</h1>
 
         <p className="hero-description">
-          Compra y vende material deportivo premium de segunda mano
-          con vendedores verificados, pagos seguros y protección al
-          comprador.
-        </p>
+  {t.homeHeroDescription}
+</p>
 
         <div className="hero-actions">
           <button
@@ -75,7 +78,7 @@ export default function HeroSection({
             className="hero-button hero-button-primary"
             onClick={() => router.push("/products")}
           >
-            <span>Explorar material</span>
+           <span>{t.homeHeroExplore}</span>
             <span className="hero-button-arrow">↗</span>
           </button>
 
@@ -84,7 +87,7 @@ export default function HeroSection({
             className="hero-button hero-button-secondary"
             onClick={() => router.push("/sell")}
           >
-            Vender en ATHMOV
+           {t.homeHeroSell}
           </button>
         </div>
 
@@ -93,8 +96,13 @@ export default function HeroSection({
             <span className="hero-trust-icon">✓</span>
 
             <div>
-              <strong>Pagos seguros</strong>
-              <small>Operaciones protegidas</small>
+             <strong>
+  {t.homeHeroSecurePayments}
+</strong>
+
+<small>
+  {t.homeHeroProtectedTransactions}
+</small>
             </div>
           </div>
 
@@ -102,8 +110,13 @@ export default function HeroSection({
             <span className="hero-trust-icon">✓</span>
 
             <div>
-              <strong>Vendedores verificados</strong>
-              <small>Más confianza al comprar</small>
+            <strong>
+  {t.homeHeroVerifiedSellers}
+</strong>
+
+<small>
+  {t.homeHeroMoreTrust}
+</small>
             </div>
           </div>
 
@@ -111,8 +124,13 @@ export default function HeroSection({
             <span className="hero-trust-icon">✓</span>
 
             <div>
-              <strong>Protección al comprador</strong>
-              <small>Compra con tranquilidad</small>
+             <strong>
+  {t.homeHeroBuyerProtection}
+</strong>
+
+<small>
+  {t.homeHeroShopConfidently}
+</small>
             </div>
           </div>
         </div>
@@ -120,7 +138,7 @@ export default function HeroSection({
 
       <div className="hero-scroll-indicator" aria-hidden="true">
         <span />
-        Descubre ATHMOV
+        {t.homeHeroDiscover}
       </div>
 
       <style jsx>{`
