@@ -8,6 +8,7 @@ import {
   type MouseEvent,
 } from "react";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/components/LanguageProvider";
 
 interface ProductCardProps {
   product: any;
@@ -25,6 +26,14 @@ export default function ProductCard({
   compact = false,
 }: ProductCardProps) {
   const router = useRouter();
+  const { lang, t } = useLanguage();
+
+const locale =
+  lang === "en"
+    ? "en-GB"
+    : lang === "pt"
+      ? "pt-PT"
+      : "es-ES";
   const [isFavorite, setIsFavorite] = useState(
   Boolean(product?.is_favorite || product?.isFavorite)
 );
@@ -61,7 +70,7 @@ const savingPercentage = hasSaving
     )
   : 0;
 
-const formattedPrice = new Intl.NumberFormat("es-ES", {
+const formattedPrice = new Intl.NumberFormat(locale, {
   style: "currency",
   currency: "EUR",
   maximumFractionDigits: 0,
@@ -170,7 +179,9 @@ className={`athmov-product-card ${
 }`}
         role="link"
         tabIndex={0}
-        aria-label={`Ver ${product?.title || "producto"}`}
+       aria-label={`${t.productCardView} ${
+  product?.title || t.productCardProduct
+}`}
         onClick={openProduct}
         onKeyDown={handleKeyboard}
         onMouseMove={handleMouseMove}
@@ -200,11 +211,11 @@ className={`athmov-product-card ${
           >
             <span className="athmov-badge-dot" />
 
-            {product?.featured
-  ? "Destacado"
+{product?.featured
+  ? t.productCardFeatured
   : product?.seller_verified
-    ? "Verificado"
-    : "Nuevo"}
+    ? t.productCardVerified
+    : t.productCardNew}
           </span>
 
           {showFavorite && (
@@ -213,11 +224,11 @@ className={`athmov-product-card ${
               className={`athmov-favorite-button ${
                 isFavorite ? "is-active" : ""
               }`}
-              aria-label={
-                isFavorite
-                  ? "Eliminar de favoritos"
-                  : "Añadir a favoritos"
-              }
+            aria-label={
+  isFavorite
+    ? t.productCardRemoveFavorite
+    : t.productCardAddFavorite
+}
               aria-pressed={isFavorite}
               onClick={toggleFavorite}
             >
@@ -233,7 +244,7 @@ className={`athmov-product-card ${
 
           <Image
             src={imageError ? "/logo.png" : safeImage(productImage)}
-            alt={product?.title || "Producto ATHMOV"}
+            alt={product?.title || t.productCardDefaultAlt}
             fill
             sizes={
               isMobile
@@ -251,7 +262,7 @@ className={`athmov-product-card ${
           <div className="athmov-image-overlay" />
 
           <span className="athmov-view-product">
-            Descubrir
+           {t.productCardDiscover}
 
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M5 12h14M13 6l6 6-6 6" />
@@ -315,7 +326,7 @@ className={`athmov-product-card ${
               fontSize: isMobile ? "21px" : "24px",
             }}
           >
-            {product?.title || "Producto deportivo premium"}
+            {product?.title || t.productCardDefaultTitle}
           </h3>
 
 {showRating && (
@@ -332,12 +343,12 @@ className={`athmov-product-card ${
         ? `${normalizedRating.toFixed(1)}${
             reviewsCount > 0 ? ` · ${reviewsCount}` : ""
           }`
-        : "Sin reseñas"}
+       : t.productCardNoReviews}
     </span>
     <span className="athmov-sr-only">
-  {rating > 0
-    ? `Valoración de ${rating.toFixed(1)} sobre 5`
-    : "Producto sin valoraciones"}
+{rating > 0
+  ? `${t.productCardRatingOf} ${rating.toFixed(1)} ${t.productCardOutOfFive}`
+  : t.productCardNoRatings}
 </span>
   </div>
 )}
@@ -355,7 +366,7 @@ className={`athmov-product-card ${
   {hasSaving && (
     <div className="athmov-price-saving">
       <p className="athmov-original-price">
-        {new Intl.NumberFormat("es-ES", {
+        {new Intl.NumberFormat(locale, {
           style: "currency",
           currency: "EUR",
           maximumFractionDigits: 0,
@@ -374,18 +385,18 @@ className={`athmov-product-card ${
         <div className="athmov-product-footer">
   <div className="athmov-product-meta">
     <span className="athmov-meta-condition">
-      {product?.condition || "Muy buen estado"}
+      {product?.condition || t.productCardDefaultCondition}
     </span>
 
     <span className="athmov-meta-separator" />
 
     <span className="athmov-meta-item">
-      {product?.location || "España"}
+      {product?.location || t.productCardDefaultLocation}
     </span>
   </div>
 
 <span className="athmov-product-link">
-  Ver producto
+ {t.productCardViewProduct}
 
   <svg viewBox="0 0 24 24" aria-hidden="true">
     <path d="M5 12h14M13 6l6 6-6 6" />

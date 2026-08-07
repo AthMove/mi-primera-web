@@ -1547,6 +1547,46 @@ adminFeature:
   "Destacar",
 adminUnfeature:
   "Quitar destacado",
+  productCardView:
+  "Ver",
+productCardProduct:
+  "producto",
+
+productCardFeatured:
+  "Destacado",
+productCardVerified:
+  "Verificado",
+productCardNew:
+  "Nuevo",
+
+productCardRemoveFavorite:
+  "Eliminar de favoritos",
+productCardAddFavorite:
+  "Añadir a favoritos",
+
+productCardDefaultAlt:
+  "Producto ATHMOV",
+productCardDiscover:
+  "Descubrir",
+productCardDefaultTitle:
+  "Producto deportivo premium",
+
+productCardNoReviews:
+  "Sin reseñas",
+productCardRatingOf:
+  "Valoración de",
+productCardOutOfFive:
+  "sobre 5",
+productCardNoRatings:
+  "Producto sin valoraciones",
+
+productCardDefaultCondition:
+  "Muy buen estado",
+productCardDefaultLocation:
+  "Europa",
+
+productCardViewProduct:
+  "Ver producto",
   },
 
 
@@ -3090,6 +3130,46 @@ adminFeature:
   "Feature",
 adminUnfeature:
   "Unfeature",
+  productCardView:
+  "View",
+productCardProduct:
+  "product",
+
+productCardFeatured:
+  "Featured",
+productCardVerified:
+  "Verified",
+productCardNew:
+  "New",
+
+productCardRemoveFavorite:
+  "Remove from favourites",
+productCardAddFavorite:
+  "Add to favourites",
+
+productCardDefaultAlt:
+  "ATHMOV product",
+productCardDiscover:
+  "Discover",
+productCardDefaultTitle:
+  "Premium sports product",
+
+productCardNoReviews:
+  "No reviews",
+productCardRatingOf:
+  "Rating of",
+productCardOutOfFive:
+  "out of 5",
+productCardNoRatings:
+  "Product without ratings",
+
+productCardDefaultCondition:
+  "Very good condition",
+productCardDefaultLocation:
+  "Europe",
+
+productCardViewProduct:
+  "View product",
   },
 
   pt: {
@@ -4649,5 +4729,45 @@ adminFeature:
   "Destacar",
 adminUnfeature:
   "Remover destaque",
+  productCardView:
+  "Ver",
+productCardProduct:
+  "produto",
+
+productCardFeatured:
+  "Destacado",
+productCardVerified:
+  "Verificado",
+productCardNew:
+  "Novo",
+
+productCardRemoveFavorite:
+  "Remover dos favoritos",
+productCardAddFavorite:
+  "Adicionar aos favoritos",
+
+productCardDefaultAlt:
+  "Produto ATHMOV",
+productCardDiscover:
+  "Descobrir",
+productCardDefaultTitle:
+  "Produto desportivo premium",
+
+productCardNoReviews:
+  "Sem avaliações",
+productCardRatingOf:
+  "Avaliação de",
+productCardOutOfFive:
+  "em 5",
+productCardNoRatings:
+  "Produto sem avaliações",
+
+productCardDefaultCondition:
+  "Muito bom estado",
+productCardDefaultLocation:
+  "Europa",
+
+productCardViewProduct:
+  "Ver produto",
   },
 };
