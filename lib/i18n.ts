@@ -1618,6 +1618,18 @@ brandFinalDescription:
   "Encuentra material deportivo premium de segunda mano o publica el que ya no utilizas.",
 brandExplore: "Explorar",
 brandPublishProduct: "Publicar producto",
+brandsPageEyebrow: "SELECCIÓN ATHMOV",
+brandsPageTitle: "Marcas deportivas",
+brandsPageDescription:
+  "Explora las marcas premium disponibles en ATHMOV y encuentra material deportivo de segunda mano en pádel, golf, tenis y running.",
+brandsExploreTitle: "Explora por marca",
+brandsExploreDescription:
+  "Descubre todas las marcas disponibles en ATHMOV y accede a sus productos, guías de compra y artículos relacionados.",
+brandsProductAvailable: "producto disponible",
+brandsProductsAvailable: "productos disponibles",
+brandsViewProducts: "Ver productos",
+brandsComingSoon: "Próximamente nuevas marcas",
+brandsNoProducts: "En este momento no hay productos disponibles.",
   },
 
 
@@ -3232,7 +3244,18 @@ brandFinalDescription:
   "Find premium second-hand sports equipment or list the gear you no longer use.",
 brandExplore: "Explore",
 brandPublishProduct: "List product",
-
+brandsPageEyebrow: "ATHMOV SELECTION",
+brandsPageTitle: "Sports brands",
+brandsPageDescription:
+  "Explore the premium brands available on ATHMOV and find second-hand padel, golf, tennis and running equipment.",
+brandsExploreTitle: "Explore by brand",
+brandsExploreDescription:
+  "Discover all the brands available on ATHMOV and access their products, buying guides and related articles.",
+brandsProductAvailable: "product available",
+brandsProductsAvailable: "products available",
+brandsViewProducts: "View products",
+brandsComingSoon: "More brands coming soon",
+brandsNoProducts: "There are currently no products available.",
   },
 
   pt: {
@@ -4863,5 +4886,17 @@ brandFinalDescription:
   "Encontra material desportivo premium em segunda mão ou publica o que já não utilizas.",
 brandExplore: "Explorar",
 brandPublishProduct: "Publicar produto",
+brandsPageEyebrow: "SELEÇÃO ATHMOV",
+brandsPageTitle: "Marcas desportivas",
+brandsPageDescription:
+  "Explora as marcas premium disponíveis na ATHMOV e encontra material de pádel, golfe, ténis e running em segunda mão.",
+brandsExploreTitle: "Explora por marca",
+brandsExploreDescription:
+  "Descobre todas as marcas disponíveis na ATHMOV e acede aos seus produtos, guias de compra e artigos relacionados.",
+brandsProductAvailable: "produto disponível",
+brandsProductsAvailable: "produtos disponíveis",
+brandsViewProducts: "Ver produtos",
+brandsComingSoon: "Novas marcas em breve",
+brandsNoProducts: "Neste momento não existem produtos disponíveis.",
   },
 };
