@@ -89,12 +89,15 @@ const responseText = responseTime.toLowerCase();
 const responsePoints =
   responseText.includes("min") ||
   responseText.includes("< 1") ||
-  responseText.includes("menos de 1")
+  responseText.includes("menos de 1") ||
+  responseText.includes("less than 1")
     ? 2
-    : responseText.includes("hora")
+    : responseText.includes("hora") ||
+        responseText.includes("hour")
       ? 1.4
       : responseText.includes("día") ||
-          responseText.includes("dia")
+          responseText.includes("dia") ||
+          responseText.includes("day")
         ? 0.7
         : 0.4;
 
