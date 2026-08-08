@@ -14,7 +14,14 @@ export default function RelatedProducts({
   safeImage,
 }: RelatedProductsProps) {
   const router = useRouter();
-  const { t } = useLanguage();
+ const { lang, t } = useLanguage();
+
+const locale =
+  lang === "en"
+    ? "en-GB"
+    : lang === "pt"
+      ? "pt-PT"
+      : "es-ES";
 
   return (
     <section style={relatedSectionStyle}>
@@ -72,9 +79,13 @@ export default function RelatedProducts({
                 </p>
 
                 <div style={relatedFooterStyle}>
-                  <p style={relatedPriceStyle}>
-                    €{item.price}
-                  </p>
+                 <p style={relatedPriceStyle}>
+  {new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  }).format(Number(item.price || 0))}
+</p>
 
                   <span style={relatedViewStyle}>
                     {t.relatedView}
