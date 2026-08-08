@@ -9,7 +9,21 @@ import { useLanguage } from "@/components/LanguageProvider";
 export default function CartPage() {
   const [cart, setCart] = useState<any[]>([]);
   const [userEmail, setUserEmail] = useState<string | null>(null);
-  const { t } = useLanguage();
+ const { lang, t } = useLanguage();
+
+const locale =
+  lang === "en"
+    ? "en-GB"
+    : lang === "pt"
+      ? "pt-PT"
+      : "es-ES";
+
+const formatCurrency = (value: number) =>
+  new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  }).format(value);
 
   useEffect(() => {
     setCart(JSON.parse(localStorage.getItem("athmov_cart") || "[]"));
@@ -82,7 +96,7 @@ export default function CartPage() {
     <main style={pageStyle}>
       <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
         <p style={eyebrowStyle}>{t.cartEyebrow}</p>
-        <h1 style={titleStyle}>Checkout seguro</h1>
+        <h1 style={titleStyle}>{t.cartSecureCheckoutTitle}</h1>
 
         {cart.length === 0 ? (
           <section style={emptyStyle}>
@@ -111,7 +125,11 @@ export default function CartPage() {
                   <div>
                     <p style={sportStyle}>{item.deporte}</p>
                     <h2 style={itemTitleStyle}>{item.nombre}</h2>
-                    <p style={priceStyle}>{item.precio}</p>
+                   <p style={priceStyle}>
+  {formatCurrency(
+    Number(String(item.precio).replace("€", "").replace(",", "."))
+  )}
+</p>
                   </div>
 
                   <button
@@ -129,7 +147,7 @@ export default function CartPage() {
 
               <div style={summaryRowStyle}>
                 <span>{t.subtotal}</span>
-                <strong>€{total}</strong>
+               <strong>{formatCurrency(total)}</strong>
               </div>
 
               <div style={summaryRowStyle}>
@@ -143,11 +161,11 @@ export default function CartPage() {
                 <span>{t.total}</span>
                 <strong>€{total}</strong>
               </div>
-              <div style={protectionBoxStyle}>
-  <strong>Compra protegida por ATHMOV</strong>
-  <p>✓ Pago seguro mediante Stripe</p>
-  <p>✓ Protección al comprador</p>
-  <p>✓ Soporte hasta la entrega</p>
+  <div style={protectionBoxStyle}>
+  <strong>{t.cartProtectedPurchase}</strong>
+  <p>✓ {t.cartSecureStripe}</p>
+  <p>✓ {t.cartBuyerProtection}</p>
+  <p>✓ {t.cartSupportUntilDelivery}</p>
 </div>
 
               <button onClick={handleCheckout} style={checkoutButtonStyle}>

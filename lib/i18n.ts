@@ -1587,6 +1587,11 @@ productCardDefaultLocation:
 
 productCardViewProduct:
   "Ver producto",
+cartSecureCheckoutTitle: "Checkout seguro",
+cartProtectedPurchase: "Compra protegida por ATHMOV",
+cartSecureStripe: "Pago seguro mediante Stripe",
+cartBuyerProtection: "Protección al comprador",
+cartSupportUntilDelivery: "Soporte hasta la entrega",
   },
 
 
@@ -3170,6 +3175,12 @@ productCardDefaultLocation:
 
 productCardViewProduct:
   "View product",
+cartSecureCheckoutTitle: "Secure checkout",
+cartProtectedPurchase: "Purchase protected by ATHMOV",
+cartSecureStripe: "Secure payment via Stripe",
+cartBuyerProtection: "Buyer protection",
+cartSupportUntilDelivery: "Support until delivery",
+
   },
 
   pt: {
@@ -4769,5 +4780,10 @@ productCardDefaultLocation:
 
 productCardViewProduct:
   "Ver produto",
+cartSecureCheckoutTitle: "Checkout seguro",
+cartProtectedPurchase: "Compra protegida pela ATHMOV",
+cartSecureStripe: "Pagamento seguro através da Stripe",
+cartBuyerProtection: "Proteção do comprador",
+cartSupportUntilDelivery: "Suporte até à entrega",
   },
 };
