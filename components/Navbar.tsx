@@ -14,6 +14,12 @@ import { useLanguage } from "./LanguageProvider";
 
 export default function Navbar() {
   const { lang, setLang, t } = useLanguage();
+  const locale =
+  lang === "en"
+    ? "en-GB"
+    : lang === "pt"
+      ? "pt-PT"
+      : "es-ES";
   const [cartCount, setCartCount] = useState(0);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [messagesCount, setMessagesCount] = useState(0);
@@ -506,7 +512,13 @@ height={84}
                   </div>
                 </div>
 
-                <strong>€{product.price}</strong>
+                <strong>
+  {new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  }).format(Number(product.price || 0))}
+</strong>
               </Link>
             ))}
           </div>
