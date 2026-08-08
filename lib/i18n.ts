@@ -1764,6 +1764,90 @@ aboutCtaTitleSecond:
   "Vende lo que todavía tiene historia.",
 aboutExploreMarketplace: "EXPLORAR MARKETPLACE",
 aboutSellEquipment: "VENDER MATERIAL",
+padelPageEyebrow: "ATHMOV · PÁDEL",
+padelPageTitle: "Palas de pádel de segunda mano",
+padelPageIntro:
+  "Descubre palas premium publicadas por vendedores particulares, compara marcas y modelos y revisa su estado antes de comprar.",
+padelViewAllRackets: "VER TODAS LAS PALAS",
+padelSellRacket: "VENDER UNA PALA",
+
+padelWhyUsedEyebrow: "POR QUÉ COMPRAR USADO",
+padelWhyUsedTitle: "Más valor por tu presupuesto.",
+padelWhyUsedTextOne:
+  "El mercado de segunda mano permite acceder a palas de gamas altas por un precio inferior al de una unidad nueva. Esto resulta especialmente interesante en modelos premium que conservan buenas prestaciones aunque hayan tenido un uso moderado.",
+padelWhyUsedTextTwo:
+  "Antes de comprar, conviene revisar el estado estructural, el peso, la antigüedad y las posibles reparaciones. Una pala con pequeños roces superficiales puede seguir ofreciendo un buen rendimiento, mientras que una grieta profunda puede afectar a su durabilidad.",
+padelWhyUsedTextThree:
+  "En ATHMOV puedes comparar anuncios, consultar perfiles de vendedores y acceder a guías específicas para tomar una decisión con más información.",
+
+padelMarketplaceEyebrow: "MARKETPLACE",
+padelAvailableTitle: "Palas de pádel disponibles",
+padelViewFullCatalog: "Ver catálogo completo",
+
+padelPopularBrandsEyebrow: "MARCAS POPULARES",
+padelPopularBrandsTitle: "Encuentra tu marca de pádel.",
+padelBrandLabel: "MARCA",
+padelViewProducts: "Ver productos",
+
+padelBullpadelText:
+  "Vertex, Hack, Elite, Neuron y otras gamas premium.",
+padelNoxText:
+  "AT10, ML10, LA10, VK10 y modelos para distintos niveles.",
+padelAdidasText:
+  "Palas de potencia, control y gamas profesionales.",
+padelHeadText:
+  "Modelos conocidos por su equilibrio, tecnología y manejabilidad.",
+padelSiuxText:
+  "Palas orientadas a jugadores avanzados y competición.",
+padelBabolatText:
+  "Gamas técnicas con opciones de potencia y control.",
+
+padelBuyingGuideEyebrow: "GUÍA DE COMPRA",
+padelBuyingGuideTitle: "Qué revisar antes de comprar.",
+padelTipFrameTitle: "Revisa el marco",
+padelTipFrameText:
+  "Busca grietas, golpes profundos, reparaciones o zonas blandas alrededor del perímetro.",
+padelTipFacesTitle: "Comprueba las caras",
+padelTipFacesText:
+  "Examina la superficie, la rugosidad, el carbono y posibles daños cerca de los agujeros.",
+padelTipWeightTitle: "Verifica el peso",
+padelTipWeightText:
+  "Compara el peso real con el rango oficial del modelo y ten en cuenta los protectores añadidos.",
+padelTipModelTitle: "Confirma el modelo",
+padelTipModelText:
+  "Revisa colores, logotipos, acabados, número de serie y detalles de fabricación.",
+padelViewBuyerGuide: "Ver guía del comprador",
+
+padelJournalEyebrow: "ATHMOV JOURNAL",
+padelJournalTitle: "Guías para comprar mejor.",
+padelGuideLabel: "GUÍA DE PÁDEL",
+padelReadArticle: "Leer artículo",
+
+padelFaqEyebrow: "PREGUNTAS FRECUENTES",
+padelFaqTitle: "Antes de comprar una pala usada.",
+padelFaqSafeQuestion:
+  "¿Es seguro comprar una pala de pádel de segunda mano?",
+padelFaqSafeAnswer:
+  "Puede ser una buena compra cuando el anuncio incluye fotografías detalladas, una descripción precisa y un precio coherente con el estado de la pala. Conviene revisar marco, caras, puente, peso y posibles reparaciones.",
+padelFaqBrandsQuestion:
+  "¿Qué marcas de pádel mantienen mejor su valor?",
+padelFaqBrandsAnswer:
+  "Las gamas premium de marcas como Bullpadel, Nox, Head, Adidas o Siux suelen mantener mejor su valor cuando el modelo tiene demanda y la pala está bien conservada.",
+padelFaqWearQuestion:
+  "¿Qué desgaste es aceptable en una pala usada?",
+padelFaqWearAnswer:
+  "Los pequeños roces superficiales pueden ser normales. Las grietas profundas, reparaciones estructurales, zonas blandas o daños en el puente requieren más precaución.",
+padelFaqSellQuestion:
+  "¿Cómo puedo vender mi pala en ATHMOV?",
+padelFaqSellAnswer:
+  "Puedes crear un anuncio desde la sección Vender, añadir fotografías, indicar marca, modelo, estado y precio, y publicar el producto para que otros jugadores puedan encontrarlo.",
+
+padelFinalEyebrow: "THE GAME CONTINUES",
+padelFinalTitle: "Tu próxima pala ya está en juego.",
+padelFinalText:
+  "Compra material premium de segunda mano o publica la pala que ya no utilizas.",
+padelExplore: "EXPLORAR PÁDEL",
+padelPublishRacket: "PUBLICAR PALA",
   },
 
 
@@ -3524,6 +3608,90 @@ aboutCtaTitleSecond:
   "Sell what still has a story to tell.",
 aboutExploreMarketplace: "EXPLORE MARKETPLACE",
 aboutSellEquipment: "SELL EQUIPMENT",
+padelPageEyebrow: "ATHMOV · PADEL",
+padelPageTitle: "Second-hand padel rackets",
+padelPageIntro:
+  "Discover premium rackets listed by private sellers, compare brands and models, and review their condition before buying.",
+padelViewAllRackets: "VIEW ALL RACKETS",
+padelSellRacket: "SELL A RACKET",
+
+padelWhyUsedEyebrow: "WHY BUY USED",
+padelWhyUsedTitle: "More value for your budget.",
+padelWhyUsedTextOne:
+  "The second-hand market gives you access to high-end rackets at a lower price than a new one. This is especially attractive for premium models that retain strong performance even after moderate use.",
+padelWhyUsedTextTwo:
+  "Before buying, check the structural condition, weight, age and any possible repairs. A racket with minor superficial marks can still perform well, while a deep crack may affect its durability.",
+padelWhyUsedTextThree:
+  "On ATHMOV you can compare listings, review seller profiles and access specific guides to make a more informed decision.",
+
+padelMarketplaceEyebrow: "MARKETPLACE",
+padelAvailableTitle: "Available padel rackets",
+padelViewFullCatalog: "View full catalogue",
+
+padelPopularBrandsEyebrow: "POPULAR BRANDS",
+padelPopularBrandsTitle: "Find your padel brand.",
+padelBrandLabel: "BRAND",
+padelViewProducts: "View products",
+
+padelBullpadelText:
+  "Vertex, Hack, Elite, Neuron and other premium ranges.",
+padelNoxText:
+  "AT10, ML10, LA10, VK10 and models for different levels.",
+padelAdidasText:
+  "Power, control and professional-level rackets.",
+padelHeadText:
+  "Models known for their balance, technology and manoeuvrability.",
+padelSiuxText:
+  "Rackets aimed at advanced and competitive players.",
+padelBabolatText:
+  "Technical ranges with power and control options.",
+
+padelBuyingGuideEyebrow: "BUYING GUIDE",
+padelBuyingGuideTitle: "What to check before buying.",
+padelTipFrameTitle: "Check the frame",
+padelTipFrameText:
+  "Look for cracks, deep impacts, repairs or soft spots around the perimeter.",
+padelTipFacesTitle: "Inspect the faces",
+padelTipFacesText:
+  "Examine the surface, texture, carbon and any damage near the holes.",
+padelTipWeightTitle: "Check the weight",
+padelTipWeightText:
+  "Compare the actual weight with the model's official range and take any added protectors into account.",
+padelTipModelTitle: "Confirm the model",
+padelTipModelText:
+  "Check colours, logos, finishes, serial number and manufacturing details.",
+padelViewBuyerGuide: "View buyer guide",
+
+padelJournalEyebrow: "ATHMOV JOURNAL",
+padelJournalTitle: "Guides to help you buy better.",
+padelGuideLabel: "PADEL GUIDE",
+padelReadArticle: "Read article",
+
+padelFaqEyebrow: "FREQUENTLY ASKED QUESTIONS",
+padelFaqTitle: "Before buying a used racket.",
+padelFaqSafeQuestion:
+  "Is it safe to buy a second-hand padel racket?",
+padelFaqSafeAnswer:
+  "It can be a good purchase when the listing includes detailed photos, an accurate description and a price that matches the racket's condition. It is worth checking the frame, faces, bridge, weight and any repairs.",
+padelFaqBrandsQuestion:
+  "Which padel brands hold their value best?",
+padelFaqBrandsAnswer:
+  "Premium ranges from brands such as Bullpadel, Nox, Head, Adidas or Siux tend to retain value better when the model is in demand and the racket is well preserved.",
+padelFaqWearQuestion:
+  "What level of wear is acceptable on a used racket?",
+padelFaqWearAnswer:
+  "Minor superficial marks can be normal. Deep cracks, structural repairs, soft spots or damage to the bridge require greater caution.",
+padelFaqSellQuestion:
+  "How can I sell my racket on ATHMOV?",
+padelFaqSellAnswer:
+  "You can create a listing from the Sell section, add photos, enter the brand, model, condition and price, and publish the product so other players can find it.",
+
+padelFinalEyebrow: "THE GAME CONTINUES",
+padelFinalTitle: "Your next racket is already in play.",
+padelFinalText:
+  "Buy premium second-hand equipment or list the racket you no longer use.",
+padelExplore: "EXPLORE PADEL",
+padelPublishRacket: "LIST RACKET",
   },
 
   pt: {
@@ -5300,5 +5468,89 @@ aboutCtaTitleSecond:
   "Vende o que ainda tem uma história.",
 aboutExploreMarketplace: "EXPLORAR MARKETPLACE",
 aboutSellEquipment: "VENDER MATERIAL",
+padelPageEyebrow: "ATHMOV · PÁDEL",
+padelPageTitle: "Palas de pádel em segunda mão",
+padelPageIntro:
+  "Descobre palas premium publicadas por vendedores particulares, compara marcas e modelos e verifica o seu estado antes de comprar.",
+padelViewAllRackets: "VER TODAS AS PALAS",
+padelSellRacket: "VENDER UMA PALA",
+
+padelWhyUsedEyebrow: "PORQUÊ COMPRAR USADO",
+padelWhyUsedTitle: "Mais valor para o teu orçamento.",
+padelWhyUsedTextOne:
+  "O mercado de segunda mão permite aceder a palas de gama alta por um preço inferior ao de uma unidade nova. Isto é especialmente interessante em modelos premium que mantêm um bom desempenho mesmo após uma utilização moderada.",
+padelWhyUsedTextTwo:
+  "Antes de comprar, convém verificar o estado estrutural, o peso, a antiguidade e possíveis reparações. Uma pala com pequenos sinais superficiais pode continuar a oferecer um bom desempenho, enquanto uma fissura profunda pode afetar a sua durabilidade.",
+padelWhyUsedTextThree:
+  "Na ATHMOV podes comparar anúncios, consultar perfis de vendedores e aceder a guias específicos para tomar uma decisão mais informada.",
+
+padelMarketplaceEyebrow: "MARKETPLACE",
+padelAvailableTitle: "Palas de pádel disponíveis",
+padelViewFullCatalog: "Ver catálogo completo",
+
+padelPopularBrandsEyebrow: "MARCAS POPULARES",
+padelPopularBrandsTitle: "Encontra a tua marca de pádel.",
+padelBrandLabel: "MARCA",
+padelViewProducts: "Ver produtos",
+
+padelBullpadelText:
+  "Vertex, Hack, Elite, Neuron e outras gamas premium.",
+padelNoxText:
+  "AT10, ML10, LA10, VK10 e modelos para diferentes níveis.",
+padelAdidasText:
+  "Palas de potência, controlo e gamas profissionais.",
+padelHeadText:
+  "Modelos conhecidos pelo equilíbrio, tecnologia e manobrabilidade.",
+padelSiuxText:
+  "Palas orientadas para jogadores avançados e competição.",
+padelBabolatText:
+  "Gamas técnicas com opções de potência e controlo.",
+
+padelBuyingGuideEyebrow: "GUIA DE COMPRA",
+padelBuyingGuideTitle: "O que verificar antes de comprar.",
+padelTipFrameTitle: "Verifica a estrutura",
+padelTipFrameText:
+  "Procura fissuras, impactos profundos, reparações ou zonas moles à volta do perímetro.",
+padelTipFacesTitle: "Verifica as faces",
+padelTipFacesText:
+  "Examina a superfície, a rugosidade, o carbono e possíveis danos junto aos furos.",
+padelTipWeightTitle: "Verifica o peso",
+padelTipWeightText:
+  "Compara o peso real com o intervalo oficial do modelo e tem em conta os protetores adicionados.",
+padelTipModelTitle: "Confirma o modelo",
+padelTipModelText:
+  "Verifica cores, logótipos, acabamentos, número de série e detalhes de fabrico.",
+padelViewBuyerGuide: "Ver guia do comprador",
+
+padelJournalEyebrow: "ATHMOV JOURNAL",
+padelJournalTitle: "Guias para comprar melhor.",
+padelGuideLabel: "GUIA DE PÁDEL",
+padelReadArticle: "Ler artigo",
+
+padelFaqEyebrow: "PERGUNTAS FREQUENTES",
+padelFaqTitle: "Antes de comprar uma pala usada.",
+padelFaqSafeQuestion:
+  "É seguro comprar uma pala de pádel em segunda mão?",
+padelFaqSafeAnswer:
+  "Pode ser uma boa compra quando o anúncio inclui fotografias detalhadas, uma descrição precisa e um preço coerente com o estado da pala. Convém verificar a estrutura, as faces, a ponte, o peso e possíveis reparações.",
+padelFaqBrandsQuestion:
+  "Que marcas de pádel mantêm melhor o seu valor?",
+padelFaqBrandsAnswer:
+  "As gamas premium de marcas como Bullpadel, Nox, Head, Adidas ou Siux tendem a manter melhor o seu valor quando o modelo tem procura e a pala está bem conservada.",
+padelFaqWearQuestion:
+  "Que desgaste é aceitável numa pala usada?",
+padelFaqWearAnswer:
+  "Pequenos sinais superficiais podem ser normais. Fissuras profundas, reparações estruturais, zonas moles ou danos na ponte exigem mais atenção.",
+padelFaqSellQuestion:
+  "Como posso vender a minha pala na ATHMOV?",
+padelFaqSellAnswer:
+  "Podes criar um anúncio na secção Vender, adicionar fotografias, indicar a marca, modelo, estado e preço, e publicar o produto para que outros jogadores o possam encontrar.",
+
+padelFinalEyebrow: "THE GAME CONTINUES",
+padelFinalTitle: "A tua próxima pala já está em jogo.",
+padelFinalText:
+  "Compra material premium em segunda mão ou publica a pala que já não utilizas.",
+padelExplore: "EXPLORAR PÁDEL",
+padelPublishRacket: "PUBLICAR PALA",
   },
 };

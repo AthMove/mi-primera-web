@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import ProductsClient from "@/app/products/ProductsClient";
+import ProductsLoading from "@/components/ProductsLoading";
 
 export const metadata: Metadata = {
   title: "Zapatillas de running de segunda mano | ATHMOV",
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
 
 export default function RunningPage() {
   return (
-    <Suspense fallback={<main>Cargando productos de running...</main>}>
+   <Suspense fallback={<ProductsLoading />}>
      <ProductsClient fixedCategory="RUNNING" />
     </Suspense>
   );
