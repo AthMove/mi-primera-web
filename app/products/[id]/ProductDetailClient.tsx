@@ -46,7 +46,14 @@ export default function ProductDetail({
 }: ProductDetailProps) {
   const params = useParams();
   const router = useRouter();
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
+
+const locale =
+  lang === "en"
+    ? "en-GB"
+    : lang === "pt"
+      ? "pt-PT"
+      : "es-ES";
 
   const id = productId || String(params.id || "");
 
@@ -895,6 +902,7 @@ return (
       messageSellerLabel={t.messageSeller}
       addToFavoritesLabel={t.addToFavorites}
       inFavoritesLabel={t.inFavorites}
+      locale={locale}
       onBuyNow={buyNow}
       onAddToCart={addToCart}
       onMakeOffer={makeOffer}

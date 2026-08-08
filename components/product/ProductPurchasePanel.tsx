@@ -24,28 +24,29 @@ type ProductPurchasePanelProps = {
   addToFavoritesLabel: string;
   inFavoritesLabel: string;
   vatSecurePaymentLabel: string;
-newPriceLabel: string;
-athmovPriceLabel: string;
-youSaveLabel: string;
-securePaymentLabel: string;
-verifiedSellerLabel: string;
-protectedShippingLabel: string;
-estimatedDeliveryLabel: string;
-estimatedDeliveryText: string;
-protectedPaymentLabel: string;
-availableLabel: string;
-availableDescription: string;
-athmovProtectionLabel: string;
-athmovProtectionText: string;
-stripePaymentLabel: string;
-stripePaymentText: string;
-trackingLabel: string;
-trackingText: string;
-protectionLabel: string;
-protectionText: string;
-singleUnitLabel: string;
-paymentNoteLabel: string;
-countryFallbackLabel: string;
+  newPriceLabel: string;
+  athmovPriceLabel: string;
+  youSaveLabel: string;
+  securePaymentLabel: string;
+  verifiedSellerLabel: string;
+  protectedShippingLabel: string;
+  estimatedDeliveryLabel: string;
+  estimatedDeliveryText: string;
+  protectedPaymentLabel: string;
+  availableLabel: string;
+  availableDescription: string;
+  athmovProtectionLabel: string;
+  athmovProtectionText: string;
+  stripePaymentLabel: string;
+  stripePaymentText: string;
+  trackingLabel: string;
+  trackingText: string;
+  protectionLabel: string;
+  protectionText: string;
+  singleUnitLabel: string;
+  paymentNoteLabel: string;
+  countryFallbackLabel: string;
+  locale: string;
 
   onBuyNow: () => void;
   onAddToCart: () => void;
@@ -96,6 +97,7 @@ protectionText,
 singleUnitLabel,
 paymentNoteLabel,
 countryFallbackLabel,
+locale,
 
   onBuyNow,
   onAddToCart,
@@ -103,7 +105,7 @@ countryFallbackLabel,
   onMessageSeller,
   onToggleFavorite,
 }: ProductPurchasePanelProps) {
-  const formattedPrice = new Intl.NumberFormat("es-ES", {
+  const formattedPrice = new Intl.NumberFormat(locale, {
     style: "currency",
     currency: "EUR",
     maximumFractionDigits: 0,
@@ -125,13 +127,13 @@ const savingPercentage = hasSaving
   ? Math.round((savingAmount / newPrice) * 100)
   : 0;
 
-const formattedOriginalPrice = new Intl.NumberFormat("es-ES", {
+const formattedOriginalPrice = new Intl.NumberFormat(locale, {
   style: "currency",
   currency: "EUR",
   maximumFractionDigits: 0,
 }).format(newPrice);
 
-const formattedSaving = new Intl.NumberFormat("es-ES", {
+const formattedSaving = new Intl.NumberFormat(locale, {
   style: "currency",
   currency: "EUR",
   maximumFractionDigits: 0,
