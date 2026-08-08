@@ -1630,6 +1630,41 @@ brandsProductsAvailable: "productos disponibles",
 brandsViewProducts: "Ver productos",
 brandsComingSoon: "Próximamente nuevas marcas",
 brandsNoProducts: "En este momento no hay productos disponibles.",
+modelBreadcrumbLabel: "Migas de pan",
+modelPageEyebrow: "ATHMOV · MODELOS",
+modelSecondHand: "de segunda mano",
+modelDescriptionStart: "Explora los anuncios disponibles de",
+modelDescriptionEnd:
+  "compara precios, condiciones y vendedores antes de comprar.",
+modelViewProducts: "VER PRODUCTOS",
+modelSellThisModel: "VENDER ESTE MODELO",
+modelAvailableProducts: "PRODUCTOS DISPONIBLES",
+modelAvailableOnAthmov: "en ATHMOV",
+modelOneProductAvailable: "Hay 1 producto disponible.",
+modelProductsAvailable: "productos disponibles.",
+modelConditionUnknown: "Estado no indicado",
+modelEmptyTitle: "Todavía no hay unidades disponibles",
+modelEmptyTextStart: "Puedes explorar otros productos de",
+modelEmptyTextEnd: "o publicar el tuyo.",
+modelViewBrand: "VER",
+modelPublishProduct: "PUBLICAR PRODUCTO",
+modelFaqEyebrow: "PREGUNTAS FRECUENTES",
+modelFaqTitle: "Comprar",
+
+modelFaqGoodIdeaQuestion:
+  "¿Es buena idea comprar este modelo de segunda mano?",
+modelFaqGoodIdeaAnswer:
+  "Puede ser una buena opción si el producto está bien conservado, el precio es coherente y el anuncio incluye fotografías claras y una descripción precisa.",
+
+modelFaqCheckQuestion:
+  "¿Qué debo revisar antes de comprar este modelo?",
+modelFaqCheckAnswer:
+  "Revisa el estado estructural, las zonas de desgaste, posibles reparaciones, la autenticidad y que las características coincidan con el modelo anunciado.",
+
+modelFaqSellQuestion:
+  "¿Cómo vender este modelo en ATHMOV?",
+modelFaqSellAnswer:
+  "Puedes publicar el producto desde la sección Vender, indicando la marca, el modelo, el estado, el precio y añadiendo fotografías claras.",
   },
 
 
@@ -3256,6 +3291,41 @@ brandsProductsAvailable: "products available",
 brandsViewProducts: "View products",
 brandsComingSoon: "More brands coming soon",
 brandsNoProducts: "There are currently no products available.",
+modelBreadcrumbLabel: "Breadcrumb",
+modelPageEyebrow: "ATHMOV · MODELS",
+modelSecondHand: "second hand",
+modelDescriptionStart: "Explore the available listings for",
+modelDescriptionEnd:
+  "compare prices, condition and sellers before buying.",
+modelViewProducts: "VIEW PRODUCTS",
+modelSellThisModel: "SELL THIS MODEL",
+modelAvailableProducts: "AVAILABLE PRODUCTS",
+modelAvailableOnAthmov: "on ATHMOV",
+modelOneProductAvailable: "There is 1 product available.",
+modelProductsAvailable: "products available.",
+modelConditionUnknown: "Condition not specified",
+modelEmptyTitle: "No units available yet",
+modelEmptyTextStart: "You can explore other products from",
+modelEmptyTextEnd: "or list yours.",
+modelViewBrand: "VIEW",
+modelPublishProduct: "LIST PRODUCT",
+modelFaqEyebrow: "FREQUENTLY ASKED QUESTIONS",
+modelFaqTitle: "Buying",
+
+modelFaqGoodIdeaQuestion:
+  "Is it a good idea to buy this model second hand?",
+modelFaqGoodIdeaAnswer:
+  "It can be a good option if the product is well preserved, the price is reasonable and the listing includes clear photos and an accurate description.",
+
+modelFaqCheckQuestion:
+  "What should I check before buying this model?",
+modelFaqCheckAnswer:
+  "Check the structural condition, areas of wear, possible repairs, authenticity and that the specifications match the advertised model.",
+
+modelFaqSellQuestion:
+  "How can I sell this model on ATHMOV?",
+modelFaqSellAnswer:
+  "You can list the product from the Sell section, entering the brand, model, condition and price, and adding clear photos.",
   },
 
   pt: {
@@ -4898,5 +4968,40 @@ brandsProductsAvailable: "produtos disponíveis",
 brandsViewProducts: "Ver produtos",
 brandsComingSoon: "Novas marcas em breve",
 brandsNoProducts: "Neste momento não existem produtos disponíveis.",
+modelBreadcrumbLabel: "Navegação estrutural",
+modelPageEyebrow: "ATHMOV · MODELOS",
+modelSecondHand: "em segunda mão",
+modelDescriptionStart: "Explora os anúncios disponíveis de",
+modelDescriptionEnd:
+  "compara preços, estado e vendedores antes de comprar.",
+modelViewProducts: "VER PRODUTOS",
+modelSellThisModel: "VENDER ESTE MODELO",
+modelAvailableProducts: "PRODUTOS DISPONÍVEIS",
+modelAvailableOnAthmov: "na ATHMOV",
+modelOneProductAvailable: "Existe 1 produto disponível.",
+modelProductsAvailable: "produtos disponíveis.",
+modelConditionUnknown: "Estado não indicado",
+modelEmptyTitle: "Ainda não existem unidades disponíveis",
+modelEmptyTextStart: "Podes explorar outros produtos da",
+modelEmptyTextEnd: "ou publicar o teu.",
+modelViewBrand: "VER",
+modelPublishProduct: "PUBLICAR PRODUTO",
+modelFaqEyebrow: "PERGUNTAS FREQUENTES",
+modelFaqTitle: "Comprar",
+
+modelFaqGoodIdeaQuestion:
+  "Vale a pena comprar este modelo em segunda mão?",
+modelFaqGoodIdeaAnswer:
+  "Pode ser uma boa opção se o produto estiver bem conservado, o preço for adequado e o anúncio incluir fotografias claras e uma descrição precisa.",
+
+modelFaqCheckQuestion:
+  "O que devo verificar antes de comprar este modelo?",
+modelFaqCheckAnswer:
+  "Verifica o estado estrutural, as zonas de desgaste, possíveis reparações, a autenticidade e se as características correspondem ao modelo anunciado.",
+
+modelFaqSellQuestion:
+  "Como posso vender este modelo na ATHMOV?",
+modelFaqSellAnswer:
+  "Podes publicar o produto na secção Vender, indicando a marca, o modelo, o estado e o preço, e adicionando fotografias claras.",
   },
 };
