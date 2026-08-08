@@ -1665,6 +1665,105 @@ modelFaqSellQuestion:
   "¿Cómo vender este modelo en ATHMOV?",
 modelFaqSellAnswer:
   "Puedes publicar el producto desde la sección Vender, indicando la marca, el modelo, el estado, el precio y añadiendo fotografías claras.",
+  aboutEyebrow: "SOBRE ATHMOV",
+aboutHeroTitleFirst: "El mejor material",
+aboutHeroTitleSecond: "merece seguir jugando.",
+aboutIntro:
+  "ATHMOV es un marketplace especializado en material deportivo premium de segunda mano. Un espacio creado para conectar productos que todavía tienen mucho que ofrecer con deportistas que buscan calidad, confianza y una forma más inteligente de comprar.",
+
+aboutIdeaEyebrow: "NUESTRA IDEA",
+aboutIdeaTitle:
+  "El valor de un producto no termina con su primer propietario.",
+aboutIdeaText:
+  "Una pala, una raqueta, un driver o unas zapatillas premium pueden conservar rendimiento, diseño y valor mucho después de su primera etapa de uso.",
+
+aboutMissionEyebrow: "NUESTRA MISIÓN",
+aboutMissionTitle:
+  "Hacer más segura y sencilla la compraventa deportiva.",
+aboutMissionText:
+  "Queremos ofrecer una experiencia especializada, cuidada y transparente para compradores y vendedores de material deportivo.",
+
+aboutWhyEyebrow: "POR QUÉ ATHMOV",
+aboutWhyTitle: "Un marketplace creado para deportistas.",
+
+aboutValueSpecializationTitle: "Especialización",
+aboutValueSpecializationText:
+  "Una plataforma centrada en pádel, golf, tenis y running.",
+aboutValueTrustTitle: "Confianza",
+aboutValueTrustText:
+  "Pagos seguros, vendedores identificados y protección en cada operación.",
+aboutValueQualityTitle: "Calidad",
+aboutValueQualityText:
+  "Material seleccionado para quienes buscan productos con valor real.",
+aboutValueSecondLifeTitle: "Segunda vida",
+aboutValueSecondLifeText:
+  "Más uso, menos desperdicio y una forma más responsable de consumir.",
+
+aboutSportsEyebrow: "NUESTROS DEPORTES",
+aboutExplore: "Explorar",
+
+aboutBehindEyebrow: "QUIÉN ESTÁ DETRÁS",
+aboutBehindTitle:
+  "Un proyecto deportivo y tecnológico desarrollado en España.",
+aboutProjectTitle: "El proyecto",
+aboutProjectText:
+  "ATHMOV es una plataforma especializada en material deportivo premium de segunda mano, inicialmente centrada en pádel, golf, tenis y running.",
+aboutTeamTitle: "El equipo",
+aboutTeamText:
+  "La plataforma reúne trabajo en estrategia, tecnología, producto, operaciones, marketing y comunidad deportiva. ATHMOV se encuentra actualmente en una fase inicial de crecimiento.",
+aboutLocationTitle: "Ubicación",
+aboutLocationText:
+  "ATHMOV se desarrolla y gestiona desde España, con vocación de crear una comunidad europea de compraventa deportiva.",
+
+aboutFundingEyebrow: "FINANCIACIÓN",
+aboutIndependentTitle: "Un proyecto independiente.",
+aboutIndependentTextOne:
+  "ATHMOV se encuentra en una fase inicial y se está desarrollando como un proyecto independiente.",
+aboutIndependentTextTwo:
+  "Si en el futuro se incorporan socios, inversión externa, aceleradoras u otras formas de financiación relevantes, esta información se actualizará para mantener una comunicación transparente.",
+
+aboutBusinessEyebrow: "MODELO DE NEGOCIO",
+aboutBusinessTitle: "Cómo se financia ATHMOV.",
+aboutBusinessIntro:
+  "Queremos que compradores y vendedores sepan desde el principio cómo funciona la plataforma y qué costes se aplican.",
+aboutPublishingLabel: "PUBLICACIÓN",
+aboutPublishingTitle: "Publicar es gratuito",
+aboutPublishingText:
+  "El vendedor puede publicar su material deportivo sin pagar una cuota inicial.",
+aboutCommissionLabel: "COMISIÓN ATHMOV",
+aboutCommissionTitle: "Solo cuando se vende",
+aboutCommissionText:
+  "ATHMOV aplica una comisión del 8 % sobre el precio del producto cuando la operación se completa correctamente.",
+aboutSubscriptionLabel: "SUSCRIPCIÓN",
+aboutSubscriptionTitle: "Sin cuota mensual",
+aboutSubscriptionText:
+  "Actualmente no es necesario contratar una suscripción para comprar o publicar productos.",
+
+aboutSaleExampleEyebrow: "EJEMPLO DE VENTA",
+aboutSaleExampleTitle: "Una operación de 200 €.",
+aboutProductPrice: "Precio del producto",
+aboutAthmovCommission: "Comisión ATHMOV (8 %)",
+aboutPaymentProcessing: "Procesamiento de pago estimado",
+aboutSellerEstimatedAmount: "Importe estimado para el vendedor",
+aboutCalculationNote:
+  "El coste de procesamiento es una estimación y puede variar según el método de pago, el país y las condiciones del proveedor de pagos. El desglose definitivo debe mostrarse antes de confirmar la operación.",
+
+aboutCorporateEyebrow: "INFORMACIÓN CORPORATIVA",
+aboutCorporateTitle: "Datos legales y contacto.",
+aboutTradeName: "Nombre comercial",
+aboutActivity: "Actividad",
+aboutActivityValue: "Marketplace de material deportivo",
+aboutManagementCountry: "País de gestión",
+aboutSpain: "España",
+aboutEmail: "Correo electrónico",
+aboutLegalNote:
+  "La razón social, identificación fiscal y domicilio social se incorporarán a esta página y al aviso legal cuando correspondan a la entidad responsable de la plataforma.",
+
+aboutCtaTitleFirst: "Compra mejor.",
+aboutCtaTitleSecond:
+  "Vende lo que todavía tiene historia.",
+aboutExploreMarketplace: "EXPLORAR MARKETPLACE",
+aboutSellEquipment: "VENDER MATERIAL",
   },
 
 
@@ -3326,6 +3425,105 @@ modelFaqSellQuestion:
   "How can I sell this model on ATHMOV?",
 modelFaqSellAnswer:
   "You can list the product from the Sell section, entering the brand, model, condition and price, and adding clear photos.",
+  aboutEyebrow: "ABOUT ATHMOV",
+aboutHeroTitleFirst: "The best equipment",
+aboutHeroTitleSecond: "deserves to keep playing.",
+aboutIntro:
+  "ATHMOV is a marketplace specialising in premium second-hand sports equipment. A space created to connect products that still have plenty to offer with athletes looking for quality, trust and a smarter way to buy.",
+
+aboutIdeaEyebrow: "OUR IDEA",
+aboutIdeaTitle:
+  "A product's value does not end with its first owner.",
+aboutIdeaText:
+  "A padel racket, tennis racket, driver or premium pair of shoes can retain performance, design and value long after their first stage of use.",
+
+aboutMissionEyebrow: "OUR MISSION",
+aboutMissionTitle:
+  "Make buying and selling sports equipment safer and simpler.",
+aboutMissionText:
+  "We want to offer a specialised, polished and transparent experience for buyers and sellers of sports equipment.",
+
+aboutWhyEyebrow: "WHY ATHMOV",
+aboutWhyTitle: "A marketplace built for athletes.",
+
+aboutValueSpecializationTitle: "Specialisation",
+aboutValueSpecializationText:
+  "A platform focused on padel, golf, tennis and running.",
+aboutValueTrustTitle: "Trust",
+aboutValueTrustText:
+  "Secure payments, identified sellers and protection in every transaction.",
+aboutValueQualityTitle: "Quality",
+aboutValueQualityText:
+  "Selected equipment for people looking for products with real value.",
+aboutValueSecondLifeTitle: "Second life",
+aboutValueSecondLifeText:
+  "More use, less waste and a more responsible way to consume.",
+
+aboutSportsEyebrow: "OUR SPORTS",
+aboutExplore: "Explore",
+
+aboutBehindEyebrow: "WHO'S BEHIND ATHMOV",
+aboutBehindTitle:
+  "A sports and technology project developed in Spain.",
+aboutProjectTitle: "The project",
+aboutProjectText:
+  "ATHMOV is a platform specialising in premium second-hand sports equipment, initially focused on padel, golf, tennis and running.",
+aboutTeamTitle: "The team",
+aboutTeamText:
+  "The platform brings together work across strategy, technology, product, operations, marketing and the sports community. ATHMOV is currently in an early stage of growth.",
+aboutLocationTitle: "Location",
+aboutLocationText:
+  "ATHMOV is developed and managed from Spain, with the ambition of building a European sports resale community.",
+
+aboutFundingEyebrow: "FUNDING",
+aboutIndependentTitle: "An independent project.",
+aboutIndependentTextOne:
+  "ATHMOV is currently in an early stage and is being developed as an independent project.",
+aboutIndependentTextTwo:
+  "If partners, external investment, accelerators or other relevant forms of funding are added in the future, this information will be updated to maintain transparent communication.",
+
+aboutBusinessEyebrow: "BUSINESS MODEL",
+aboutBusinessTitle: "How ATHMOV is funded.",
+aboutBusinessIntro:
+  "We want buyers and sellers to know from the start how the platform works and what costs apply.",
+aboutPublishingLabel: "LISTING",
+aboutPublishingTitle: "Listing is free",
+aboutPublishingText:
+  "Sellers can list their sports equipment without paying an upfront fee.",
+aboutCommissionLabel: "ATHMOV FEE",
+aboutCommissionTitle: "Only when it sells",
+aboutCommissionText:
+  "ATHMOV applies an 8% fee to the product price when the transaction is successfully completed.",
+aboutSubscriptionLabel: "SUBSCRIPTION",
+aboutSubscriptionTitle: "No monthly fee",
+aboutSubscriptionText:
+  "At present, no subscription is required to buy or list products.",
+
+aboutSaleExampleEyebrow: "SALE EXAMPLE",
+aboutSaleExampleTitle: "A €200 transaction.",
+aboutProductPrice: "Product price",
+aboutAthmovCommission: "ATHMOV fee (8%)",
+aboutPaymentProcessing: "Estimated payment processing",
+aboutSellerEstimatedAmount: "Estimated amount for the seller",
+aboutCalculationNote:
+  "Payment processing cost is an estimate and may vary depending on the payment method, country and payment provider conditions. The final breakdown should be shown before confirming the transaction.",
+
+aboutCorporateEyebrow: "CORPORATE INFORMATION",
+aboutCorporateTitle: "Legal details and contact.",
+aboutTradeName: "Trading name",
+aboutActivity: "Activity",
+aboutActivityValue: "Sports equipment marketplace",
+aboutManagementCountry: "Country of management",
+aboutSpain: "Spain",
+aboutEmail: "Email",
+aboutLegalNote:
+  "The company name, tax identification and registered address will be added to this page and the legal notice when they correspond to the entity responsible for the platform.",
+
+aboutCtaTitleFirst: "Buy better.",
+aboutCtaTitleSecond:
+  "Sell what still has a story to tell.",
+aboutExploreMarketplace: "EXPLORE MARKETPLACE",
+aboutSellEquipment: "SELL EQUIPMENT",
   },
 
   pt: {
@@ -5003,5 +5201,104 @@ modelFaqSellQuestion:
   "Como posso vender este modelo na ATHMOV?",
 modelFaqSellAnswer:
   "Podes publicar o produto na secção Vender, indicando a marca, o modelo, o estado e o preço, e adicionando fotografias claras.",
+  aboutEyebrow: "SOBRE A ATHMOV",
+aboutHeroTitleFirst: "O melhor material",
+aboutHeroTitleSecond: "merece continuar a jogar.",
+aboutIntro:
+  "A ATHMOV é um marketplace especializado em material desportivo premium em segunda mão. Um espaço criado para ligar produtos que ainda têm muito para oferecer a desportistas que procuram qualidade, confiança e uma forma mais inteligente de comprar.",
+
+aboutIdeaEyebrow: "A NOSSA IDEIA",
+aboutIdeaTitle:
+  "O valor de um produto não termina com o primeiro proprietário.",
+aboutIdeaText:
+  "Uma pala, uma raquete, um driver ou umas sapatilhas premium podem manter desempenho, design e valor muito depois da primeira fase de utilização.",
+
+aboutMissionEyebrow: "A NOSSA MISSÃO",
+aboutMissionTitle:
+  "Tornar a compra e venda de material desportivo mais segura e simples.",
+aboutMissionText:
+  "Queremos oferecer uma experiência especializada, cuidada e transparente para compradores e vendedores de material desportivo.",
+
+aboutWhyEyebrow: "PORQUÊ A ATHMOV",
+aboutWhyTitle: "Um marketplace criado para desportistas.",
+
+aboutValueSpecializationTitle: "Especialização",
+aboutValueSpecializationText:
+  "Uma plataforma centrada em pádel, golfe, ténis e running.",
+aboutValueTrustTitle: "Confiança",
+aboutValueTrustText:
+  "Pagamentos seguros, vendedores identificados e proteção em cada operação.",
+aboutValueQualityTitle: "Qualidade",
+aboutValueQualityText:
+  "Material selecionado para quem procura produtos com valor real.",
+aboutValueSecondLifeTitle: "Segunda vida",
+aboutValueSecondLifeText:
+  "Mais utilização, menos desperdício e uma forma mais responsável de consumir.",
+
+aboutSportsEyebrow: "OS NOSSOS DESPORTOS",
+aboutExplore: "Explorar",
+
+aboutBehindEyebrow: "QUEM ESTÁ POR TRÁS",
+aboutBehindTitle:
+  "Um projeto desportivo e tecnológico desenvolvido em Espanha.",
+aboutProjectTitle: "O projeto",
+aboutProjectText:
+  "A ATHMOV é uma plataforma especializada em material desportivo premium em segunda mão, inicialmente centrada em pádel, golfe, ténis e running.",
+aboutTeamTitle: "A equipa",
+aboutTeamText:
+  "A plataforma reúne trabalho em estratégia, tecnologia, produto, operações, marketing e comunidade desportiva. A ATHMOV encontra-se atualmente numa fase inicial de crescimento.",
+aboutLocationTitle: "Localização",
+aboutLocationText:
+  "A ATHMOV é desenvolvida e gerida a partir de Espanha, com a ambição de criar uma comunidade europeia de compra e venda de material desportivo.",
+
+aboutFundingEyebrow: "FINANCIAMENTO",
+aboutIndependentTitle: "Um projeto independente.",
+aboutIndependentTextOne:
+  "A ATHMOV encontra-se numa fase inicial e está a ser desenvolvida como um projeto independente.",
+aboutIndependentTextTwo:
+  "Se no futuro forem incorporados parceiros, investimento externo, aceleradoras ou outras formas relevantes de financiamento, esta informação será atualizada para manter uma comunicação transparente.",
+
+aboutBusinessEyebrow: "MODELO DE NEGÓCIO",
+aboutBusinessTitle: "Como a ATHMOV se financia.",
+aboutBusinessIntro:
+  "Queremos que compradores e vendedores saibam desde o início como funciona a plataforma e que custos são aplicados.",
+aboutPublishingLabel: "PUBLICAÇÃO",
+aboutPublishingTitle: "Publicar é gratuito",
+aboutPublishingText:
+  "O vendedor pode publicar o seu material desportivo sem pagar uma taxa inicial.",
+aboutCommissionLabel: "COMISSÃO ATHMOV",
+aboutCommissionTitle: "Só quando é vendido",
+aboutCommissionText:
+  "A ATHMOV aplica uma comissão de 8% sobre o preço do produto quando a operação é concluída com sucesso.",
+aboutSubscriptionLabel: "SUBSCRIÇÃO",
+aboutSubscriptionTitle: "Sem mensalidade",
+aboutSubscriptionText:
+  "Atualmente não é necessário contratar uma subscrição para comprar ou publicar produtos.",
+
+aboutSaleExampleEyebrow: "EXEMPLO DE VENDA",
+aboutSaleExampleTitle: "Uma operação de 200 €.",
+aboutProductPrice: "Preço do produto",
+aboutAthmovCommission: "Comissão ATHMOV (8%)",
+aboutPaymentProcessing: "Processamento de pagamento estimado",
+aboutSellerEstimatedAmount: "Valor estimado para o vendedor",
+aboutCalculationNote:
+  "O custo de processamento é uma estimativa e pode variar consoante o método de pagamento, o país e as condições do fornecedor de pagamentos. O detalhe final deve ser apresentado antes de confirmar a operação.",
+
+aboutCorporateEyebrow: "INFORMAÇÃO CORPORATIVA",
+aboutCorporateTitle: "Dados legais e contacto.",
+aboutTradeName: "Nome comercial",
+aboutActivity: "Atividade",
+aboutActivityValue: "Marketplace de material desportivo",
+aboutManagementCountry: "País de gestão",
+aboutSpain: "Espanha",
+aboutEmail: "Email",
+aboutLegalNote:
+  "A denominação social, identificação fiscal e sede social serão adicionadas a esta página e ao aviso legal quando corresponderem à entidade responsável pela plataforma.",
+
+aboutCtaTitleFirst: "Compra melhor.",
+aboutCtaTitleSecond:
+  "Vende o que ainda tem uma história.",
+aboutExploreMarketplace: "EXPLORAR MARKETPLACE",
+aboutSellEquipment: "VENDER MATERIAL",
   },
 };
