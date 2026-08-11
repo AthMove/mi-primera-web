@@ -2014,6 +2014,36 @@ buyerProtectionFaqOrderAnswer:
 buyerProtectionFinalTitle:
   "Encuentra tu próximo equipo en ATHMOV.",
 buyerProtectionViewMarketplace: "VER MARKETPLACE",
+sellerPayoutsLoading: "Cargando pagos...",
+sellerPayoutsEyebrow: "CENTRO DE VENDEDOR",
+sellerPayoutsTitle: "Pagos",
+
+sellerPayoutsPendingRelease: "Pendiente de liberar",
+sellerPayoutsReleased: "Liberado",
+sellerPayoutsInDispute: "En disputa",
+sellerPayoutsTotalEarnings: "Ingresos totales",
+
+sellerPayoutsNoPayments: "Todavía no hay pagos.",
+sellerPayoutsOrder: "PEDIDO",
+sellerPayoutsStatus: "Estado",
+sellerPayoutsTransfer: "Transferencia",
+sellerPayoutsDisputeOpen: "Disputa abierta — pago bloqueado",
+
+sellerPayoutsPending: "Pendiente",
+sellerPayoutsCancelled: "Cancelado",
+sellerPayoutsRefunded: "Reembolsado",
+
+sellerPayoutsOrderPending: "Pendiente",
+sellerPayoutsOrderPaid: "Pagado",
+sellerPayoutsOrderPreparing: "En preparación",
+sellerPayoutsOrderShipped: "Enviado",
+sellerPayoutsOrderDelivered: "Entregado",
+sellerPayoutsOrderCompleted: "Completado",
+sellerPayoutsOrderRefunded: "Reembolsado",
+
+sellerPayoutsReleasedDate: "Liberado",
+sellerPayoutsDeliveredDate: "Entregado",
+sellerPayoutsCreatedDate: "Creado",
   },
 
 
@@ -4024,6 +4054,36 @@ buyerProtectionFaqOrderAnswer:
 buyerProtectionFinalTitle:
   "Find your next piece of equipment on ATHMOV.",
 buyerProtectionViewMarketplace: "VIEW MARKETPLACE",
+sellerPayoutsLoading: "Loading payouts...",
+sellerPayoutsEyebrow: "SELLER CENTRE",
+sellerPayoutsTitle: "Payouts",
+
+sellerPayoutsPendingRelease: "Pending release",
+sellerPayoutsReleased: "Released",
+sellerPayoutsInDispute: "In dispute",
+sellerPayoutsTotalEarnings: "Total earnings",
+
+sellerPayoutsNoPayments: "There are no payouts yet.",
+sellerPayoutsOrder: "ORDER",
+sellerPayoutsStatus: "Status",
+sellerPayoutsTransfer: "Transfer",
+sellerPayoutsDisputeOpen: "Open dispute — payout blocked",
+
+sellerPayoutsPending: "Pending",
+sellerPayoutsCancelled: "Cancelled",
+sellerPayoutsRefunded: "Refunded",
+
+sellerPayoutsOrderPending: "Pending",
+sellerPayoutsOrderPaid: "Paid",
+sellerPayoutsOrderPreparing: "Preparing",
+sellerPayoutsOrderShipped: "Shipped",
+sellerPayoutsOrderDelivered: "Delivered",
+sellerPayoutsOrderCompleted: "Completed",
+sellerPayoutsOrderRefunded: "Refunded",
+
+sellerPayoutsReleasedDate: "Released",
+sellerPayoutsDeliveredDate: "Delivered",
+sellerPayoutsCreatedDate: "Created",
   },
 
   pt: {
@@ -6050,5 +6110,35 @@ buyerProtectionFaqOrderAnswer:
 buyerProtectionFinalTitle:
   "Encontra o teu próximo equipamento na ATHMOV.",
 buyerProtectionViewMarketplace: "VER MARKETPLACE",
+sellerPayoutsLoading: "A carregar pagamentos...",
+sellerPayoutsEyebrow: "CENTRO DO VENDEDOR",
+sellerPayoutsTitle: "Pagamentos",
+
+sellerPayoutsPendingRelease: "Pendente de libertação",
+sellerPayoutsReleased: "Libertado",
+sellerPayoutsInDispute: "Em disputa",
+sellerPayoutsTotalEarnings: "Receitas totais",
+
+sellerPayoutsNoPayments: "Ainda não existem pagamentos.",
+sellerPayoutsOrder: "ENCOMENDA",
+sellerPayoutsStatus: "Estado",
+sellerPayoutsTransfer: "Transferência",
+sellerPayoutsDisputeOpen: "Disputa aberta — pagamento bloqueado",
+
+sellerPayoutsPending: "Pendente",
+sellerPayoutsCancelled: "Cancelado",
+sellerPayoutsRefunded: "Reembolsado",
+
+sellerPayoutsOrderPending: "Pendente",
+sellerPayoutsOrderPaid: "Pago",
+sellerPayoutsOrderPreparing: "Em preparação",
+sellerPayoutsOrderShipped: "Enviado",
+sellerPayoutsOrderDelivered: "Entregue",
+sellerPayoutsOrderCompleted: "Concluído",
+sellerPayoutsOrderRefunded: "Reembolsado",
+
+sellerPayoutsReleasedDate: "Libertado",
+sellerPayoutsDeliveredDate: "Entregue",
+sellerPayoutsCreatedDate: "Criado",
   },
 };

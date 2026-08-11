@@ -2,10 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function SellerPayoutsPage() {
+  const { lang, t } = useLanguage();
+
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const locale =
+    lang === "en"
+      ? "en-GB"
+      : lang === "pt"
+        ? "pt-PT"
+        : "es-ES";
 
   useEffect(() => {
     loadPayouts();
@@ -38,86 +48,231 @@ export default function SellerPayoutsPage() {
   };
 
   const pending = orders.filter(
-    (o) => o.transfer_status === "pending" && o.dispute_status !== "open"
+    (o) =>
+      o.transfer_status === "pending" &&
+      o.dispute_status !== "open"
   );
 
-  const paid = orders.filter((o) => o.transfer_status === "released");
+  const paid = orders.filter(
+    (o) => o.transfer_status === "released"
+  );
 
-  const disputed = orders.filter((o) => o.dispute_status === "open");
+  const disputed = orders.filter(
+    (o) => o.dispute_status === "open"
+  );
 
   const sum = (items: any[]) =>
     items.reduce(
-      (acc, item) => acc + Number(item.seller_amount || item.amount || 0),
+      (acc, item) =>
+        acc +
+        Number(
+          item.seller_amount ||
+            item.amount ||
+            0
+        ),
       0
     );
 
+  const formatCurrency = (value: number) =>
+    new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: "EUR",
+    }).format(value);
+
+  const formatDate = (date?: string) => {
+    if (!date) return "";
+
+    return new Date(date).toLocaleDateString(locale, {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  const getOrderStatusLabel = (status?: string) => {
+    if (status === "pending") {
+      return t.sellerPayoutsOrderPending;
+    }
+
+    if (status === "paid") {
+      return t.sellerPayoutsOrderPaid;
+    }
+
+    if (status === "preparing") {
+      return t.sellerPayoutsOrderPreparing;
+    }
+
+    if (status === "shipped") {
+      return t.sellerPayoutsOrderShipped;
+    }
+
+    if (status === "delivered") {
+      return t.sellerPayoutsOrderDelivered;
+    }
+
+    if (status === "completed") {
+      return t.sellerPayoutsOrderCompleted;
+    }
+
+    if (status === "refunded") {
+      return t.sellerPayoutsOrderRefunded;
+    }
+
+    return status || t.sellerPayoutsOrderPending;
+  };
+
+  const getTransferStatusLabel = (
+    status?: string
+  ) => {
+    if (status === "pending") {
+      return t.sellerPayoutsPending;
+    }
+
+    if (status === "released") {
+      return t.sellerPayoutsReleased;
+    }
+
+    if (status === "cancelled") {
+      return t.sellerPayoutsCancelled;
+    }
+
+    if (status === "refunded") {
+      return t.sellerPayoutsRefunded;
+    }
+
+    return status || t.sellerPayoutsPending;
+  };
+
   if (loading) {
-    return <main style={pageStyle}>Cargando pagos...</main>;
+    return (
+      <main style={pageStyle}>
+        {t.sellerPayoutsLoading}
+      </main>
+    );
   }
 
   return (
     <main style={pageStyle}>
-      <p style={eyebrowStyle}>CENTRO DE VENDEDOR</p>
-      <h1 style={titleStyle}>Pagos</h1>
+      <p style={eyebrowStyle}>
+        {t.sellerPayoutsEyebrow}
+      </p>
+
+      <h1 style={titleStyle}>
+        {t.sellerPayoutsTitle}
+      </h1>
 
       <section style={statsGridStyle}>
         <div style={statCardStyle}>
-          <span style={statLabelStyle}>Pendiente de liberar</span>
-          <strong style={statValueStyle}>€{sum(pending).toFixed(2)}</strong>
+          <span style={statLabelStyle}>
+            {t.sellerPayoutsPendingRelease}
+          </span>
+
+          <strong style={statValueStyle}>
+            {formatCurrency(sum(pending))}
+          </strong>
         </div>
 
         <div style={statCardStyle}>
-          <span style={statLabelStyle}>Liberado</span>
-          <strong style={statValueStyle}>€{sum(paid).toFixed(2)}</strong>
+          <span style={statLabelStyle}>
+            {t.sellerPayoutsReleased}
+          </span>
+
+          <strong style={statValueStyle}>
+            {formatCurrency(sum(paid))}
+          </strong>
         </div>
 
         <div style={statCardStyle}>
-          <span style={statLabelStyle}>En disputa</span>
-          <strong style={statValueStyle}>€{sum(disputed).toFixed(2)}</strong>
+          <span style={statLabelStyle}>
+            {t.sellerPayoutsInDispute}
+          </span>
+
+          <strong style={statValueStyle}>
+            {formatCurrency(sum(disputed))}
+          </strong>
         </div>
 
         <div style={statCardDarkStyle}>
-          <span style={statLabelLightStyle}>Ingresos totales</span>
-          <strong style={statValueLightStyle}>€{sum(orders).toFixed(2)}</strong>
+          <span style={statLabelLightStyle}>
+            {t.sellerPayoutsTotalEarnings}
+          </span>
+
+          <strong style={statValueLightStyle}>
+            {formatCurrency(sum(orders))}
+          </strong>
         </div>
       </section>
 
       <section style={listStyle}>
         {orders.length === 0 ? (
-          <div style={emptyStyle}>Todavía no hay pagos.</div>
+          <div style={emptyStyle}>
+            {t.sellerPayoutsNoPayments}
+          </div>
         ) : (
           orders.map((order) => (
-            <article key={order.id} style={rowStyle}>
+            <article
+              key={order.id}
+              style={rowStyle}
+            >
               <div>
-                <p style={rowEyebrowStyle}>PEDIDO #{order.id.slice(0, 8)}</p>
+                <p style={rowEyebrowStyle}>
+                  {t.sellerPayoutsOrder} #
+                  {order.id.slice(0, 8)}
+                </p>
 
                 <h2 style={rowTitleStyle}>
-                  €{Number(order.seller_amount || order.amount || 0).toFixed(2)}
+                  {formatCurrency(
+                    Number(
+                      order.seller_amount ||
+                        order.amount ||
+                        0
+                    )
+                  )}
                 </h2>
 
                 <p style={rowTextStyle}>
-                  Estado: {getOrderStatusLabel(order.status)} · Transferencia:{" "}
-                  {getTransferStatusLabel(order.transfer_status)}
+                  {t.sellerPayoutsStatus}:{" "}
+                  {getOrderStatusLabel(
+                    order.status
+                  )}{" "}
+                  · {t.sellerPayoutsTransfer}:{" "}
+                  {getTransferStatusLabel(
+                    order.transfer_status
+                  )}
                 </p>
 
-                {order.dispute_status === "open" && (
-                  <p style={warningStyle}>Disputa abierta — pago bloqueado</p>
+                {order.dispute_status ===
+                  "open" && (
+                  <p style={warningStyle}>
+                    {t.sellerPayoutsDisputeOpen}
+                  </p>
                 )}
               </div>
 
               <div style={rightStyle}>
-                <span style={badgeStyle(order.transfer_status)}>
-                  {order.transfer_status === "released"
-                    ? "Liberado"
-                    : "Pendiente"}
+                <span
+                  style={badgeStyle(
+                    order.transfer_status
+                  )}
+                >
+                  {order.transfer_status ===
+                  "released"
+                    ? t.sellerPayoutsReleased
+                    : t.sellerPayoutsPending}
                 </span>
 
                 <small style={dateStyle}>
                   {order.payout_released_at
-                    ? `Liberado ${formatDate(order.payout_released_at)}`
+                    ? `${t.sellerPayoutsReleasedDate} ${formatDate(
+                        order.payout_released_at
+                      )}`
                     : order.delivered_at
-                      ? `Entregado ${formatDate(order.delivered_at)}`
-                      : `Creado ${formatDate(order.created_at)}`}
+                      ? `${t.sellerPayoutsDeliveredDate} ${formatDate(
+                          order.delivered_at
+                        )}`
+                      : `${t.sellerPayoutsCreatedDate} ${formatDate(
+                          order.created_at
+                        )}`}
                 </small>
               </div>
             </article>
@@ -126,35 +281,6 @@ export default function SellerPayoutsPage() {
       </section>
     </main>
   );
-}
-
-function getOrderStatusLabel(status?: string) {
-  if (status === "pending") return "Pendiente";
-  if (status === "paid") return "Pagado";
-  if (status === "preparing") return "En preparación";
-  if (status === "shipped") return "Enviado";
-  if (status === "delivered") return "Entregado";
-  if (status === "completed") return "Completado";
-  if (status === "refunded") return "Reembolsado";
-  return status || "Pendiente";
-}
-
-function getTransferStatusLabel(status?: string) {
-  if (status === "pending") return "Pendiente";
-  if (status === "released") return "Liberado";
-  if (status === "cancelled") return "Cancelado";
-  if (status === "refunded") return "Reembolsado";
-  return status || "Pendiente";
-}
-
-function formatDate(date?: string) {
-  if (!date) return "";
-
-  return new Date(date).toLocaleDateString([], {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
 }
 
 const pageStyle = {
@@ -181,7 +307,8 @@ const titleStyle = {
 
 const statsGridStyle = {
   display: "grid",
-  gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+  gridTemplateColumns:
+    "repeat(4, minmax(0, 1fr))",
   gap: "18px",
   marginBottom: "34px",
 };
@@ -275,8 +402,10 @@ const rightStyle = {
 };
 
 const badgeStyle = (status?: string) => ({
-  background: status === "released" ? "#111" : "#fff",
-  color: status === "released" ? "#fff" : "#111",
+  background:
+    status === "released" ? "#111" : "#fff",
+  color:
+    status === "released" ? "#fff" : "#111",
   border: "1px solid rgba(0,0,0,0.12)",
   borderRadius: "999px",
   padding: "10px 14px",
