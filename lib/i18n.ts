@@ -2161,6 +2161,35 @@ dashboardNoRecentSales:
   "Todavía no tienes ventas recientes.",
 dashboardOrderLabel: "PEDIDO",
 dashboardSellerPayment: "Pago al vendedor",
+adminFinanceLoading: "Cargando finanzas...",
+adminFinanceEyebrow: "ADMIN ATHMOV",
+adminFinanceTitle: "Finanzas",
+adminFinanceSubtitle:
+  "Controla el volumen del marketplace, comisiones, pagos y riesgo abierto.",
+
+adminFinanceGmv: "GMV",
+adminFinanceAthmovFees: "Comisiones ATHMOV",
+adminFinanceSellerEarnings: "Ganancias vendedores",
+adminFinancePendingPayouts: "Pagos pendientes",
+adminFinanceReleasedPayouts: "Pagos liberados",
+adminFinancePaidOrders: "Pedidos pagados",
+adminFinanceTotalOrders: "Pedidos totales",
+adminFinanceOpenDisputes: "Disputas abiertas",
+
+adminFinanceOrdersEyebrow: "FINANZAS DE PEDIDOS",
+adminFinanceOrdersTitle: "Pedidos",
+adminFinanceNoOrders: "Todavía no hay pedidos.",
+
+adminFinanceAmount: "Importe",
+adminFinanceFee: "Comisión",
+adminFinanceSeller: "Vendedor",
+adminFinanceStatus: "Estado",
+adminFinanceTransfer: "Transferencia",
+adminFinanceDispute: "Disputa",
+
+adminFinanceDisputeOpen: "Abierta",
+adminFinanceDisputeResolved: "Resuelta",
+adminFinanceNoDispute: "Sin disputa",
   },
 
 
@@ -4318,6 +4347,35 @@ dashboardNoRecentSales:
   "You don't have any recent sales yet.",
 dashboardOrderLabel: "ORDER",
 dashboardSellerPayment: "Seller payout",
+adminFinanceLoading: "Loading finance...",
+adminFinanceEyebrow: "ATHMOV ADMIN",
+adminFinanceTitle: "Finance",
+adminFinanceSubtitle:
+  "Monitor marketplace volume, fees, payouts and open risk.",
+
+adminFinanceGmv: "GMV",
+adminFinanceAthmovFees: "ATHMOV fees",
+adminFinanceSellerEarnings: "Seller earnings",
+adminFinancePendingPayouts: "Pending payouts",
+adminFinanceReleasedPayouts: "Released payouts",
+adminFinancePaidOrders: "Paid orders",
+adminFinanceTotalOrders: "Total orders",
+adminFinanceOpenDisputes: "Open disputes",
+
+adminFinanceOrdersEyebrow: "ORDER FINANCE",
+adminFinanceOrdersTitle: "Orders",
+adminFinanceNoOrders: "There are no orders yet.",
+
+adminFinanceAmount: "Amount",
+adminFinanceFee: "Fee",
+adminFinanceSeller: "Seller",
+adminFinanceStatus: "Status",
+adminFinanceTransfer: "Transfer",
+adminFinanceDispute: "Dispute",
+
+adminFinanceDisputeOpen: "Open",
+adminFinanceDisputeResolved: "Resolved",
+adminFinanceNoDispute: "No dispute",
   },
 
   pt: {
@@ -6491,5 +6549,34 @@ dashboardNoRecentSales:
   "Ainda não tens vendas recentes.",
 dashboardOrderLabel: "ENCOMENDA",
 dashboardSellerPayment: "Pagamento ao vendedor",
+adminFinanceLoading: "A carregar finanças...",
+adminFinanceEyebrow: "ADMIN ATHMOV",
+adminFinanceTitle: "Finanças",
+adminFinanceSubtitle:
+  "Controla o volume do marketplace, comissões, pagamentos e risco em aberto.",
+
+adminFinanceGmv: "GMV",
+adminFinanceAthmovFees: "Comissões ATHMOV",
+adminFinanceSellerEarnings: "Ganhos dos vendedores",
+adminFinancePendingPayouts: "Pagamentos pendentes",
+adminFinanceReleasedPayouts: "Pagamentos libertados",
+adminFinancePaidOrders: "Encomendas pagas",
+adminFinanceTotalOrders: "Total de encomendas",
+adminFinanceOpenDisputes: "Disputas abertas",
+
+adminFinanceOrdersEyebrow: "FINANÇAS DAS ENCOMENDAS",
+adminFinanceOrdersTitle: "Encomendas",
+adminFinanceNoOrders: "Ainda não existem encomendas.",
+
+adminFinanceAmount: "Montante",
+adminFinanceFee: "Comissão",
+adminFinanceSeller: "Vendedor",
+adminFinanceStatus: "Estado",
+adminFinanceTransfer: "Transferência",
+adminFinanceDispute: "Disputa",
+
+adminFinanceDisputeOpen: "Aberta",
+adminFinanceDisputeResolved: "Resolvida",
+adminFinanceNoDispute: "Sem disputa",
   },
 };

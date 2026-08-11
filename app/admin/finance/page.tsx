@@ -2,10 +2,20 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function AdminFinancePage() {
+  const { lang, t } = useLanguage();
+
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const locale =
+    lang === "en"
+      ? "en-GB"
+      : lang === "pt"
+        ? "pt-PT"
+        : "es-ES";
 
   useEffect(() => {
     loadFinance();
@@ -34,22 +44,38 @@ export default function AdminFinancePage() {
       )
     );
 
-    const gmv = paidOrders.reduce((sum, o) => sum + Number(o.amount || 0), 0);
+    const gmv = paidOrders.reduce(
+      (sum, o) => sum + Number(o.amount || 0),
+      0
+    );
+
     const fees = paidOrders.reduce(
       (sum, o) => sum + Number(o.platform_fee || 0),
       0
     );
+
     const sellerEarnings = paidOrders.reduce(
       (sum, o) => sum + Number(o.seller_amount || 0),
       0
     );
+
     const released = orders
       .filter((o) => o.transfer_status === "released")
-      .reduce((sum, o) => sum + Number(o.seller_amount || 0), 0);
+      .reduce(
+        (sum, o) => sum + Number(o.seller_amount || 0),
+        0
+      );
+
     const pendingRelease = paidOrders
       .filter((o) => o.transfer_status !== "released")
-      .reduce((sum, o) => sum + Number(o.seller_amount || 0), 0);
-    const disputes = orders.filter((o) => o.dispute_status === "open").length;
+      .reduce(
+        (sum, o) => sum + Number(o.seller_amount || 0),
+        0
+      );
+
+    const disputes = orders.filter(
+      (o) => o.dispute_status === "open"
+    ).length;
 
     return {
       gmv,
@@ -63,12 +89,16 @@ export default function AdminFinancePage() {
     };
   }, [orders]);
 
-  const formatMoney = (value: number) => `€${value.toFixed(2)}`;
+  const formatMoney = (value: number) =>
+    new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: "EUR",
+    }).format(Number(value || 0));
 
   const formatDate = (date?: string) => {
     if (!date) return "-";
 
-    return new Date(date).toLocaleDateString([], {
+    return new Date(date).toLocaleDateString(locale, {
       day: "2-digit",
       month: "short",
       year: "numeric",
@@ -76,97 +106,230 @@ export default function AdminFinancePage() {
   };
 
   const getStatusLabel = (status?: string) => {
-    if (status === "paid") return "Pagado";
-    if (status === "preparing") return "Preparando";
-    if (status === "shipped") return "Enviado";
-    if (status === "delivered") return "Entregado";
-    if (status === "completed") return "Completado";
-    if (status === "refunded") return "Reembolsado";
-    if (status === "pending") return "Pendiente";
-    return status || "Pendiente";
+    if (status === "paid") {
+      return t.earningsStatusPaid;
+    }
+
+    if (status === "preparing") {
+      return t.earningsStatusPreparing;
+    }
+
+    if (status === "shipped") {
+      return t.earningsStatusShipped;
+    }
+
+    if (status === "delivered") {
+      return t.earningsStatusDelivered;
+    }
+
+    if (status === "completed") {
+      return t.earningsStatusCompleted;
+    }
+
+    if (status === "refunded") {
+      return t.earningsStatusRefunded;
+    }
+
+    if (status === "pending") {
+      return t.earningsStatusPending;
+    }
+
+    return status || t.earningsStatusPending;
   };
 
   const getTransferLabel = (status?: string) => {
-    if (status === "released") return "Liberado";
-    if (status === "pending") return "Pendiente";
-    if (status === "cancelled") return "Cancelado";
-    if (status === "refunded") return "Reembolsado";
-    return status || "Pendiente";
+    if (status === "released") {
+      return t.sellerPayoutsReleased;
+    }
+
+    if (status === "pending") {
+      return t.sellerPayoutsPending;
+    }
+
+    if (status === "cancelled") {
+      return t.sellerPayoutsCancelled;
+    }
+
+    if (status === "refunded") {
+      return t.sellerPayoutsRefunded;
+    }
+
+    return status || t.sellerPayoutsPending;
   };
 
   const getDisputeLabel = (status?: string) => {
-    if (status === "open") return "Abierta";
-    if (status === "resolved") return "Resuelta";
-    if (status === "none") return "Sin disputa";
-    return status || "Sin disputa";
+    if (status === "open") {
+      return t.adminFinanceDisputeOpen;
+    }
+
+    if (status === "resolved") {
+      return t.adminFinanceDisputeResolved;
+    }
+
+    if (status === "none") {
+      return t.adminFinanceNoDispute;
+    }
+
+    return status || t.adminFinanceNoDispute;
   };
 
   if (loading) {
-    return <main style={pageStyle}>Cargando finanzas...</main>;
+    return (
+      <main style={pageStyle}>
+        {t.adminFinanceLoading}
+      </main>
+    );
   }
 
   return (
-    <main style={pageStyle} className="admin-finance-page">
+    <main
+      style={pageStyle}
+      className="admin-finance-page"
+    >
       <section style={headerStyle}>
-        <p style={eyebrowStyle}>ADMIN ATHMOV</p>
+        <p style={eyebrowStyle}>
+          {t.adminFinanceEyebrow}
+        </p>
 
-        <h1 style={titleStyle} className="admin-finance-title">
-          Finanzas
+        <h1
+          style={titleStyle}
+          className="admin-finance-title"
+        >
+          {t.adminFinanceTitle}
         </h1>
 
         <p style={subtitleStyle}>
-          Controla el volumen del marketplace, comisiones, pagos y riesgo abierto.
+          {t.adminFinanceSubtitle}
         </p>
       </section>
 
-      <section style={statsGridStyle} className="stats-grid">
-        <Card label="GMV" value={formatMoney(stats.gmv)} />
-        <Card label="Comisiones ATHMOV" value={formatMoney(stats.fees)} />
-        <Card label="Ganancias vendedores" value={formatMoney(stats.sellerEarnings)} />
-        <Card label="Pagos pendientes" value={formatMoney(stats.pendingRelease)} />
-        <Card label="Pagos liberados" value={formatMoney(stats.released)} />
-        <Card label="Pedidos pagados" value={String(stats.paidOrders)} />
-        <Card label="Pedidos totales" value={String(stats.totalOrders)} />
-        <Card label="Disputas abiertas" value={String(stats.disputes)} />
+      <section
+        style={statsGridStyle}
+        className="stats-grid"
+      >
+        <Card
+          label={t.adminFinanceGmv}
+          value={formatMoney(stats.gmv)}
+        />
+
+        <Card
+          label={t.adminFinanceAthmovFees}
+          value={formatMoney(stats.fees)}
+        />
+
+        <Card
+          label={t.adminFinanceSellerEarnings}
+          value={formatMoney(stats.sellerEarnings)}
+        />
+
+        <Card
+          label={t.adminFinancePendingPayouts}
+          value={formatMoney(stats.pendingRelease)}
+        />
+
+        <Card
+          label={t.adminFinanceReleasedPayouts}
+          value={formatMoney(stats.released)}
+        />
+
+        <Card
+          label={t.adminFinancePaidOrders}
+          value={String(stats.paidOrders)}
+        />
+
+        <Card
+          label={t.adminFinanceTotalOrders}
+          value={String(stats.totalOrders)}
+        />
+
+        <Card
+          label={t.adminFinanceOpenDisputes}
+          value={String(stats.disputes)}
+        />
       </section>
 
       <section style={tableSectionStyle}>
-        <p style={eyebrowStyle}>FINANZAS DE PEDIDOS</p>
-        <h2 style={sectionTitleStyle}>Pedidos</h2>
+        <p style={eyebrowStyle}>
+          {t.adminFinanceOrdersEyebrow}
+        </p>
+
+        <h2 style={sectionTitleStyle}>
+          {t.adminFinanceOrdersTitle}
+        </h2>
 
         {orders.length === 0 ? (
-          <div style={emptyStyle}>Todavía no hay pedidos.</div>
+          <div style={emptyStyle}>
+            {t.adminFinanceNoOrders}
+          </div>
         ) : (
           <div style={tableStyle}>
             {orders.map((order) => (
-              <div key={order.id} style={rowStyle} className="finance-row">
+              <div
+                key={order.id}
+                style={rowStyle}
+                className="finance-row"
+              >
                 <div>
-                  <p style={rowTitleStyle}>#{String(order.id).slice(0, 8)}</p>
-                  <p style={rowMetaStyle}>{formatDate(order.created_at)}</p>
+                  <p style={rowTitleStyle}>
+                    #{String(order.id).slice(0, 8)}
+                  </p>
+
+                  <p style={rowMetaStyle}>
+                    {formatDate(order.created_at)}
+                  </p>
                 </div>
 
                 <div>
-                  <p style={rowLabelStyle}>Importe</p>
-                  <strong>{formatMoney(Number(order.amount || 0))}</strong>
+                  <p style={rowLabelStyle}>
+                    {t.adminFinanceAmount}
+                  </p>
+
+                  <strong>
+                    {formatMoney(
+                      Number(order.amount || 0)
+                    )}
+                  </strong>
                 </div>
 
                 <div>
-                  <p style={rowLabelStyle}>Comisión</p>
-                  <strong>{formatMoney(Number(order.platform_fee || 0))}</strong>
+                  <p style={rowLabelStyle}>
+                    {t.adminFinanceFee}
+                  </p>
+
+                  <strong>
+                    {formatMoney(
+                      Number(order.platform_fee || 0)
+                    )}
+                  </strong>
                 </div>
 
                 <div>
-                  <p style={rowLabelStyle}>Vendedor</p>
-                  <strong>{formatMoney(Number(order.seller_amount || 0))}</strong>
+                  <p style={rowLabelStyle}>
+                    {t.adminFinanceSeller}
+                  </p>
+
+                  <strong>
+                    {formatMoney(
+                      Number(order.seller_amount || 0)
+                    )}
+                  </strong>
                 </div>
 
                 <div>
-                  <p style={rowLabelStyle}>Estado</p>
-                  <span style={badgeStyle}>{getStatusLabel(order.status)}</span>
+                  <p style={rowLabelStyle}>
+                    {t.adminFinanceStatus}
+                  </p>
+
+                  <span style={badgeStyle}>
+                    {getStatusLabel(order.status)}
+                  </span>
                 </div>
 
                 <div>
-                  <p style={rowLabelStyle}>Transferencia</p>
+                  <p style={rowLabelStyle}>
+                    {t.adminFinanceTransfer}
+                  </p>
+
                   <span
                     style={{
                       ...badgeStyle,
@@ -175,12 +338,17 @@ export default function AdminFinancePage() {
                         : pendingBadgeStyle),
                     }}
                   >
-                    {getTransferLabel(order.transfer_status)}
+                    {getTransferLabel(
+                      order.transfer_status
+                    )}
                   </span>
                 </div>
 
                 <div>
-                  <p style={rowLabelStyle}>Disputa</p>
+                  <p style={rowLabelStyle}>
+                    {t.adminFinanceDispute}
+                  </p>
+
                   <span
                     style={{
                       ...badgeStyle,
@@ -189,7 +357,9 @@ export default function AdminFinancePage() {
                         : pendingBadgeStyle),
                     }}
                   >
-                    {getDisputeLabel(order.dispute_status)}
+                    {getDisputeLabel(
+                      order.dispute_status
+                    )}
                   </span>
                 </div>
               </div>
@@ -232,7 +402,13 @@ export default function AdminFinancePage() {
   );
 }
 
-function Card({ label, value }: { label: string; value: string }) {
+function Card({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
   return (
     <div style={cardStyle}>
       <p style={cardLabelStyle}>{label}</p>
@@ -330,7 +506,8 @@ const rowStyle = {
   borderRadius: "24px",
   padding: "22px",
   display: "grid",
-  gridTemplateColumns: "1.3fr 1fr 1fr 1fr 1fr 1fr 1fr",
+  gridTemplateColumns:
+    "1.3fr 1fr 1fr 1fr 1fr 1fr 1fr",
   gap: "14px",
   alignItems: "center",
 };
