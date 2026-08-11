@@ -1931,6 +1931,89 @@ golfPageFinalText:
   "Compra material premium de segunda mano o publica el equipo de golf que ya no utilizas.",
 golfPageExplore: "EXPLORAR GOLF",
 golfPagePublishEquipment: "PUBLICAR MATERIAL",
+buyerProtectionPageEyebrow: "PROTECCIÓN AL COMPRADOR",
+buyerProtectionPageTitleFirst: "Compra con más confianza.",
+buyerProtectionPageTitleSecond: "Juega con tranquilidad.",
+buyerProtectionPageIntro:
+  "ATHMOV conecta a compradores y vendedores de material deportivo premium de segunda mano y centraliza la compra, la comunicación, el seguimiento y la gestión de posibles incidencias.",
+buyerProtectionExploreProducts: "EXPLORAR PRODUCTOS",
+buyerProtectionHowItWorks: "CÓMO FUNCIONA",
+
+buyerProtectionHowEyebrow: "CÓMO TE PROTEGEMOS",
+buyerProtectionHowTitle: "Más claridad durante toda la operación.",
+
+buyerProtectionSecurePaymentTitle: "Pago seguro",
+buyerProtectionSecurePaymentText:
+  "El pago se procesa a través de una pasarela segura. ATHMOV registra la operación para que exista trazabilidad durante todo el proceso de compra.",
+
+buyerProtectionTrackingTitle: "Seguimiento del pedido",
+buyerProtectionTrackingText:
+  "Cuando el vendedor prepara y envía el producto, el comprador puede consultar el estado del pedido y los datos de seguimiento disponibles.",
+
+buyerProtectionCommunicationTitle: "Comunicación centralizada",
+buyerProtectionCommunicationText:
+  "Las conversaciones, ofertas y detalles de la operación quedan vinculados al producto y al pedido dentro de ATHMOV.",
+
+buyerProtectionIssuesTitle: "Gestión de incidencias",
+buyerProtectionIssuesText:
+  "Si el producto no llega, llega dañado o no coincide con la descripción, el comprador puede abrir una incidencia y aportar pruebas.",
+
+buyerProtectionProblemEyebrow: "CUANDO ALGO NO SALE BIEN",
+buyerProtectionProblemTitle:
+  "Una incidencia debe quedar documentada desde el primer momento.",
+buyerProtectionProblemText:
+  "No utilices el producto, conserva el embalaje y reúne pruebas antes de comunicar el problema.",
+
+buyerProtectionNotArrivedTitle: "El producto no llega",
+buyerProtectionNotArrivedText:
+  "Revisa primero el seguimiento del transportista. Si el envío no avanza o aparece una incidencia, comunícalo desde el pedido.",
+
+buyerProtectionDamagedTitle: "El producto llega dañado",
+buyerProtectionDamagedText:
+  "Haz fotografías claras del embalaje, del daño y del producto completo antes de utilizarlo.",
+
+buyerProtectionNotAsDescribedTitle:
+  "No coincide con la descripción",
+buyerProtectionNotAsDescribedText:
+  "Documenta las diferencias entre el anuncio y el producto recibido y abre una incidencia desde tu pedido.",
+
+buyerProtectionOpenIssueEyebrow: "ABRIR UNA INCIDENCIA",
+buyerProtectionOpenIssueTitle: "Qué debes hacer paso a paso.",
+
+buyerProtectionStep1: "Accede a tu cuenta de ATHMOV.",
+buyerProtectionStep2: "Entra en la sección de pedidos.",
+buyerProtectionStep3: "Selecciona la compra afectada.",
+buyerProtectionStep4:
+  "Pulsa la opción para informar de un problema.",
+buyerProtectionStep5:
+  "Explica lo ocurrido y añade fotografías o documentación.",
+
+buyerProtectionFaqEyebrow: "PREGUNTAS FRECUENTES",
+buyerProtectionFaqTitle: "Respuestas antes de comprar.",
+
+buyerProtectionFaqDamagedQuestion:
+  "¿Qué debo hacer si el paquete llega dañado?",
+buyerProtectionFaqDamagedAnswer:
+  "Debes conservar el embalaje, hacer fotografías claras y comunicar la incidencia desde el pedido lo antes posible.",
+
+buyerProtectionFaqEvidenceQuestion:
+  "¿Qué pruebas debo aportar?",
+buyerProtectionFaqEvidenceAnswer:
+  "Fotografías del embalaje, del producto completo, del daño o diferencia detectada y cualquier información relevante del transporte.",
+
+buyerProtectionFaqSellerQuestion:
+  "¿Puedo hablar con el vendedor antes de comprar?",
+buyerProtectionFaqSellerAnswer:
+  "Sí. Puedes utilizar la mensajería de ATHMOV para resolver dudas sobre el estado, las medidas, el modelo o el envío.",
+
+buyerProtectionFaqOrderQuestion:
+  "¿Dónde puedo consultar el estado del pedido?",
+buyerProtectionFaqOrderAnswer:
+  "Dentro de tu cuenta, en la sección de pedidos, podrás consultar el estado disponible de cada compra.",
+
+buyerProtectionFinalTitle:
+  "Encuentra tu próximo equipo en ATHMOV.",
+buyerProtectionViewMarketplace: "VER MARKETPLACE",
   },
 
 
@@ -3858,6 +3941,89 @@ golfPageFinalText:
   "Buy premium second-hand equipment or list the golf gear you no longer use.",
 golfPageExplore: "EXPLORE GOLF",
 golfPagePublishEquipment: "LIST EQUIPMENT",
+buyerProtectionPageEyebrow: "BUYER PROTECTION",
+buyerProtectionPageTitleFirst: "Buy with more confidence.",
+buyerProtectionPageTitleSecond: "Play with peace of mind.",
+buyerProtectionPageIntro:
+  "ATHMOV connects buyers and sellers of premium second-hand sports equipment and centralises the purchase, communication, tracking and management of possible issues.",
+buyerProtectionExploreProducts: "EXPLORE PRODUCTS",
+buyerProtectionHowItWorks: "HOW IT WORKS",
+
+buyerProtectionHowEyebrow: "HOW WE PROTECT YOU",
+buyerProtectionHowTitle: "More clarity throughout the entire transaction.",
+
+buyerProtectionSecurePaymentTitle: "Secure payment",
+buyerProtectionSecurePaymentText:
+  "Payment is processed through a secure payment gateway. ATHMOV records the transaction so there is traceability throughout the purchase process.",
+
+buyerProtectionTrackingTitle: "Order tracking",
+buyerProtectionTrackingText:
+  "When the seller prepares and ships the product, the buyer can check the order status and any available tracking information.",
+
+buyerProtectionCommunicationTitle: "Centralised communication",
+buyerProtectionCommunicationText:
+  "Conversations, offers and transaction details remain linked to the product and order within ATHMOV.",
+
+buyerProtectionIssuesTitle: "Issue management",
+buyerProtectionIssuesText:
+  "If the product does not arrive, arrives damaged or does not match the description, the buyer can open an issue and provide evidence.",
+
+buyerProtectionProblemEyebrow: "WHEN SOMETHING GOES WRONG",
+buyerProtectionProblemTitle:
+  "An issue should be documented from the very beginning.",
+buyerProtectionProblemText:
+  "Do not use the product, keep the packaging and gather evidence before reporting the problem.",
+
+buyerProtectionNotArrivedTitle: "The product does not arrive",
+buyerProtectionNotArrivedText:
+  "First check the carrier tracking. If the shipment stops progressing or an issue appears, report it from the order.",
+
+buyerProtectionDamagedTitle: "The product arrives damaged",
+buyerProtectionDamagedText:
+  "Take clear photos of the packaging, the damage and the full product before using it.",
+
+buyerProtectionNotAsDescribedTitle:
+  "It does not match the description",
+buyerProtectionNotAsDescribedText:
+  "Document the differences between the listing and the product received and open an issue from your order.",
+
+buyerProtectionOpenIssueEyebrow: "OPEN AN ISSUE",
+buyerProtectionOpenIssueTitle: "What to do step by step.",
+
+buyerProtectionStep1: "Sign in to your ATHMOV account.",
+buyerProtectionStep2: "Go to the orders section.",
+buyerProtectionStep3: "Select the affected purchase.",
+buyerProtectionStep4:
+  "Choose the option to report a problem.",
+buyerProtectionStep5:
+  "Explain what happened and add photos or documentation.",
+
+buyerProtectionFaqEyebrow: "FREQUENTLY ASKED QUESTIONS",
+buyerProtectionFaqTitle: "Answers before you buy.",
+
+buyerProtectionFaqDamagedQuestion:
+  "What should I do if the package arrives damaged?",
+buyerProtectionFaqDamagedAnswer:
+  "Keep the packaging, take clear photos and report the issue from the order as soon as possible.",
+
+buyerProtectionFaqEvidenceQuestion:
+  "What evidence should I provide?",
+buyerProtectionFaqEvidenceAnswer:
+  "Photos of the packaging, the full product, the damage or difference detected, and any relevant shipping information.",
+
+buyerProtectionFaqSellerQuestion:
+  "Can I speak to the seller before buying?",
+buyerProtectionFaqSellerAnswer:
+  "Yes. You can use ATHMOV messaging to ask about condition, measurements, model or shipping.",
+
+buyerProtectionFaqOrderQuestion:
+  "Where can I check the order status?",
+buyerProtectionFaqOrderAnswer:
+  "Within your account, in the orders section, you can check the available status of each purchase.",
+
+buyerProtectionFinalTitle:
+  "Find your next piece of equipment on ATHMOV.",
+buyerProtectionViewMarketplace: "VIEW MARKETPLACE",
   },
 
   pt: {
@@ -5801,5 +5967,88 @@ golfPageFinalText:
   "Compra material premium em segunda mão ou publica o equipamento de golfe que já não utilizas.",
 golfPageExplore: "EXPLORAR GOLFE",
 golfPagePublishEquipment: "PUBLICAR MATERIAL",
+buyerProtectionPageEyebrow: "PROTEÇÃO AO COMPRADOR",
+buyerProtectionPageTitleFirst: "Compra com mais confiança.",
+buyerProtectionPageTitleSecond: "Joga com tranquilidade.",
+buyerProtectionPageIntro:
+  "A ATHMOV liga compradores e vendedores de material desportivo premium em segunda mão e centraliza a compra, a comunicação, o acompanhamento e a gestão de possíveis incidências.",
+buyerProtectionExploreProducts: "EXPLORAR PRODUTOS",
+buyerProtectionHowItWorks: "COMO FUNCIONA",
+
+buyerProtectionHowEyebrow: "COMO TE PROTEGEMOS",
+buyerProtectionHowTitle: "Mais clareza durante toda a operação.",
+
+buyerProtectionSecurePaymentTitle: "Pagamento seguro",
+buyerProtectionSecurePaymentText:
+  "O pagamento é processado através de uma plataforma segura. A ATHMOV regista a operação para garantir rastreabilidade durante todo o processo de compra.",
+
+buyerProtectionTrackingTitle: "Acompanhamento da encomenda",
+buyerProtectionTrackingText:
+  "Quando o vendedor prepara e envia o produto, o comprador pode consultar o estado da encomenda e os dados de acompanhamento disponíveis.",
+
+buyerProtectionCommunicationTitle: "Comunicação centralizada",
+buyerProtectionCommunicationText:
+  "As conversas, ofertas e detalhes da operação ficam associados ao produto e à encomenda dentro da ATHMOV.",
+
+buyerProtectionIssuesTitle: "Gestão de incidências",
+buyerProtectionIssuesText:
+  "Se o produto não chegar, chegar danificado ou não corresponder à descrição, o comprador pode abrir uma incidência e apresentar provas.",
+
+buyerProtectionProblemEyebrow: "QUANDO ALGO CORRE MAL",
+buyerProtectionProblemTitle:
+  "Uma incidência deve ficar documentada desde o primeiro momento.",
+buyerProtectionProblemText:
+  "Não utilizes o produto, guarda a embalagem e reúne provas antes de comunicar o problema.",
+
+buyerProtectionNotArrivedTitle: "O produto não chega",
+buyerProtectionNotArrivedText:
+  "Verifica primeiro o acompanhamento da transportadora. Se o envio não avançar ou surgir uma incidência, comunica-a a partir da encomenda.",
+
+buyerProtectionDamagedTitle: "O produto chega danificado",
+buyerProtectionDamagedText:
+  "Tira fotografias claras da embalagem, do dano e do produto completo antes de o utilizares.",
+
+buyerProtectionNotAsDescribedTitle:
+  "Não corresponde à descrição",
+buyerProtectionNotAsDescribedText:
+  "Documenta as diferenças entre o anúncio e o produto recebido e abre uma incidência a partir da tua encomenda.",
+
+buyerProtectionOpenIssueEyebrow: "ABRIR UMA INCIDÊNCIA",
+buyerProtectionOpenIssueTitle: "O que deves fazer passo a passo.",
+
+buyerProtectionStep1: "Acede à tua conta ATHMOV.",
+buyerProtectionStep2: "Entra na secção de encomendas.",
+buyerProtectionStep3: "Seleciona a compra afetada.",
+buyerProtectionStep4:
+  "Escolhe a opção para comunicar um problema.",
+buyerProtectionStep5:
+  "Explica o que aconteceu e adiciona fotografias ou documentação.",
+
+buyerProtectionFaqEyebrow: "PERGUNTAS FREQUENTES",
+buyerProtectionFaqTitle: "Respostas antes de comprar.",
+
+buyerProtectionFaqDamagedQuestion:
+  "O que devo fazer se a encomenda chegar danificada?",
+buyerProtectionFaqDamagedAnswer:
+  "Deves guardar a embalagem, tirar fotografias claras e comunicar a incidência a partir da encomenda o mais rapidamente possível.",
+
+buyerProtectionFaqEvidenceQuestion:
+  "Que provas devo apresentar?",
+buyerProtectionFaqEvidenceAnswer:
+  "Fotografias da embalagem, do produto completo, do dano ou diferença detetada e qualquer informação relevante sobre o transporte.",
+
+buyerProtectionFaqSellerQuestion:
+  "Posso falar com o vendedor antes de comprar?",
+buyerProtectionFaqSellerAnswer:
+  "Sim. Podes utilizar as mensagens da ATHMOV para esclarecer dúvidas sobre o estado, medidas, modelo ou envio.",
+
+buyerProtectionFaqOrderQuestion:
+  "Onde posso consultar o estado da encomenda?",
+buyerProtectionFaqOrderAnswer:
+  "Na tua conta, na secção de encomendas, podes consultar o estado disponível de cada compra.",
+
+buyerProtectionFinalTitle:
+  "Encontra o teu próximo equipamento na ATHMOV.",
+buyerProtectionViewMarketplace: "VER MARKETPLACE",
   },
 };

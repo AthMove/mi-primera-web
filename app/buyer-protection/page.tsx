@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import BuyerProtectionClient from "@/components/buyer-protection/BuyerProtectionClient";
 
 const pageUrl = "https://athmov.com/buyer-protection";
 
@@ -135,114 +135,7 @@ export default function BuyerProtectionPage() {
         }}
       />
 
-      <section className="buyer-protection-hero">
-        <p className="buyer-protection-eyebrow">PROTECCIÓN AL COMPRADOR</p>
-
-        <h1>
-          Compra con más confianza.
-          <br />
-          Juega con tranquilidad.
-        </h1>
-
-        <p className="buyer-protection-intro">
-          ATHMOV conecta a compradores y vendedores de material deportivo
-          premium de segunda mano y centraliza la compra, la comunicación, el
-          seguimiento y la gestión de posibles incidencias.
-        </p>
-
-        <div className="buyer-protection-actions">
-          <Link href="/products" className="buyer-protection-primary">
-            EXPLORAR PRODUCTOS
-          </Link>
-
-          <Link href="/how-it-works" className="buyer-protection-secondary">
-            CÓMO FUNCIONA
-          </Link>
-        </div>
-      </section>
-
-      <section className="buyer-protection-section">
-        <div className="buyer-protection-heading">
-          <p>CÓMO TE PROTEGEMOS</p>
-          <h2>Más claridad durante toda la operación.</h2>
-        </div>
-
-        <div className="buyer-protection-grid">
-          {protections.map((item) => (
-            <article key={item.number} className="buyer-protection-card">
-              <span>{item.number}</span>
-              <h3>{item.title}</h3>
-              <p>{item.text}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="buyer-protection-dark">
-        <div>
-          <p className="buyer-protection-dark-eyebrow">
-            CUANDO ALGO NO SALE BIEN
-          </p>
-
-          <h2>
-            Una incidencia debe quedar documentada desde el primer momento.
-          </h2>
-
-          <p className="buyer-protection-dark-text">
-            No utilices el producto, conserva el embalaje y reúne pruebas antes
-            de comunicar el problema.
-          </p>
-        </div>
-
-        <div className="buyer-protection-situations">
-          {situations.map((item) => (
-            <article key={item.title}>
-              <h3>{item.title}</h3>
-              <p>{item.text}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="buyer-protection-section">
-        <div className="buyer-protection-heading">
-          <p>ABRIR UNA INCIDENCIA</p>
-          <h2>Qué debes hacer paso a paso.</h2>
-        </div>
-
-        <div className="buyer-protection-steps">
-          {steps.map((step, index) => (
-            <div key={step} className="buyer-protection-step">
-              <span>{String(index + 1).padStart(2, "0")}</span>
-              <p>{step}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="buyer-protection-section">
-        <div className="buyer-protection-heading">
-          <p>PREGUNTAS FRECUENTES</p>
-          <h2>Respuestas antes de comprar.</h2>
-        </div>
-
-        <div className="buyer-protection-faq">
-          {faqItems.map((item) => (
-            <details key={item.question}>
-              <summary>{item.question}</summary>
-              <p>{item.answer}</p>
-            </details>
-          ))}
-        </div>
-      </section>
-
-      <section className="buyer-protection-cta">
-        <p>THE GAME CONTINUES.</p>
-
-        <h2>Encuentra tu próximo equipo en ATHMOV.</h2>
-
-        <Link href="/products">VER MARKETPLACE</Link>
-      </section>
+<BuyerProtectionClient />
     </main>
   );
 }
