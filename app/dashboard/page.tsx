@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function DashboardPage() {
+  const { lang, t } = useLanguage();
+
   const [loading, setLoading] = useState(true);
 
   const [stats, setStats] = useState({
@@ -25,6 +28,13 @@ export default function DashboardPage() {
   });
 
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
+
+  const locale =
+    lang === "en"
+      ? "en-GB"
+      : lang === "pt"
+        ? "pt-PT"
+        : "es-ES";
 
   useEffect(() => {
     loadDashboard();
@@ -59,13 +69,15 @@ export default function DashboardPage() {
 
     const grossRevenue =
       orders?.reduce(
-        (acc: number, item: any) => acc + Number(item.amount || 0),
+        (acc: number, item: any) =>
+          acc + Number(item.amount || 0),
         0
       ) || 0;
 
     const platformFees =
       orders?.reduce(
-        (acc: number, item: any) => acc + Number(item.platform_fee || 0),
+        (acc: number, item: any) =>
+          acc + Number(item.platform_fee || 0),
         0
       ) || 0;
 
@@ -78,7 +90,8 @@ export default function DashboardPage() {
 
     const sellerEarnings =
       orders?.reduce(
-        (acc: number, item: any) => acc + Number(item.seller_amount || 0),
+        (acc: number, item: any) =>
+          acc + Number(item.seller_amount || 0),
         0
       ) || 0;
 
@@ -86,7 +99,8 @@ export default function DashboardPage() {
       orders
         ?.filter((o: any) => o.status !== "completed")
         .reduce(
-          (acc: number, item: any) => acc + Number(item.seller_amount || 0),
+          (acc: number, item: any) =>
+            acc + Number(item.seller_amount || 0),
           0
         ) || 0;
 
@@ -94,49 +108,67 @@ export default function DashboardPage() {
       orders
         ?.filter((o: any) => o.status === "completed")
         .reduce(
-          (acc: number, item: any) => acc + Number(item.seller_amount || 0),
+          (acc: number, item: any) =>
+            acc + Number(item.seller_amount || 0),
           0
         ) || 0;
 
     const openDisputes =
-      orders?.filter((o: any) => o.dispute_status === "open").length || 0;
+      orders?.filter(
+        (o: any) => o.dispute_status === "open"
+      ).length || 0;
 
     const heldAmount =
       orders
-        ?.filter((o: any) => o.dispute_status === "open")
+        ?.filter(
+          (o: any) => o.dispute_status === "open"
+        )
         .reduce(
-          (acc: number, item: any) => acc + Number(item.seller_amount || 0),
+          (acc: number, item: any) =>
+            acc + Number(item.seller_amount || 0),
           0
         ) || 0;
 
     const sales =
-      orders?.filter((o: any) => o.status === "completed").length || 0;
+      orders?.filter(
+        (o: any) => o.status === "completed"
+      ).length || 0;
 
     const activeOrders =
       orders?.filter((o: any) =>
-        ["paid", "preparing", "shipped", "delivered"].includes(o.status)
+        ["paid", "preparing", "shipped", "delivered"].includes(
+          o.status
+        )
       ).length || 0;
 
     const activeProducts =
       products?.filter(
-        (p: any) => !p.sold && p.moderation_status === "approved"
+        (p: any) =>
+          !p.sold &&
+          p.moderation_status === "approved"
       ).length || 0;
 
     const pendingProducts =
-      products?.filter((p: any) => p.moderation_status === "pending").length ||
-      0;
+      products?.filter(
+        (p: any) =>
+          p.moderation_status === "pending"
+      ).length || 0;
 
     const rejectedProducts =
-      products?.filter((p: any) => p.moderation_status === "rejected").length ||
-      0;
+      products?.filter(
+        (p: any) =>
+          p.moderation_status === "rejected"
+      ).length || 0;
 
-    const soldProducts = products?.filter((p: any) => p.sold).length || 0;
+    const soldProducts =
+      products?.filter((p: any) => p.sold).length || 0;
 
     const averageRating =
       reviews && reviews.length > 0
         ? (
             reviews.reduce(
-              (acc: number, item: any) => acc + Number(item.rating || 0),
+              (acc: number, item: any) =>
+                acc + Number(item.rating || 0),
               0
             ) / reviews.length
           ).toFixed(1)
@@ -176,173 +208,299 @@ export default function DashboardPage() {
   const translateStatus = (status: string) => {
     switch (status) {
       case "paid":
-        return "Pagado";
+        return t.earningsStatusPaid;
       case "preparing":
-        return "Preparando";
+        return t.earningsStatusPreparing;
       case "shipped":
-        return "Enviado";
+        return t.earningsStatusShipped;
       case "delivered":
-        return "Entregado";
+        return t.earningsStatusDelivered;
       case "completed":
-        return "Completado";
+        return t.earningsStatusCompleted;
       case "refunded":
-        return "Reembolsado";
+        return t.earningsStatusRefunded;
       case "pending":
-        return "Pendiente";
+        return t.earningsStatusPending;
       default:
-        return status || "Pendiente";
+        return status || t.earningsStatusPending;
     }
   };
 
-  const formatMoney = (value: number) => {
-    return `€${Number(value || 0).toFixed(2)}`;
+  const formatMoney = (value: number) =>
+    new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: "EUR",
+    }).format(Number(value || 0));
+
+  const formatDate = (date?: string) => {
+    if (!date) return "-";
+
+    return new Date(date).toLocaleDateString(locale, {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
   };
 
   if (loading) {
-    return <main style={loadingStyle}>Cargando panel...</main>;
+    return (
+      <main style={loadingStyle}>
+        {t.dashboardLoading}
+      </main>
+    );
   }
 
   return (
-    <main style={pageStyle} className="dashboard-page">
+    <main
+      style={pageStyle}
+      className="dashboard-page"
+    >
       <section style={heroStyle}>
-        <p style={eyebrowStyle}>ATHMOV SELLER</p>
+        <p style={eyebrowStyle}>
+          {t.dashboardEyebrow}
+        </p>
 
-        <h1 style={titleStyle} className="dashboard-title">
-          Panel de vendedor
+        <h1
+          style={titleStyle}
+          className="dashboard-title"
+        >
+          {t.dashboardTitle}
         </h1>
 
         <p style={subtitleStyle}>
-          Gestiona tus ventas, saldo pendiente, pagos liberados y rendimiento
-          como vendedor.
+          {t.dashboardSubtitle}
         </p>
       </section>
 
       <section style={statsGridStyle}>
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Saldo disponible</p>
+          <p style={cardLabelStyle}>
+            {t.dashboardAvailableBalance}
+          </p>
+
           <h2 style={cardValueStyle}>
             {formatMoney(stats.availableEarnings)}
           </h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Saldo pendiente</p>
-          <h2 style={cardValueStyle}>{formatMoney(stats.pendingEarnings)}</h2>
+          <p style={cardLabelStyle}>
+            {t.dashboardPendingBalance}
+          </p>
+
+          <h2 style={cardValueStyle}>
+            {formatMoney(stats.pendingEarnings)}
+          </h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Ganancias totales</p>
-          <h2 style={cardValueStyle}>{formatMoney(stats.sellerEarnings)}</h2>
+          <p style={cardLabelStyle}>
+            {t.dashboardTotalEarnings}
+          </p>
+
+          <h2 style={cardValueStyle}>
+            {formatMoney(stats.sellerEarnings)}
+          </h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Ventas brutas</p>
-          <h2 style={cardValueStyle}>{formatMoney(stats.grossRevenue)}</h2>
+          <p style={cardLabelStyle}>
+            {t.dashboardGrossSales}
+          </p>
+
+          <h2 style={cardValueStyle}>
+            {formatMoney(stats.grossRevenue)}
+          </h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Comisiones ATHMOV</p>
-          <h2 style={cardValueStyle}>{formatMoney(stats.platformFees)}</h2>
+          <p style={cardLabelStyle}>
+            {t.dashboardAthmovFees}
+          </p>
+
+          <h2 style={cardValueStyle}>
+            {formatMoney(stats.platformFees)}
+          </h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Comisión Stripe estimada</p>
-          <h2 style={cardValueStyle}>{formatMoney(stats.stripeFees)}</h2>
+          <p style={cardLabelStyle}>
+            {t.dashboardStripeFees}
+          </p>
+
+          <h2 style={cardValueStyle}>
+            {formatMoney(stats.stripeFees)}
+          </h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Ventas completadas</p>
-          <h2 style={cardValueStyle}>{stats.sales}</h2>
+          <p style={cardLabelStyle}>
+            {t.dashboardCompletedSales}
+          </p>
+
+          <h2 style={cardValueStyle}>
+            {stats.sales}
+          </h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Pedidos activos</p>
-          <h2 style={cardValueStyle}>{stats.activeOrders}</h2>
+          <p style={cardLabelStyle}>
+            {t.dashboardActiveOrders}
+          </p>
+
+          <h2 style={cardValueStyle}>
+            {stats.activeOrders}
+          </h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Productos activos</p>
-          <h2 style={cardValueStyle}>{stats.activeProducts}</h2>
+          <p style={cardLabelStyle}>
+            {t.dashboardActiveProducts}
+          </p>
+
+          <h2 style={cardValueStyle}>
+            {stats.activeProducts}
+          </h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Pendientes de aprobación</p>
-          <h2 style={cardValueStyle}>{stats.pendingProducts}</h2>
+          <p style={cardLabelStyle}>
+            {t.dashboardPendingProducts}
+          </p>
+
+          <h2 style={cardValueStyle}>
+            {stats.pendingProducts}
+          </h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Productos rechazados</p>
-          <h2 style={cardValueStyle}>{stats.rejectedProducts}</h2>
+          <p style={cardLabelStyle}>
+            {t.dashboardRejectedProducts}
+          </p>
+
+          <h2 style={cardValueStyle}>
+            {stats.rejectedProducts}
+          </h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Productos vendidos</p>
-          <h2 style={cardValueStyle}>{stats.soldProducts}</h2>
+          <p style={cardLabelStyle}>
+            {t.dashboardSoldProducts}
+          </p>
+
+          <h2 style={cardValueStyle}>
+            {stats.soldProducts}
+          </h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Valoración media</p>
-          <h2 style={cardValueStyle}>★ {stats.averageRating}</h2>
+          <p style={cardLabelStyle}>
+            {t.dashboardAverageRating}
+          </p>
+
+          <h2 style={cardValueStyle}>
+            ★ {stats.averageRating}
+          </h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Disputas abiertas</p>
-          <h2 style={cardValueStyle}>{stats.openDisputes}</h2>
+          <p style={cardLabelStyle}>
+            {t.dashboardOpenDisputes}
+          </p>
+
+          <h2 style={cardValueStyle}>
+            {stats.openDisputes}
+          </h2>
         </div>
 
         <div style={cardStyle}>
-          <p style={cardLabelStyle}>Importe retenido</p>
-          <h2 style={cardValueStyle}>{formatMoney(stats.heldAmount)}</h2>
+          <p style={cardLabelStyle}>
+            {t.dashboardHeldAmount}
+          </p>
+
+          <h2 style={cardValueStyle}>
+            {formatMoney(stats.heldAmount)}
+          </h2>
         </div>
       </section>
 
       <section style={quickActionsStyle}>
-        <Link href="/sell" style={actionButtonStyle}>
-          Añadir producto
+        <Link
+          href="/sell"
+          style={actionButtonStyle}
+        >
+          {t.dashboardAddProduct}
         </Link>
 
-        <Link href="/orders" style={actionButtonStyle}>
-          Pedidos
+        <Link
+          href="/orders"
+          style={actionButtonStyle}
+        >
+          {t.dashboardOrders}
         </Link>
 
-        <Link href="/products" style={actionButtonStyle}>
-          Marketplace
+        <Link
+          href="/products"
+          style={actionButtonStyle}
+        >
+          {t.dashboardMarketplace}
         </Link>
 
-        <Link href="/account" style={actionButtonStyle}>
-          Mi cuenta
+        <Link
+          href="/account"
+          style={actionButtonStyle}
+        >
+          {t.dashboardMyAccount}
         </Link>
       </section>
 
       <section style={recentSectionStyle}>
         <div style={recentHeaderStyle}>
-          <h2 style={recentTitleStyle}>Pedidos recientes</h2>
+          <h2 style={recentTitleStyle}>
+            {t.dashboardRecentOrders}
+          </h2>
 
-          <Link href="/orders" style={viewAllStyle}>
-            Ver todos →
+          <Link
+            href="/orders"
+            style={viewAllStyle}
+          >
+            {t.dashboardViewAll} →
           </Link>
         </div>
 
         {recentOrders.length === 0 ? (
-          <div style={emptyStyle}>Todavía no tienes ventas recientes.</div>
+          <div style={emptyStyle}>
+            {t.dashboardNoRecentSales}
+          </div>
         ) : (
           <div style={ordersListStyle}>
             {recentOrders.map((order: any) => (
-              <div key={order.id} style={orderCardStyle}>
+              <div
+                key={order.id}
+                style={orderCardStyle}
+              >
                 <div>
-                  <p style={orderMetaStyle}>PEDIDO</p>
+                  <p style={orderMetaStyle}>
+                    {t.dashboardOrderLabel}
+                  </p>
 
                   <h3 style={orderPriceStyle}>
-                    {formatMoney(Number(order.amount || 0))}
+                    {formatMoney(
+                      Number(order.amount || 0)
+                    )}
                   </h3>
 
                   <p style={orderDateStyle}>
-                    Pago al vendedor:{" "}
-                    {formatMoney(Number(order.seller_amount || 0))}
+                    {t.dashboardSellerPayment}:{" "}
+                    {formatMoney(
+                      Number(
+                        order.seller_amount || 0
+                      )
+                    )}
                   </p>
 
                   <p style={orderDateStyle}>
-                    {new Date(order.created_at).toLocaleDateString()}
+                    {formatDate(order.created_at)}
                   </p>
                 </div>
 
@@ -382,7 +540,8 @@ const loadingStyle = {
 
 const pageStyle = {
   minHeight: "100vh",
-  background: "linear-gradient(to bottom, #f8f8f4, #eeeeea)",
+  background:
+    "linear-gradient(to bottom, #f8f8f4, #eeeeea)",
   padding: "70px 60px",
   fontFamily: "Inter, sans-serif",
 };
@@ -416,7 +575,8 @@ const statsGridStyle = {
   maxWidth: "1200px",
   margin: "0 auto",
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))",
+  gridTemplateColumns:
+    "repeat(auto-fit,minmax(240px,1fr))",
   gap: "20px",
 };
 

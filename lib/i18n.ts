@@ -2128,6 +2128,39 @@ earningsNoSellerOrders:
 earningsOrderLabel: "PEDIDO",
 earningsNet: "Neto",
 earningsCommission: "Comisión",
+dashboardLoading: "Cargando panel...",
+dashboardEyebrow: "ATHMOV SELLER",
+dashboardTitle: "Panel de vendedor",
+dashboardSubtitle:
+  "Gestiona tus ventas, saldo pendiente, pagos liberados y rendimiento como vendedor.",
+
+dashboardAvailableBalance: "Saldo disponible",
+dashboardPendingBalance: "Saldo pendiente",
+dashboardTotalEarnings: "Ganancias totales",
+dashboardGrossSales: "Ventas brutas",
+dashboardAthmovFees: "Comisiones ATHMOV",
+dashboardStripeFees: "Comisión Stripe estimada",
+dashboardCompletedSales: "Ventas completadas",
+dashboardActiveOrders: "Pedidos activos",
+dashboardActiveProducts: "Productos activos",
+dashboardPendingProducts: "Pendientes de aprobación",
+dashboardRejectedProducts: "Productos rechazados",
+dashboardSoldProducts: "Productos vendidos",
+dashboardAverageRating: "Valoración media",
+dashboardOpenDisputes: "Disputas abiertas",
+dashboardHeldAmount: "Importe retenido",
+
+dashboardAddProduct: "Añadir producto",
+dashboardOrders: "Pedidos",
+dashboardMarketplace: "Marketplace",
+dashboardMyAccount: "Mi cuenta",
+
+dashboardRecentOrders: "Pedidos recientes",
+dashboardViewAll: "Ver todos",
+dashboardNoRecentSales:
+  "Todavía no tienes ventas recientes.",
+dashboardOrderLabel: "PEDIDO",
+dashboardSellerPayment: "Pago al vendedor",
   },
 
 
@@ -4252,6 +4285,39 @@ earningsNoSellerOrders:
 earningsOrderLabel: "ORDER",
 earningsNet: "Net",
 earningsCommission: "Fee",
+dashboardLoading: "Loading dashboard...",
+dashboardEyebrow: "ATHMOV SELLER",
+dashboardTitle: "Seller dashboard",
+dashboardSubtitle:
+  "Manage your sales, pending balance, released payouts and seller performance.",
+
+dashboardAvailableBalance: "Available balance",
+dashboardPendingBalance: "Pending balance",
+dashboardTotalEarnings: "Total earnings",
+dashboardGrossSales: "Gross sales",
+dashboardAthmovFees: "ATHMOV fees",
+dashboardStripeFees: "Estimated Stripe fee",
+dashboardCompletedSales: "Completed sales",
+dashboardActiveOrders: "Active orders",
+dashboardActiveProducts: "Active products",
+dashboardPendingProducts: "Pending approval",
+dashboardRejectedProducts: "Rejected products",
+dashboardSoldProducts: "Sold products",
+dashboardAverageRating: "Average rating",
+dashboardOpenDisputes: "Open disputes",
+dashboardHeldAmount: "Held amount",
+
+dashboardAddProduct: "Add product",
+dashboardOrders: "Orders",
+dashboardMarketplace: "Marketplace",
+dashboardMyAccount: "My account",
+
+dashboardRecentOrders: "Recent orders",
+dashboardViewAll: "View all",
+dashboardNoRecentSales:
+  "You don't have any recent sales yet.",
+dashboardOrderLabel: "ORDER",
+dashboardSellerPayment: "Seller payout",
   },
 
   pt: {
@@ -6392,5 +6458,38 @@ earningsNoSellerOrders:
 earningsOrderLabel: "ENCOMENDA",
 earningsNet: "Líquido",
 earningsCommission: "Comissão",
+dashboardLoading: "A carregar painel...",
+dashboardEyebrow: "VENDEDOR ATHMOV",
+dashboardTitle: "Painel do vendedor",
+dashboardSubtitle:
+  "Gere as tuas vendas, saldo pendente, pagamentos libertados e desempenho como vendedor.",
+
+dashboardAvailableBalance: "Saldo disponível",
+dashboardPendingBalance: "Saldo pendente",
+dashboardTotalEarnings: "Ganhos totais",
+dashboardGrossSales: "Vendas brutas",
+dashboardAthmovFees: "Comissões ATHMOV",
+dashboardStripeFees: "Comissão Stripe estimada",
+dashboardCompletedSales: "Vendas concluídas",
+dashboardActiveOrders: "Encomendas ativas",
+dashboardActiveProducts: "Produtos ativos",
+dashboardPendingProducts: "Pendentes de aprovação",
+dashboardRejectedProducts: "Produtos rejeitados",
+dashboardSoldProducts: "Produtos vendidos",
+dashboardAverageRating: "Avaliação média",
+dashboardOpenDisputes: "Disputas abertas",
+dashboardHeldAmount: "Valor retido",
+
+dashboardAddProduct: "Adicionar produto",
+dashboardOrders: "Encomendas",
+dashboardMarketplace: "Marketplace",
+dashboardMyAccount: "A minha conta",
+
+dashboardRecentOrders: "Encomendas recentes",
+dashboardViewAll: "Ver todas",
+dashboardNoRecentSales:
+  "Ainda não tens vendas recentes.",
+dashboardOrderLabel: "ENCOMENDA",
+dashboardSellerPayment: "Pagamento ao vendedor",
   },
 };
