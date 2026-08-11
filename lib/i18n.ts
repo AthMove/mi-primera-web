@@ -2190,6 +2190,67 @@ adminFinanceDispute: "Disputa",
 adminFinanceDisputeOpen: "Abierta",
 adminFinanceDisputeResolved: "Resuelta",
 adminFinanceNoDispute: "Sin disputa",
+adminDisputesLoading: "Cargando disputas...",
+adminDisputesLoadError: "No se pudieron cargar las disputas",
+adminDisputesOpenCount: "Disputas abiertas",
+adminDisputesUnknown: "Desconocido",
+
+adminDisputesEyebrow: "ADMIN ATHMOV",
+adminDisputesTitle: "Disputas",
+adminDisputesEmptyTitle: "No hay disputas abiertas",
+adminDisputesEmptyText:
+  "Las disputas abiertas aparecerán aquí.",
+
+adminDisputesDisputeEyebrow: "DISPUTA",
+adminDisputesOrder: "Pedido",
+adminDisputesProduct: "Producto",
+adminDisputesNoImage: "Sin imagen",
+
+adminDisputesDisputeStatus: "Estado de disputa",
+adminDisputesOrderStatus: "Estado del pedido",
+adminDisputesOrderAmount: "Importe del pedido",
+adminDisputesProductPrice: "Precio del producto",
+adminDisputesBuyer: "Comprador",
+adminDisputesSeller: "Vendedor",
+adminDisputesSport: "Deporte",
+adminDisputesPurchasedAt: "Comprado",
+adminDisputesOpenedAt: "Disputa abierta",
+adminDisputesCarrier: "Transportista",
+adminDisputesNoCarrier: "Sin transportista",
+adminDisputesTracking: "Tracking",
+adminDisputesNoTracking: "Sin tracking",
+adminDisputesProductId: "ID producto",
+adminDisputesBuyerId: "ID comprador",
+adminDisputesSellerId: "ID vendedor",
+adminDisputesResolution: "Resolución",
+
+adminDisputesOpen: "Abierta",
+adminDisputesResolved: "Resuelta",
+adminDisputesSellerWins: "Gana el vendedor",
+adminDisputesBuyerRefund: "Reembolso al comprador",
+adminDisputesPending: "Pendiente",
+
+adminDisputesReason: "Motivo",
+adminDisputesNoReason:
+  "No se ha indicado ningún motivo",
+adminDisputesEvidence: "Pruebas",
+adminDisputesEvidenceAlt: "Prueba",
+
+adminDisputesConfirmSeller:
+  "¿Liberar el pago al vendedor?",
+adminDisputesConfirmRefund:
+  "¿Reembolsar al comprador?",
+adminDisputesResolveError:
+  "Error al resolver la disputa",
+adminDisputesResolveSuccess:
+  "Disputa resuelta correctamente",
+
+adminDisputesResolving: "Resolviendo...",
+adminDisputesReleaseSeller:
+  "Liberar pago al vendedor",
+adminDisputesRefundBuyer:
+  "Reembolsar al comprador",
+adminDisputesResolvedNote: "Disputa resuelta",
   },
 
 
@@ -4376,6 +4437,67 @@ adminFinanceDispute: "Dispute",
 adminFinanceDisputeOpen: "Open",
 adminFinanceDisputeResolved: "Resolved",
 adminFinanceNoDispute: "No dispute",
+adminDisputesLoading: "Loading disputes...",
+adminDisputesLoadError: "Could not load disputes",
+adminDisputesOpenCount: "Open disputes",
+adminDisputesUnknown: "Unknown",
+
+adminDisputesEyebrow: "ATHMOV ADMIN",
+adminDisputesTitle: "Disputes",
+adminDisputesEmptyTitle: "No open disputes",
+adminDisputesEmptyText:
+  "Open disputes will appear here.",
+
+adminDisputesDisputeEyebrow: "DISPUTE",
+adminDisputesOrder: "Order",
+adminDisputesProduct: "Product",
+adminDisputesNoImage: "No image",
+
+adminDisputesDisputeStatus: "Dispute status",
+adminDisputesOrderStatus: "Order status",
+adminDisputesOrderAmount: "Order amount",
+adminDisputesProductPrice: "Product price",
+adminDisputesBuyer: "Buyer",
+adminDisputesSeller: "Seller",
+adminDisputesSport: "Sport",
+adminDisputesPurchasedAt: "Purchased",
+adminDisputesOpenedAt: "Dispute opened",
+adminDisputesCarrier: "Carrier",
+adminDisputesNoCarrier: "No carrier",
+adminDisputesTracking: "Tracking",
+adminDisputesNoTracking: "No tracking",
+adminDisputesProductId: "Product ID",
+adminDisputesBuyerId: "Buyer ID",
+adminDisputesSellerId: "Seller ID",
+adminDisputesResolution: "Resolution",
+
+adminDisputesOpen: "Open",
+adminDisputesResolved: "Resolved",
+adminDisputesSellerWins: "Seller wins",
+adminDisputesBuyerRefund: "Buyer refund",
+adminDisputesPending: "Pending",
+
+adminDisputesReason: "Reason",
+adminDisputesNoReason:
+  "No reason has been provided",
+adminDisputesEvidence: "Evidence",
+adminDisputesEvidenceAlt: "Evidence",
+
+adminDisputesConfirmSeller:
+  "Release the payment to the seller?",
+adminDisputesConfirmRefund:
+  "Refund the buyer?",
+adminDisputesResolveError:
+  "Error resolving the dispute",
+adminDisputesResolveSuccess:
+  "Dispute resolved successfully",
+
+adminDisputesResolving: "Resolving...",
+adminDisputesReleaseSeller:
+  "Release payment to seller",
+adminDisputesRefundBuyer:
+  "Refund buyer",
+adminDisputesResolvedNote: "Dispute resolved",
   },
 
   pt: {
@@ -6578,5 +6700,66 @@ adminFinanceDispute: "Disputa",
 adminFinanceDisputeOpen: "Aberta",
 adminFinanceDisputeResolved: "Resolvida",
 adminFinanceNoDispute: "Sem disputa",
+adminDisputesLoading: "A carregar disputas...",
+adminDisputesLoadError: "Não foi possível carregar as disputas",
+adminDisputesOpenCount: "Disputas abertas",
+adminDisputesUnknown: "Desconhecido",
+
+adminDisputesEyebrow: "ADMIN ATHMOV",
+adminDisputesTitle: "Disputas",
+adminDisputesEmptyTitle: "Não existem disputas abertas",
+adminDisputesEmptyText:
+  "As disputas abertas aparecerão aqui.",
+
+adminDisputesDisputeEyebrow: "DISPUTA",
+adminDisputesOrder: "Encomenda",
+adminDisputesProduct: "Produto",
+adminDisputesNoImage: "Sem imagem",
+
+adminDisputesDisputeStatus: "Estado da disputa",
+adminDisputesOrderStatus: "Estado da encomenda",
+adminDisputesOrderAmount: "Montante da encomenda",
+adminDisputesProductPrice: "Preço do produto",
+adminDisputesBuyer: "Comprador",
+adminDisputesSeller: "Vendedor",
+adminDisputesSport: "Desporto",
+adminDisputesPurchasedAt: "Comprado",
+adminDisputesOpenedAt: "Disputa aberta",
+adminDisputesCarrier: "Transportadora",
+adminDisputesNoCarrier: "Sem transportadora",
+adminDisputesTracking: "Tracking",
+adminDisputesNoTracking: "Sem tracking",
+adminDisputesProductId: "ID do produto",
+adminDisputesBuyerId: "ID do comprador",
+adminDisputesSellerId: "ID do vendedor",
+adminDisputesResolution: "Resolução",
+
+adminDisputesOpen: "Aberta",
+adminDisputesResolved: "Resolvida",
+adminDisputesSellerWins: "Ganha o vendedor",
+adminDisputesBuyerRefund: "Reembolso ao comprador",
+adminDisputesPending: "Pendente",
+
+adminDisputesReason: "Motivo",
+adminDisputesNoReason:
+  "Não foi indicado nenhum motivo",
+adminDisputesEvidence: "Provas",
+adminDisputesEvidenceAlt: "Prova",
+
+adminDisputesConfirmSeller:
+  "Libertar o pagamento ao vendedor?",
+adminDisputesConfirmRefund:
+  "Reembolsar o comprador?",
+adminDisputesResolveError:
+  "Erro ao resolver a disputa",
+adminDisputesResolveSuccess:
+  "Disputa resolvida com sucesso",
+
+adminDisputesResolving: "A resolver...",
+adminDisputesReleaseSeller:
+  "Libertar pagamento ao vendedor",
+adminDisputesRefundBuyer:
+  "Reembolsar o comprador",
+adminDisputesResolvedNote: "Disputa resolvida",
   },
 };
