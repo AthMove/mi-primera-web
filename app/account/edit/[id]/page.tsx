@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/components/LanguageProvider";
 
 const PREMIUM_BRANDS: Record<string, string[]> = {
   PADEL: ["NOX", "Bullpadel", "Siux", "Babolat", "Wilson", "Head", "Asics"],
@@ -17,6 +18,8 @@ const SPORTS = ["PADEL", "GOLF", "TENNIS", "RUNNING"];
 export default function EditProductPage() {
   const params = useParams();
   const router = useRouter();
+  const { t } = useLanguage();
+
   const id = String(params.id);
 
   const [loading, setLoading] = useState(true);
@@ -49,7 +52,7 @@ export default function EditProductPage() {
       .single();
 
     if (error || !data) {
-      alert("Producto no encontrado");
+      alert(t.editProductNotFound);
       router.push("/account");
       return;
     }
@@ -81,7 +84,9 @@ export default function EditProductPage() {
     if (!files) return;
 
     const fileArray = Array.from(files);
+
     setNewFiles((prev) => [...prev, ...fileArray]);
+
     setNewPreviews((prev) => [
       ...prev,
       ...fileArray.map((file) => URL.createObjectURL(file)),
@@ -100,15 +105,20 @@ export default function EditProductPage() {
   const saveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title.trim() || !brand.trim() || !price.trim() || !description.trim()) {
-      alert("Completa todos los campos");
+    if (
+      !title.trim() ||
+      !brand.trim() ||
+      !price.trim() ||
+      !description.trim()
+    ) {
+      alert(t.editProductCompleteFields);
       return;
     }
 
     const numericPrice = Number(price);
 
     if (!numericPrice || numericPrice <= 0) {
-      alert("Introduce un precio válido");
+      alert(t.editProductValidPrice);
       return;
     }
 
@@ -128,6 +138,7 @@ export default function EditProductPage() {
 
       for (const file of newFiles) {
         const fileExt = file.name.split(".").pop() || "jpg";
+
         const fileName = `${user.id}-${Date.now()}-${Math.random()
           .toString(36)
           .slice(2)}.${fileExt}`;
@@ -171,7 +182,7 @@ export default function EditProductPage() {
         return;
       }
 
-      alert("Producto actualizado correctamente");
+      alert(t.editProductUpdated);
       router.push("/account");
     } finally {
       setSaving(false);
@@ -179,18 +190,29 @@ export default function EditProductPage() {
   };
 
   const safeImage = (src?: string) => {
-    return src?.startsWith("http") || src?.startsWith("/") ? src : "/logo.png";
+    return src?.startsWith("http") || src?.startsWith("/")
+      ? src
+      : "/logo.png";
+  };
+
+  const getSportLabel = (sport: string) => {
+    if (sport === "PADEL") return t.padel;
+    if (sport === "GOLF") return t.golf;
+    if (sport === "TENNIS") return t.tennis;
+    if (sport === "RUNNING") return t.running;
+    return sport;
   };
 
   if (loading) {
-    return <main style={pageStyle}>Cargando...</main>;
+    return <main style={pageStyle}>{t.editProductLoading}</main>;
   }
 
   return (
     <main style={pageStyle}>
       <section style={cardStyle}>
-        <p style={eyebrowStyle}>VENDEDOR ATHMOV</p>
-        <h1 style={titleStyle}>Editar producto</h1>
+        <p style={eyebrowStyle}>{t.editProductEyebrow}</p>
+
+        <h1 style={titleStyle}>{t.editProductTitle}</h1>
 
         <form onSubmit={saveProduct} style={formStyle}>
           <div style={imagesGridStyle}>
@@ -198,7 +220,7 @@ export default function EditProductPage() {
               <div key={image} style={imageBoxStyle}>
                 <Image
                   src={safeImage(image)}
-                  alt="Imagen del producto"
+                  alt={t.editProductImageAlt}
                   fill
                   style={{ objectFit: "cover" }}
                 />
@@ -217,7 +239,7 @@ export default function EditProductPage() {
               <div key={preview} style={imageBoxStyle}>
                 <Image
                   src={preview}
-                  alt="Nueva imagen"
+                  alt={t.editProductNewImageAlt}
                   fill
                   style={{ objectFit: "cover" }}
                 />
@@ -234,7 +256,8 @@ export default function EditProductPage() {
 
             <label style={uploadBoxStyle}>
               ＋
-              <span>Añadir fotos</span>
+              <span>{t.editProductAddPhotos}</span>
+
               <input
                 type="file"
                 accept="image/*"
@@ -252,7 +275,7 @@ export default function EditProductPage() {
           >
             {SPORTS.map((sport) => (
               <option key={sport} value={sport}>
-                {sport}
+                {getSportLabel(sport)}
               </option>
             ))}
           </select>
@@ -272,14 +295,14 @@ export default function EditProductPage() {
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Título"
+            placeholder={t.editProductTitlePlaceholder}
             style={inputStyle}
           />
 
           <input
             value={price}
             onChange={(e) => setPrice(e.target.value)}
-            placeholder="Precio"
+            placeholder={t.editProductPricePlaceholder}
             type="number"
             style={inputStyle}
           />
@@ -289,23 +312,46 @@ export default function EditProductPage() {
             onChange={(e) => setCondition(e.target.value)}
             style={inputStyle}
           >
-            <option value="">Estado</option>
-            <option value="Nuevo">Nuevo</option>
-            <option value="Como nuevo">Como nuevo</option>
-            <option value="Excelente">Excelente</option>
-            <option value="Bueno">Bueno</option>
-            <option value="Usado">Usado</option>
+            <option value="">
+              {t.editProductConditionPlaceholder}
+            </option>
+
+            <option value="Nuevo">
+              {t.conditionNew}
+            </option>
+
+            <option value="Como nuevo">
+              {t.conditionLikeNew}
+            </option>
+
+            <option value="Excelente">
+              {t.conditionExcellent}
+            </option>
+
+            <option value="Bueno">
+              {t.conditionGood}
+            </option>
+
+            <option value="Usado">
+              {t.conditionUsed}
+            </option>
           </select>
 
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Descripción"
+            placeholder={t.editProductDescriptionPlaceholder}
             style={textareaStyle}
           />
 
-          <button type="submit" disabled={saving} style={buttonStyle}>
-            {saving ? "Guardando..." : "Guardar cambios"}
+          <button
+            type="submit"
+            disabled={saving}
+            style={buttonStyle}
+          >
+            {saving
+              ? t.editProductSaving
+              : t.editProductSaveChanges}
           </button>
         </form>
       </section>

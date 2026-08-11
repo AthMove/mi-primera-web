@@ -2083,6 +2083,26 @@ earningsTransferReleased: "Liberado",
 earningsTransferPending: "Pendiente",
 earningsTransferCancelled: "Cancelado",
 earningsTransferRefunded: "Reembolsado",
+editProductNotFound: "Producto no encontrado",
+editProductCompleteFields: "Completa todos los campos",
+editProductValidPrice: "Introduce un precio válido",
+editProductUpdated: "Producto actualizado correctamente",
+
+editProductLoading: "Cargando...",
+editProductEyebrow: "VENDEDOR ATHMOV",
+editProductTitle: "Editar producto",
+
+editProductImageAlt: "Imagen del producto",
+editProductNewImageAlt: "Nueva imagen",
+editProductAddPhotos: "Añadir fotos",
+
+editProductTitlePlaceholder: "Título",
+editProductPricePlaceholder: "Precio",
+editProductConditionPlaceholder: "Estado",
+editProductDescriptionPlaceholder: "Descripción",
+
+editProductSaving: "Guardando...",
+editProductSaveChanges: "Guardar cambios",
   },
 
 
@@ -4162,6 +4182,26 @@ earningsTransferReleased: "Released",
 earningsTransferPending: "Pending",
 earningsTransferCancelled: "Cancelled",
 earningsTransferRefunded: "Refunded",
+editProductNotFound: "Product not found",
+editProductCompleteFields: "Complete all fields",
+editProductValidPrice: "Enter a valid price",
+editProductUpdated: "Product updated successfully",
+
+editProductLoading: "Loading...",
+editProductEyebrow: "ATHMOV SELLER",
+editProductTitle: "Edit product",
+
+editProductImageAlt: "Product image",
+editProductNewImageAlt: "New image",
+editProductAddPhotos: "Add photos",
+
+editProductTitlePlaceholder: "Title",
+editProductPricePlaceholder: "Price",
+editProductConditionPlaceholder: "Condition",
+editProductDescriptionPlaceholder: "Description",
+
+editProductSaving: "Saving...",
+editProductSaveChanges: "Save changes",
   },
 
   pt: {
@@ -6257,5 +6297,25 @@ earningsTransferReleased: "Libertado",
 earningsTransferPending: "Pendente",
 earningsTransferCancelled: "Cancelado",
 earningsTransferRefunded: "Reembolsado",
+editProductNotFound: "Produto não encontrado",
+editProductCompleteFields: "Preenche todos os campos",
+editProductValidPrice: "Introduz um preço válido",
+editProductUpdated: "Produto atualizado com sucesso",
+
+editProductLoading: "A carregar...",
+editProductEyebrow: "VENDEDOR ATHMOV",
+editProductTitle: "Editar produto",
+
+editProductImageAlt: "Imagem do produto",
+editProductNewImageAlt: "Nova imagem",
+editProductAddPhotos: "Adicionar fotografias",
+
+editProductTitlePlaceholder: "Título",
+editProductPricePlaceholder: "Preço",
+editProductConditionPlaceholder: "Estado",
+editProductDescriptionPlaceholder: "Descrição",
+
+editProductSaving: "A guardar...",
+editProductSaveChanges: "Guardar alterações",
   },
 };
