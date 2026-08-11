@@ -2251,6 +2251,26 @@ adminDisputesReleaseSeller:
 adminDisputesRefundBuyer:
   "Reembolsar al comprador",
 adminDisputesResolvedNote: "Disputa resuelta",
+adminProductsLoading: "Cargando productos...",
+adminProductsEyebrow: "ADMIN ATHMOV",
+adminProductsSubtitle:
+  "Revisa, gestiona y elimina productos del marketplace.",
+
+adminProductsEmpty: "No se han encontrado productos.",
+adminProductsNoTitle: "Sin título",
+adminProductsNoBrand: "Sin marca",
+adminProductsNoCategory: "Sin categoría",
+adminProductsSeller: "Vendedor",
+adminProductsUnknown: "Desconocido",
+
+adminProductsSoldHidden: "Vendido / Oculto",
+adminProductsActive: "Activo",
+adminProductsRestore: "Restaurar",
+adminProductsHide: "Ocultar",
+adminProductsDelete: "Eliminar",
+
+adminProductsDeleteConfirm:
+  "¿Eliminar este producto permanentemente?",
   },
 
 
@@ -4498,6 +4518,26 @@ adminDisputesReleaseSeller:
 adminDisputesRefundBuyer:
   "Refund buyer",
 adminDisputesResolvedNote: "Dispute resolved",
+adminProductsLoading: "Loading products...",
+adminProductsEyebrow: "ATHMOV ADMIN",
+adminProductsSubtitle:
+  "Review, manage and remove products from the marketplace.",
+
+adminProductsEmpty: "No products found.",
+adminProductsNoTitle: "Untitled",
+adminProductsNoBrand: "No brand",
+adminProductsNoCategory: "No category",
+adminProductsSeller: "Seller",
+adminProductsUnknown: "Unknown",
+
+adminProductsSoldHidden: "Sold / Hidden",
+adminProductsActive: "Active",
+adminProductsRestore: "Restore",
+adminProductsHide: "Hide",
+adminProductsDelete: "Delete",
+
+adminProductsDeleteConfirm:
+  "Permanently delete this product?",
   },
 
   pt: {
@@ -6761,5 +6801,25 @@ adminDisputesReleaseSeller:
 adminDisputesRefundBuyer:
   "Reembolsar o comprador",
 adminDisputesResolvedNote: "Disputa resolvida",
+adminProductsLoading: "A carregar produtos...",
+adminProductsEyebrow: "ADMIN ATHMOV",
+adminProductsSubtitle:
+  "Revê, gere e elimina produtos do marketplace.",
+
+adminProductsEmpty: "Não foram encontrados produtos.",
+adminProductsNoTitle: "Sem título",
+adminProductsNoBrand: "Sem marca",
+adminProductsNoCategory: "Sem categoria",
+adminProductsSeller: "Vendedor",
+adminProductsUnknown: "Desconhecido",
+
+adminProductsSoldHidden: "Vendido / Oculto",
+adminProductsActive: "Ativo",
+adminProductsRestore: "Restaurar",
+adminProductsHide: "Ocultar",
+adminProductsDelete: "Eliminar",
+
+adminProductsDeleteConfirm:
+  "Eliminar este produto permanentemente?",
   },
 };

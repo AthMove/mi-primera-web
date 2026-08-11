@@ -3,10 +3,20 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function AdminProductsPage() {
+  const { lang, t } = useLanguage();
+
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const locale =
+    lang === "en"
+      ? "en-GB"
+      : lang === "pt"
+        ? "pt-PT"
+        : "es-ES";
 
   useEffect(() => {
     loadProducts();
@@ -43,7 +53,7 @@ export default function AdminProductsPage() {
   }
 
   async function deleteProduct(productId: string) {
-    const ok = confirm("¿Eliminar este producto permanentemente?");
+    const ok = confirm(t.adminProductsDeleteConfirm);
     if (!ok) return;
 
     const { error } = await supabase
@@ -60,36 +70,82 @@ export default function AdminProductsPage() {
   }
 
   const safeImage = (product: any) => {
-    const src = product.image || product.image_url || product.images?.[0];
-    return src?.startsWith("http") || src?.startsWith("/") ? src : "/logo.png";
+    const src =
+      product.image ||
+      product.image_url ||
+      product.images?.[0];
+
+    return src?.startsWith("http") ||
+      src?.startsWith("/")
+      ? src
+      : "/logo.png";
+  };
+
+  const formatMoney = (value: number) =>
+    new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: "EUR",
+    }).format(Number(value || 0));
+
+  const formatDate = (date?: string) => {
+    if (!date) return "-";
+
+    return new Date(date).toLocaleDateString(locale, {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
   };
 
   if (loading) {
-    return <main style={pageStyle}>Cargando productos...</main>;
+    return (
+      <main style={pageStyle}>
+        {t.adminProductsLoading}
+      </main>
+    );
   }
 
   return (
-    <main style={pageStyle} className="admin-products-page">
+    <main
+      style={pageStyle}
+      className="admin-products-page"
+    >
       <section style={headerStyle}>
-        <p style={eyebrowStyle}>ADMIN ATHMOV</p>
-        <h1 style={titleStyle} className="admin-products-title">
-          Productos
+        <p style={eyebrowStyle}>
+          {t.adminProductsEyebrow}
+        </p>
+
+        <h1
+          style={titleStyle}
+          className="admin-products-title"
+        >
+          {t.adminProducts}
         </h1>
+
         <p style={subtitleStyle}>
-          Revisa, gestiona y elimina productos del marketplace.
+          {t.adminProductsSubtitle}
         </p>
       </section>
 
       <section style={listStyle}>
         {products.length === 0 ? (
-          <div style={emptyStyle}>No se han encontrado productos.</div>
+          <div style={emptyStyle}>
+            {t.adminProductsEmpty}
+          </div>
         ) : (
           products.map((product) => (
-            <article key={product.id} style={cardStyle} className="product-card">
+            <article
+              key={product.id}
+              style={cardStyle}
+              className="product-card"
+            >
               <div style={imageWrapperStyle}>
                 <Image
                   src={safeImage(product)}
-                  alt={product.title || "Producto"}
+                  alt={
+                    product.title ||
+                    t.adminProductsNoTitle
+                  }
                   fill
                   sizes="120px"
                   style={{ objectFit: "cover" }}
@@ -97,28 +153,45 @@ export default function AdminProductsPage() {
               </div>
 
               <div style={{ flex: 1 }}>
-                <p style={metaStyle}>#{String(product.id).slice(0, 8)}</p>
+                <p style={metaStyle}>
+                  #{String(product.id).slice(0, 8)}
+                </p>
 
                 <h2 style={productTitleStyle}>
-                  {product.title || "Sin título"}
+                  {product.title ||
+                    t.adminProductsNoTitle}
                 </h2>
 
                 <div style={detailsStyle}>
-                  <span>{product.brand || "Sin marca"}</span>
-                  <span>{product.category || product.sport || "Sin categoría"}</span>
-                  <span>€{product.price || 0}</span>
                   <span>
-                    {product.created_at
-                      ? new Date(product.created_at).toLocaleDateString()
-                      : "-"}
+                    {product.brand ||
+                      t.adminProductsNoBrand}
+                  </span>
+
+                  <span>
+                    {product.category ||
+                      product.sport ||
+                      t.adminProductsNoCategory}
+                  </span>
+
+                  <span>
+                    {formatMoney(
+                      Number(product.price || 0)
+                    )}
+                  </span>
+
+                  <span>
+                    {formatDate(product.created_at)}
                   </span>
                 </div>
 
                 <p style={sellerStyle}>
-                  Vendedor:{" "}
+                  {t.adminProductsSeller}:{" "}
                   {product.seller_id
-                    ? String(product.seller_id).slice(0, 8)
-                    : "Desconocido"}
+                    ? String(
+                        product.seller_id
+                      ).slice(0, 8)
+                    : t.adminProductsUnknown}
                 </p>
               </div>
 
@@ -126,21 +199,34 @@ export default function AdminProductsPage() {
                 <span
                   style={{
                     ...badgeStyle,
-                    ...(product.sold ? soldBadgeStyle : activeBadgeStyle),
+                    ...(product.sold
+                      ? soldBadgeStyle
+                      : activeBadgeStyle),
                   }}
                 >
-                  {product.sold ? "Vendido / Oculto" : "Activo"}
+                  {product.sold
+                    ? t.adminProductsSoldHidden
+                    : t.adminProductsActive}
                 </span>
 
-                <button onClick={() => toggleSold(product)} style={buttonStyle}>
-                  {product.sold ? "Restaurar" : "Ocultar"}
+                <button
+                  onClick={() =>
+                    toggleSold(product)
+                  }
+                  style={buttonStyle}
+                >
+                  {product.sold
+                    ? t.adminProductsRestore
+                    : t.adminProductsHide}
                 </button>
 
                 <button
-                  onClick={() => deleteProduct(product.id)}
+                  onClick={() =>
+                    deleteProduct(product.id)
+                  }
                   style={dangerButtonStyle}
                 >
-                  Eliminar
+                  {t.adminProductsDelete}
                 </button>
               </div>
             </article>
