@@ -3,11 +3,21 @@
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/components/LanguageProvider";
 
 function EarningsPageContent() {
+  const { lang, t } = useLanguage();
+
   const [orders, setOrders] = useState<any[]>([]);
   const [userId, setUserId] = useState("");
   const [loading, setLoading] = useState(true);
+
+  const locale =
+    lang === "en"
+      ? "en-GB"
+      : lang === "pt"
+        ? "pt-PT"
+        : "es-ES";
 
   useEffect(() => {
     loadEarnings();
@@ -43,36 +53,49 @@ function EarningsPageContent() {
 
   const stats = useMemo(() => {
     const totalSales = orders.reduce(
-      (sum: number, order: any) => sum + Number(order.amount || 0),
+      (sum: number, order: any) =>
+        sum + Number(order.amount || 0),
       0
     );
 
     const totalSellerEarnings = orders.reduce(
-      (sum: number, order: any) => sum + Number(order.seller_amount || 0),
+      (sum: number, order: any) =>
+        sum + Number(order.seller_amount || 0),
       0
     );
 
     const pendingRelease = orders
       .filter(
         (order: any) =>
-          ["paid", "preparing", "shipped", "delivered", "completed"].includes(
-            order.status
-          ) && order.transfer_status !== "released"
+          [
+            "paid",
+            "preparing",
+            "shipped",
+            "delivered",
+            "completed",
+          ].includes(order.status) &&
+          order.transfer_status !== "released"
       )
       .reduce(
-        (sum: number, order: any) => sum + Number(order.seller_amount || 0),
+        (sum: number, order: any) =>
+          sum + Number(order.seller_amount || 0),
         0
       );
 
     const released = orders
-      .filter((order: any) => order.transfer_status === "released")
+      .filter(
+        (order: any) =>
+          order.transfer_status === "released"
+      )
       .reduce(
-        (sum: number, order: any) => sum + Number(order.seller_amount || 0),
+        (sum: number, order: any) =>
+          sum + Number(order.seller_amount || 0),
         0
       );
 
     const platformFees = orders.reduce(
-      (sum: number, order: any) => sum + Number(order.platform_fee || 0),
+      (sum: number, order: any) =>
+        sum + Number(order.platform_fee || 0),
       0
     );
 
@@ -86,14 +109,16 @@ function EarningsPageContent() {
     };
   }, [orders]);
 
-  const formatMoney = (value: number) => {
-    return `€${value.toFixed(2)}`;
-  };
+  const formatMoney = (value: number) =>
+    new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: "EUR",
+    }).format(value);
 
   const formatDate = (date?: string) => {
     if (!date) return "-";
 
-    return new Date(date).toLocaleDateString([], {
+    return new Date(date).toLocaleDateString(locale, {
       day: "2-digit",
       month: "short",
       year: "numeric",
@@ -101,132 +126,250 @@ function EarningsPageContent() {
   };
 
   const getStatusLabel = (status?: string) => {
-    if (status === "paid") return "Pagado";
-    if (status === "preparing") return "Preparando";
-    if (status === "shipped") return "Enviado";
-    if (status === "delivered") return "Entregado";
-    if (status === "completed") return "Completado";
-    if (status === "refunded") return "Reembolsado";
-    if (status === "pending") return "Pendiente";
-    return status || "Pendiente";
+    if (status === "paid") {
+      return t.earningsStatusPaid;
+    }
+
+    if (status === "preparing") {
+      return t.earningsStatusPreparing;
+    }
+
+    if (status === "shipped") {
+      return t.earningsStatusShipped;
+    }
+
+    if (status === "delivered") {
+      return t.earningsStatusDelivered;
+    }
+
+    if (status === "completed") {
+      return t.earningsStatusCompleted;
+    }
+
+    if (status === "refunded") {
+      return t.earningsStatusRefunded;
+    }
+
+    if (status === "pending") {
+      return t.earningsStatusPending;
+    }
+
+    return status || t.earningsStatusPending;
   };
 
-  const getTransferStatusLabel = (status?: string) => {
-    if (status === "released") return "Liberado";
-    if (status === "pending") return "Pendiente";
-    if (status === "cancelled") return "Cancelado";
-    if (status === "refunded") return "Reembolsado";
-    return status || "Pendiente";
+  const getTransferStatusLabel = (
+    status?: string
+  ) => {
+    if (status === "released") {
+      return t.earningsTransferReleased;
+    }
+
+    if (status === "pending") {
+      return t.earningsTransferPending;
+    }
+
+    if (status === "cancelled") {
+      return t.earningsTransferCancelled;
+    }
+
+    if (status === "refunded") {
+      return t.earningsTransferRefunded;
+    }
+
+    return status || t.earningsTransferPending;
   };
 
   if (loading) {
-    return <main style={pageStyle}>Cargando ganancias...</main>;
+    return (
+      <main style={pageStyle}>
+        {t.earningsLoading}
+      </main>
+    );
   }
 
   return (
     <main style={pageStyle}>
       <section style={headerStyle}>
-        <p style={eyebrowStyle}>VENDEDOR ATHMOV</p>
-        <h1 style={titleStyle}>Ganancias</h1>
+        <p style={eyebrowStyle}>
+          {t.earningsEyebrow}
+        </p>
+
+        <h1 style={titleStyle}>
+          {t.earningsTitle}
+        </h1>
+
         <p style={subtitleStyle}>
-          Consulta tus ventas, pagos pendientes y pagos liberados.
+          {t.earningsSubtitle}
         </p>
       </section>
 
       <section style={statsGridStyle}>
         <div style={statCardStyle}>
-          <p style={statLabelStyle}>Ventas totales</p>
-          <h2 style={statValueStyle}>{formatMoney(stats.totalSales)}</h2>
-        </div>
+          <p style={statLabelStyle}>
+            {t.earningsTotalSales}
+          </p>
 
-        <div style={statCardStyle}>
-          <p style={statLabelStyle}>Ganancias del vendedor</p>
           <h2 style={statValueStyle}>
-            {formatMoney(stats.totalSellerEarnings)}
+            {formatMoney(stats.totalSales)}
           </h2>
         </div>
 
         <div style={statCardStyle}>
-          <p style={statLabelStyle}>Pendiente de liberar</p>
-          <h2 style={statValueStyle}>{formatMoney(stats.pendingRelease)}</h2>
+          <p style={statLabelStyle}>
+            {t.earningsSellerEarnings}
+          </p>
+
+          <h2 style={statValueStyle}>
+            {formatMoney(
+              stats.totalSellerEarnings
+            )}
+          </h2>
         </div>
 
         <div style={statCardStyle}>
-          <p style={statLabelStyle}>Liberado</p>
-          <h2 style={statValueStyle}>{formatMoney(stats.released)}</h2>
+          <p style={statLabelStyle}>
+            {t.earningsPendingRelease}
+          </p>
+
+          <h2 style={statValueStyle}>
+            {formatMoney(stats.pendingRelease)}
+          </h2>
+        </div>
+
+        <div style={statCardStyle}>
+          <p style={statLabelStyle}>
+            {t.earningsReleased}
+          </p>
+
+          <h2 style={statValueStyle}>
+            {formatMoney(stats.released)}
+          </h2>
         </div>
       </section>
 
       <section style={summaryStyle}>
         <div>
-          <p style={summaryLabelStyle}>Ventas completadas</p>
+          <p style={summaryLabelStyle}>
+            {t.earningsCompletedSales}
+          </p>
+
           <strong>{stats.salesCount}</strong>
         </div>
 
         <div>
-          <p style={summaryLabelStyle}>Comisiones generadas para ATHMOV</p>
-          <strong>{formatMoney(stats.platformFees)}</strong>
+          <p style={summaryLabelStyle}>
+            {t.earningsPlatformFees}
+          </p>
+
+          <strong>
+            {formatMoney(stats.platformFees)}
+          </strong>
         </div>
       </section>
 
       <section style={tableSectionStyle}>
         <div style={tableHeaderStyle}>
           <div>
-            <p style={eyebrowStyle}>HISTORIAL DE PAGOS</p>
-            <h2 style={sectionTitleStyle}>Pedidos y pagos</h2>
+            <p style={eyebrowStyle}>
+              {t.earningsHistoryEyebrow}
+            </p>
+
+            <h2 style={sectionTitleStyle}>
+              {t.earningsOrdersAndPayments}
+            </h2>
           </div>
         </div>
 
         {orders.length === 0 ? (
           <div style={emptyStyle}>
-            <h3>Todavía no tienes ganancias</h3>
-            <p>Tus ventas y pagos aparecerán aquí.</p>
+            <h3>{t.earningsEmptyTitle}</h3>
+            <p>{t.earningsEmptyText}</p>
           </div>
         ) : (
           <div style={tableStyle}>
             {orders.map((order: any) => (
-              <div key={order.id} style={rowStyle}>
+              <div
+                key={order.id}
+                style={rowStyle}
+                className="earnings-row"
+              >
                 <div>
                   <p style={rowTitleStyle}>
-                    Pedido #{String(order.id).slice(0, 8)}
+                    {t.earningsOrder} #
+                    {String(order.id).slice(0, 8)}
                   </p>
-                  <p style={rowMetaStyle}>{formatDate(order.created_at)}</p>
+
+                  <p style={rowMetaStyle}>
+                    {formatDate(order.created_at)}
+                  </p>
                 </div>
 
                 <div>
-                  <p style={rowLabelStyle}>Venta</p>
-                  <strong>{formatMoney(Number(order.amount || 0))}</strong>
-                </div>
+                  <p style={rowLabelStyle}>
+                    {t.earningsSale}
+                  </p>
 
-                <div>
-                  <p style={rowLabelStyle}>Recibes</p>
                   <strong>
-                    {formatMoney(Number(order.seller_amount || 0))}
+                    {formatMoney(
+                      Number(order.amount || 0)
+                    )}
                   </strong>
                 </div>
 
                 <div>
-                  <p style={rowLabelStyle}>Estado</p>
-                  <span style={badgeStyle}>{getStatusLabel(order.status)}</span>
+                  <p style={rowLabelStyle}>
+                    {t.earningsYouReceive}
+                  </p>
+
+                  <strong>
+                    {formatMoney(
+                      Number(
+                        order.seller_amount || 0
+                      )
+                    )}
+                  </strong>
                 </div>
 
                 <div>
-                  <p style={rowLabelStyle}>Pago</p>
-                  <span
-                    style={{
-                      ...badgeStyle,
-                      ...(order.transfer_status === "released"
-                        ? releasedBadgeStyle
-                        : pendingBadgeStyle),
-                    }}
-                  >
-                    {getTransferStatusLabel(order.transfer_status)}
+                  <p style={rowLabelStyle}>
+                    {t.earningsStatus}
+                  </p>
+
+                  <span style={badgeStyle}>
+                    {getStatusLabel(order.status)}
                   </span>
                 </div>
 
                 <div>
-                  <p style={rowLabelStyle}>Liberado el</p>
-                  <strong>{formatDate(order.payout_released_at)}</strong>
+                  <p style={rowLabelStyle}>
+                    {t.earningsPayment}
+                  </p>
+
+                  <span
+                    style={{
+                      ...badgeStyle,
+                      ...(order.transfer_status ===
+                      "released"
+                        ? releasedBadgeStyle
+                        : pendingBadgeStyle),
+                    }}
+                  >
+                    {getTransferStatusLabel(
+                      order.transfer_status
+                    )}
+                  </span>
+                </div>
+
+                <div>
+                  <p style={rowLabelStyle}>
+                    {t.earningsReleasedOn}
+                  </p>
+
+                  <strong>
+                    {formatDate(
+                      order.payout_released_at
+                    )}
+                  </strong>
                 </div>
               </div>
             ))}
@@ -291,7 +434,8 @@ const statsGridStyle = {
   maxWidth: "1100px",
   margin: "0 auto",
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+  gridTemplateColumns:
+    "repeat(auto-fit, minmax(220px, 1fr))",
   gap: "18px",
 };
 
@@ -367,7 +511,8 @@ const rowStyle = {
   borderRadius: "24px",
   padding: "22px",
   display: "grid",
-  gridTemplateColumns: "1.4fr 1fr 1fr 1fr 1fr 1fr",
+  gridTemplateColumns:
+    "1.4fr 1fr 1fr 1fr 1fr 1fr",
   gap: "16px",
   alignItems: "center",
 };
@@ -413,6 +558,9 @@ const pendingBadgeStyle = {
   color: "#111",
 };
 
-export default dynamic(() => Promise.resolve(EarningsPageContent), {
-  ssr: false,
-});
+export default dynamic(
+  () => Promise.resolve(EarningsPageContent),
+  {
+    ssr: false,
+  }
+);

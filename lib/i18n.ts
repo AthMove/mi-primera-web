@@ -2044,6 +2044,45 @@ sellerPayoutsOrderRefunded: "Reembolsado",
 sellerPayoutsReleasedDate: "Liberado",
 sellerPayoutsDeliveredDate: "Entregado",
 sellerPayoutsCreatedDate: "Creado",
+earningsLoading: "Cargando ganancias...",
+earningsEyebrow: "VENDEDOR ATHMOV",
+earningsTitle: "Ganancias",
+earningsSubtitle:
+  "Consulta tus ventas, pagos pendientes y pagos liberados.",
+
+earningsTotalSales: "Ventas totales",
+earningsSellerEarnings: "Ganancias del vendedor",
+earningsPendingRelease: "Pendiente de liberar",
+earningsReleased: "Liberado",
+
+earningsCompletedSales: "Ventas completadas",
+earningsPlatformFees: "Comisiones generadas para ATHMOV",
+
+earningsHistoryEyebrow: "HISTORIAL DE PAGOS",
+earningsOrdersAndPayments: "Pedidos y pagos",
+
+earningsEmptyTitle: "Todavía no tienes ganancias",
+earningsEmptyText: "Tus ventas y pagos aparecerán aquí.",
+
+earningsOrder: "Pedido",
+earningsSale: "Venta",
+earningsYouReceive: "Recibes",
+earningsStatus: "Estado",
+earningsPayment: "Pago",
+earningsReleasedOn: "Liberado el",
+
+earningsStatusPaid: "Pagado",
+earningsStatusPreparing: "Preparando",
+earningsStatusShipped: "Enviado",
+earningsStatusDelivered: "Entregado",
+earningsStatusCompleted: "Completado",
+earningsStatusRefunded: "Reembolsado",
+earningsStatusPending: "Pendiente",
+
+earningsTransferReleased: "Liberado",
+earningsTransferPending: "Pendiente",
+earningsTransferCancelled: "Cancelado",
+earningsTransferRefunded: "Reembolsado",
   },
 
 
@@ -4084,6 +4123,45 @@ sellerPayoutsOrderRefunded: "Refunded",
 sellerPayoutsReleasedDate: "Released",
 sellerPayoutsDeliveredDate: "Delivered",
 sellerPayoutsCreatedDate: "Created",
+earningsLoading: "Loading earnings...",
+earningsEyebrow: "ATHMOV SELLER",
+earningsTitle: "Earnings",
+earningsSubtitle:
+  "Review your sales, pending payouts and released payouts.",
+
+earningsTotalSales: "Total sales",
+earningsSellerEarnings: "Seller earnings",
+earningsPendingRelease: "Pending release",
+earningsReleased: "Released",
+
+earningsCompletedSales: "Completed sales",
+earningsPlatformFees: "Fees generated for ATHMOV",
+
+earningsHistoryEyebrow: "PAYMENT HISTORY",
+earningsOrdersAndPayments: "Orders and payments",
+
+earningsEmptyTitle: "You don't have any earnings yet",
+earningsEmptyText: "Your sales and payments will appear here.",
+
+earningsOrder: "Order",
+earningsSale: "Sale",
+earningsYouReceive: "You receive",
+earningsStatus: "Status",
+earningsPayment: "Payment",
+earningsReleasedOn: "Released on",
+
+earningsStatusPaid: "Paid",
+earningsStatusPreparing: "Preparing",
+earningsStatusShipped: "Shipped",
+earningsStatusDelivered: "Delivered",
+earningsStatusCompleted: "Completed",
+earningsStatusRefunded: "Refunded",
+earningsStatusPending: "Pending",
+
+earningsTransferReleased: "Released",
+earningsTransferPending: "Pending",
+earningsTransferCancelled: "Cancelled",
+earningsTransferRefunded: "Refunded",
   },
 
   pt: {
@@ -6140,5 +6218,44 @@ sellerPayoutsOrderRefunded: "Reembolsado",
 sellerPayoutsReleasedDate: "Libertado",
 sellerPayoutsDeliveredDate: "Entregue",
 sellerPayoutsCreatedDate: "Criado",
+earningsLoading: "A carregar ganhos...",
+earningsEyebrow: "VENDEDOR ATHMOV",
+earningsTitle: "Ganhos",
+earningsSubtitle:
+  "Consulta as tuas vendas, pagamentos pendentes e pagamentos libertados.",
+
+earningsTotalSales: "Vendas totais",
+earningsSellerEarnings: "Ganhos do vendedor",
+earningsPendingRelease: "Pendente de libertação",
+earningsReleased: "Libertado",
+
+earningsCompletedSales: "Vendas concluídas",
+earningsPlatformFees: "Comissões geradas para a ATHMOV",
+
+earningsHistoryEyebrow: "HISTÓRICO DE PAGAMENTOS",
+earningsOrdersAndPayments: "Encomendas e pagamentos",
+
+earningsEmptyTitle: "Ainda não tens ganhos",
+earningsEmptyText: "As tuas vendas e pagamentos aparecerão aqui.",
+
+earningsOrder: "Encomenda",
+earningsSale: "Venda",
+earningsYouReceive: "Recebes",
+earningsStatus: "Estado",
+earningsPayment: "Pagamento",
+earningsReleasedOn: "Libertado em",
+
+earningsStatusPaid: "Pago",
+earningsStatusPreparing: "Em preparação",
+earningsStatusShipped: "Enviado",
+earningsStatusDelivered: "Entregue",
+earningsStatusCompleted: "Concluído",
+earningsStatusRefunded: "Reembolsado",
+earningsStatusPending: "Pendente",
+
+earningsTransferReleased: "Libertado",
+earningsTransferPending: "Pendente",
+earningsTransferCancelled: "Cancelado",
+earningsTransferRefunded: "Reembolsado",
   },
 };
