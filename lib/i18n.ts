@@ -2103,6 +2103,31 @@ editProductDescriptionPlaceholder: "Descripción",
 
 editProductSaving: "Guardando...",
 editProductSaveChanges: "Guardar cambios",
+earningsMainEyebrow: "GANANCIAS ATHMOV",
+earningsMainSubtitle:
+  "Consulta tus ingresos como vendedor, saldo pendiente, pagos liberados y comisiones del marketplace.",
+
+earningsAvailableBalance: "Saldo disponible",
+earningsAvailableBalanceText:
+  "Saldo correspondiente a pedidos completados o pagos ya liberados. Los pagos se gestionan mediante Stripe Connect.",
+earningsAutomaticStripeWithdrawal:
+  "Retirada automática mediante Stripe",
+
+earningsCompletedRevenue: "Ingresos completados",
+earningsPendingBalance: "Saldo pendiente",
+earningsAthmovFees: "Comisiones ATHMOV",
+
+earningsSellerDashboard: "Panel de vendedor",
+earningsOrdersLink: "Pedidos",
+earningsAddProduct: "Añadir producto",
+
+earningsHistoryTitle: "Historial de ganancias",
+earningsNoSellerOrders:
+  "Todavía no tienes pedidos como vendedor.",
+
+earningsOrderLabel: "PEDIDO",
+earningsNet: "Neto",
+earningsCommission: "Comisión",
   },
 
 
@@ -4202,6 +4227,31 @@ editProductDescriptionPlaceholder: "Description",
 
 editProductSaving: "Saving...",
 editProductSaveChanges: "Save changes",
+earningsMainEyebrow: "ATHMOV EARNINGS",
+earningsMainSubtitle:
+  "Review your seller income, pending balance, released payouts and marketplace fees.",
+
+earningsAvailableBalance: "Available balance",
+earningsAvailableBalanceText:
+  "Balance from completed orders or payouts that have already been released. Payments are managed through Stripe Connect.",
+earningsAutomaticStripeWithdrawal:
+  "Automatic payout via Stripe",
+
+earningsCompletedRevenue: "Completed revenue",
+earningsPendingBalance: "Pending balance",
+earningsAthmovFees: "ATHMOV fees",
+
+earningsSellerDashboard: "Seller dashboard",
+earningsOrdersLink: "Orders",
+earningsAddProduct: "Add product",
+
+earningsHistoryTitle: "Earnings history",
+earningsNoSellerOrders:
+  "You don't have any seller orders yet.",
+
+earningsOrderLabel: "ORDER",
+earningsNet: "Net",
+earningsCommission: "Fee",
   },
 
   pt: {
@@ -6317,5 +6367,30 @@ editProductDescriptionPlaceholder: "Descrição",
 
 editProductSaving: "A guardar...",
 editProductSaveChanges: "Guardar alterações",
+earningsMainEyebrow: "GANHOS ATHMOV",
+earningsMainSubtitle:
+  "Consulta os teus rendimentos como vendedor, saldo pendente, pagamentos libertados e comissões do marketplace.",
+
+earningsAvailableBalance: "Saldo disponível",
+earningsAvailableBalanceText:
+  "Saldo correspondente a encomendas concluídas ou pagamentos já libertados. Os pagamentos são geridos através do Stripe Connect.",
+earningsAutomaticStripeWithdrawal:
+  "Pagamento automático através do Stripe",
+
+earningsCompletedRevenue: "Receitas concluídas",
+earningsPendingBalance: "Saldo pendente",
+earningsAthmovFees: "Comissões ATHMOV",
+
+earningsSellerDashboard: "Painel do vendedor",
+earningsOrdersLink: "Encomendas",
+earningsAddProduct: "Adicionar produto",
+
+earningsHistoryTitle: "Histórico de ganhos",
+earningsNoSellerOrders:
+  "Ainda não tens encomendas como vendedor.",
+
+earningsOrderLabel: "ENCOMENDA",
+earningsNet: "Líquido",
+earningsCommission: "Comissão",
   },
 };

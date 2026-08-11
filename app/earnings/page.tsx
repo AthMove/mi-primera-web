@@ -3,8 +3,11 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useLanguage } from "@/components/LanguageProvider";
 
 function EarningsPageContent() {
+  const { lang, t } = useLanguage();
+
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState<any[]>([]);
 
@@ -15,6 +18,13 @@ function EarningsPageContent() {
     athmovFees: 0,
     completedSales: 0,
   });
+
+  const locale =
+    lang === "en"
+      ? "en-GB"
+      : lang === "pt"
+        ? "pt-PT"
+        : "es-ES";
 
   useEffect(() => {
     loadEarnings();
@@ -48,27 +58,32 @@ function EarningsPageContent() {
 
     const pending = sellerOrders.filter(
       (order: any) =>
-        ["paid", "preparing", "shipped", "delivered"].includes(order.status) &&
-        order.transfer_status !== "released"
+        ["paid", "preparing", "shipped", "delivered"].includes(
+          order.status
+        ) && order.transfer_status !== "released"
     );
 
     const totalRevenue = completed.reduce(
-      (acc: number, order: any) => acc + Number(order.amount || 0),
+      (acc: number, order: any) =>
+        acc + Number(order.amount || 0),
       0
     );
 
     const availableBalance = completed.reduce(
-      (acc: number, order: any) => acc + Number(order.seller_amount || 0),
+      (acc: number, order: any) =>
+        acc + Number(order.seller_amount || 0),
       0
     );
 
     const pendingBalance = pending.reduce(
-      (acc: number, order: any) => acc + Number(order.seller_amount || 0),
+      (acc: number, order: any) =>
+        acc + Number(order.seller_amount || 0),
       0
     );
 
     const athmovFees = sellerOrders.reduce(
-      (acc: number, order: any) => acc + Number(order.platform_fee || 0),
+      (acc: number, order: any) =>
+        acc + Number(order.platform_fee || 0),
       0
     );
 
@@ -84,131 +99,213 @@ function EarningsPageContent() {
     setLoading(false);
   };
 
-  const money = (value: number) => `€${Number(value || 0).toFixed(2)}`;
+  const money = (value: number) =>
+    new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: "EUR",
+    }).format(Number(value || 0));
+
+  const formatDate = (date?: string) => {
+    if (!date) return "-";
+
+    return new Date(date).toLocaleDateString(locale, {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
 
   const translateStatus = (status: string) => {
     switch (status) {
       case "pending":
-        return "Pendiente";
+        return t.earningsStatusPending;
       case "paid":
-        return "Pagado";
+        return t.earningsStatusPaid;
       case "preparing":
-        return "Preparando";
+        return t.earningsStatusPreparing;
       case "shipped":
-        return "Enviado";
+        return t.earningsStatusShipped;
       case "delivered":
-        return "Entregado";
+        return t.earningsStatusDelivered;
       case "completed":
-        return "Completado";
+        return t.earningsStatusCompleted;
       case "refunded":
-        return "Reembolsado";
+        return t.earningsStatusRefunded;
       default:
-        return status || "Pendiente";
+        return status || t.earningsStatusPending;
     }
   };
 
   if (loading) {
-    return <main style={pageStyle}>Cargando ganancias...</main>;
+    return (
+      <main style={pageStyle}>
+        {t.earningsLoading}
+      </main>
+    );
   }
 
   return (
     <main style={pageStyle} className="earnings-page">
       <section style={heroStyle}>
-        <p style={eyebrowStyle}>GANANCIAS ATHMOV</p>
+        <p style={eyebrowStyle}>
+          {t.earningsMainEyebrow}
+        </p>
 
-        <h1 style={titleStyle} className="earnings-title">
-          Ganancias
+        <h1
+          style={titleStyle}
+          className="earnings-title"
+        >
+          {t.earningsTitle}
         </h1>
 
         <p style={subtitleStyle}>
-          Consulta tus ingresos como vendedor, saldo pendiente, pagos liberados y
-          comisiones del marketplace.
+          {t.earningsMainSubtitle}
         </p>
       </section>
 
       <section style={balanceCardStyle}>
-        <p style={balanceLabelStyle}>Saldo disponible</p>
-
-        <h2 style={balanceValueStyle}>{money(stats.availableBalance)}</h2>
-
-        <p style={balanceTextStyle}>
-          Saldo correspondiente a pedidos completados o pagos ya liberados. Los
-          pagos se gestionan mediante Stripe Connect.
+        <p style={balanceLabelStyle}>
+          {t.earningsAvailableBalance}
         </p>
 
-        <button style={withdrawButtonStyle} disabled>
-          Retirada automática mediante Stripe
+        <h2 style={balanceValueStyle}>
+          {money(stats.availableBalance)}
+        </h2>
+
+        <p style={balanceTextStyle}>
+          {t.earningsAvailableBalanceText}
+        </p>
+
+        <button
+          style={withdrawButtonStyle}
+          disabled
+        >
+          {t.earningsAutomaticStripeWithdrawal}
         </button>
       </section>
 
       <section style={statsGridStyle}>
         <div style={statCardStyle}>
-          <p style={statLabelStyle}>Ingresos completados</p>
-          <h2 style={statValueStyle}>{money(stats.totalRevenue)}</h2>
+          <p style={statLabelStyle}>
+            {t.earningsCompletedRevenue}
+          </p>
+
+          <h2 style={statValueStyle}>
+            {money(stats.totalRevenue)}
+          </h2>
         </div>
 
         <div style={statCardStyle}>
-          <p style={statLabelStyle}>Saldo pendiente</p>
-          <h2 style={statValueStyle}>{money(stats.pendingBalance)}</h2>
+          <p style={statLabelStyle}>
+            {t.earningsPendingBalance}
+          </p>
+
+          <h2 style={statValueStyle}>
+            {money(stats.pendingBalance)}
+          </h2>
         </div>
 
         <div style={statCardStyle}>
-          <p style={statLabelStyle}>Comisiones ATHMOV</p>
-          <h2 style={statValueStyle}>{money(stats.athmovFees)}</h2>
+          <p style={statLabelStyle}>
+            {t.earningsAthmovFees}
+          </p>
+
+          <h2 style={statValueStyle}>
+            {money(stats.athmovFees)}
+          </h2>
         </div>
 
         <div style={statCardStyle}>
-          <p style={statLabelStyle}>Ventas completadas</p>
-          <h2 style={statValueStyle}>{stats.completedSales}</h2>
+          <p style={statLabelStyle}>
+            {t.earningsCompletedSales}
+          </p>
+
+          <h2 style={statValueStyle}>
+            {stats.completedSales}
+          </h2>
         </div>
       </section>
 
       <section style={actionsStyle}>
-        <Link href="/dashboard" style={actionButtonStyle}>
-          Panel de vendedor
+        <Link
+          href="/dashboard"
+          style={actionButtonStyle}
+        >
+          {t.earningsSellerDashboard}
         </Link>
 
-        <Link href="/orders" style={actionButtonStyle}>
-          Pedidos
+        <Link
+          href="/orders"
+          style={actionButtonStyle}
+        >
+          {t.earningsOrdersLink}
         </Link>
 
-        <Link href="/sell" style={actionButtonStyle}>
-          Añadir producto
+        <Link
+          href="/sell"
+          style={actionButtonStyle}
+        >
+          {t.earningsAddProduct}
         </Link>
       </section>
 
       <section style={historySectionStyle}>
-        <h2 style={sectionTitleStyle}>Historial de ganancias</h2>
+        <p style={eyebrowStyle}>
+          {t.earningsHistoryEyebrow}
+        </p>
+
+        <h2 style={sectionTitleStyle}>
+          {t.earningsHistoryTitle}
+        </h2>
 
         {orders.length === 0 ? (
-          <div style={emptyStyle}>Todavía no tienes pedidos como vendedor.</div>
+          <div style={emptyStyle}>
+            {t.earningsNoSellerOrders}
+          </div>
         ) : (
           <div style={listStyle}>
             {orders.map((order: any) => {
               const amount = Number(order.amount || 0);
               const fee = Number(order.platform_fee || 0);
-              const net = Number(order.seller_amount || 0);
+              const net = Number(
+                order.seller_amount || 0
+              );
 
               return (
-                <article key={order.id} style={orderCardStyle}>
+                <article
+                  key={order.id}
+                  style={orderCardStyle}
+                >
                   <div>
-                    <p style={orderMetaStyle}>PEDIDO</p>
+                    <p style={orderMetaStyle}>
+                      {t.earningsOrderLabel}
+                    </p>
 
-                    <h3 style={orderAmountStyle}>{money(amount)}</h3>
+                    <h3 style={orderAmountStyle}>
+                      {money(amount)}
+                    </h3>
 
                     <p style={orderDateStyle}>
-                      {new Date(order.created_at).toLocaleDateString()}
+                      {formatDate(order.created_at)}
                     </p>
                   </div>
 
                   <div style={rightStyle}>
                     <span style={statusStyle}>
-                      {translateStatus(order.status)}
+                      {translateStatus(
+                        order.status
+                      )}
                     </span>
 
-                    <p style={netStyle}>Neto: {money(net)}</p>
+                    <p style={netStyle}>
+                      {t.earningsNet}:{" "}
+                      {money(net)}
+                    </p>
 
-                    <p style={feeStyle}>Comisión: {money(fee)}</p>
+                    <p style={feeStyle}>
+                      {t.earningsCommission}:{" "}
+                      {money(fee)}
+                    </p>
                   </div>
                 </article>
               );
@@ -235,7 +332,8 @@ function EarningsPageContent() {
 
 const pageStyle = {
   minHeight: "100vh",
-  background: "linear-gradient(to bottom, #f8f8f4, #eeeeea)",
+  background:
+    "linear-gradient(to bottom, #f8f8f4, #eeeeea)",
   padding: "70px 60px",
   fontFamily: "Inter, sans-serif",
 };
@@ -271,7 +369,8 @@ const balanceCardStyle = {
   color: "#fff",
   borderRadius: "38px",
   padding: "46px",
-  boxShadow: "0 40px 120px rgba(0,0,0,0.14)",
+  boxShadow:
+    "0 40px 120px rgba(0,0,0,0.14)",
 };
 
 const balanceLabelStyle = {
@@ -311,7 +410,8 @@ const statsGridStyle = {
   maxWidth: "1200px",
   margin: "0 auto",
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))",
+  gridTemplateColumns:
+    "repeat(auto-fit,minmax(240px,1fr))",
   gap: "20px",
 };
 
@@ -319,7 +419,8 @@ const statCardStyle = {
   background: "#fff",
   borderRadius: "30px",
   padding: "28px",
-  border: "1px solid rgba(0,0,0,0.06)",
+  border:
+    "1px solid rgba(0,0,0,0.06)",
 };
 
 const statLabelStyle = {
@@ -381,7 +482,8 @@ const orderCardStyle = {
   background: "#fff",
   borderRadius: "28px",
   padding: "24px",
-  border: "1px solid rgba(0,0,0,0.06)",
+  border:
+    "1px solid rgba(0,0,0,0.06)",
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
@@ -432,6 +534,9 @@ const feeStyle = {
   fontSize: "13px",
 };
 
-export default dynamic(() => Promise.resolve(EarningsPageContent), {
-  ssr: false,
-});
+export default dynamic(
+  () => Promise.resolve(EarningsPageContent),
+  {
+    ssr: false,
+  }
+);
