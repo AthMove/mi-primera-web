@@ -1,15 +1,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function AdminDisputesPage() {
+  const { lang, t } = useLanguage();
+
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [debug, setDebug] = useState("");
   const [resolvingId, setResolvingId] = useState<string | null>(null);
 
+  const locale =
+    lang === "en"
+      ? "en-GB"
+      : lang === "pt"
+        ? "pt-PT"
+        : "es-ES";
+
   const loadDisputes = async () => {
-    setDebug("Cargando disputas...");
+    setDebug(t.adminDisputesLoading);
 
     try {
       const response = await fetch("/api/admin/disputes", {
@@ -22,14 +32,25 @@ export default function AdminDisputesPage() {
       console.log("DISPUTAS ADMIN:", JSON.stringify(result, null, 2));
 
       if (!response.ok) {
-        setDebug("ERROR: " + (result.error || "No se pudieron cargar las disputas"));
+        setDebug(
+          "ERROR: " +
+            (result.error || t.adminDisputesLoadError)
+        );
         return;
       }
 
-      setDebug(`Disputas abiertas: ${result.orders?.length || 0}`);
+      setDebug(
+        `${t.adminDisputesOpenCount}: ${
+          result.orders?.length || 0
+        }`
+      );
+
       setOrders(result.orders || []);
     } catch (error: any) {
-      setDebug("ERROR: " + (error.message || "No se pudieron cargar las disputas"));
+      setDebug(
+        "ERROR: " +
+          (error.message || t.adminDisputesLoadError)
+      );
     } finally {
       setLoading(false);
     }
@@ -40,27 +61,78 @@ export default function AdminDisputesPage() {
   }, []);
 
   const shortId = (value?: string | null) => {
-    if (!value) return "Desconocido";
+    if (!value) return t.adminDisputesUnknown;
     return value.slice(0, 8);
   };
 
+  const formatMoney = (value: number) =>
+    new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: "EUR",
+    }).format(Number(value || 0));
+
+  const formatDateTime = (date?: string | null) => {
+    if (!date) return t.adminDisputesUnknown;
+
+    return new Date(date).toLocaleString(locale, {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   const getStatusLabel = (status?: string) => {
-    if (status === "open") return "Abierta";
-    if (status === "resolved") return "Resuelta";
-    if (status === "paid") return "Pagado";
-    if (status === "preparing") return "Preparando";
-    if (status === "shipped") return "Enviado";
-    if (status === "delivered") return "Entregado";
-    if (status === "completed") return "Completado";
-    if (status === "refunded") return "Reembolsado";
-    if (status === "pending") return "Pendiente";
-    return status || "Desconocido";
+    if (status === "open") {
+      return t.adminDisputesOpen;
+    }
+
+    if (status === "resolved") {
+      return t.adminDisputesResolved;
+    }
+
+    if (status === "paid") {
+      return t.earningsStatusPaid;
+    }
+
+    if (status === "preparing") {
+      return t.earningsStatusPreparing;
+    }
+
+    if (status === "shipped") {
+      return t.earningsStatusShipped;
+    }
+
+    if (status === "delivered") {
+      return t.earningsStatusDelivered;
+    }
+
+    if (status === "completed") {
+      return t.earningsStatusCompleted;
+    }
+
+    if (status === "refunded") {
+      return t.earningsStatusRefunded;
+    }
+
+    if (status === "pending") {
+      return t.earningsStatusPending;
+    }
+
+    return status || t.adminDisputesUnknown;
   };
 
   const getResolutionLabel = (resolution?: string) => {
-    if (resolution === "seller_wins") return "Gana el vendedor";
-    if (resolution === "buyer_refund") return "Reembolso al comprador";
-    return "Pendiente";
+    if (resolution === "seller_wins") {
+      return t.adminDisputesSellerWins;
+    }
+
+    if (resolution === "buyer_refund") {
+      return t.adminDisputesBuyerRefund;
+    }
+
+    return t.adminDisputesPending;
   };
 
   const resolveDispute = async (
@@ -69,8 +141,8 @@ export default function AdminDisputesPage() {
   ) => {
     const confirmed = confirm(
       resolution === "seller_wins"
-        ? "¿Liberar el pago al vendedor?"
-        : "¿Reembolsar al comprador?"
+        ? t.adminDisputesConfirmSeller
+        : t.adminDisputesConfirmRefund
     );
 
     if (!confirmed) return;
@@ -92,99 +164,163 @@ export default function AdminDisputesPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.error || "Error al resolver la disputa");
+        alert(
+          data.error || t.adminDisputesResolveError
+        );
         return;
       }
 
-      alert("Disputa resuelta correctamente");
-      setOrders((prev) => prev.filter((order) => order.id !== orderId));
+      alert(t.adminDisputesResolveSuccess);
+
+      setOrders((prev) =>
+        prev.filter((order) => order.id !== orderId)
+      );
+
       await loadDisputes();
     } catch (error: any) {
-      alert(error.message || "Error al resolver la disputa");
+      alert(
+        error.message || t.adminDisputesResolveError
+      );
     } finally {
       setResolvingId(null);
     }
   };
 
   if (loading) {
-    return <main style={pageStyle}>Cargando disputas...</main>;
+    return (
+      <main style={pageStyle}>
+        {t.adminDisputesLoading}
+      </main>
+    );
   }
 
   return (
-    <main style={pageStyle} className="admin-disputes-page">
-      <p style={eyebrowStyle}>ADMIN ATHMOV</p>
-      <h1 style={titleStyle} className="admin-disputes-title">
-        Disputas
+    <main
+      style={pageStyle}
+      className="admin-disputes-page"
+    >
+      <p style={eyebrowStyle}>
+        {t.adminDisputesEyebrow}
+      </p>
+
+      <h1
+        style={titleStyle}
+        className="admin-disputes-title"
+      >
+        {t.adminDisputesTitle}
       </h1>
 
-      <p style={debugStyle}>{debug}</p>
+      <p style={debugStyle}>
+        {debug}
+      </p>
 
       {orders.length === 0 ? (
         <section style={emptyStyle}>
-          <h2 style={{ margin: 0 }}>No hay disputas abiertas</h2>
+          <h2 style={{ margin: 0 }}>
+            {t.adminDisputesEmptyTitle}
+          </h2>
+
           <p style={{ color: "#666" }}>
-            Las disputas abiertas aparecerán aquí.
+            {t.adminDisputesEmptyText}
           </p>
         </section>
       ) : (
         <div style={listStyle}>
           {orders.map((order) => {
             const product =
-              Array.isArray(order.products) && order.products.length > 0
+              Array.isArray(order.products) &&
+              order.products.length > 0
                 ? order.products[0]
                 : order.products || null;
 
             const productImages = Array.from(
               new Set(
                 [
-                  ...(product?.image ? [product.image] : []),
-                  ...(Array.isArray(product?.images) ? product.images : []),
+                  ...(product?.image
+                    ? [product.image]
+                    : []),
+                  ...(Array.isArray(product?.images)
+                    ? product.images
+                    : []),
                 ].filter(Boolean)
               )
             );
 
-            const isResolved = order.dispute_status === "resolved";
+            const isResolved =
+              order.dispute_status === "resolved";
 
             return (
-              <article key={order.id} style={cardStyle} className="dispute-card">
-                <div style={productRowStyle} className="dispute-row">
+              <article
+                key={order.id}
+                style={cardStyle}
+                className="dispute-card"
+              >
+                <div
+                  style={productRowStyle}
+                  className="dispute-row"
+                >
                   <div style={imageBoxStyle}>
                     {productImages[0] ? (
                       <img
                         src={productImages[0] as string}
-                        alt={product?.title || "Producto"}
+                        alt={
+                          product?.title ||
+                          t.adminDisputesProduct
+                        }
                         style={imageStyle}
                       />
                     ) : (
-                      <span style={imagePlaceholderStyle}>Sin imagen</span>
+                      <span style={imagePlaceholderStyle}>
+                        {t.adminDisputesNoImage}
+                      </span>
                     )}
                   </div>
 
                   <div style={{ flex: 1 }}>
-                    <p style={eyebrowStyle}>DISPUTA</p>
+                    <p style={eyebrowStyle}>
+                      {t.adminDisputesDisputeEyebrow}
+                    </p>
 
                     <h2 style={productTitleStyle}>
-                      {product?.title || `Pedido #${shortId(order.id)}`}
+                      {product?.title ||
+                        `${t.adminDisputesOrder} #${shortId(
+                          order.id
+                        )}`}
                     </h2>
 
-                    <p style={mutedTextStyle}>Pedido #{shortId(order.id)}</p>
+                    <p style={mutedTextStyle}>
+                      {t.adminDisputesOrder} #
+                      {shortId(order.id)}
+                    </p>
 
                     {productImages.length > 1 && (
                       <div style={galleryStyle}>
-                        {productImages.slice(0, 6).map((img, index) => (
-                          <img
-                            key={`${String(img)}-${index}`}
-                            src={String(img)}
-                            alt={`${product?.title || "Producto"} ${index + 1}`}
-                            style={thumbStyle}
-                          />
-                        ))}
+                        {productImages
+                          .slice(0, 6)
+                          .map((img, index) => (
+                            <img
+                              key={`${String(
+                                img
+                              )}-${index}`}
+                              src={String(img)}
+                              alt={`${
+                                product?.title ||
+                                t.adminDisputesProduct
+                              } ${index + 1}`}
+                              style={thumbStyle}
+                            />
+                          ))}
                       </div>
                     )}
 
-                    <div style={detailsGridStyle} className="details-grid">
+                    <div
+                      style={detailsGridStyle}
+                      className="details-grid"
+                    >
                       <p>
-                        <strong>Estado de disputa:</strong>{" "}
+                        <strong>
+                          {t.adminDisputesDisputeStatus}:
+                        </strong>{" "}
                         <span
                           style={{
                             color:
@@ -194,20 +330,26 @@ export default function AdminDisputesPage() {
                             fontWeight: 700,
                           }}
                         >
-                          {getStatusLabel(order.dispute_status || "open")}
+                          {getStatusLabel(
+                            order.dispute_status || "open"
+                          )}
                         </span>
                       </p>
 
                       <p>
-                        <strong>Estado del pedido:</strong>{" "}
+                        <strong>
+                          {t.adminDisputesOrderStatus}:
+                        </strong>{" "}
                         <span
                           style={{
                             color:
                               order.status === "paid"
                                 ? "#16a34a"
-                                : order.status === "shipped"
+                                : order.status ===
+                                    "shipped"
                                   ? "#2563eb"
-                                  : order.status === "refunded"
+                                  : order.status ===
+                                      "refunded"
                                     ? "#dc2626"
                                     : "#d97706",
                             fontWeight: 700,
@@ -218,74 +360,115 @@ export default function AdminDisputesPage() {
                       </p>
 
                       <p>
-                        <strong>Importe del pedido:</strong> €{order.amount || 0}
+                        <strong>
+                          {t.adminDisputesOrderAmount}:
+                        </strong>{" "}
+                        {formatMoney(
+                          Number(order.amount || 0)
+                        )}
                       </p>
 
                       <p>
-                        <strong>Precio del producto:</strong> €{product?.price || 0}
+                        <strong>
+                          {t.adminDisputesProductPrice}:
+                        </strong>{" "}
+                        {formatMoney(
+                          Number(product?.price || 0)
+                        )}
                       </p>
 
                       <p>
-                        <strong>Comprador:</strong>{" "}
+                        <strong>
+                          {t.adminDisputesBuyer}:
+                        </strong>{" "}
                         {order.buyer_email ||
                           order.user_email ||
                           order.buyer_id ||
-                          "Desconocido"}
+                          t.adminDisputesUnknown}
                       </p>
 
                       <p>
-                        <strong>Vendedor:</strong>{" "}
-                        {product?.seller_email || order.seller_id || "Desconocido"}
+                        <strong>
+                          {t.adminDisputesSeller}:
+                        </strong>{" "}
+                        {product?.seller_email ||
+                          order.seller_id ||
+                          t.adminDisputesUnknown}
                       </p>
 
                       <p>
-                        <strong>Deporte:</strong> {product?.sport || "Desconocido"}
+                        <strong>
+                          {t.adminDisputesSport}:
+                        </strong>{" "}
+                        {product?.sport ||
+                          t.adminDisputesUnknown}
                       </p>
 
                       <p>
-                        <strong>Comprado:</strong>{" "}
-                        {order.created_at
-                          ? new Date(order.created_at).toLocaleString()
-                          : "Desconocido"}
+                        <strong>
+                          {t.adminDisputesPurchasedAt}:
+                        </strong>{" "}
+                        {formatDateTime(order.created_at)}
                       </p>
 
                       <p>
-                        <strong>Disputa abierta:</strong>{" "}
-                        {order.dispute_opened_at
-                          ? new Date(order.dispute_opened_at).toLocaleString()
-                          : "Desconocido"}
+                        <strong>
+                          {t.adminDisputesOpenedAt}:
+                        </strong>{" "}
+                        {formatDateTime(
+                          order.dispute_opened_at
+                        )}
                       </p>
 
                       <p>
-                        <strong>Transportista:</strong>{" "}
-                        {order.carrier || "Sin transportista"}
+                        <strong>
+                          {t.adminDisputesCarrier}:
+                        </strong>{" "}
+                        {order.carrier ||
+                          t.adminDisputesNoCarrier}
                       </p>
 
                       <p>
-                        <strong>Tracking:</strong>{" "}
-                        {order.tracking_number || "Sin tracking"}
+                        <strong>
+                          {t.adminDisputesTracking}:
+                        </strong>{" "}
+                        {order.tracking_number ||
+                          t.adminDisputesNoTracking}
                       </p>
 
                       <p>
-                        <strong>ID producto:</strong> {shortId(order.product_id)}
+                        <strong>
+                          {t.adminDisputesProductId}:
+                        </strong>{" "}
+                        {shortId(order.product_id)}
                       </p>
 
                       <p>
-                        <strong>ID comprador:</strong> {shortId(order.buyer_id)}
+                        <strong>
+                          {t.adminDisputesBuyerId}:
+                        </strong>{" "}
+                        {shortId(order.buyer_id)}
                       </p>
 
                       <p>
-                        <strong>ID vendedor:</strong> {shortId(order.seller_id)}
+                        <strong>
+                          {t.adminDisputesSellerId}:
+                        </strong>{" "}
+                        {shortId(order.seller_id)}
                       </p>
 
                       <p>
-                        <strong>Resolución:</strong>{" "}
+                        <strong>
+                          {t.adminDisputesResolution}:
+                        </strong>{" "}
                         <span
                           style={{
                             background:
-                              order.dispute_resolution === "seller_wins"
+                              order.dispute_resolution ===
+                              "seller_wins"
                                 ? "#dcfce7"
-                                : order.dispute_resolution === "buyer_refund"
+                                : order.dispute_resolution ===
+                                    "buyer_refund"
                                   ? "#fee2e2"
                                   : "#f3f4f6",
                             padding: "6px 12px",
@@ -293,41 +476,54 @@ export default function AdminDisputesPage() {
                             fontWeight: 600,
                           }}
                         >
-                          {getResolutionLabel(order.dispute_resolution)}
+                          {getResolutionLabel(
+                            order.dispute_resolution
+                          )}
                         </span>
                       </p>
                     </div>
 
                     <p style={reasonLabelStyle}>
-                      <strong>Motivo:</strong>
+                      <strong>
+                        {t.adminDisputesReason}:
+                      </strong>
                     </p>
 
                     <p style={reasonBoxStyle}>
-                      {order.dispute_reason || "No se ha indicado ningún motivo"}
+                      {order.dispute_reason ||
+                        t.adminDisputesNoReason}
                     </p>
 
                     {order.evidence?.length > 0 && (
                       <div style={evidenceSectionStyle}>
                         <p style={reasonLabelStyle}>
-                          <strong>Pruebas:</strong>
+                          <strong>
+                            {t.adminDisputesEvidence}:
+                          </strong>
                         </p>
 
                         <div style={evidenceGridStyle}>
-                          {order.evidence.map((item: any, index: number) =>
-                            item.file_url ? (
-                              <a
-                                key={`${item.file_url}-${index}`}
-                                href={item.file_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                <img
-                                  src={item.file_url}
-                                  alt={`Prueba ${index + 1}`}
-                                  style={evidenceImageStyle}
-                                />
-                              </a>
-                            ) : null
+                          {order.evidence.map(
+                            (
+                              item: any,
+                              index: number
+                            ) =>
+                              item.file_url ? (
+                                <a
+                                  key={`${item.file_url}-${index}`}
+                                  href={item.file_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <img
+                                    src={item.file_url}
+                                    alt={`${t.adminDisputesEvidenceAlt} ${
+                                      index + 1
+                                    }`}
+                                    style={evidenceImageStyle}
+                                  />
+                                </a>
+                              ) : null
                           )}
                         </div>
                       </div>
@@ -336,35 +532,57 @@ export default function AdminDisputesPage() {
                     {!isResolved ? (
                       <div style={actionsStyle}>
                         <button
-                          onClick={() => resolveDispute(order.id, "seller_wins")}
+                          onClick={() =>
+                            resolveDispute(
+                              order.id,
+                              "seller_wins"
+                            )
+                          }
                           style={{
                             ...primaryButtonStyle,
-                            opacity: resolvingId === order.id ? 0.5 : 1,
+                            opacity:
+                              resolvingId === order.id
+                                ? 0.5
+                                : 1,
                           }}
-                          disabled={resolvingId === order.id}
+                          disabled={
+                            resolvingId === order.id
+                          }
                         >
                           {resolvingId === order.id
-                            ? "Resolviendo..."
-                            : "Liberar pago al vendedor"}
+                            ? t.adminDisputesResolving
+                            : t.adminDisputesReleaseSeller}
                         </button>
 
                         <button
-                          onClick={() => resolveDispute(order.id, "buyer_refund")}
+                          onClick={() =>
+                            resolveDispute(
+                              order.id,
+                              "buyer_refund"
+                            )
+                          }
                           style={{
                             ...secondaryButtonStyle,
-                            opacity: resolvingId === order.id ? 0.5 : 1,
+                            opacity:
+                              resolvingId === order.id
+                                ? 0.5
+                                : 1,
                           }}
-                          disabled={resolvingId === order.id}
+                          disabled={
+                            resolvingId === order.id
+                          }
                         >
                           {resolvingId === order.id
-                            ? "Resolviendo..."
-                            : "Reembolsar al comprador"}
+                            ? t.adminDisputesResolving
+                            : t.adminDisputesRefundBuyer}
                         </button>
                       </div>
                     ) : (
                       <p style={resolvedNoteStyle}>
-                        Disputa resuelta ·{" "}
-                        {getResolutionLabel(order.dispute_resolution)}
+                        {t.adminDisputesResolvedNote} ·{" "}
+                        {getResolutionLabel(
+                          order.dispute_resolution
+                        )}
                       </p>
                     )}
                   </div>

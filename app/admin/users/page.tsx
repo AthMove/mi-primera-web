@@ -2,10 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useLanguage } from "@/components/LanguageProvider";
 
 export default function AdminUsersPage() {
+  const { lang, t } = useLanguage();
+
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const locale =
+    lang === "en"
+      ? "en-GB"
+      : lang === "pt"
+        ? "pt-PT"
+        : "es-ES";
 
   useEffect(() => {
     loadUsers();
@@ -27,58 +37,103 @@ export default function AdminUsersPage() {
     setLoading(false);
   }
 
+  const formatDate = (date?: string) => {
+    if (!date) return "-";
+
+    return new Date(date).toLocaleDateString(locale, {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
   if (loading) {
-    return <main style={pageStyle}>Cargando usuarios...</main>;
+    return (
+      <main style={pageStyle}>
+        {t.adminUsersLoading}
+      </main>
+    );
   }
 
   return (
-    <main style={pageStyle} className="admin-users-page">
+    <main
+      style={pageStyle}
+      className="admin-users-page"
+    >
       <section style={headerStyle}>
-        <p style={eyebrowStyle}>ADMIN ATHMOV</p>
+        <p style={eyebrowStyle}>
+          {t.adminUsersEyebrow}
+        </p>
 
-        <h1 style={titleStyle} className="admin-users-title">
-          Usuarios
+        <h1
+          style={titleStyle}
+          className="admin-users-title"
+        >
+          {t.adminUsersTitle}
         </h1>
 
         <p style={subtitleStyle}>
-          Controla los miembros del marketplace y el estado de Stripe.
+          {t.adminUsersSubtitle}
         </p>
       </section>
 
       <section style={listStyle}>
         {users.length === 0 ? (
-          <div style={emptyStyle}>No se han encontrado usuarios.</div>
+          <div style={emptyStyle}>
+            {t.adminUsersEmpty}
+          </div>
         ) : (
           users.map((user) => (
-            <div key={user.id} style={cardStyle} className="user-card">
+            <div
+              key={user.id}
+              style={cardStyle}
+              className="user-card"
+            >
               <div>
-                <p style={idStyle}>#{user.id?.slice(0, 8)}</p>
+                <p style={idStyle}>
+                  #{user.id?.slice(0, 8)}
+                </p>
 
                 <h2 style={nameStyle}>
-                  {user.username || user.full_name || "Usuario sin nombre"}
+                  {user.username ||
+                    user.full_name ||
+                    t.adminUsersUnnamed}
                 </h2>
 
-                <p style={emailStyle}>{user.email || "Sin email"}</p>
+                <p style={emailStyle}>
+                  {user.email ||
+                    t.adminUsersNoEmail}
+                </p>
               </div>
 
               <div>
-                <p style={labelStyle}>Stripe</p>
+                <p style={labelStyle}>
+                  {t.adminUsersStripe}
+                </p>
 
                 <span
                   style={{
                     ...badgeStyle,
-                    background: user.stripe_payouts_enabled
-                      ? "#dcfce7"
-                      : "#fee2e2",
-                    color: user.stripe_payouts_enabled ? "#166534" : "#991b1b",
+                    background:
+                      user.stripe_payouts_enabled
+                        ? "#dcfce7"
+                        : "#fee2e2",
+                    color:
+                      user.stripe_payouts_enabled
+                        ? "#166534"
+                        : "#991b1b",
                   }}
                 >
-                  {user.stripe_payouts_enabled ? "Conectado" : "No conectado"}
+                  {user.stripe_payouts_enabled
+                    ? t.adminUsersStripeConnected
+                    : t.adminUsersStripeNotConnected}
                 </span>
               </div>
 
               <div>
-                <p style={labelStyle}>Cuenta</p>
+                <p style={labelStyle}>
+                  {t.adminUsersAccount}
+                </p>
 
                 <span
                   style={{
@@ -86,17 +141,17 @@ export default function AdminUsersPage() {
                     background: "#f3f4f6",
                   }}
                 >
-                  Activa
+                  {t.adminUsersAccountActive}
                 </span>
               </div>
 
               <div>
-                <p style={labelStyle}>Registro</p>
+                <p style={labelStyle}>
+                  {t.adminUsersRegistered}
+                </p>
 
                 <strong>
-                  {user.created_at
-                    ? new Date(user.created_at).toLocaleDateString()
-                    : "-"}
+                  {formatDate(user.created_at)}
                 </strong>
               </div>
             </div>

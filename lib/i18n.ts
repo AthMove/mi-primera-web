@@ -2271,6 +2271,24 @@ adminProductsDelete: "Eliminar",
 
 adminProductsDeleteConfirm:
   "¿Eliminar este producto permanentemente?",
+  adminUsersLoading: "Cargando usuarios...",
+adminUsersEyebrow: "ADMIN ATHMOV",
+adminUsersTitle: "Usuarios",
+adminUsersSubtitle:
+  "Controla los miembros del marketplace y el estado de Stripe.",
+
+adminUsersEmpty: "No se han encontrado usuarios.",
+adminUsersUnnamed: "Usuario sin nombre",
+adminUsersNoEmail: "Sin email",
+
+adminUsersStripe: "Stripe",
+adminUsersStripeConnected: "Conectado",
+adminUsersStripeNotConnected: "No conectado",
+
+adminUsersAccount: "Cuenta",
+adminUsersAccountActive: "Activa",
+
+adminUsersRegistered: "Registro",
   },
 
 
@@ -4538,6 +4556,24 @@ adminProductsDelete: "Delete",
 
 adminProductsDeleteConfirm:
   "Permanently delete this product?",
+  adminUsersLoading: "Loading users...",
+adminUsersEyebrow: "ATHMOV ADMIN",
+adminUsersTitle: "Users",
+adminUsersSubtitle:
+  "Manage marketplace members and their Stripe status.",
+
+adminUsersEmpty: "No users found.",
+adminUsersUnnamed: "Unnamed user",
+adminUsersNoEmail: "No email",
+
+adminUsersStripe: "Stripe",
+adminUsersStripeConnected: "Connected",
+adminUsersStripeNotConnected: "Not connected",
+
+adminUsersAccount: "Account",
+adminUsersAccountActive: "Active",
+
+adminUsersRegistered: "Registered",
   },
 
   pt: {
@@ -6821,5 +6857,23 @@ adminProductsDelete: "Eliminar",
 
 adminProductsDeleteConfirm:
   "Eliminar este produto permanentemente?",
+  adminUsersLoading: "A carregar utilizadores...",
+adminUsersEyebrow: "ADMIN ATHMOV",
+adminUsersTitle: "Utilizadores",
+adminUsersSubtitle:
+  "Gere os membros do marketplace e o estado do Stripe.",
+
+adminUsersEmpty: "Não foram encontrados utilizadores.",
+adminUsersUnnamed: "Utilizador sem nome",
+adminUsersNoEmail: "Sem email",
+
+adminUsersStripe: "Stripe",
+adminUsersStripeConnected: "Ligado",
+adminUsersStripeNotConnected: "Não ligado",
+
+adminUsersAccount: "Conta",
+adminUsersAccountActive: "Ativa",
+
+adminUsersRegistered: "Registo",
   },
 };
