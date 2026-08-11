@@ -1848,6 +1848,89 @@ padelFinalText:
   "Compra material premium de segunda mano o publica la pala que ya no utilizas.",
 padelExplore: "EXPLORAR PÁDEL",
 padelPublishRacket: "PUBLICAR PALA",
+golfPageEyebrow: "ATHMOV · GOLF",
+golfPageTitle: "Palos de golf de segunda mano",
+golfPageIntro:
+  "Encuentra drivers, hierros, wedges, putters y bolsas de golf premium publicados por vendedores particulares. Compara marcas, modelos, especificaciones y estado antes de comprar.",
+golfPageViewAll: "VER TODO EL MATERIAL",
+golfPageSellEquipment: "VENDER MATERIAL DE GOLF",
+
+golfPageWhyUsedEyebrow: "POR QUÉ COMPRAR USADO",
+golfPageWhyUsedTitle: "Más tecnología por menos.",
+golfPageWhyUsedTextOne:
+  "El material de golf premium suele conservar sus prestaciones durante años cuando se mantiene correctamente. Comprar de segunda mano permite acceder a gamas altas y modelos recientes con un ahorro importante respecto al precio nuevo.",
+golfPageWhyUsedTextTwo:
+  "Antes de elegir, revisa la cabeza, la cara, la suela, la varilla, el grip y las especificaciones. El loft, el flex, la longitud y el lie deben adaptarse a tu nivel y características.",
+golfPageWhyUsedTextThree:
+  "En ATHMOV puedes comparar anuncios, consultar perfiles de vendedores y acceder a guías para valorar precios y reducir el riesgo de falsificaciones.",
+
+golfPageMarketplaceEyebrow: "MARKETPLACE",
+golfPageAvailableTitle: "Material de golf disponible",
+golfPageViewFullCatalog: "Ver catálogo completo",
+
+golfPagePopularBrandsEyebrow: "MARCAS POPULARES",
+golfPagePopularBrandsTitle: "Encuentra tu marca de golf.",
+golfPageBrandLabel: "MARCA",
+golfPageViewProducts: "Ver productos",
+
+golfPageTaylorMadeText:
+  "Drivers, hierros P790, wedges y putters Spider.",
+golfPageCallawayText:
+  "Drivers, maderas, hierros y wedges de gamas premium.",
+golfPageTitleistText:
+  "Drivers, hierros, wedges Vokey y putters de alta gama.",
+golfPagePingText:
+  "Palos reconocidos por su tolerancia, ajuste y consistencia.",
+golfPageMizunoText:
+  "Hierros forjados y material orientado a jugadores exigentes.",
+golfPageCobraText:
+  "Drivers, maderas e hierros con tecnologías de rendimiento.",
+
+golfPageBuyingGuideEyebrow: "GUÍA DE COMPRA",
+golfPageBuyingGuideTitle: "Qué revisar antes de comprar.",
+golfPageTipHeadTitle: "Revisa la cabeza",
+golfPageTipHeadText:
+  "Comprueba la cara, la corona, la suela y posibles golpes, fisuras o reparaciones.",
+golfPageTipShaftTitle: "Comprueba la varilla",
+golfPageTipShaftText:
+  "Verifica el flex, la longitud, el peso y que no existan grietas o daños visibles.",
+golfPageTipMeasurementsTitle: "Confirma las medidas",
+golfPageTipMeasurementsText:
+  "Revisa loft, lie, longitud y configuración para asegurar que encajan con tu juego.",
+golfPageTipAuthenticityTitle: "Verifica la autenticidad",
+golfPageTipAuthenticityText:
+  "Examina número de serie, logotipos, acabados y especificaciones del modelo.",
+golfPageViewBuyerGuide: "Ver guía del comprador",
+
+golfPageJournalEyebrow: "ATHMOV JOURNAL",
+golfPageJournalTitle: "Guías para comprar y valorar mejor.",
+golfPageGuideLabel: "GUÍA DE GOLF",
+golfPageReadArticle: "Leer artículo",
+
+golfPageFaqEyebrow: "PREGUNTAS FRECUENTES",
+golfPageFaqTitle: "Antes de comprar material usado.",
+golfPageFaqQuestion1:
+  "¿Es buena idea comprar palos de golf de segunda mano?",
+golfPageFaqAnswer1:
+  "Puede ser una excelente opción para acceder a material premium con un coste inferior. Antes de comprar conviene revisar la cabeza, la varilla, el grip, las medidas y la autenticidad.",
+golfPageFaqQuestion2:
+  "¿Qué debo revisar en un driver usado?",
+golfPageFaqAnswer2:
+  "Examina la cara, la corona, la suela, el hosel y la varilla. Comprueba también el loft, el flex y si incluye la llave o el adaptador correspondiente.",
+golfPageFaqQuestion3:
+  "¿Cómo saber si unos palos de golf son originales?",
+golfPageFaqAnswer3:
+  "Compara los números de serie, logotipos, grabados, acabados y especificaciones con la información oficial del fabricante. Los precios anormalmente bajos pueden ser una señal de alerta.",
+golfPageFaqQuestion4:
+  "¿Qué marcas de golf mantienen mejor su valor?",
+golfPageFaqAnswer4:
+  "Las gamas premium de marcas como TaylorMade, Callaway, Titleist, Ping y Mizuno suelen conservar mejor su valor cuando el modelo tiene demanda y está bien cuidado.",
+
+golfPageFinalTitle: "Tu próximo palo ya está en juego.",
+golfPageFinalText:
+  "Compra material premium de segunda mano o publica el equipo de golf que ya no utilizas.",
+golfPageExplore: "EXPLORAR GOLF",
+golfPagePublishEquipment: "PUBLICAR MATERIAL",
   },
 
 
@@ -3692,6 +3775,89 @@ padelFinalText:
   "Buy premium second-hand equipment or list the racket you no longer use.",
 padelExplore: "EXPLORE PADEL",
 padelPublishRacket: "LIST RACKET",
+golfPageEyebrow: "ATHMOV · GOLF",
+golfPageTitle: "Second-hand golf clubs",
+golfPageIntro:
+  "Find premium drivers, irons, wedges, putters and golf bags listed by private sellers. Compare brands, models, specifications and condition before buying.",
+golfPageViewAll: "VIEW ALL GOLF EQUIPMENT",
+golfPageSellEquipment: "SELL GOLF EQUIPMENT",
+
+golfPageWhyUsedEyebrow: "WHY BUY USED",
+golfPageWhyUsedTitle: "More technology for less.",
+golfPageWhyUsedTextOne:
+  "Premium golf equipment can retain its performance for years when properly maintained. Buying second hand gives you access to high-end ranges and recent models at a significant saving compared with buying new.",
+golfPageWhyUsedTextTwo:
+  "Before choosing, check the head, face, sole, shaft, grip and specifications. Loft, flex, length and lie should suit your level and playing characteristics.",
+golfPageWhyUsedTextThree:
+  "On ATHMOV you can compare listings, review seller profiles and access guides to assess prices and reduce the risk of counterfeits.",
+
+golfPageMarketplaceEyebrow: "MARKETPLACE",
+golfPageAvailableTitle: "Available golf equipment",
+golfPageViewFullCatalog: "View full catalogue",
+
+golfPagePopularBrandsEyebrow: "POPULAR BRANDS",
+golfPagePopularBrandsTitle: "Find your golf brand.",
+golfPageBrandLabel: "BRAND",
+golfPageViewProducts: "View products",
+
+golfPageTaylorMadeText:
+  "Drivers, P790 irons, wedges and Spider putters.",
+golfPageCallawayText:
+  "Drivers, fairway woods, irons and premium-range wedges.",
+golfPageTitleistText:
+  "Drivers, irons, Vokey wedges and high-end putters.",
+golfPagePingText:
+  "Clubs known for forgiveness, fitting options and consistency.",
+golfPageMizunoText:
+  "Forged irons and equipment aimed at demanding players.",
+golfPageCobraText:
+  "Drivers, fairway woods and irons with performance technologies.",
+
+golfPageBuyingGuideEyebrow: "BUYING GUIDE",
+golfPageBuyingGuideTitle: "What to check before buying.",
+golfPageTipHeadTitle: "Check the clubhead",
+golfPageTipHeadText:
+  "Check the face, crown and sole for impacts, cracks or possible repairs.",
+golfPageTipShaftTitle: "Check the shaft",
+golfPageTipShaftText:
+  "Verify the flex, length and weight, and make sure there are no cracks or visible damage.",
+golfPageTipMeasurementsTitle: "Confirm the specifications",
+golfPageTipMeasurementsText:
+  "Check loft, lie, length and configuration to make sure they suit your game.",
+golfPageTipAuthenticityTitle: "Verify authenticity",
+golfPageTipAuthenticityText:
+  "Inspect the serial number, logos, finishes and model specifications.",
+golfPageViewBuyerGuide: "View buyer guide",
+
+golfPageJournalEyebrow: "ATHMOV JOURNAL",
+golfPageJournalTitle: "Guides to help you buy and value equipment better.",
+golfPageGuideLabel: "GOLF GUIDE",
+golfPageReadArticle: "Read article",
+
+golfPageFaqEyebrow: "FREQUENTLY ASKED QUESTIONS",
+golfPageFaqTitle: "Before buying used equipment.",
+golfPageFaqQuestion1:
+  "Is it a good idea to buy second-hand golf clubs?",
+golfPageFaqAnswer1:
+  "It can be an excellent way to access premium equipment at a lower cost. Before buying, check the clubhead, shaft, grip, specifications and authenticity.",
+golfPageFaqQuestion2:
+  "What should I check on a used driver?",
+golfPageFaqAnswer2:
+  "Inspect the face, crown, sole, hosel and shaft. Also check the loft, flex and whether the corresponding wrench or adapter is included.",
+golfPageFaqQuestion3:
+  "How can I tell if golf clubs are genuine?",
+golfPageFaqAnswer3:
+  "Compare serial numbers, logos, engravings, finishes and specifications with the manufacturer's official information. Unusually low prices can be a warning sign.",
+golfPageFaqQuestion4:
+  "Which golf brands hold their value best?",
+golfPageFaqAnswer4:
+  "Premium ranges from brands such as TaylorMade, Callaway, Titleist, Ping and Mizuno tend to retain their value better when the model is in demand and well cared for.",
+
+golfPageFinalTitle: "Your next club is already in play.",
+golfPageFinalText:
+  "Buy premium second-hand equipment or list the golf gear you no longer use.",
+golfPageExplore: "EXPLORE GOLF",
+golfPagePublishEquipment: "LIST EQUIPMENT",
   },
 
   pt: {
@@ -5552,5 +5718,88 @@ padelFinalText:
   "Compra material premium em segunda mão ou publica a pala que já não utilizas.",
 padelExplore: "EXPLORAR PÁDEL",
 padelPublishRacket: "PUBLICAR PALA",
+golfPageEyebrow: "ATHMOV · GOLFE",
+golfPageTitle: "Tacos de golfe em segunda mão",
+golfPageIntro:
+  "Encontra drivers, ferros, wedges, putters e sacos de golfe premium publicados por vendedores particulares. Compara marcas, modelos, especificações e estado antes de comprar.",
+golfPageViewAll: "VER TODO O MATERIAL",
+golfPageSellEquipment: "VENDER MATERIAL DE GOLFE",
+
+golfPageWhyUsedEyebrow: "PORQUÊ COMPRAR USADO",
+golfPageWhyUsedTitle: "Mais tecnologia por menos.",
+golfPageWhyUsedTextOne:
+  "O material de golfe premium pode manter o seu desempenho durante anos quando é bem conservado. Comprar em segunda mão permite aceder a gamas altas e modelos recentes com uma poupança significativa face ao preço novo.",
+golfPageWhyUsedTextTwo:
+  "Antes de escolher, verifica a cabeça, a face, a sola, a vara, o grip e as especificações. O loft, o flex, o comprimento e o lie devem adaptar-se ao teu nível e características de jogo.",
+golfPageWhyUsedTextThree:
+  "Na ATHMOV podes comparar anúncios, consultar perfis de vendedores e aceder a guias para avaliar preços e reduzir o risco de contrafações.",
+
+golfPageMarketplaceEyebrow: "MARKETPLACE",
+golfPageAvailableTitle: "Material de golfe disponível",
+golfPageViewFullCatalog: "Ver catálogo completo",
+
+golfPagePopularBrandsEyebrow: "MARCAS POPULARES",
+golfPagePopularBrandsTitle: "Encontra a tua marca de golfe.",
+golfPageBrandLabel: "MARCA",
+golfPageViewProducts: "Ver produtos",
+
+golfPageTaylorMadeText:
+  "Drivers, ferros P790, wedges e putters Spider.",
+golfPageCallawayText:
+  "Drivers, madeiras, ferros e wedges de gamas premium.",
+golfPageTitleistText:
+  "Drivers, ferros, wedges Vokey e putters de gama alta.",
+golfPagePingText:
+  "Tacos reconhecidos pela tolerância, ajuste e consistência.",
+golfPageMizunoText:
+  "Ferros forjados e material orientado para jogadores exigentes.",
+golfPageCobraText:
+  "Drivers, madeiras e ferros com tecnologias de desempenho.",
+
+golfPageBuyingGuideEyebrow: "GUIA DE COMPRA",
+golfPageBuyingGuideTitle: "O que verificar antes de comprar.",
+golfPageTipHeadTitle: "Verifica a cabeça",
+golfPageTipHeadText:
+  "Verifica a face, a coroa, a sola e possíveis impactos, fissuras ou reparações.",
+golfPageTipShaftTitle: "Verifica a vara",
+golfPageTipShaftText:
+  "Confirma o flex, o comprimento, o peso e que não existem fissuras ou danos visíveis.",
+golfPageTipMeasurementsTitle: "Confirma as medidas",
+golfPageTipMeasurementsText:
+  "Verifica o loft, o lie, o comprimento e a configuração para garantir que se adequam ao teu jogo.",
+golfPageTipAuthenticityTitle: "Verifica a autenticidade",
+golfPageTipAuthenticityText:
+  "Examina o número de série, logótipos, acabamentos e especificações do modelo.",
+golfPageViewBuyerGuide: "Ver guia do comprador",
+
+golfPageJournalEyebrow: "ATHMOV JOURNAL",
+golfPageJournalTitle: "Guias para comprar e avaliar melhor.",
+golfPageGuideLabel: "GUIA DE GOLFE",
+golfPageReadArticle: "Ler artigo",
+
+golfPageFaqEyebrow: "PERGUNTAS FREQUENTES",
+golfPageFaqTitle: "Antes de comprar material usado.",
+golfPageFaqQuestion1:
+  "Vale a pena comprar tacos de golfe em segunda mão?",
+golfPageFaqAnswer1:
+  "Pode ser uma excelente opção para aceder a material premium por um custo inferior. Antes de comprar, convém verificar a cabeça, a vara, o grip, as medidas e a autenticidade.",
+golfPageFaqQuestion2:
+  "O que devo verificar num driver usado?",
+golfPageFaqAnswer2:
+  "Examina a face, a coroa, a sola, o hosel e a vara. Verifica também o loft, o flex e se inclui a chave ou o adaptador correspondente.",
+golfPageFaqQuestion3:
+  "Como saber se uns tacos de golfe são originais?",
+golfPageFaqAnswer3:
+  "Compara os números de série, logótipos, gravações, acabamentos e especificações com a informação oficial do fabricante. Preços anormalmente baixos podem ser um sinal de alerta.",
+golfPageFaqQuestion4:
+  "Que marcas de golfe mantêm melhor o seu valor?",
+golfPageFaqAnswer4:
+  "As gamas premium de marcas como TaylorMade, Callaway, Titleist, Ping e Mizuno tendem a conservar melhor o seu valor quando o modelo tem procura e está bem cuidado.",
+
+golfPageFinalTitle: "O teu próximo taco já está em jogo.",
+golfPageFinalText:
+  "Compra material premium em segunda mão ou publica o equipamento de golfe que já não utilizas.",
+golfPageExplore: "EXPLORAR GOLFE",
+golfPagePublishEquipment: "PUBLICAR MATERIAL",
   },
 };
