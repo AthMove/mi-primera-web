@@ -2292,6 +2292,7 @@ adminUsersRegistered: "Registro",
 adminModerationApproved: "Aprobado",
 adminModerationPending: "Pendiente",
 adminModerationRejected: "Rechazado",
+successLoading: "Cargando...",
   },
 
 
@@ -4580,6 +4581,7 @@ adminUsersRegistered: "Registered",
 adminModerationApproved: "Approved",
 adminModerationPending: "Pending",
 adminModerationRejected: "Rejected",
+successLoading: "Loading...",
   },
 
   pt: {
@@ -6884,5 +6886,6 @@ adminUsersRegistered: "Registo",
 adminModerationApproved: "Aprovado",
 adminModerationPending: "Pendente",
 adminModerationRejected: "Rejeitado",
+successLoading: "A carregar...",
   },
 };
