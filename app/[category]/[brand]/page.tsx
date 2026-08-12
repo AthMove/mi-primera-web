@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import ProductsClient from "@/app/products/ProductsClient";
+import ProductsLoading from "@/components/ProductsLoading";
 
 interface CategoryBrandPageProps {
   params: Promise<{
@@ -132,7 +133,7 @@ export default async function CategoryBrandPage({
         }}
       />
 
-      <Suspense fallback={<main>Cargando productos...</main>}>
+     <Suspense fallback={<ProductsLoading />}>
         <ProductsClient
           fixedCategory={categoryName}
           fixedBrand={brandName}
