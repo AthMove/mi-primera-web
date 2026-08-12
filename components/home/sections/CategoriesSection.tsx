@@ -24,32 +24,32 @@ export default function CategoriesSection({
   const sectionRef = useRef<HTMLElement | null>(null);
   const [isVisible, setIsVisible] = useState(false);
 
-  const categories = [
-    {
-      title: "PÁDEL",
-      text: "Palas y material premium",
-      href: "/products?category=PADEL",
-      image: "/padel.jpg",
-    },
-    {
-      title: "GOLF",
-      text: "Palos, bolsas y accesorios",
-      href: "/products?category=GOLF",
-      image: "/golf.jpg",
-    },
-    {
-      title: "TENIS",
-      text: "Raquetas y piezas de alto rendimiento",
-      href: "/products?category=TENIS",
-      image: "/tennis.jpg",
-    },
-    {
-      title: "RUNNING",
-      text: "Calzado técnico y ropa deportiva",
-      href: "/products?category=RUNNING",
-      image: "/running.jpg",
-    },
-  ];
+const categories = [
+  {
+    title: t.padel,
+    text: t.categoryPadelText,
+    href: "/products?category=PADEL",
+    image: "/padel.jpg",
+  },
+  {
+    title: t.golf,
+    text: t.categoryGolfText,
+    href: "/products?category=GOLF",
+    image: "/golf.jpg",
+  },
+  {
+    title: t.tennis,
+    text: t.categoryTennisText,
+    href: "/products?category=TENNIS",
+    image: "/tennis.jpg",
+  },
+  {
+    title: t.running,
+    text: t.categoryRunningText,
+    href: "/products?category=RUNNING",
+    image: "/running.jpg",
+  },
+];
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -116,7 +116,7 @@ export default function CategoriesSection({
             className="categories-view-all"
             onClick={() => router.push("/products")}
           >
-            Ver todo
+           {t.viewAll}
 
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M5 12h14M13 6l6 6-6 6" />
@@ -131,7 +131,7 @@ export default function CategoriesSection({
               className="category-card"
               role="link"
               tabIndex={0}
-              aria-label={`Explorar ${category.title}`}
+             aria-label={`${t.categoryExplore} ${category.title}`}
               style={
                 {
                   "--category-delay": `${index * 110}ms`,
@@ -144,7 +144,7 @@ export default function CategoriesSection({
             >
               <Image
                 src={category.image}
-                alt={`Material premium de ${category.title.toLowerCase()}`}
+                alt={`${t.categoryPremiumMaterialAlt} ${category.title.toLowerCase()}`}
                 fill
                 sizes={
                   isMobile
@@ -162,7 +162,9 @@ export default function CategoriesSection({
               </div>
 
               <div className="category-content">
-                <p className="category-kicker">DEPORTE</p>
+               <p className="category-kicker">
+  {t.categorySportLabel}
+</p>
 
                 <h3>{category.title}</h3>
 
@@ -171,7 +173,7 @@ export default function CategoriesSection({
                 </p>
 
                 <span className="category-link">
-                  Explorar
+                  {t.categoryExplore}
 
                   <svg viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M5 12h14M13 6l6 6-6 6" />

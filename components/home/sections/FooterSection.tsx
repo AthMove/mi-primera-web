@@ -17,8 +17,12 @@ export default function FooterSection({
     <footer
       style={{
         ...footerStyle,
-        padding: isMobile ? "64px 24px 36px" : footerStyle.padding,
-        marginTop: isMobile ? "70px" : footerStyle.marginTop,
+        padding: isMobile
+          ? "64px 24px 36px"
+          : footerStyle.padding,
+        marginTop: isMobile
+          ? "70px"
+          : footerStyle.marginTop,
         borderTopLeftRadius: isMobile
           ? "30px"
           : footerStyle.borderTopLeftRadius,
@@ -33,14 +37,19 @@ export default function FooterSection({
           gridTemplateColumns: isMobile
             ? "1fr"
             : footerGridStyle.gridTemplateColumns,
-          gap: isMobile ? "38px" : footerGridStyle.gap,
+          gap: isMobile
+            ? "38px"
+            : footerGridStyle.gap,
         }}
       >
+        {/* BRAND */}
         <div>
           <div
             style={{
               ...footerBrandStyle,
-              fontSize: isMobile ? "42px" : footerBrandStyle.fontSize,
+              fontSize: isMobile
+                ? "42px"
+                : footerBrandStyle.fontSize,
               letterSpacing: isMobile
                 ? "-2px"
                 : footerBrandStyle.letterSpacing,
@@ -49,112 +58,162 @@ export default function FooterSection({
             ATHMOV
           </div>
 
-          <p style={footerTextStyle}>{t.footerDescription}</p>
+          <p style={footerTextStyle}>
+            {t.footerDescription}
+          </p>
 
-          <a href="mailto:contact@athmov.com" style={footerEmailStyle}>
+          <a
+            href="mailto:contact@athmov.com"
+            style={footerEmailStyle}
+          >
             contact@athmov.com
           </a>
         </div>
 
+        {/* MARKETPLACE */}
         <div style={footerColumnStyle}>
-          <p style={footerTitleStyle}>{t.marketplace}</p>
+          <p style={footerTitleStyle}>
+            {t.marketplace}
+          </p>
 
           <button
-            onClick={() => router.push("/products")}
+            type="button"
+            onClick={() =>
+              router.push("/products")
+            }
             style={footerLinkStyle}
           >
             {t.buy}
           </button>
 
           <button
-            onClick={() => router.push("/sell")}
+            type="button"
+            onClick={() =>
+              router.push("/sell")
+            }
             style={footerLinkStyle}
           >
             {t.sell}
           </button>
 
           <button
-            onClick={() => router.push("/blog")}
+            type="button"
+            onClick={() =>
+              router.push("/blog")
+            }
             style={footerLinkStyle}
           >
             Blog
           </button>
         </div>
 
-       <div style={footerColumnStyle}>
-  <p style={footerTitleStyle}>Categorías</p>
+        {/* CATEGORIES */}
+        <div style={footerColumnStyle}>
+          <p style={footerTitleStyle}>
+            {t.categories}
+          </p>
 
-  <button
-    onClick={() => router.push("/padel")}
-    style={footerLinkStyle}
-  >
-    PÁDEL
-  </button>
+          <button
+            type="button"
+            onClick={() =>
+              router.push("/padel")
+            }
+            style={footerLinkStyle}
+          >
+            {t.padel}
+          </button>
 
-  <button
-    onClick={() => router.push("/golf")}
-    style={footerLinkStyle}
-  >
-    GOLF
-  </button>
+          <button
+            type="button"
+            onClick={() =>
+              router.push("/golf")
+            }
+            style={footerLinkStyle}
+          >
+            {t.golf}
+          </button>
 
-  <button
-    onClick={() => router.push("/tenis")}
-    style={footerLinkStyle}
-  >
-    TENIS
-  </button>
+          <button
+            type="button"
+            onClick={() =>
+              router.push("/tenis")
+            }
+            style={footerLinkStyle}
+          >
+            {t.tennis}
+          </button>
 
-  <button
-    onClick={() => router.push("/running")}
-    style={footerLinkStyle}
-  >
-    RUNNING
-  </button>
-</div>
+          <button
+            type="button"
+            onClick={() =>
+              router.push("/running")
+            }
+            style={footerLinkStyle}
+          >
+            {t.running}
+          </button>
+        </div>
 
-<div style={footerColumnStyle}>
-  <p style={footerTitleStyle}>ATHMOV</p>
+        {/* ATHMOV */}
+        <div style={footerColumnStyle}>
+          <p style={footerTitleStyle}>
+            ATHMOV
+          </p>
 
-  <button
-    onClick={() => router.push("/about")}
-    style={footerLinkStyle}
-  >
-    Sobre ATHMOV
-  </button>
+          <button
+            type="button"
+            onClick={() =>
+              router.push("/about")
+            }
+            style={footerLinkStyle}
+          >
+            {t.aboutAthmov}
+          </button>
 
-  <button
-    onClick={() => router.push("/how-it-works")}
-    style={footerLinkStyle}
-  >
-    Cómo funciona
-  </button>
+          <button
+            type="button"
+            onClick={() =>
+              router.push("/how-it-works")
+            }
+            style={footerLinkStyle}
+          >
+            {t.howItWorks}
+          </button>
 
-  <button
-    onClick={() => router.push("/buyer-guide")}
-    style={footerLinkStyle}
-  >
-    Guía del comprador
-  </button>
+          <button
+            type="button"
+            onClick={() =>
+              router.push("/buyer-guide")
+            }
+            style={footerLinkStyle}
+          >
+            {t.buyerGuide}
+          </button>
 
-  <button
-    onClick={() => router.push("/buyer-protection")}
-    style={footerLinkStyle}
-  >
-    Protección al comprador
-  </button>
-</div>
-        
+          <button
+            type="button"
+            onClick={() =>
+              router.push("/buyer-protection")
+            }
+            style={footerLinkStyle}
+          >
+            {t.buyerProtection}
+          </button>
+        </div>
       </div>
 
       <div
         style={{
           ...footerBottomStyle,
-          marginTop: isMobile ? "42px" : footerBottomStyle.marginTop,
-          lineHeight: isMobile ? 1.6 : undefined,
+          marginTop: isMobile
+            ? "42px"
+            : footerBottomStyle.marginTop,
+          lineHeight: isMobile
+            ? 1.6
+            : undefined,
         }}
       >
-        {t.rights} · Contacto: contact@athmov.com
+        {t.rights} · contact@athmov.com
       </div>
     </footer>
   );
@@ -162,7 +221,8 @@ export default function FooterSection({
 
 const footerStyle = {
   marginTop: "140px",
-  background: "linear-gradient(180deg,#111 0%,#080808 100%)",
+  background:
+    "linear-gradient(180deg,#111 0%,#080808 100%)",
   color: "#fff",
   padding: "120px 80px 60px",
   borderTopLeftRadius: "42px",
@@ -173,7 +233,8 @@ const footerGridStyle = {
   maxWidth: "1400px",
   margin: "0 auto",
   display: "grid",
-  gridTemplateColumns: "2fr 1fr 1fr 1fr",
+  gridTemplateColumns:
+    "2fr 1fr 1fr 1fr",
   gap: "70px",
 };
 
@@ -222,7 +283,8 @@ const footerBottomStyle = {
   marginTop: "60px",
   marginLeft: "auto",
   marginRight: "auto",
-  borderTop: "1px solid rgba(255,255,255,.12)",
+  borderTop:
+    "1px solid rgba(255,255,255,.12)",
   paddingTop: "28px",
   color: "rgba(255,255,255,.45)",
   fontSize: "13px",

@@ -2306,6 +2306,15 @@ ordersAthmovSupport: "Soporte ATHMOV",
 ordersProtectedBadge: "PROTEGIDO POR ATHMOV",
 ordersPaymentConfirmed: "Pago confirmado",
 ordersContact: "Contactar",
+categorySportLabel: "DEPORTE",
+categoryExplore: "Explorar",
+
+categoryPadelText: "Palas y material premium",
+categoryGolfText: "Palos, bolsas y accesorios",
+categoryTennisText: "Raquetas y piezas de alto rendimiento",
+categoryRunningText: "Calzado técnico y ropa deportiva",
+
+categoryPremiumMaterialAlt: "Material premium de",
   },
 
 
@@ -4608,6 +4617,15 @@ ordersAthmovSupport: "ATHMOV support",
 ordersProtectedBadge: "PROTECTED BY ATHMOV",
 ordersPaymentConfirmed: "Payment confirmed",
 ordersContact: "Contact",
+categorySportLabel: "SPORT",
+categoryExplore: "Explore",
+
+categoryPadelText: "Premium rackets and equipment",
+categoryGolfText: "Clubs, bags and accessories",
+categoryTennisText: "High-performance rackets and equipment",
+categoryRunningText: "Technical footwear and sportswear",
+
+categoryPremiumMaterialAlt: "Premium equipment for",
   },
 
   pt: {
@@ -6926,5 +6944,14 @@ ordersAthmovSupport: "Suporte ATHMOV",
 ordersProtectedBadge: "PROTEGIDO PELA ATHMOV",
 ordersPaymentConfirmed: "Pagamento confirmado",
 ordersContact: "Contactar",
+categorySportLabel: "DESPORTO",
+categoryExplore: "Explorar",
+
+categoryPadelText: "Raquetes e material premium",
+categoryGolfText: "Tacos, sacos e acessórios",
+categoryTennisText: "Raquetes e material de alto desempenho",
+categoryRunningText: "Calçado técnico e roupa desportiva",
+
+categoryPremiumMaterialAlt: "Material premium de",
   },
 };
