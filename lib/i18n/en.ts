@@ -2308,4 +2308,61 @@ categoryTennisText: "High-performance rackets and equipment",
 categoryRunningText: "Technical footwear and sportswear",
 
 categoryPremiumMaterialAlt: "Premium equipment for",
+orderDeliveredNotificationTitle: "Order delivered",
+orderDeliveredNotificationMessage:
+  "The buyer has marked the order as delivered.",
+
+orderCompletedNotificationTitle: "Order completed",
+orderCompletedNotificationMessage:
+  "Your order has been completed successfully.",
+
+paymentReleasedNotificationTitle: "Payment released",
+paymentReleasedNotificationMessage:
+  "Your payment has been released.",
+
+orderShippedNotificationTitle: "Order shipped",
+orderShippedNotificationMessage:
+  "Your order has been shipped",
+
+disputeOpenedNotificationTitle: "Dispute opened",
+disputeOpenedNotificationMessage:
+  "The buyer has reported an issue with the order.",
+
+reviewReceivedNotificationTitle: "New review received",
+reviewReceivedNotificationMessage:
+  "You have received a new rating.",
+  autoCompletedOrderNotificationTitle: "Order completed",
+autoCompletedOrderNotificationMessage:
+  "Your order was completed automatically 72 hours after delivery.",
+
+autoPaymentReleasedNotificationTitle: "Payment released",
+autoPaymentReleasedNotificationMessage:
+  "Your payment was released automatically.",
+  refundApprovedNotificationTitle: "Refund approved",
+refundApprovedNotificationMessage:
+  "Your order has been refunded successfully.",
+
+orderRefundedNotificationTitle: "Order refunded",
+orderRefundedNotificationMessage:
+  "The order has been refunded and the seller payment has been cancelled.",
+  disputeResolvedNotificationTitle: "Dispute resolved",
+
+disputeBuyerRefundNotificationMessage:
+  "Your refund has been approved.",
+
+disputeBuyerSellerWinsNotificationMessage:
+  "The payment has been released to the seller.",
+
+disputeSellerWinsNotificationMessage:
+  "Your payment has been released.",
+
+disputeSellerBuyerRefundNotificationMessage:
+  "The buyer's refund has been approved.",
+  releasePaymentSellerTitle: "Payment released",
+releasePaymentSellerMessage:
+  "Your payment has been released successfully.",
+
+releasePaymentBuyerTitle: "Order completed",
+releasePaymentBuyerMessage:
+  "The order has been completed successfully.",
   } satisfies Record<keyof typeof es, string>;

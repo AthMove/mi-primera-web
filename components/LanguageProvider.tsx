@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import { translations } from "@/lib/i18n";
+import { supabase } from "@/lib/supabase";
 
 type Language = "es" | "en" | "pt";
 
@@ -27,6 +28,30 @@ export function LanguageProvider({
   const [mounted, setMounted] =
     useState(false);
 
+  const saveLanguageToProfile = async (
+    language: Language
+  ) => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) return;
+
+      await supabase
+        .from("profiles")
+        .update({
+          preferred_language: language,
+        })
+        .eq("id", user.id);
+    } catch (error) {
+      console.log(
+        "LANGUAGE PROFILE SYNC ERROR:",
+        error
+      );
+    }
+  };
+
   useEffect(() => {
     const initializeLanguage = async () => {
       const savedLang =
@@ -34,20 +59,21 @@ export function LanguageProvider({
           "athmov-language"
         ) as Language | null;
 
-      // Si el usuario ya eligió idioma,
-      // respetamos siempre su elección.
       if (
         savedLang === "es" ||
         savedLang === "en" ||
         savedLang === "pt"
       ) {
         setLangState(savedLang);
+
+        await saveLanguageToProfile(
+          savedLang
+        );
+
         setMounted(true);
         return;
       }
 
-      // Primera visita:
-      // detectamos el país desde Vercel.
       try {
         const response = await fetch(
           "/api/language",
@@ -57,9 +83,10 @@ export function LanguageProvider({
         );
 
         if (response.ok) {
-          const data = await response.json();
+          const data =
+            await response.json();
 
-          const detectedLang =
+          const detectedLang: Language =
             data.lang === "es" ||
             data.lang === "pt" ||
             data.lang === "en"
@@ -72,11 +99,33 @@ export function LanguageProvider({
             "athmov-language",
             detectedLang
           );
+
+          await saveLanguageToProfile(
+            detectedLang
+          );
         } else {
           setLangState("en");
+
+          localStorage.setItem(
+            "athmov-language",
+            "en"
+          );
+
+          await saveLanguageToProfile(
+            "en"
+          );
         }
       } catch {
         setLangState("en");
+
+        localStorage.setItem(
+          "athmov-language",
+          "en"
+        );
+
+        await saveLanguageToProfile(
+          "en"
+        );
       }
 
       setMounted(true);
@@ -85,11 +134,17 @@ export function LanguageProvider({
     initializeLanguage();
   }, []);
 
-  const setLang = (newLang: Language) => {
+  const setLang = (
+    newLang: Language
+  ) => {
     setLangState(newLang);
 
     localStorage.setItem(
       "athmov-language",
+      newLang
+    );
+
+    void saveLanguageToProfile(
       newLang
     );
   };

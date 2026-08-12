@@ -2325,4 +2325,61 @@ categoryTennisText: "Raquetes e material de alto desempenho",
 categoryRunningText: "Calçado técnico e roupa desportiva",
 
 categoryPremiumMaterialAlt: "Material premium de",
+orderDeliveredNotificationTitle: "Encomenda entregue",
+orderDeliveredNotificationMessage:
+  "O comprador marcou a encomenda como entregue.",
+
+orderCompletedNotificationTitle: "Encomenda concluída",
+orderCompletedNotificationMessage:
+  "A tua encomenda foi concluída com sucesso.",
+
+paymentReleasedNotificationTitle: "Pagamento libertado",
+paymentReleasedNotificationMessage:
+  "O teu pagamento foi libertado.",
+
+orderShippedNotificationTitle: "Encomenda enviada",
+orderShippedNotificationMessage:
+  "A tua encomenda foi enviada",
+
+disputeOpenedNotificationTitle: "Disputa aberta",
+disputeOpenedNotificationMessage:
+  "O comprador comunicou um problema com a encomenda.",
+
+reviewReceivedNotificationTitle: "Nova avaliação recebida",
+reviewReceivedNotificationMessage:
+  "Recebeste uma nova avaliação.",
+  autoCompletedOrderNotificationTitle: "Encomenda concluída",
+autoCompletedOrderNotificationMessage:
+  "A tua encomenda foi concluída automaticamente 72 horas após a entrega.",
+
+autoPaymentReleasedNotificationTitle: "Pagamento libertado",
+autoPaymentReleasedNotificationMessage:
+  "O teu pagamento foi libertado automaticamente.",
+  refundApprovedNotificationTitle: "Reembolso aprovado",
+refundApprovedNotificationMessage:
+  "A tua encomenda foi reembolsada com sucesso.",
+
+orderRefundedNotificationTitle: "Encomenda reembolsada",
+orderRefundedNotificationMessage:
+  "A encomenda foi reembolsada e o pagamento ao vendedor foi cancelado.",
+  disputeResolvedNotificationTitle: "Disputa resolvida",
+
+disputeBuyerRefundNotificationMessage:
+  "O teu reembolso foi aprovado.",
+
+disputeBuyerSellerWinsNotificationMessage:
+  "O pagamento foi libertado ao vendedor.",
+
+disputeSellerWinsNotificationMessage:
+  "O teu pagamento foi libertado.",
+
+disputeSellerBuyerRefundNotificationMessage:
+  "O reembolso ao comprador foi aprovado.",
+  releasePaymentSellerTitle: "Pagamento libertado",
+releasePaymentSellerMessage:
+  "O teu pagamento foi libertado com sucesso.",
+
+releasePaymentBuyerTitle: "Encomenda concluída",
+releasePaymentBuyerMessage:
+  "A encomenda foi concluída com sucesso.",
   } satisfies Record<keyof typeof es, string>;

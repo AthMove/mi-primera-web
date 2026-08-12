@@ -145,12 +145,12 @@ const formatMoney = (value: number) =>
         }),
       });
 
-      await notify({
-        user_id: order.seller_id,
-        title: "Pedido entregado",
-        message: "El comprador ha marcado el pedido como entregado.",
-        link: "/orders",
-      });
+    await notify({
+  user_id: order.seller_id,
+  title: t.orderDeliveredNotificationTitle,
+  message: t.orderDeliveredNotificationMessage,
+  link: "/orders",
+});
     }
 
     if (status === "completed") {
@@ -174,12 +174,12 @@ if (!releaseResponse.ok) {
         target_seller_id: order.seller_id,
       });
 
-      await notify({
-        user_id: order.buyer_id,
-        title: "Pedido completado",
-        message: "Tu pedido se ha completado correctamente.",
-        link: "/orders",
-      });
+    await notify({
+  user_id: order.buyer_id,
+  title: t.orderCompletedNotificationTitle,
+  message: t.orderCompletedNotificationMessage,
+  link: "/orders",
+});
 
       await fetch("/api/email/payout-released", {
         method: "POST",
@@ -191,12 +191,12 @@ if (!releaseResponse.ok) {
         }),
       });
 
-      await notify({
-        user_id: order.seller_id,
-        title: "Pago liberado",
-        message: "Tu pago ha sido liberado.",
-        link: "/orders",
-      });
+ await notify({
+  user_id: order.seller_id,
+  title: t.paymentReleasedNotificationTitle,
+  message: t.paymentReleasedNotificationMessage,
+  link: "/orders",
+});
     }
 
     await loadOrders();
@@ -236,12 +236,12 @@ if (!releaseResponse.ok) {
         return;
       }
 
-      await notify({
-        user_id: trackingOrder.buyer_id,
-        title: "Pedido enviado",
-        message: `Tu pedido ha sido enviado con ${carrier.trim()}. Seguimiento: ${trackingNumber.trim()}`,
-        link: "/orders",
-      });
+    await notify({
+  user_id: trackingOrder.buyer_id,
+  title: t.orderShippedNotificationTitle,
+  message: `${t.orderShippedNotificationMessage} · ${carrier.trim()} · ${trackingNumber.trim()}`,
+  link: "/orders",
+});
 
       await fetch("/api/email/order-shipped", {
         method: "POST",
@@ -330,12 +330,12 @@ if (!releaseResponse.ok) {
         },
       ]);
 
-      await notify({
-        user_id: disputeOrder.seller_id,
-        title: "Disputa abierta",
-        message: "El comprador ha reportado un problema con el pedido.",
-        link: "/orders",
-      });
+     await notify({
+  user_id: disputeOrder.seller_id,
+  title: t.disputeOpenedNotificationTitle,
+  message: t.disputeOpenedNotificationMessage,
+  link: "/orders",
+});
 
       await fetch("/api/email/dispute-opened", {
         method: "POST",
@@ -402,12 +402,12 @@ if (!releaseResponse.ok) {
         target_seller_id: reviewOrder.seller_id,
       });
 
-      await notify({
-        user_id: reviewOrder.seller_id,
-        title: "Nueva reseña recibida",
-        message: `Has recibido una valoración de ${rating} estrellas.`,
-        link: `/seller/${reviewOrder.seller_id}`,
-      });
+  await notify({
+  user_id: reviewOrder.seller_id,
+  title: t.reviewReceivedNotificationTitle,
+  message: `${t.reviewReceivedNotificationMessage} ★ ${rating}/5`,
+  link: `/seller/${reviewOrder.seller_id}`,
+});
 
       await fetch("/api/email/review-received", {
         method: "POST",

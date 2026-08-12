@@ -2314,4 +2314,61 @@ categoryTennisText: "Raquetas y piezas de alto rendimiento",
 categoryRunningText: "Calzado técnico y ropa deportiva",
 
 categoryPremiumMaterialAlt: "Material premium de",
+orderDeliveredNotificationTitle: "Pedido entregado",
+orderDeliveredNotificationMessage:
+  "El comprador ha marcado el pedido como entregado.",
+
+orderCompletedNotificationTitle: "Pedido completado",
+orderCompletedNotificationMessage:
+  "Tu pedido se ha completado correctamente.",
+
+paymentReleasedNotificationTitle: "Pago liberado",
+paymentReleasedNotificationMessage:
+  "Tu pago ha sido liberado.",
+
+orderShippedNotificationTitle: "Pedido enviado",
+orderShippedNotificationMessage:
+  "Tu pedido ha sido enviado",
+
+disputeOpenedNotificationTitle: "Disputa abierta",
+disputeOpenedNotificationMessage:
+  "El comprador ha reportado un problema con el pedido.",
+
+reviewReceivedNotificationTitle: "Nueva reseña recibida",
+reviewReceivedNotificationMessage:
+  "Has recibido una nueva valoración.",
+  autoCompletedOrderNotificationTitle: "Pedido completado",
+autoCompletedOrderNotificationMessage:
+  "Tu pedido se ha completado automáticamente tras 72 horas desde la entrega.",
+
+autoPaymentReleasedNotificationTitle: "Pago liberado",
+autoPaymentReleasedNotificationMessage:
+  "Tu pago se ha liberado automáticamente.",
+  refundApprovedNotificationTitle: "Reembolso aprobado",
+refundApprovedNotificationMessage:
+  "Tu pedido ha sido reembolsado correctamente.",
+
+orderRefundedNotificationTitle: "Pedido reembolsado",
+orderRefundedNotificationMessage:
+  "El pedido ha sido reembolsado y el pago al vendedor ha sido cancelado.",
+  disputeResolvedNotificationTitle: "Disputa resuelta",
+
+disputeBuyerRefundNotificationMessage:
+  "Tu reembolso ha sido aprobado.",
+
+disputeBuyerSellerWinsNotificationMessage:
+  "El pago ha sido liberado al vendedor.",
+
+disputeSellerWinsNotificationMessage:
+  "Tu pago ha sido liberado.",
+
+disputeSellerBuyerRefundNotificationMessage:
+  "El reembolso al comprador ha sido aprobado.",
+  releasePaymentSellerTitle: "Pago liberado",
+releasePaymentSellerMessage:
+  "Tu pago ha sido liberado correctamente.",
+
+releasePaymentBuyerTitle: "Pedido completado",
+releasePaymentBuyerMessage:
+  "El pedido se ha completado correctamente.",
   };
