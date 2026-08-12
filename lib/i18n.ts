@@ -2289,6 +2289,9 @@ adminUsersAccount: "Cuenta",
 adminUsersAccountActive: "Activa",
 
 adminUsersRegistered: "Registro",
+adminModerationApproved: "Aprobado",
+adminModerationPending: "Pendiente",
+adminModerationRejected: "Rechazado",
   },
 
 
@@ -4574,6 +4577,9 @@ adminUsersAccount: "Account",
 adminUsersAccountActive: "Active",
 
 adminUsersRegistered: "Registered",
+adminModerationApproved: "Approved",
+adminModerationPending: "Pending",
+adminModerationRejected: "Rejected",
   },
 
   pt: {
@@ -6875,5 +6881,8 @@ adminUsersAccount: "Conta",
 adminUsersAccountActive: "Ativa",
 
 adminUsersRegistered: "Registo",
+adminModerationApproved: "Aprovado",
+adminModerationPending: "Pendente",
+adminModerationRejected: "Rejeitado",
   },
 };
