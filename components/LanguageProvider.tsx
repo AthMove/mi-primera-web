@@ -6,7 +6,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { translations } from "../lib/i18n";
+import { translations } from "@/lib/i18n";
 
 type Language = "es" | "en" | "pt";
 
