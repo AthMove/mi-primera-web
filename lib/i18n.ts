@@ -2293,6 +2293,19 @@ adminModerationApproved: "Aprobado",
 adminModerationPending: "Pendiente",
 adminModerationRejected: "Rechazado",
 successLoading: "Cargando...",
+ordersActive: "Activos",
+ordersInTransit: "En tránsito",
+ordersCompleted: "Finalizados",
+
+ordersTrustTitle: "Compra protegida por ATHMOV",
+ordersTrustText:
+  "Tu pago queda protegido hasta que el pedido se entregue correctamente.",
+ordersShipmentTracking: "Seguimiento del envío",
+ordersAthmovSupport: "Soporte ATHMOV",
+
+ordersProtectedBadge: "PROTEGIDO POR ATHMOV",
+ordersPaymentConfirmed: "Pago confirmado",
+ordersContact: "Contactar",
   },
 
 
@@ -4582,6 +4595,19 @@ adminModerationApproved: "Approved",
 adminModerationPending: "Pending",
 adminModerationRejected: "Rejected",
 successLoading: "Loading...",
+ordersActive: "Active",
+ordersInTransit: "In transit",
+ordersCompleted: "Completed",
+
+ordersTrustTitle: "Purchase protected by ATHMOV",
+ordersTrustText:
+  "Your payment remains protected until the order is delivered successfully.",
+ordersShipmentTracking: "Shipment tracking",
+ordersAthmovSupport: "ATHMOV support",
+
+ordersProtectedBadge: "PROTECTED BY ATHMOV",
+ordersPaymentConfirmed: "Payment confirmed",
+ordersContact: "Contact",
   },
 
   pt: {
@@ -6887,5 +6913,18 @@ adminModerationApproved: "Aprovado",
 adminModerationPending: "Pendente",
 adminModerationRejected: "Rejeitado",
 successLoading: "A carregar...",
+ordersActive: "Ativas",
+ordersInTransit: "Em trânsito",
+ordersCompleted: "Concluídas",
+
+ordersTrustTitle: "Compra protegida pela ATHMOV",
+ordersTrustText:
+  "O teu pagamento fica protegido até a encomenda ser entregue corretamente.",
+ordersShipmentTracking: "Acompanhamento do envio",
+ordersAthmovSupport: "Suporte ATHMOV",
+
+ordersProtectedBadge: "PROTEGIDO PELA ATHMOV",
+ordersPaymentConfirmed: "Pagamento confirmado",
+ordersContact: "Contactar",
   },
 };

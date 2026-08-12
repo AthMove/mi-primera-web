@@ -5,7 +5,20 @@ import { useEffect, useState } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
 
 export default function OrdersPage() {
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
+
+const locale =
+  lang === "en"
+    ? "en-GB"
+    : lang === "pt"
+      ? "pt-PT"
+      : "es-ES";
+
+const formatMoney = (value: number) =>
+  new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "EUR",
+  }).format(Number(value || 0));
   const [orders, setOrders] = useState<any[]>([]);
   const [userId, setUserId] = useState("");
   const [loading, setLoading] = useState(true);
@@ -420,15 +433,15 @@ if (!releaseResponse.ok) {
     return src?.startsWith("http") || src?.startsWith("/") ? src : "/logo.png";
   };
 
-  const formatDate = (date?: string) => {
-    if (!date) return "";
+const formatDate = (date?: string) => {
+  if (!date) return "";
 
-    return new Date(date).toLocaleDateString("es-ES", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
-  };
+  return new Date(date).toLocaleDateString(locale, {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
 
 const getStatusLabel = (status: string) => {
   if (status === "pending") return t.statusPending;
@@ -620,7 +633,7 @@ const getStatusLabel = (status: string) => {
   style={statCardStyle}
   className="order-stat"
 >
-    <span>Activos</span>
+   <span>{t.ordersActive}</span>
     <strong style={{
 fontSize:"42px",
 fontWeight:900,
@@ -633,14 +646,14 @@ letterSpacing:"-2px"
   </div>
 
   <div style={statCardStyle}>
-    <span>En tránsito</span>
+    <span>{t.ordersInTransit}</span>
     <strong>
       {orders.filter((o) => o.status === "shipped").length}
     </strong>
   </div>
 
   <div style={statCardStyle}>
-    <span>Finalizados</span>
+    <span>{t.ordersCompleted}</span>
     <strong>
       {orders.filter((o) => o.status === "completed").length}
     </strong>
@@ -649,16 +662,17 @@ letterSpacing:"-2px"
 
 <section style={ordersTrustStyle}>
   <div>
-    <strong>Compra protegida por ATHMOV</strong>
+    <strong>{t.ordersTrustTitle}</strong>
+
     <p>
-      Tu pago queda protegido hasta que el pedido se entregue correctamente.
+      {t.ordersTrustText}
     </p>
   </div>
 
   <div style={ordersTrustItemsStyle}>
-    <span>✓ Pago seguro</span>
-    <span>✓ Seguimiento del envío</span>
-    <span>✓ Soporte ATHMOV</span>
+    <span>✓ {t.securePaymentLabel}</span>
+    <span>✓ {t.ordersShipmentTracking}</span>
+    <span>✓ {t.ordersAthmovSupport}</span>
   </div>
 </section>
 
@@ -704,7 +718,7 @@ style={{
 </p>
 
 <div style={badgeStyle}>
-  ✓ PROTEGIDO POR ATHMOV
+  ✓ {t.ordersProtectedBadge}
 </div>
 
 <h2 style={orderTitleStyle}>
@@ -844,7 +858,9 @@ style={{
                 </div>
 
                 <div style={rightStyle} className="order-actions">
-                  <strong style={amountStyle}>€{order.amount}</strong>
+                  <strong style={amountStyle}>
+  {formatMoney(Number(order.amount || 0))}
+</strong>
 
 <span
   style={{
@@ -863,9 +879,9 @@ style={{
         : "#111",
   }}
 >
-  {status === "pending" && order.payment_status === "paid"
-    ? "Pago confirmado"
-    : getStatusLabel(status)}
+{status === "pending" && order.payment_status === "paid"
+  ? t.ordersPaymentConfirmed
+  : getStatusLabel(status)}
 </span>
 
                   {isSeller && order.transfer_status === "released" && (
@@ -880,7 +896,12 @@ style={{
                     onClick={() => openOrderChat(order)}
                     style={reviewButtonStyle}
                   >
-                    💬 Contactar
+                    <button
+  onClick={() => openOrderChat(order)}
+  style={reviewButtonStyle}
+>
+  💬 {t.ordersContact}
+</button>
                   </button>
 
                   {isBuyer &&
