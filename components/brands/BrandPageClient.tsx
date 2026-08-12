@@ -4,6 +4,10 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
 import BrandProductsClient from "@/app/brands/BrandProductsClient";
+import {
+  brandContent,
+  type BrandLanguage,
+} from "@/lib/brand-content";
 
 interface BrandConfig {
   name: string;
@@ -42,7 +46,17 @@ export default function BrandPageClient({
   brand,
   availableModels,
 }: Props) {
-  const { t } = useLanguage();
+ const { lang, t } = useLanguage();
+
+const localizedContent =
+  brandContent[slugify(brand.name)]?.[
+    lang as BrandLanguage
+  ];
+
+const displayBrand = {
+  ...brand,
+  ...(localizedContent || {}),
+};
 
   return (
     <>
@@ -61,7 +75,7 @@ export default function BrandPageClient({
           {brand.name} {t.brandSecondHand}
         </h1>
 
-        <p className="hero-description">{brand.description}</p>
+        <p className="hero-description">{displayBrand.description}</p>
 
         <div className="hero-actions">
           <Link
@@ -87,7 +101,7 @@ export default function BrandPageClient({
         </div>
 
         <div className="intro-grid">
-          {brand.intro.map((paragraph) => (
+          {displayBrand.intro.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
         </div>
@@ -104,7 +118,7 @@ export default function BrandPageClient({
           </div>
 
           <Link href={brand.categoryHref} className="text-link">
-            {t.brandViewAllCategory} {brand.categoryLabel} →
+            {t.brandViewAllCategory} {displayBrand.categoryLabel} →
           </Link>
         </div>
 
@@ -159,7 +173,7 @@ export default function BrandPageClient({
         </div>
 
         <div className="tips-grid">
-          {brand.buyingTips.map((tip, index) => (
+          {displayBrand.buyingTips.map((tip, index) => (
             <article key={tip} className="tip-card">
               <span>{String(index + 1).padStart(2, "0")}</span>
               <p>{tip}</p>
@@ -168,7 +182,7 @@ export default function BrandPageClient({
         </div>
       </section>
 
-      {brand.relatedGuides.length > 0 && (
+{displayBrand.relatedGuides.length > 0 && (
         <section className="guides-section">
           <div className="section-heading">
             <p className="eyebrow">{t.brandGuidesEyebrow}</p>
@@ -177,7 +191,7 @@ export default function BrandPageClient({
           </div>
 
           <div className="guides-grid">
-            {brand.relatedGuides.map((guide) => (
+            {displayBrand.relatedGuides.map((guide) => (
               <Link
                 key={guide.href}
                 href={guide.href}
@@ -202,7 +216,7 @@ export default function BrandPageClient({
         </div>
 
         <div className="faq-list">
-          {brand.faq.map((item) => (
+          {displayBrand.faq.map((item) => (
             <details key={item.question} className="faq-item">
               <summary>{item.question}</summary>
               <p>{item.answer}</p>
