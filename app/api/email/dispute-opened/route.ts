@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { sendEmail } from "@/lib/email";
+import { translations } from "@/lib/i18n";
 
 export async function POST(req: Request) {
   try {
@@ -32,36 +33,46 @@ export async function POST(req: Request) {
 
     const { data: seller } = await supabase
       .from("profiles")
-      .select("email, full_name")
+      .select("email, full_name, preferred_language")
       .eq("id", order.seller_id)
       .maybeSingle();
 
     if (seller?.email) {
+      const lang: "es" | "en" | "pt" =
+        seller.preferred_language === "en" ||
+        seller.preferred_language === "pt"
+          ? seller.preferred_language
+          : "es";
+
+      const t = translations[lang];
+
       await sendEmail({
         to: seller.email,
-        subject: "Se ha abierto una disputa en ATHMOV",
+        subject: t.emailDisputeOpenedSubject,
         html: `
           <div style="font-family: Arial, sans-serif; color: #111; line-height: 1.6;">
-            <h1>Disputa abierta</h1>
-
-            <p>Hola ${seller.full_name || ""},</p>
+            <h1>${t.emailDisputeOpenedTitle}</h1>
 
             <p>
-              Se ha abierto una disputa relacionada con 
-              <strong>${product?.title || "tu producto"}</strong>.
+              ${t.emailHello} ${seller.full_name || t.emailUserFallback},
             </p>
 
             <p>
-              <strong>Motivo:</strong> 
-              ${order.dispute_reason || "No se ha indicado ningún motivo"}
+              ${t.emailDisputeOpenedTextOne}
+              <strong>${product?.title || t.emailYourItemFallback}</strong>.
             </p>
 
             <p>
-              El pago queda temporalmente pausado mientras ATHMOV revisa el caso.
+              <strong>${t.emailDisputeReason}</strong>
+              ${order.dispute_reason || t.emailDisputeNoReason}
             </p>
 
             <p>
-              Puedes consultar más detalles desde tu página de pedidos.
+              ${t.emailDisputePaymentHeld}
+            </p>
+
+            <p>
+              ${t.emailDisputeCheckOrders}
             </p>
 
             <p>ATHMOV</p>
@@ -73,7 +84,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json(
-      { error: error.message || "No se pudo enviar el email de disputa" },
+      {
+        error:
+          error.message ||
+          "No se pudo enviar el email de disputa",
+      },
       { status: 500 }
     );
   }

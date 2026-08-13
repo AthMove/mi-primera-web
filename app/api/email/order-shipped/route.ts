@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { sendEmail } from "@/lib/email";
+import { translations } from "@/lib/i18n";
 
 export async function POST(req: Request) {
   console.log("ORDER SHIPPED EMAIL API CALLED");
@@ -34,7 +35,7 @@ export async function POST(req: Request) {
 
     const { data: buyer } = await supabase
       .from("profiles")
-      .select("email, full_name")
+      .select("email, full_name, preferred_language")
       .eq("id", order.buyer_id)
       .maybeSingle();
 
@@ -45,33 +46,43 @@ export async function POST(req: Request) {
       );
     }
 
+    const lang: "es" | "en" | "pt" =
+      buyer.preferred_language === "en" ||
+      buyer.preferred_language === "pt"
+        ? buyer.preferred_language
+        : "es";
+
+    const t = translations[lang];
+
     await sendEmail({
       to: buyer.email,
-      subject: "Tu pedido de ATHMOV ha sido enviado",
+      subject: t.emailOrderShippedSubject,
       html: `
         <div style="font-family: Arial, sans-serif; color: #111; line-height: 1.6;">
-          <h1>Pedido enviado</h1>
-
-          <p>Hola ${buyer.full_name || "usuario"},</p>
+          <h1>${t.emailOrderShippedTitle}</h1>
 
           <p>
-            Tu pedido de
-            <strong>${product?.title || "tu artículo"}</strong>
-            ha sido enviado.
+            ${t.emailHello} ${buyer.full_name || t.emailUserFallback},
           </p>
 
           <p>
-            <strong>Transportista:</strong>
-            ${order.carrier || "Pendiente"}
+            ${t.emailOrderShippedTextOne}
+            <strong>${product?.title || t.emailYourItemFallback}</strong>
+            ${t.emailOrderShippedTextTwo}
           </p>
 
           <p>
-            <strong>Número de seguimiento:</strong>
-            ${order.tracking_number || "Pendiente"}
+            <strong>${t.emailCarrierLabel}</strong>
+            ${order.carrier || t.emailPending}
           </p>
 
           <p>
-            Puedes seguir tu pedido desde tu cuenta de ATHMOV.
+            <strong>${t.trackingNumber}:</strong>
+            ${order.tracking_number || t.emailPending}
+          </p>
+
+          <p>
+            ${t.emailOrderShippedTrack}
           </p>
 
           <p>ATHMOV</p>
@@ -83,7 +94,8 @@ export async function POST(req: Request) {
   } catch (error: any) {
     return NextResponse.json(
       {
-        error: error.message || "Error al enviar el email",
+        error:
+          error.message || "Error al enviar el email",
       },
       { status: 500 }
     );

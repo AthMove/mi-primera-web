@@ -12,7 +12,20 @@ export default function SoldProductsSection({
   isMobile,
   soldProducts,
 }: SoldProductsSectionProps) {
-  const { t } = useLanguage();
+ const { lang, t } = useLanguage();
+
+const locale =
+  lang === "en"
+    ? "en-GB"
+    : lang === "pt"
+      ? "pt-PT"
+      : "es-ES";
+
+const formatCurrency = (value: number) =>
+  new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: "EUR",
+  }).format(value);
 
   const safeImage = (src?: string) => {
     return src?.startsWith("http") || src?.startsWith("/")
@@ -69,13 +82,15 @@ export default function SoldProductsSection({
             <div style={soldImageStyle}>
               <Image
                 src={safeImage(product.image)}
-                alt={product.title || "Producto vendido"}
+               alt={product.title || t.homeRecentlySoldProductAlt}
                 fill
                 sizes="25vw"
                 style={{ objectFit: "cover" }}
               />
 
-              <span style={soldBadgeStyle}>VENDIDO</span>
+              <span style={soldBadgeStyle}>
+  {t.homeRecentlySoldBadge}
+</span>
             </div>
 
             <div style={soldContentStyle}>
@@ -83,7 +98,9 @@ export default function SoldProductsSection({
 
               <h3 style={soldTitleStyle}>{product.title}</h3>
 
-              <p style={soldPriceStyle}>€{product.price}</p>
+              <p style={soldPriceStyle}>
+  {formatCurrency(Number(product.price || 0))}
+</p>
             </div>
           </article>
         ))}

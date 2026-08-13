@@ -84,21 +84,20 @@ export default function PadelPageClient() {
     },
   ];
 
-  const relatedGuides = [
-    {
-      title:
-        "Bullpadel Vertex 04 de segunda mano: guía completa para comprar con seguridad",
-      href: "/blog/bullpadel-vertex-04-segunda-mano",
-    },
-    {
-      title: "Cómo detectar una pala de pádel falsa",
-      href: "/blog/como-detectar-pala-padel-falsa",
-    },
-    {
-      title: "Cómo valorar una pala de pádel de segunda mano",
-      href: "/blog/como-valorar-pala-padel-segunda-mano",
-    },
-  ];
+const relatedGuides = [
+  {
+    title: t.padelGuideBullpadelVertex,
+    href: "/blog/bullpadel-vertex-04-segunda-mano",
+  },
+  {
+    title: t.padelGuideFakeRacket,
+    href: "/blog/como-detectar-pala-padel-falsa",
+  },
+  {
+    title: t.padelGuideValueRacket,
+    href: "/blog/como-valorar-pala-padel-segunda-mano",
+  },
+];
 
   return (
     <>

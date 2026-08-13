@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createClient } from "@supabase/supabase-js";
+import { translations } from "@/lib/i18n";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -28,28 +29,47 @@ export async function POST(req: Request) {
 
     const { data: product } = await supabase
       .from("products")
-      .select("*")
+      .select("title")
       .eq("id", offer.product_id)
-      .single();
+      .maybeSingle();
+
+    const { data: buyer } = await supabase
+      .from("profiles")
+      .select("full_name, preferred_language")
+      .eq("email", offer.buyer_email)
+      .maybeSingle();
+
+    const lang: "es" | "en" | "pt" =
+      buyer?.preferred_language === "en" ||
+      buyer?.preferred_language === "pt"
+        ? buyer.preferred_language
+        : "es";
+
+    const t = translations[lang];
+
+    const buyerName =
+      buyer?.full_name ||
+      offer.buyer_email?.split("@")[0] ||
+      t.emailUserFallback;
 
     await resend.emails.send({
       from: "ATHMOV <orders@athmov.com>",
       to: offer.buyer_email,
-      subject: "Tu oferta no ha sido aceptada",
+      subject: t.emailOfferRejectedSubject,
       html: `
         <div style="font-family:Arial,sans-serif;padding:40px;max-width:600px;margin:auto">
-          <h2>Tu oferta no ha sido aceptada</h2>
+          <h2>${t.emailOfferRejectedTitle}</h2>
 
-          <p>Hola ${offer.buyer_email.split("@")[0]},</p>
+          <p>${t.emailHello} ${buyerName},</p>
 
           <p>
-            Lamentablemente, tu oferta por
-            <strong>${product?.title || "este producto"}</strong>
-            no ha sido aceptada por el vendedor.
+            ${t.emailOfferRejectedTextOne}
+            <strong>${product?.title || t.emailThisProductFallback}</strong>
+            ${t.emailOfferRejectedTextTwo}
           </p>
 
           <p>
-            Aún puedes contactar con el vendedor o realizar una nueva oferta.
+            ${t.emailOfferRejectedNextStep}
           </p>
 
           <p>ATHMOV</p>

@@ -2365,4 +2365,143 @@ releasePaymentSellerMessage:
 releasePaymentBuyerTitle: "Order completed",
 releasePaymentBuyerMessage:
   "The order has been completed successfully.",
+  filterSport: "SPORT",
+filterBrand: "BRAND",
+filterMinPrice: "MIN. PRICE",
+filterMaxPrice: "MAX. PRICE",
+filterAll: "All",
+filterAllBrands: "All",
+filterShowSold: "Show sold products",
+relatedArticlesEyebrow: "MORE ATHMOV GUIDES",
+relatedArticlesTitle: "You may also be interested in",
+featuredDescription:
+  "A curated selection of premium products highlighted by ATHMOV.",
+featuredEditorialSelection:
+  "ATHMOV editorial selection",
+featuredViewFullCollection:
+  "View full collection",
+  golfPageGuideVerifyClubs:
+  "How to verify authentic golf clubs",
+golfPageGuideCalculatePrice:
+  "How to calculate the price of second-hand golf clubs",
+golfPageGuideBuySell:
+  "When to buy and sell second-hand golf clubs",
+golfPageGuideDriver:
+  "What to check before buying a second-hand driver",
+golfPageGuideIrons:
+  "What to check before buying used golf irons",
+golfPageGuideBestCourses:
+  "The best golf courses in Spain",
+  padelGuideBullpadelVertex:
+  "Second-hand Bullpadel Vertex 04: complete guide to buying safely",
+padelGuideFakeRacket:
+  "How to spot a fake padel racket",
+padelGuideValueRacket:
+  "How to value a second-hand padel racket",
+  emailOrderDeliveredSubject:
+  "Your ATHMOV order has been delivered",
+emailOrderDeliveredTitle:
+  "Order delivered",
+emailHello:
+  "Hello",
+emailUserFallback:
+  "user",
+emailYourItemFallback:
+  "your item",
+emailOrderDeliveredTextOne:
+  "Your order for",
+emailOrderDeliveredTextTwo:
+  "has been delivered.",
+emailOrderDeliveredProtection:
+  "If everything is correct, the order will be completed and the seller payment will be released in accordance with ATHMOV Protection.",
+emailOrderDeliveredIssue:
+  "If there is any problem, you can report it from your Orders page.",
+  emailPayoutReleasedSubject:
+  "Your ATHMOV payment has been released",
+emailPayoutReleasedTitle:
+  "Payment released",
+emailPayoutReleasedTextOne:
+  "The payment for",
+emailPayoutReleasedTextTwo:
+  "has been released.",
+emailPayoutReleasedStripe:
+  "The funds will arrive in your connected Stripe account according to Stripe's processing times.",
+emailPayoutReleasedThanks:
+  "Thank you for selling on ATHMOV.",
+  emailDisputeOpenedSubject:
+  "A dispute has been opened on ATHMOV",
+emailDisputeOpenedTitle:
+  "Dispute opened",
+emailDisputeOpenedTextOne:
+  "A dispute has been opened regarding",
+emailDisputeReason:
+  "Reason:",
+emailDisputeNoReason:
+  "No reason has been provided",
+emailDisputePaymentHeld:
+  "The payment has been temporarily held while ATHMOV reviews the case.",
+emailDisputeCheckOrders:
+  "Check your Orders page for more information.",
+  emailOfferReceivedSubject:
+  "You have received a new offer on ATHMOV",
+emailOfferReceivedTitle:
+  "New offer received",
+emailOfferReceivedText:
+  "You have received a new offer for",
+emailOfferLabel:
+  "Offer:",
+emailBuyerLabel:
+  "Buyer:",
+emailAthmovBuyerFallback:
+  "ATHMOV buyer",
+emailOfferReceivedReview:
+  "You can review the offer from your ATHMOV account.",
+  emailReviewReceivedSubject:
+  "You have received a new review on ATHMOV",
+emailReviewReceivedTitle:
+  "New review received",
+emailReviewReceivedTextOne:
+  "You have received a",
+emailReviewReceivedStars:
+  "star review",
+emailReviewReceivedTextTwo:
+  "for",
+emailReviewReceivedThanks:
+  "Thank you for selling on ATHMOV.",
+  emailOfferRejectedSubject:
+  "Your offer was not accepted",
+emailOfferRejectedTitle:
+  "Your offer was not accepted",
+emailOfferRejectedTextOne:
+  "Unfortunately, your offer for",
+emailOfferRejectedTextTwo:
+  "was not accepted by the seller.",
+emailOfferRejectedNextStep:
+  "You can still contact the seller or make a new offer.",
+emailThisProductFallback:
+  "this product",
+  emailOfferAcceptedSubject:
+  "Your offer has been accepted",
+emailOfferAcceptedTitle:
+  "Offer accepted",
+emailOfferAcceptedTextOne:
+  "The seller has accepted your offer for",
+emailOfferAcceptedTextTwo:
+  "You can now continue with the purchase from your ATHMOV account.",
+emailOfferAcceptedAmount:
+  "Accepted offer:",
+  emailOrderShippedSubject:
+  "Your ATHMOV order has been shipped",
+emailOrderShippedTitle:
+  "Order shipped",
+emailOrderShippedTextOne:
+  "Your order for",
+emailOrderShippedTextTwo:
+  "has been shipped.",
+emailCarrierLabel:
+  "Carrier:",
+emailPending:
+  "Pending",
+emailOrderShippedTrack:
+  "You can track your order from your ATHMOV account.",
   } satisfies Record<keyof typeof es, string>;

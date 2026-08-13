@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { sendEmail } from "@/lib/email";
+import { translations } from "@/lib/i18n";
 
 export async function POST(req: Request) {
   try {
@@ -19,7 +20,7 @@ export async function POST(req: Request) {
 
     const { data: seller } = await supabase
       .from("profiles")
-      .select("email, full_name")
+      .select("email, full_name, preferred_language")
       .eq("id", sellerId)
       .maybeSingle();
 
@@ -30,30 +31,54 @@ export async function POST(req: Request) {
       );
     }
 
+    const lang: "es" | "en" | "pt" =
+      seller.preferred_language === "en" ||
+      seller.preferred_language === "pt"
+        ? seller.preferred_language
+        : "es";
+
+    const t = translations[lang];
+
+    const locale =
+      lang === "en"
+        ? "en-GB"
+        : lang === "pt"
+          ? "pt-PT"
+          : "es-ES";
+
+    const formattedAmount = new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: "EUR",
+    }).format(Number(amount || 0));
+
     await sendEmail({
       to: seller.email,
-      subject: "Has recibido una nueva oferta en ATHMOV",
+      subject: t.emailOfferReceivedSubject,
       html: `
         <div style="font-family: Arial, sans-serif; color: #111; line-height: 1.6;">
-          <h1>Nueva oferta recibida</h1>
-
-          <p>Hola ${seller.full_name || "usuario"},</p>
+          <h1>${t.emailOfferReceivedTitle}</h1>
 
           <p>
-            Has recibido una nueva oferta por
-            <strong>${product?.title || "tu artículo"}</strong>.
+            ${t.emailHello} ${seller.full_name || t.emailUserFallback},
           </p>
 
           <p>
-            <strong>Oferta:</strong> €${Number(amount).toFixed(2)}
+            ${t.emailOfferReceivedText}
+            <strong>${product?.title || t.emailYourItemFallback}</strong>.
           </p>
 
           <p>
-            <strong>Comprador:</strong> ${buyerEmail || "Comprador de ATHMOV"}
+            <strong>${t.emailOfferLabel}</strong>
+            ${formattedAmount}
           </p>
 
           <p>
-            Puedes revisar la oferta desde tu cuenta de ATHMOV.
+            <strong>${t.emailBuyerLabel}</strong>
+            ${buyerEmail || t.emailAthmovBuyerFallback}
+          </p>
+
+          <p>
+            ${t.emailOfferReceivedReview}
           </p>
 
           <p>ATHMOV</p>
@@ -64,7 +89,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json(
-      { error: error.message || "Error al enviar el email de oferta" },
+      {
+        error:
+          error.message || "Error al enviar el email de oferta",
+      },
       { status: 500 }
     );
   }

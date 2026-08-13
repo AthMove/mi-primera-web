@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { sendEmail } from "@/lib/email";
+import { translations } from "@/lib/i18n";
 
 export async function POST(req: Request) {
   try {
@@ -38,31 +39,47 @@ export async function POST(req: Request) {
 
     const { data: seller } = await supabase
       .from("profiles")
-      .select("email, full_name")
+      .select("email, full_name, preferred_language")
       .eq("id", order.seller_id)
       .maybeSingle();
 
     if (seller?.email) {
+      const lang: "es" | "en" | "pt" =
+        seller.preferred_language === "en" ||
+        seller.preferred_language === "pt"
+          ? seller.preferred_language
+          : "es";
+
+      const t = translations[lang];
+
       await sendEmail({
         to: seller.email,
-        subject: "Has recibido una nueva valoración en ATHMOV",
+        subject: t.emailReviewReceivedSubject,
         html: `
           <div style="font-family: Arial, sans-serif; color: #111; line-height: 1.6;">
-            <h1>Nueva valoración recibida</h1>
-
-            <p>Hola ${seller.full_name || "usuario"},</p>
+            <h1>${t.emailReviewReceivedTitle}</h1>
 
             <p>
-              Has recibido una
-              <strong> valoración de ${review.rating} estrellas </strong>
-              para
-              <strong>${product?.title || "tu artículo"}</strong>.
+              ${t.emailHello} ${seller.full_name || t.emailUserFallback},
             </p>
 
-            <p>${review.comment || ""}</p>
+            <p>
+              ${t.emailReviewReceivedTextOne}
+              <strong>
+                ${review.rating} ${t.emailReviewReceivedStars}
+              </strong>
+              ${t.emailReviewReceivedTextTwo}
+              <strong>${product?.title || t.emailYourItemFallback}</strong>.
+            </p>
+
+            ${
+              review.comment
+                ? `<p>${review.comment}</p>`
+                : ""
+            }
 
             <p>
-              Gracias por vender en ATHMOV.
+              ${t.emailReviewReceivedThanks}
             </p>
 
             <p>ATHMOV</p>
@@ -75,7 +92,9 @@ export async function POST(req: Request) {
   } catch (error: any) {
     return NextResponse.json(
       {
-        error: error.message || "Error al enviar el email de valoración",
+        error:
+          error.message ||
+          "Error al enviar el email de valoración",
       },
       { status: 500 }
     );

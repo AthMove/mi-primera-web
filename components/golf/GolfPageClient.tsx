@@ -84,37 +84,37 @@ export default function GolfPageClient() {
     },
   ];
 
-  const relatedGuides = [
-    {
-      title: "Cómo verificar unos palos de golf originales",
-      href: "/blog/verificar-palos-golf",
-    },
-    {
-      title: "Cómo calcular el precio de palos de golf de segunda mano",
-      href: "/blog/como-calcular-precio-palos-golf-segunda-mano",
-    },
-    {
-      title: "Cuándo comprar y vender palos de golf de segunda mano",
-      href: "/blog/cuando-comprar-vender-palos-golf-segunda-mano",
-    },
-    {
-      title: "Qué revisar antes de comprar un driver de segunda mano",
-      href: "/blog/que-revisar-driver-golf-segunda-mano",
-    },
-    {
-      title: "Qué revisar antes de comprar unos hierros usados",
-      href: "/blog/que-revisar-hierros-golf-segunda-mano",
-    },
-    {
-      title: "Los mejores campos de golf de España",
-      href: "/blog/mejores-campos-golf-espana",
-    },
-  ];
+const relatedGuides = [
+  {
+    title: t.golfPageGuideVerifyClubs,
+    href: "/blog/verificar-palos-golf",
+  },
+  {
+    title: t.golfPageGuideCalculatePrice,
+    href: "/blog/como-calcular-precio-palos-golf-segunda-mano",
+  },
+  {
+    title: t.golfPageGuideBuySell,
+    href: "/blog/cuando-comprar-vender-palos-golf-segunda-mano",
+  },
+  {
+    title: t.golfPageGuideDriver,
+    href: "/blog/que-revisar-driver-golf-segunda-mano",
+  },
+  {
+    title: t.golfPageGuideIrons,
+    href: "/blog/que-revisar-hierros-golf-segunda-mano",
+  },
+  {
+    title: t.golfPageGuideBestCourses,
+    href: "/blog/mejores-campos-golf-espana",
+  },
+];
 
   return (
     <>
       <section className="golf-hero">
-        <nav className="golf-breadcrumb" aria-label="Breadcrumb">
+       <nav className="golf-breadcrumb" aria-label="Breadcrumb">
           <Link href="/">{t.home}</Link>
           <span>›</span>
           <span>{t.golf}</span>

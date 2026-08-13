@@ -75,10 +75,9 @@ export default function FeaturedProducts({
             {t.featuredProducts}
           </h2>
 
-          <p className="featured-description">
-            Una selección cuidada de productos premium destacados por
-            ATHMOV.
-          </p>
+         <p className="featured-description">
+  {t.featuredDescription}
+</p>
         </div>
 
         <button
@@ -114,19 +113,20 @@ export default function FeaturedProducts({
         ))}
       </div>
 
-      <div className="featured-footer">
-        <span>Selección editorial ATHMOV</span>
+     <div className="featured-footer">
+  <span>{t.featuredEditorialSelection}</span>
 
-        <button
-          type="button"
-          onClick={() => router.push("/products")}
-        >
-          Ver colección completa
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M5 12h14M13 6l6 6-6 6" />
-          </svg>
-        </button>
-      </div>
+  <button
+    type="button"
+    onClick={() => router.push("/products")}
+  >
+    {t.featuredViewFullCollection}
+
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  </button>
+</div>
 
       <style jsx>{`
         .featured-section {

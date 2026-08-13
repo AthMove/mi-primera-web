@@ -1,4 +1,5 @@
 "use client";
+import { useLanguage } from "@/components/LanguageProvider";
 
 type Props = {
   selectedCategory: string;
@@ -54,18 +55,21 @@ export default function Filters({
   showSold,
   setShowSold,
 }: Props) {
+
+  const { t } = useLanguage();
+
   return (
     <section style={wrapperStyle}>
       <div style={filtersGridStyle}>
         <div>
-          <p style={labelStyle}>DEPORTE</p>
+          <p style={labelStyle}>{t.filterSport}</p>
 
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
             style={selectStyle}
           >
-            <option value="ALL">Todos</option>
+            <option value="ALL">{t.filterAll}</option>
 
             {categories
               .filter((category) => category !== "ALL")
@@ -78,14 +82,14 @@ export default function Filters({
         </div>
 
         <div>
-          <p style={labelStyle}>MARCA</p>
+          <p style={labelStyle}>{t.filterBrand}</p>
 
           <select
             value={selectedBrand}
             onChange={(e) => setSelectedBrand(e.target.value)}
             style={selectStyle}
           >
-            <option value="ALL">Todas</option>
+            <option value="ALL">{t.filterAllBrands}</option>
 
             {brands
               .filter((brand) => brand !== "ALL")
@@ -98,7 +102,7 @@ export default function Filters({
         </div>
 
         <div>
-          <p style={labelStyle}>PRECIO MÍN.</p>
+         <p style={labelStyle}>{t.filterMinPrice}</p>
 
           <input
             value={minPrice}
@@ -110,7 +114,7 @@ export default function Filters({
         </div>
 
         <div>
-          <p style={labelStyle}>PRECIO MÁX.</p>
+         <p style={labelStyle}>{t.filterMaxPrice}</p>
 
           <input
             value={maxPrice}
@@ -130,7 +134,7 @@ export default function Filters({
             onChange={(e) => setShowSold(e.target.checked)}
           />
 
-          <span>Mostrar productos vendidos</span>
+          <span>{t.filterShowSold}</span>
         </label>
       </div>
     </section>

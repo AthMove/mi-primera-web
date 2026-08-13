@@ -1,25 +1,26 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { sendEmail } from "@/lib/email";
+import { translations } from "@/lib/i18n";
 
 export async function POST(req: Request) {
   try {
-    const { orderId } = await req.json();
+    const { offerId } = await req.json();
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    const { data: order } = await supabase
-      .from("orders")
+    const { data: offer } = await supabase
+      .from("offers")
       .select("*")
-      .eq("id", orderId)
+      .eq("id", offerId)
       .single();
 
-    if (!order) {
+    if (!offer) {
       return NextResponse.json(
-        { error: "Pedido no encontrado" },
+        { error: "Oferta no encontrada" },
         { status: 404 }
       );
     }
@@ -27,55 +28,77 @@ export async function POST(req: Request) {
     const { data: product } = await supabase
       .from("products")
       .select("title")
-      .eq("id", order.product_id)
+      .eq("id", offer.product_id)
       .maybeSingle();
 
-    const { data: seller } = await supabase
+    const { data: buyer } = await supabase
       .from("profiles")
-      .select("email, full_name")
-      .eq("id", order.seller_id)
+      .select("full_name, preferred_language")
+      .eq("email", offer.buyer_email)
       .maybeSingle();
 
-    if (seller?.email) {
-      await sendEmail({
-        to: seller.email,
-        subject: "Se ha abierto una disputa en ATHMOV",
-        html: `
-          <div style="font-family: Arial, sans-serif; color: #111; line-height: 1.6;">
-            <h1>Disputa abierta</h1>
+    const lang: "es" | "en" | "pt" =
+      buyer?.preferred_language === "en" ||
+      buyer?.preferred_language === "pt"
+        ? buyer.preferred_language
+        : "es";
 
-            <p>Hola ${seller.full_name || "usuario"},</p>
+    const t = translations[lang];
 
-            <p>
-              Se ha abierto una disputa relacionada con
-              <strong>${product?.title || "tu artículo"}</strong>.
-            </p>
+    const locale =
+      lang === "en"
+        ? "en-GB"
+        : lang === "pt"
+          ? "pt-PT"
+          : "es-ES";
 
-            <p>
-              <strong>Motivo:</strong>
-              ${order.dispute_reason || "No se ha indicado ningún motivo"}
-            </p>
+    const formattedAmount = new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency: "EUR",
+    }).format(Number(offer.amount || 0));
 
-            <p>
-              El pago ha quedado temporalmente retenido mientras ATHMOV revisa el caso.
-            </p>
+    const buyerName =
+      buyer?.full_name ||
+      offer.buyer_email?.split("@")[0] ||
+      t.emailUserFallback;
 
-            <p>
-              Consulta tu página de Pedidos para obtener más información.
-            </p>
+    await sendEmail({
+      to: offer.buyer_email,
+      subject: t.emailOfferAcceptedSubject,
+      html: `
+        <div style="font-family: Arial, sans-serif; color: #111; line-height: 1.6;">
+          <h1>${t.emailOfferAcceptedTitle}</h1>
 
-            <p>ATHMOV</p>
-          </div>
-        `,
-      });
-    }
+          <p>
+            ${t.emailHello} ${buyerName},
+          </p>
+
+          <p>
+            ${t.emailOfferAcceptedTextOne}
+            <strong>${product?.title || t.emailThisProductFallback}</strong>.
+          </p>
+
+          <p>
+            <strong>${t.emailOfferAcceptedAmount}</strong>
+            ${formattedAmount}
+          </p>
+
+          <p>
+            ${t.emailOfferAcceptedTextTwo}
+          </p>
+
+          <p>ATHMOV</p>
+        </div>
+      `,
+    });
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json(
       {
         error:
-          error.message || "Error al enviar el correo de disputa",
+          error.message ||
+          "Error al enviar el email de oferta aceptada",
       },
       { status: 500 }
     );

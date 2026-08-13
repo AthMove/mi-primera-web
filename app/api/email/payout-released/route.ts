@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { sendEmail } from "@/lib/email";
+import { translations } from "@/lib/i18n";
 
 export async function POST(req: Request) {
   try {
@@ -32,7 +33,7 @@ export async function POST(req: Request) {
 
     const { data: seller } = await supabase
       .from("profiles")
-      .select("email, full_name")
+      .select("email, full_name, preferred_language")
       .eq("id", order.seller_id)
       .maybeSingle();
 
@@ -43,31 +44,40 @@ export async function POST(req: Request) {
       );
     }
 
+    const lang: "es" | "en" | "pt" =
+      seller.preferred_language === "en" ||
+      seller.preferred_language === "pt"
+        ? seller.preferred_language
+        : "es";
+
+    const t = translations[lang];
+
     await sendEmail({
       to: seller.email,
-     subject: "Tu pago de ATHMOV ha sido liberado",
+      subject: t.emailPayoutReleasedSubject,
       html: `
         <div style="font-family: Arial,sans-serif;color:#111;line-height:1.6;">
-          <h1>Pago liberado</h1>
+          <h1>${t.emailPayoutReleasedTitle}</h1>
 
-<p>Hola ${seller.full_name || "usuario"},</p>
+          <p>
+            ${t.emailHello} ${seller.full_name || t.emailUserFallback},
+          </p>
 
-<p>
-  El pago correspondiente a
-  <strong>${product?.title || "tu artículo"}</strong>
-  ha sido liberado.
-</p>
+          <p>
+            ${t.emailPayoutReleasedTextOne}
+            <strong>${product?.title || t.emailYourItemFallback}</strong>
+            ${t.emailPayoutReleasedTextTwo}
+          </p>
 
-<p>
-  Los fondos llegarán a tu cuenta de Stripe conectada
-  según los tiempos de procesamiento de Stripe.
-</p>
+          <p>
+            ${t.emailPayoutReleasedStripe}
+          </p>
 
-<p>
-  Gracias por vender en ATHMOV.
-</p>
+          <p>
+            ${t.emailPayoutReleasedThanks}
+          </p>
 
-<p>ATHMOV</p>
+          <p>ATHMOV</p>
         </div>
       `,
     });
@@ -75,7 +85,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json(
-      { error: error.message || "Error al enviar el email de pago" },
+      {
+        error:
+          error.message || "Error al enviar el email de pago",
+      },
       { status: 500 }
     );
   }

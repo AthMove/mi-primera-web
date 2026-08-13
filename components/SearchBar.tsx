@@ -1,5 +1,7 @@
 "use client";
 
+import { useLanguage } from "@/components/LanguageProvider";
+
 type Props = {
   value: string;
   onChange: (value: string) => void;
@@ -9,21 +11,9 @@ export default function SearchBar({
   value,
   onChange,
 }: Props) {
-  return (
-    <div style={wrapperStyle}>
-      <input
-        value={value}
-        onChange={(e) =>
-          onChange(e.target.value)
-        }
-        placeholder="Search products, brands, categories..."
-        style={inputStyle}
-      />
-    </div>
-  );
-}
+  const { t } = useLanguage();
 
-const wrapperStyle = {
+  const wrapperStyle = {
   width: "100%",
 };
 
@@ -37,3 +27,17 @@ const inputStyle = {
   outline: "none",
   boxShadow: "0 12px 40px rgba(0,0,0,0.04)",
 };
+
+  return (
+    <div style={wrapperStyle}>
+      <input
+        value={value}
+        onChange={(e) =>
+          onChange(e.target.value)
+        }
+        placeholder={t.searchMarketplace}
+        style={inputStyle}
+      />
+    </div>
+  );
+}

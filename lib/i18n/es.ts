@@ -2371,4 +2371,143 @@ releasePaymentSellerMessage:
 releasePaymentBuyerTitle: "Pedido completado",
 releasePaymentBuyerMessage:
   "El pedido se ha completado correctamente.",
+  filterSport: "DEPORTE",
+filterBrand: "MARCA",
+filterMinPrice: "PRECIO MÍN.",
+filterMaxPrice: "PRECIO MÁX.",
+filterAll: "Todos",
+filterAllBrands: "Todas",
+filterShowSold: "Mostrar productos vendidos",
+relatedArticlesEyebrow: "MÁS GUÍAS ATHMOV",
+relatedArticlesTitle: "También te puede interesar",
+featuredDescription:
+  "Una selección cuidada de productos premium destacados por ATHMOV.",
+featuredEditorialSelection:
+  "Selección editorial ATHMOV",
+featuredViewFullCollection:
+  "Ver colección completa",
+  golfPageGuideVerifyClubs:
+  "Cómo verificar unos palos de golf originales",
+golfPageGuideCalculatePrice:
+  "Cómo calcular el precio de palos de golf de segunda mano",
+golfPageGuideBuySell:
+  "Cuándo comprar y vender palos de golf de segunda mano",
+golfPageGuideDriver:
+  "Qué revisar antes de comprar un driver de segunda mano",
+golfPageGuideIrons:
+  "Qué revisar antes de comprar unos hierros usados",
+golfPageGuideBestCourses:
+  "Los mejores campos de golf de España",
+  padelGuideBullpadelVertex:
+  "Bullpadel Vertex 04 de segunda mano: guía completa para comprar con seguridad",
+padelGuideFakeRacket:
+  "Cómo detectar una pala de pádel falsa",
+padelGuideValueRacket:
+  "Cómo valorar una pala de pádel de segunda mano",
+  emailOrderDeliveredSubject:
+  "Tu pedido de ATHMOV ha sido entregado",
+emailOrderDeliveredTitle:
+  "Pedido entregado",
+emailHello:
+  "Hola",
+emailUserFallback:
+  "usuario",
+emailYourItemFallback:
+  "tu artículo",
+emailOrderDeliveredTextOne:
+  "Tu pedido de",
+emailOrderDeliveredTextTwo:
+  "ha sido entregado.",
+emailOrderDeliveredProtection:
+  "Si todo está correcto, el pedido se completará y el pago al vendedor será liberado de acuerdo con la Protección ATHMOV.",
+emailOrderDeliveredIssue:
+  "Si existe algún problema, puedes reportarlo desde tu página de Pedidos.",
+  emailPayoutReleasedSubject:
+  "Tu pago de ATHMOV ha sido liberado",
+emailPayoutReleasedTitle:
+  "Pago liberado",
+emailPayoutReleasedTextOne:
+  "El pago correspondiente a",
+emailPayoutReleasedTextTwo:
+  "ha sido liberado.",
+emailPayoutReleasedStripe:
+  "Los fondos llegarán a tu cuenta de Stripe conectada según los tiempos de procesamiento de Stripe.",
+emailPayoutReleasedThanks:
+  "Gracias por vender en ATHMOV.",
+  emailDisputeOpenedSubject:
+  "Se ha abierto una disputa en ATHMOV",
+emailDisputeOpenedTitle:
+  "Disputa abierta",
+emailDisputeOpenedTextOne:
+  "Se ha abierto una disputa relacionada con",
+emailDisputeReason:
+  "Motivo:",
+emailDisputeNoReason:
+  "No se ha indicado ningún motivo",
+emailDisputePaymentHeld:
+  "El pago ha quedado temporalmente retenido mientras ATHMOV revisa el caso.",
+emailDisputeCheckOrders:
+  "Consulta tu página de Pedidos para obtener más información.",
+  emailOfferReceivedSubject:
+  "Has recibido una nueva oferta en ATHMOV",
+emailOfferReceivedTitle:
+  "Nueva oferta recibida",
+emailOfferReceivedText:
+  "Has recibido una nueva oferta por",
+emailOfferLabel:
+  "Oferta:",
+emailBuyerLabel:
+  "Comprador:",
+emailAthmovBuyerFallback:
+  "Comprador de ATHMOV",
+emailOfferReceivedReview:
+  "Puedes revisar la oferta desde tu cuenta de ATHMOV.",
+  emailReviewReceivedSubject:
+  "Has recibido una nueva valoración en ATHMOV",
+emailReviewReceivedTitle:
+  "Nueva valoración recibida",
+emailReviewReceivedTextOne:
+  "Has recibido una valoración de",
+emailReviewReceivedStars:
+  "estrellas",
+emailReviewReceivedTextTwo:
+  "para",
+emailReviewReceivedThanks:
+  "Gracias por vender en ATHMOV.",
+  emailOfferRejectedSubject:
+  "Tu oferta no ha sido aceptada",
+emailOfferRejectedTitle:
+  "Tu oferta no ha sido aceptada",
+emailOfferRejectedTextOne:
+  "Lamentablemente, tu oferta por",
+emailOfferRejectedTextTwo:
+  "no ha sido aceptada por el vendedor.",
+emailOfferRejectedNextStep:
+  "Aún puedes contactar con el vendedor o realizar una nueva oferta.",
+emailThisProductFallback:
+  "este producto",
+  emailOfferAcceptedSubject:
+  "Tu oferta ha sido aceptada",
+emailOfferAcceptedTitle:
+  "Oferta aceptada",
+emailOfferAcceptedTextOne:
+  "El vendedor ha aceptado tu oferta por",
+emailOfferAcceptedTextTwo:
+  "Ya puedes continuar con la compra desde tu cuenta de ATHMOV.",
+emailOfferAcceptedAmount:
+  "Oferta aceptada:",
+  emailOrderShippedSubject:
+  "Tu pedido de ATHMOV ha sido enviado",
+emailOrderShippedTitle:
+  "Pedido enviado",
+emailOrderShippedTextOne:
+  "Tu pedido de",
+emailOrderShippedTextTwo:
+  "ha sido enviado.",
+emailCarrierLabel:
+  "Transportista:",
+emailPending:
+  "Pendiente",
+emailOrderShippedTrack:
+  "Puedes seguir tu pedido desde tu cuenta de ATHMOV.",
   };

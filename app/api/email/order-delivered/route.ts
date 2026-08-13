@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { sendEmail } from "@/lib/email";
+import { translations } from "@/lib/i18n";
 
 export async function POST(req: Request) {
   try {
@@ -32,7 +33,7 @@ export async function POST(req: Request) {
 
     const { data: buyer } = await supabase
       .from("profiles")
-      .select("email, full_name")
+      .select("email, full_name, preferred_language")
       .eq("id", order.buyer_id)
       .maybeSingle();
 
@@ -43,28 +44,37 @@ export async function POST(req: Request) {
       );
     }
 
+   const lang: "es" | "en" | "pt" =
+  buyer.preferred_language === "en" ||
+  buyer.preferred_language === "pt"
+    ? buyer.preferred_language
+    : "es";
+
+    const t = translations[lang];
+
     await sendEmail({
       to: buyer.email,
-      subject: "Tu pedido de ATHMOV ha sido entregado",
+      subject: t.emailOrderDeliveredSubject,
       html: `
         <div style="font-family: Arial, sans-serif; color: #111; line-height: 1.6;">
-          <h1>Pedido entregado</h1>
-
-          <p>Hola ${buyer.full_name || "usuario"},</p>
+          <h1>${t.emailOrderDeliveredTitle}</h1>
 
           <p>
-            Tu pedido de
-            <strong>${product?.title || "tu artículo"}</strong>
-            ha sido entregado.
+            ${t.emailHello} ${buyer.full_name || t.emailUserFallback},
           </p>
 
           <p>
-            Si todo está correcto, el pedido se completará y el pago al vendedor
-            será liberado de acuerdo con la Protección ATHMOV.
+            ${t.emailOrderDeliveredTextOne}
+            <strong>${product?.title || t.emailYourItemFallback}</strong>
+            ${t.emailOrderDeliveredTextTwo}
           </p>
 
           <p>
-            Si existe algún problema, puedes reportarlo desde tu página de Pedidos.
+            ${t.emailOrderDeliveredProtection}
+          </p>
+
+          <p>
+            ${t.emailOrderDeliveredIssue}
           </p>
 
           <p>ATHMOV</p>
