@@ -756,7 +756,7 @@ return (
   <main className="product-detail-page" style={pageStyle}>
   <nav
   className="product-breadcrumb"
-  aria-label="Breadcrumb"
+  aria-label={t.brandBreadcrumbLabel}
 >
   <span onClick={() => router.push("/")}>
    {t.home}

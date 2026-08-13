@@ -114,7 +114,10 @@ const relatedGuides = [
   return (
     <>
       <section className="golf-hero">
-       <nav className="golf-breadcrumb" aria-label="Breadcrumb">
+       <nav
+  className="golf-breadcrumb"
+  aria-label={t.brandBreadcrumbLabel}
+>
           <Link href="/">{t.home}</Link>
           <span>›</span>
           <span>{t.golf}</span>

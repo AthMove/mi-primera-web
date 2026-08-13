@@ -102,7 +102,10 @@ const relatedGuides = [
   return (
     <>
       <section className="padel-hero">
-        <nav className="padel-breadcrumb" aria-label="Breadcrumb">
+<nav
+  className="padel-breadcrumb"
+  aria-label={t.brandBreadcrumbLabel}
+>
           <Link href="/">{t.home}</Link>
           <span>›</span>
           <span>{t.padel}</span>
