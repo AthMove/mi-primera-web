@@ -2504,4 +2504,31 @@ emailPending:
   "Pending",
 emailOrderShippedTrack:
   "You can track your order from your ATHMOV account.",
+  emailOrderConfirmedSubject:
+  "Your ATHMOV order is confirmed",
+emailOrderConfirmedTitle:
+  "Order confirmed",
+emailOrderConfirmedTextOne:
+  "Your order for",
+emailOrderConfirmedTextTwo:
+  "has been confirmed.",
+emailOrderConfirmedShipping:
+  "The seller will prepare the shipment and add tracking shortly.",
+emailTotalLabel:
+  "Total:",
+emailOrderConfirmedTrack:
+  "You can track your order from your ATHMOV account.",
+
+emailNewSaleSubject:
+  "You have sold an item on ATHMOV",
+emailNewSaleTitle:
+  "New sale",
+emailNewSaleTextOne:
+  "Your item",
+emailNewSaleTextTwo:
+  "has been sold.",
+emailNewSalePrepare:
+  "Prepare the shipment and add tracking from your Orders page.",
+emailNewSalePayment:
+  "Your payment will be released once the order is successfully completed.",
   } satisfies Record<keyof typeof es, string>;

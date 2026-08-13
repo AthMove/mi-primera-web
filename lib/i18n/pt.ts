@@ -2521,4 +2521,31 @@ emailPending:
   "Pendente",
 emailOrderShippedTrack:
   "Podes acompanhar a tua encomenda a partir da tua conta ATHMOV.",
+  emailOrderConfirmedSubject:
+  "A tua encomenda ATHMOV está confirmada",
+emailOrderConfirmedTitle:
+  "Encomenda confirmada",
+emailOrderConfirmedTextOne:
+  "A tua encomenda de",
+emailOrderConfirmedTextTwo:
+  "foi confirmada.",
+emailOrderConfirmedShipping:
+  "O vendedor irá preparar o envio e adicionar o seguimento em breve.",
+emailTotalLabel:
+  "Total:",
+emailOrderConfirmedTrack:
+  "Podes acompanhar a tua encomenda a partir da tua conta ATHMOV.",
+
+emailNewSaleSubject:
+  "Vendeste um artigo na ATHMOV",
+emailNewSaleTitle:
+  "Nova venda",
+emailNewSaleTextOne:
+  "O teu artigo",
+emailNewSaleTextTwo:
+  "foi vendido.",
+emailNewSalePrepare:
+  "Prepara o envio e adiciona o seguimento a partir da tua página de Encomendas.",
+emailNewSalePayment:
+  "O teu pagamento será libertado quando a encomenda for concluída corretamente.",
   } satisfies Record<keyof typeof es, string>;

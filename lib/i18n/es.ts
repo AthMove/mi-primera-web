@@ -2510,4 +2510,31 @@ emailPending:
   "Pendiente",
 emailOrderShippedTrack:
   "Puedes seguir tu pedido desde tu cuenta de ATHMOV.",
+  emailOrderConfirmedSubject:
+  "Tu pedido de ATHMOV está confirmado",
+emailOrderConfirmedTitle:
+  "Pedido confirmado",
+emailOrderConfirmedTextOne:
+  "Tu pedido de",
+emailOrderConfirmedTextTwo:
+  "ha sido confirmado.",
+emailOrderConfirmedShipping:
+  "El vendedor preparará el envío y añadirá el seguimiento próximamente.",
+emailTotalLabel:
+  "Total:",
+emailOrderConfirmedTrack:
+  "Puedes seguir tu pedido desde tu cuenta de ATHMOV.",
+
+emailNewSaleSubject:
+  "Has vendido un artículo en ATHMOV",
+emailNewSaleTitle:
+  "Nueva venta",
+emailNewSaleTextOne:
+  "Tu artículo",
+emailNewSaleTextTwo:
+  "se ha vendido.",
+emailNewSalePrepare:
+  "Prepara el envío y añade el seguimiento desde tu página de pedidos.",
+emailNewSalePayment:
+  "Tu pago se liberará cuando el pedido se complete correctamente.",
   };

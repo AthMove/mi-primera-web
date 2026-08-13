@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
+import { translations } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -52,8 +53,11 @@ export async function POST(req: Request) {
       let paymentIntentId = session.payment_intent?.toString();
 
       if (!paymentIntentId && session.id) {
-        const fullSession = await stripe.checkout.sessions.retrieve(session.id);
-        paymentIntentId = fullSession.payment_intent?.toString();
+        const fullSession =
+          await stripe.checkout.sessions.retrieve(session.id);
+
+        paymentIntentId =
+          fullSession.payment_intent?.toString();
       }
 
       let orderId = metadata.order_id;
@@ -74,7 +78,11 @@ export async function POST(req: Request) {
       }
 
       if (!orderId) {
-        console.log("NO SE ENCONTRÓ PEDIDO PARA CHECKOUT:", metadata);
+        console.log(
+          "NO SE ENCONTRÓ PEDIDO PARA CHECKOUT:",
+          metadata
+        );
+
         return NextResponse.json({ received: true });
       }
 
@@ -87,9 +95,13 @@ export async function POST(req: Request) {
         .eq("id", orderId)
         .maybeSingle();
 
-      const wasAlreadyPaid = currentOrder?.payment_status === "paid";
+      const wasAlreadyPaid =
+        currentOrder?.payment_status === "paid";
 
-      const { data: updatedOrder, error: updateError } = await supabase
+      const {
+        data: updatedOrder,
+        error: updateError,
+      } = await supabase
         .from("orders")
         .update({
           status: "paid",
@@ -97,20 +109,34 @@ export async function POST(req: Request) {
           transfer_status: "pending",
           stripe_payment_intent: paymentIntentId,
           paid_at: new Date().toISOString(),
-          platform_fee: Number(metadata.platform_fee || 0),
-          seller_amount: Number(metadata.seller_amount || 0),
-          stripe_fee_estimate: Number(metadata.stripe_fee_estimate || 0),
-          seller_stripe_account_id: metadata.seller_stripe_account_id,
+          platform_fee: Number(
+            metadata.platform_fee || 0
+          ),
+          seller_amount: Number(
+            metadata.seller_amount || 0
+          ),
+          stripe_fee_estimate: Number(
+            metadata.stripe_fee_estimate || 0
+          ),
+          seller_stripe_account_id:
+            metadata.seller_stripe_account_id,
         })
         .eq("id", orderId)
         .select("*")
         .single();
 
       if (updateError || !updatedOrder) {
-        console.log("ERROR AL ACTUALIZAR PEDIDO:", updateError);
+        console.log(
+          "ERROR AL ACTUALIZAR PEDIDO:",
+          updateError
+        );
 
         return NextResponse.json(
-          { error: updateError?.message || "No se pudo actualizar el pedido" },
+          {
+            error:
+              updateError?.message ||
+              "No se pudo actualizar el pedido",
+          },
           { status: 500 }
         );
       }
@@ -128,7 +154,10 @@ export async function POST(req: Request) {
           .eq("status", "pending");
 
         if (productError) {
-          console.log("ERROR AL MARCAR PRODUCTO COMO VENDIDO:", productError);
+          console.log(
+            "ERROR AL MARCAR PRODUCTO COMO VENDIDO:",
+            productError
+          );
         }
       }
 
@@ -149,43 +178,84 @@ export async function POST(req: Request) {
 
         const { data: buyer } = await supabase
           .from("profiles")
-          .select("email, full_name")
+          .select(
+            "email, full_name, preferred_language"
+          )
           .eq("id", order.buyer_id)
           .maybeSingle();
 
         const { data: seller } = await supabase
           .from("profiles")
-          .select("email, full_name")
+          .select(
+            "email, full_name, preferred_language"
+          )
           .eq("id", order.seller_id)
           .maybeSingle();
 
-        const productTitle = product?.title || "tu artículo";
-        const amount = Number(order.amount || metadata.amount || 0).toFixed(2);
-
         if (buyer?.email) {
+          const buyerLang: "es" | "en" | "pt" =
+            buyer.preferred_language === "en" ||
+            buyer.preferred_language === "pt"
+              ? buyer.preferred_language
+              : "es";
+
+          const buyerT = translations[buyerLang];
+
+          const buyerLocale =
+            buyerLang === "en"
+              ? "en-GB"
+              : buyerLang === "pt"
+                ? "pt-PT"
+                : "es-ES";
+
+          const buyerProductTitle =
+            product?.title ||
+            buyerT.emailYourItemFallback;
+
+          const formattedAmount =
+            new Intl.NumberFormat(buyerLocale, {
+              style: "currency",
+              currency: "EUR",
+            }).format(
+              Number(
+                order.amount ||
+                  metadata.amount ||
+                  0
+              )
+            );
+
           await sendEmail({
             to: buyer.email,
-            subject: "Tu pedido de ATHMOV está confirmado",
+            subject:
+              buyerT.emailOrderConfirmedSubject,
             html: `
               <div style="font-family: Arial, sans-serif; color: #111; line-height: 1.6;">
-                <h1>Pedido confirmado</h1>
-
-                <p>Hola ${buyer.full_name || "usuario"},</p>
+                <h1>${buyerT.emailOrderConfirmedTitle}</h1>
 
                 <p>
-                  Tu pedido de
-                  <strong>${productTitle}</strong>
-                  ha sido confirmado.
+                  ${buyerT.emailHello} ${
+                    buyer.full_name ||
+                    buyerT.emailUserFallback
+                  },
                 </p>
 
                 <p>
-                  El vendedor preparará el envío y añadirá el seguimiento próximamente.
+                  ${buyerT.emailOrderConfirmedTextOne}
+                  <strong>${buyerProductTitle}</strong>
+                  ${buyerT.emailOrderConfirmedTextTwo}
                 </p>
 
-                <p><strong>Total:</strong> €${amount}</p>
+                <p>
+                  ${buyerT.emailOrderConfirmedShipping}
+                </p>
 
                 <p>
-                  Puedes seguir tu pedido desde tu cuenta de ATHMOV.
+                  <strong>${buyerT.emailTotalLabel}</strong>
+                  ${formattedAmount}
+                </p>
+
+                <p>
+                  ${buyerT.emailOrderConfirmedTrack}
                 </p>
 
                 <p>ATHMOV</p>
@@ -195,27 +265,44 @@ export async function POST(req: Request) {
         }
 
         if (seller?.email) {
+          const sellerLang: "es" | "en" | "pt" =
+            seller.preferred_language === "en" ||
+            seller.preferred_language === "pt"
+              ? seller.preferred_language
+              : "es";
+
+          const sellerT = translations[sellerLang];
+
+          const sellerProductTitle =
+            product?.title ||
+            sellerT.emailYourItemFallback;
+
           await sendEmail({
             to: seller.email,
-            subject: "Has vendido un artículo en ATHMOV",
+            subject: sellerT.emailNewSaleSubject,
             html: `
               <div style="font-family: Arial, sans-serif; color: #111; line-height: 1.6;">
-                <h1>Nueva venta</h1>
-
-                <p>Hola ${seller.full_name || "usuario"},</p>
+                <h1>${sellerT.emailNewSaleTitle}</h1>
 
                 <p>
-                  Tu artículo
-                  <strong>${productTitle}</strong>
-                  se ha vendido.
+                  ${sellerT.emailHello} ${
+                    seller.full_name ||
+                    sellerT.emailUserFallback
+                  },
                 </p>
 
                 <p>
-                  Prepara el envío y añade el seguimiento desde tu página de pedidos.
+                  ${sellerT.emailNewSaleTextOne}
+                  <strong>${sellerProductTitle}</strong>
+                  ${sellerT.emailNewSaleTextTwo}
                 </p>
 
                 <p>
-                  Tu pago se liberará cuando el pedido se complete correctamente.
+                  ${sellerT.emailNewSalePrepare}
+                </p>
+
+                <p>
+                  ${sellerT.emailNewSalePayment}
                 </p>
 
                 <p>ATHMOV</p>
@@ -226,37 +313,56 @@ export async function POST(req: Request) {
       }
     }
 
-    if (event.type === "payment_intent.payment_failed") {
-      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+    if (
+      event.type === "payment_intent.payment_failed"
+    ) {
+      const paymentIntent =
+        event.data.object as Stripe.PaymentIntent;
 
       await supabase
         .from("orders")
         .update({
           payment_status: "failed",
         })
-        .eq("stripe_payment_intent", paymentIntent.id);
+        .eq(
+          "stripe_payment_intent",
+          paymentIntent.id
+        );
     }
 
     if (event.type === "charge.refunded") {
-      const charge = event.data.object as Stripe.Charge;
-      const paymentIntentId = charge.payment_intent?.toString();
+      const charge =
+        event.data.object as Stripe.Charge;
+
+      const paymentIntentId =
+        charge.payment_intent?.toString();
 
       await supabase
         .from("orders")
         .update({
           payment_status: "refunded",
           refunded_at: new Date().toISOString(),
-          refund_amount: (charge.amount_refunded || 0) / 100,
+          refund_amount:
+            (charge.amount_refunded || 0) / 100,
         })
-        .eq("stripe_payment_intent", paymentIntentId);
+        .eq(
+          "stripe_payment_intent",
+          paymentIntentId
+        );
     }
 
     return NextResponse.json({ received: true });
   } catch (error: any) {
-    console.log("ERROR EN EL WEBHOOK:", error.message);
+    console.log(
+      "ERROR EN EL WEBHOOK:",
+      error.message
+    );
 
     return NextResponse.json(
-      { error: error.message || "Error en el webhook" },
+      {
+        error:
+          error.message || "Error en el webhook",
+      },
       { status: 500 }
     );
   }
