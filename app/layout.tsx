@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Navbar from "../components/Navbar";
 import { LanguageProvider } from "../components/LanguageProvider";
+import Script from "next/script";
 
 export const viewport: Viewport = {
   themeColor: "#0b0b0b",
@@ -129,7 +130,23 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="es">
+      <html lang="es">
+  <Script
+    src="https://www.googletagmanager.com/gtag/js?id=AW-18397701727"
+    strategy="afterInteractive"
+  />
+
+  <Script id="google-ads-tag" strategy="afterInteractive">
+    {`
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'AW-18397701727');
+    `}
+  </Script>
+   <body>
+   </body>
+
       <body>
         <script
           type="application/ld+json"
