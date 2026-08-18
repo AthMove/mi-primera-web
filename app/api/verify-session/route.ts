@@ -27,11 +27,20 @@ export async function POST(req: Request) {
 
     const session = await stripe.checkout.sessions.retrieve(body.sessionId);
 
-    return NextResponse.json({
-      success: session.payment_status === "paid",
-      payment_status: session.payment_status,
-      order_id: session.metadata?.order_id || null,
-    });
+  return NextResponse.json({
+  success: session.payment_status === "paid",
+  payment_status: session.payment_status,
+  order_id: session.metadata?.order_id || null,
+
+  transaction_id: session.id,
+
+  value:
+    typeof session.amount_total === "number"
+      ? session.amount_total / 100
+      : 0,
+
+  currency: (session.currency || "eur").toUpperCase(),
+});
   } catch (error) {
     console.log("ERROR AL VERIFICAR LA SESIÓN:", error);
 

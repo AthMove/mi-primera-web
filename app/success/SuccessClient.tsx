@@ -36,6 +36,19 @@ export default function SuccessClient() {
         console.log("VERIFY SESSION ERROR:", data.error || data);
       }
 
+      if (response.ok && data.success && typeof window !== "undefined") {
+  const gtag = (window as any).gtag;
+
+  if (typeof gtag === "function") {
+    gtag("event", "conversion", {
+      send_to: "AW-18397701727/012XCIP080McEN_M2sRE",
+      value: data.value,
+      currency: data.currency || "EUR",
+      transaction_id: data.transaction_id,
+    });
+  }
+}
+
       setLoading(false);
     } catch (error) {
       console.log("SUCCESS PAGE ERROR:", error);
