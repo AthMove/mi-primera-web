@@ -2537,4 +2537,109 @@ emailNewSalePrepare:
   "Prepara el envío y añade el seguimiento desde tu página de pedidos.",
 emailNewSalePayment:
   "Tu pago se liberará cuando el pedido se complete correctamente.",
+sectionOneTitle:
+  "La Bullpadel Vertex 04 sigue siendo una de las palas más buscadas",
+
+sectionOneTextOne:
+  "La Bullpadel Vertex 04 se ha consolidado como una de las palas de pádel de referencia para jugadores de nivel avanzado. Su potencia, estabilidad y construcción con materiales de alta gama hacen que siga siendo una de las opciones más demandadas, tanto nueva como de segunda mano.",
+
+sectionOneTextTwo:
+  "Precisamente por su popularidad, el mercado de ocasión ofrece grandes oportunidades para quienes quieren acceder a una pala premium sin pagar el precio completo.",
+
+sectionOneTextThree:
+  "En esta guía descubrirás qué revisar antes de comprar una Bullpadel Vertex 04 usada, cuánto deberías pagar y cómo detectar posibles señales de falsificación.",
+
+sectionOneLinkText:
+  "palas Bullpadel de segunda mano disponibles",
+
+specsTitle: "Características principales",
+
+specShape: "Forma",
+specShapeValue: "Diamante",
+specBalance: "Balance",
+specBalanceValue: "Alto",
+specLevel: "Nivel",
+specLevelValue: "Avanzado / Competición",
+specPower: "Potencia",
+specPowerValue: "Muy alta",
+specControl: "Control",
+specControlValue: "Alto",
+specSurface: "Superficie",
+specSurfaceValue: "Xtend Carbon 12K",
+
+specBulletOne:
+  "Marco CarbonTube 100 % carbono.",
+specBulletTwo:
+  "Núcleo MultiEva.",
+specBulletThree:
+  "Superficie Xtend Carbon 12K.",
+specBulletFour:
+  "Diseño dirigido al juego ofensivo.",
+
+specClosing:
+  "Es una pala pensada para jugadores que buscan máxima potencia en el remate sin renunciar a una buena estabilidad.",
+  checkTitle:
+  "Qué revisar antes de comprar",
+
+checkFrameTitle:
+  "1. Marco",
+checkFrameIntro:
+  "Comprueba que no existan:",
+checkFrameBulletOne:
+  "Grietas.",
+checkFrameBulletTwo:
+  "Reparaciones.",
+checkFrameBulletThree:
+  "Golpes estructurales.",
+checkFrameText:
+  "Los pequeños roces superficiales pueden ser normales, pero una grieta profunda puede afectar a la durabilidad y al rendimiento.",
+
+checkFacesTitle:
+  "2. Caras",
+checkFacesTextOne:
+  "Observa ambas caras con buena luz y, cuando sea posible, desde diferentes ángulos.",
+checkFacesIntro:
+  "Busca:",
+checkFacesBulletOne:
+  "Fisuras.",
+checkFacesBulletTwo:
+  "Desprendimientos del carbono.",
+checkFacesBulletThree:
+  "Hundimientos.",
+checkFacesBulletFour:
+  "Zonas con textura irregular.",
+
+checkProtectorTitle:
+  "3. Protector",
+checkProtectorTextOne:
+  "Si lleva protector, pregunta si se colocó desde el primer día. Muchas palas bien cuidadas incorporan protector desde nuevas.",
+checkProtectorTextTwo:
+  "No obstante, también conviene observar la zona que queda debajo, porque un protector puede ocultar golpes o reparaciones.",
+
+checkBridgeTitle:
+  "4. Puente",
+checkBridgeText:
+  "El puente es una de las zonas que más impactos y tensión soporta. Revisa que no tenga grietas, deformaciones o reparaciones.",
+
+checkGripTitle:
+  "5. Empuñadura",
+checkGripIntro:
+  "Comprueba:",
+checkGripBulletOne:
+  "El estado del grip.",
+checkGripBulletTwo:
+  "La ausencia de movimientos extraños.",
+checkGripBulletThree:
+  "Que el tapón inferior permanezca firme.",
+checkGripBulletFour:
+  "Que la correa de seguridad esté en buen estado.",
+  checkImageAlt:
+  "Infografía con los puntos que deben revisarse antes de comprar una Bullpadel Vertex 04 usada",
+checkImageCaption:
+  "Marco, caras, protector, puente y empuñadura son las cinco zonas esenciales que debes inspeccionar.",
+
+detailsImageAlt:
+  "Detalles del marco, cara, protector, puente y empuñadura de una Bullpadel Vertex 04",
+detailsImageCaption:
+  "Solicita fotografías detalladas y evita valorar una pala únicamente con una imagen frontal.",
   };

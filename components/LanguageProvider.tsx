@@ -52,70 +52,109 @@ export function LanguageProvider({
     }
   };
 
-  useEffect(() => {
-    const initializeLanguage = async () => {
-      const savedLang =
-        localStorage.getItem(
-          "athmov-language"
-        ) as Language | null;
+useEffect(() => {
+  const initializeLanguage = async () => {
+    const savedLang =
+      localStorage.getItem(
+        "athmov-language"
+      ) as Language | null;
 
-      if (
-        savedLang === "es" ||
-        savedLang === "en" ||
-        savedLang === "pt"
-      ) {
-        setLangState(savedLang);
+    const languageSource =
+      localStorage.getItem(
+        "athmov-language-source"
+      );
 
-        await saveLanguageToProfile(
-          savedLang
-        );
+    const isValidLanguage = (
+      value: unknown
+    ): value is Language =>
+      value === "es" ||
+      value === "en" ||
+      value === "pt";
 
-        setMounted(true);
-        return;
+    // 1. Elección manual del usuario
+    if (
+      isValidLanguage(savedLang) &&
+      languageSource === "manual"
+    ) {
+      setLangState(savedLang);
+
+      await saveLanguageToProfile(
+        savedLang
+      );
+
+      setMounted(true);
+      return;
+    }
+
+    try {
+      // 2. Idioma guardado en el perfil
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        const { data: profile } =
+          await supabase
+            .from("profiles")
+            .select("preferred_language")
+            .eq("id", user.id)
+            .maybeSingle();
+
+        const profileLang =
+          profile?.preferred_language;
+
+        if (isValidLanguage(profileLang)) {
+          setLangState(profileLang);
+
+          localStorage.setItem(
+            "athmov-language",
+            profileLang
+          );
+
+          localStorage.setItem(
+            "athmov-language-source",
+            "profile"
+          );
+
+          setMounted(true);
+          return;
+        }
       }
 
-      try {
-        const response = await fetch(
-          "/api/language",
-          {
-            cache: "no-store",
-          }
+      // 3. Detección automática por país
+      const response = await fetch(
+        "/api/language",
+        {
+          cache: "no-store",
+        }
+      );
+
+      if (response.ok) {
+        const data =
+          await response.json();
+
+        const detectedLang: Language =
+          isValidLanguage(data.lang)
+            ? data.lang
+            : "en";
+
+        setLangState(detectedLang);
+
+        localStorage.setItem(
+          "athmov-language",
+          detectedLang
         );
 
-        if (response.ok) {
-          const data =
-            await response.json();
+        localStorage.setItem(
+          "athmov-language-source",
+          "auto"
+        );
 
-          const detectedLang: Language =
-            data.lang === "es" ||
-            data.lang === "pt" ||
-            data.lang === "en"
-              ? data.lang
-              : "en";
-
-          setLangState(detectedLang);
-
-          localStorage.setItem(
-            "athmov-language",
-            detectedLang
-          );
-
-          await saveLanguageToProfile(
-            detectedLang
-          );
-        } else {
-          setLangState("en");
-
-          localStorage.setItem(
-            "athmov-language",
-            "en"
-          );
-
-          await saveLanguageToProfile(
-            "en"
-          );
-        }
-      } catch {
+        await saveLanguageToProfile(
+          detectedLang
+        );
+      } else {
+        // 4. Fallback
         setLangState("en");
 
         localStorage.setItem(
@@ -123,16 +162,38 @@ export function LanguageProvider({
           "en"
         );
 
+        localStorage.setItem(
+          "athmov-language-source",
+          "auto"
+        );
+
         await saveLanguageToProfile(
           "en"
         );
       }
+    } catch {
+      setLangState("en");
 
-      setMounted(true);
-    };
+      localStorage.setItem(
+        "athmov-language",
+        "en"
+      );
 
-    initializeLanguage();
-  }, []);
+      localStorage.setItem(
+        "athmov-language-source",
+        "auto"
+      );
+
+      await saveLanguageToProfile(
+        "en"
+      );
+    }
+
+    setMounted(true);
+  };
+
+  initializeLanguage();
+}, []);
 
   const setLang = (
     newLang: Language
@@ -143,6 +204,11 @@ export function LanguageProvider({
       "athmov-language",
       newLang
     );
+
+    localStorage.setItem(
+  "athmov-language-source",
+  "manual"
+);
 
     void saveLanguageToProfile(
       newLang

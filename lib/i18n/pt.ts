@@ -2548,4 +2548,109 @@ emailNewSalePrepare:
   "Prepara o envio e adiciona o seguimento a partir da tua página de Encomendas.",
 emailNewSalePayment:
   "O teu pagamento será libertado quando a encomenda for concluída corretamente.",
+ sectionOneTitle:
+  "A Bullpadel Vertex 04 continua a ser uma das raquetes mais procuradas",
+
+sectionOneTextOne:
+  "A Bullpadel Vertex 04 consolidou-se como uma das raquetes de padel de referência para jogadores de nível avançado. A sua potência, estabilidade e construção com materiais de gama alta fazem com que continue a ser uma das opções mais procuradas, tanto nova como em segunda mão.",
+
+sectionOneTextTwo:
+  "Precisamente devido à sua popularidade, o mercado de ocasião oferece grandes oportunidades para quem quer ter acesso a uma raquete premium sem pagar o preço total de uma nova.",
+
+sectionOneTextThree:
+  "Neste guia vais descobrir o que verificar antes de comprar uma Bullpadel Vertex 04 usada, quanto deves pagar e como detetar possíveis sinais de falsificação.",
+
+sectionOneLinkText:
+  "raquetes Bullpadel em segunda mão disponíveis",
+
+specsTitle: "Características principais",
+
+specShape: "Forma",
+specShapeValue: "Diamante",
+specBalance: "Equilíbrio",
+specBalanceValue: "Alto",
+specLevel: "Nível",
+specLevelValue: "Avançado / Competição",
+specPower: "Potência",
+specPowerValue: "Muito alta",
+specControl: "Controlo",
+specControlValue: "Alto",
+specSurface: "Superfície",
+specSurfaceValue: "Xtend Carbon 12K",
+
+specBulletOne:
+  "Estrutura CarbonTube em 100 % carbono.",
+specBulletTwo:
+  "Núcleo MultiEva.",
+specBulletThree:
+  "Superfície Xtend Carbon 12K.",
+specBulletFour:
+  "Design orientado para o jogo ofensivo.",
+
+specClosing:
+  "É uma raquete pensada para jogadores que procuram máxima potência no remate sem abdicar de uma boa estabilidade.",
+  checkTitle:
+  "O que verificar antes de comprar",
+
+checkFrameTitle:
+  "1. Estrutura",
+checkFrameIntro:
+  "Verifica se não existem:",
+checkFrameBulletOne:
+  "Fissuras.",
+checkFrameBulletTwo:
+  "Reparações.",
+checkFrameBulletThree:
+  "Impactos estruturais.",
+checkFrameText:
+  "Pequenos riscos superficiais podem ser normais, mas uma fissura profunda pode afetar a durabilidade e o desempenho.",
+
+checkFacesTitle:
+  "2. Faces",
+checkFacesTextOne:
+  "Observa ambas as faces com boa luz e, sempre que possível, a partir de diferentes ângulos.",
+checkFacesIntro:
+  "Procura:",
+checkFacesBulletOne:
+  "Fissuras.",
+checkFacesBulletTwo:
+  "Descolamento do carbono.",
+checkFacesBulletThree:
+  "Afundamentos.",
+checkFacesBulletFour:
+  "Zonas com textura irregular.",
+
+checkProtectorTitle:
+  "3. Protetor",
+checkProtectorTextOne:
+  "Se tiver protetor, pergunta se foi colocado desde o primeiro dia. Muitas raquetes bem cuidadas usam protetor desde novas.",
+checkProtectorTextTwo:
+  "Também convém observar a zona por baixo, porque um protetor pode ocultar impactos ou reparações.",
+
+checkBridgeTitle:
+  "4. Ponte",
+checkBridgeText:
+  "A ponte é uma das zonas que suporta mais impactos e tensão. Verifica se não apresenta fissuras, deformações ou reparações.",
+
+checkGripTitle:
+  "5. Punho",
+checkGripIntro:
+  "Verifica:",
+checkGripBulletOne:
+  "O estado do grip.",
+checkGripBulletTwo:
+  "A ausência de movimentos anormais.",
+checkGripBulletThree:
+  "Que a tampa inferior permaneça firme.",
+checkGripBulletFour:
+  "Que a correia de segurança esteja em bom estado.",
+  checkImageAlt:
+  "Infografia com os pontos que devem ser verificados antes de comprar uma Bullpadel Vertex 04 usada",
+checkImageCaption:
+  "Estrutura, faces, protetor, ponte e punho são as cinco zonas essenciais que deves inspecionar.",
+
+detailsImageAlt:
+  "Detalhes da estrutura, face, protetor, ponte e punho de uma Bullpadel Vertex 04",
+detailsImageCaption:
+  "Pede fotografias detalhadas e evita avaliar uma raquete apenas com uma imagem frontal.",
   } satisfies Record<keyof typeof es, string>;

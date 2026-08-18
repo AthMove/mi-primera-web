@@ -2531,4 +2531,109 @@ emailNewSalePrepare:
   "Prepare the shipment and add tracking from your Orders page.",
 emailNewSalePayment:
   "Your payment will be released once the order is successfully completed.",
+ sectionOneTitle:
+  "The Bullpadel Vertex 04 remains one of the most sought-after rackets",
+
+sectionOneTextOne:
+  "The Bullpadel Vertex 04 has established itself as one of the benchmark padel rackets for advanced players. Its power, stability and construction with high-end materials mean it remains one of the most sought-after options, both new and second-hand.",
+
+sectionOneTextTwo:
+  "Precisely because of its popularity, the second-hand market offers great opportunities for players who want access to a premium racket without paying the full new price.",
+
+sectionOneTextThree:
+  "In this guide, you will learn what to check before buying a used Bullpadel Vertex 04, how much you should pay and how to spot possible signs of counterfeiting.",
+
+sectionOneLinkText:
+  "second-hand Bullpadel rackets available",
+
+specsTitle: "Key specifications",
+
+specShape: "Shape",
+specShapeValue: "Diamond",
+specBalance: "Balance",
+specBalanceValue: "High",
+specLevel: "Level",
+specLevelValue: "Advanced / Competition",
+specPower: "Power",
+specPowerValue: "Very high",
+specControl: "Control",
+specControlValue: "High",
+specSurface: "Surface",
+specSurfaceValue: "Xtend Carbon 12K",
+
+specBulletOne:
+  "100% carbon CarbonTube frame.",
+specBulletTwo:
+  "MultiEva core.",
+specBulletThree:
+  "Xtend Carbon 12K surface.",
+specBulletFour:
+  "Design focused on offensive play.",
+
+specClosing:
+  "It is designed for players looking for maximum power on smashes without giving up good stability.",
+  checkTitle:
+  "What to check before buying",
+
+checkFrameTitle:
+  "1. Frame",
+checkFrameIntro:
+  "Check that there are no:",
+checkFrameBulletOne:
+  "Cracks.",
+checkFrameBulletTwo:
+  "Repairs.",
+checkFrameBulletThree:
+  "Structural impacts.",
+checkFrameText:
+  "Small superficial marks can be normal, but a deep crack may affect durability and performance.",
+
+checkFacesTitle:
+  "2. Faces",
+checkFacesTextOne:
+  "Inspect both faces in good light and, whenever possible, from different angles.",
+checkFacesIntro:
+  "Look for:",
+checkFacesBulletOne:
+  "Cracks.",
+checkFacesBulletTwo:
+  "Carbon delamination.",
+checkFacesBulletThree:
+  "Dents.",
+checkFacesBulletFour:
+  "Areas with irregular texture.",
+
+checkProtectorTitle:
+  "3. Protector",
+checkProtectorTextOne:
+  "If the racket has a protector, ask whether it was fitted from the first day. Many well-cared-for rackets use a protector from new.",
+checkProtectorTextTwo:
+  "It is also worth checking the area underneath, as a protector can hide impacts or repairs.",
+
+checkBridgeTitle:
+  "4. Bridge",
+checkBridgeText:
+  "The bridge is one of the areas that withstands the most impact and stress. Check for cracks, deformation or repairs.",
+
+checkGripTitle:
+  "5. Grip",
+checkGripIntro:
+  "Check:",
+checkGripBulletOne:
+  "The condition of the grip.",
+checkGripBulletTwo:
+  "That there is no unusual movement.",
+checkGripBulletThree:
+  "That the bottom cap remains firmly in place.",
+checkGripBulletFour:
+  "That the safety strap is in good condition.",
+  checkImageAlt:
+  "Infographic showing the areas to check before buying a used Bullpadel Vertex 04",
+checkImageCaption:
+  "The frame, faces, protector, bridge and grip are the five essential areas to inspect.",
+
+detailsImageAlt:
+  "Details of the frame, face, protector, bridge and grip of a Bullpadel Vertex 04",
+detailsImageCaption:
+  "Ask for detailed photographs and avoid assessing a racket from a single front-facing image.",
   } satisfies Record<keyof typeof es, string>;
