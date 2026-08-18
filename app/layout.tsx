@@ -130,21 +130,21 @@ export default function RootLayout({
   };
 
   return (
-      <html lang="es">
-  <Script
-    src="https://www.googletagmanager.com/gtag/js?id=AW-18397701727"
-    strategy="afterInteractive"
-  />
+  <html lang="es">
+  <body>
+    <Script
+      src="https://www.googletagmanager.com/gtag/js?id=AW-18397701727"
+      strategy="afterInteractive"
+    />
 
-  <Script id="google-ads-tag" strategy="afterInteractive">
-    {`
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'AW-18397701727');
-    `}
-  </Script>
-   <body>
+    <Script id="google-ads-tag" strategy="afterInteractive">
+      {`
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'AW-18397701727');
+      `}
+    </Script>
    </body>
 
       <body>
