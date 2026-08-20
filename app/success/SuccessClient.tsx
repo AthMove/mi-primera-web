@@ -37,57 +37,74 @@ export default function SuccessClient() {
       }
 
 if (response.ok && data.success && typeof window !== "undefined") {
-  const conversionPayload = {
-    send_to: "AW-18397701727/012XCIP080McEN_M2sRE",
-    value: Number(data.value || 45),
-    currency: data.currency || "EUR",
-    transaction_id:
-      data.transaction_id ||
-      data.order_id ||
-      sessionId,
-  };
+  const transactionId =
+    data.transaction_id ||
+    data.order_id ||
+    sessionId;
 
-  const trySendConversion = () => {
-    const gtag = (window as any).gtag;
+  const conversionKey = `athmov_google_ads_${transactionId}`;
 
-    if (typeof gtag !== "function") {
-      return false;
-    }
+  const alreadySent =
+    window.localStorage.getItem(conversionKey) === "sent";
 
-    console.log(
-      "GOOGLE ADS: sending conversion",
-      conversionPayload
-    );
+  if (!alreadySent) {
+    const conversionPayload = {
+      send_to: "AW-18397701727/012XCIP080McEN_M2sRE",
+      value: Number(data.value || 0),
+      currency: data.currency || "EUR",
+      transaction_id: transactionId,
+    };
 
-    gtag("event", "conversion", conversionPayload);
+    const trySendConversion = () => {
+      const gtag = (window as any).gtag;
 
-    (window as any).__athmovGoogleAdsConversionSent = true;
-
-    console.log(
-      "GOOGLE ADS: conversion sent successfully"
-    );
-
-    return true;
-  };
-
-  if (!trySendConversion()) {
-    let attempts = 0;
-
-    const interval = window.setInterval(() => {
-      attempts += 1;
-
-      const sent = trySendConversion();
-
-      if (sent || attempts >= 40) {
-        window.clearInterval(interval);
-
-        if (!sent) {
-          console.error(
-            "GOOGLE ADS: gtag was not available after 10 seconds"
-          );
-        }
+      if (typeof gtag !== "function") {
+        return false;
       }
-    }, 250);
+
+      console.log(
+        "GOOGLE ADS: sending conversion",
+        conversionPayload
+      );
+
+      gtag("event", "conversion", conversionPayload);
+
+      window.localStorage.setItem(
+        conversionKey,
+        "sent"
+      );
+
+      console.log(
+        "GOOGLE ADS: conversion sent successfully"
+      );
+
+      return true;
+    };
+
+    if (!trySendConversion()) {
+      let attempts = 0;
+
+      const interval = window.setInterval(() => {
+        attempts += 1;
+
+        const sent = trySendConversion();
+
+        if (sent || attempts >= 40) {
+          window.clearInterval(interval);
+
+          if (!sent) {
+            console.error(
+              "GOOGLE ADS: gtag was not available after 10 seconds"
+            );
+          }
+        }
+      }, 250);
+    }
+  } else {
+    console.log(
+      "GOOGLE ADS: conversion already sent",
+      transactionId
+    );
   }
 }
 
