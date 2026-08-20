@@ -37,37 +37,55 @@ export default function SuccessClient() {
       }
 
 if (response.ok && data.success && typeof window !== "undefined") {
-  const sendGoogleAdsConversion = () => {
+  const conversionPayload = {
+    send_to: "AW-18397701727/012XCIP080McEN_M2sRE",
+    value: Number(data.value || 45),
+    currency: data.currency || "EUR",
+    transaction_id:
+      data.transaction_id ||
+      data.order_id ||
+      sessionId,
+  };
+
+  const trySendConversion = () => {
     const gtag = (window as any).gtag;
 
     if (typeof gtag !== "function") {
       return false;
     }
 
-    gtag("event", "conversion", {
-      send_to: "AW-18397701727/012XCIP080McEN_M2sRE",
-      value: Number(data.value || 0),
-      currency: data.currency || "EUR",
-      transaction_id: data.transaction_id,
-    });
+    console.log(
+      "GOOGLE ADS: sending conversion",
+      conversionPayload
+    );
 
-    console.log("GOOGLE ADS PURCHASE SENT:", {
-      value: data.value,
-      currency: data.currency || "EUR",
-      transaction_id: data.transaction_id,
-    });
+    gtag("event", "conversion", conversionPayload);
+
+    (window as any).__athmovGoogleAdsConversionSent = true;
+
+    console.log(
+      "GOOGLE ADS: conversion sent successfully"
+    );
 
     return true;
   };
 
-  if (!sendGoogleAdsConversion()) {
+  if (!trySendConversion()) {
     let attempts = 0;
 
     const interval = window.setInterval(() => {
       attempts += 1;
 
-      if (sendGoogleAdsConversion() || attempts >= 20) {
+      const sent = trySendConversion();
+
+      if (sent || attempts >= 40) {
         window.clearInterval(interval);
+
+        if (!sent) {
+          console.error(
+            "GOOGLE ADS: gtag was not available after 10 seconds"
+          );
+        }
       }
     }, 250);
   }
