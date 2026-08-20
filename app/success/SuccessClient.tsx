@@ -36,16 +36,40 @@ export default function SuccessClient() {
         console.log("VERIFY SESSION ERROR:", data.error || data);
       }
 
-      if (response.ok && data.success && typeof window !== "undefined") {
-  const gtag = (window as any).gtag;
+if (response.ok && data.success && typeof window !== "undefined") {
+  const sendGoogleAdsConversion = () => {
+    const gtag = (window as any).gtag;
 
-  if (typeof gtag === "function") {
+    if (typeof gtag !== "function") {
+      return false;
+    }
+
     gtag("event", "conversion", {
       send_to: "AW-18397701727/012XCIP080McEN_M2sRE",
+      value: Number(data.value || 0),
+      currency: data.currency || "EUR",
+      transaction_id: data.transaction_id,
+    });
+
+    console.log("GOOGLE ADS PURCHASE SENT:", {
       value: data.value,
       currency: data.currency || "EUR",
       transaction_id: data.transaction_id,
     });
+
+    return true;
+  };
+
+  if (!sendGoogleAdsConversion()) {
+    let attempts = 0;
+
+    const interval = window.setInterval(() => {
+      attempts += 1;
+
+      if (sendGoogleAdsConversion() || attempts >= 20) {
+        window.clearInterval(interval);
+      }
+    }, 250);
   }
 }
 
