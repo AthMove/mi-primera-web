@@ -338,14 +338,6 @@ const getConditionLabel = (condition?: string) => {
 };
 
 const buyNow = async () => {
-  const testCheckout =
-    typeof window !== "undefined" &&
-    new URLSearchParams(window.location.search).get("testCheckout") === "1";
-
-  if (!testCheckout) {
-    setShowLaunchModal(true);
-    return;
-  }
 
   if (!producto) return;
 
